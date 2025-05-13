@@ -1,0 +1,3 @@
+# Ignore all input/output data and results
+data/
+results/
