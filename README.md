@@ -22,22 +22,24 @@ An bioinformatics pipeline for calling somatic mutations in sequenced CODEC libr
 ├── config
 │
 ├── data
-│   ├── bed                 # Bed files
-│   ├── cand_germ_vcf       # Candidate germline mutations for matched samples
-│   ├── cand_som_vcf        # Candidate somatic mutations called from experimental samples
-│   ├── demux_fq_ex         # Demultiplexed FASTQ files for experimental samples
-│   ├── demux_fq_ms         # Demultiplexed FASTQ files for matched samples
-│   ├── dsc_ex              # Double strand consensuses for experimental samples
-│   ├── filt_germ_vcf       # Filtered germline mutations for matched samples
-│   ├── filt_som_vcf        # Filtered somatic mutations for experimental samples
-│   ├── personal_refs       # Personalised reference genomes generated from matched samples
-│   ├── pon                 # Pannel of normals
-│   ├── proc_fq_ex          # Trimmed and filtered FASTQ files for experimental samples
-│   ├── proc_fq_ms          # Trimmed and filtered FASTQ files for matched samples
-│   ├── raw_bam_ex          # Raw alignments for experimental samples
-│   ├── raw_bam_ms          # Raw alignments for matched samples
-│   ├── raw_fq_ex           # Raw FASTQ files for experimental samples
-│   └── ssc_ex              # Single strand conensuses for experimental samples
+│   ├── combined_bed        # All regions to mask
+│   ├── ex_cand_vcf         # Candidate somatic mutations for experimental samples
+│   ├── ex_demux_fq         # Demultiplexed FASTQ files for experimental samples
+│   ├── ex_dsc_bam          # Double stranded consensus for experimental samples
+│   ├── ex_filt_vcf         # Filtered somatic mutations for experimental samples
+│   ├── ex_proc_fq          # Trimmed and quality filtered FASTQ files for experimental samples
+│   ├── ex_raw_bam          # Raw alignments for experimental samples
+│   ├── ex_raw_fq           # Raw FASTQ files for experimental samples
+│   ├── ex_ssc_bam          # Single stranded consensus for experimental samples
+│   ├── ms_cand_vcf         # Candidate germline mutatations for matched samples
+│   ├── ms_demux_fq         # Demultiplexed FASTQ files for matched samples
+│   ├── ms_filt_vcf         # Filtered germline mutations for matched samples
+│   ├── ms_hetero_bed       # All heterozygous regions masked
+│   ├── ms_lowdepth_bed     # All low depth regions masked
+│   ├── ms_proc_fq          # Trimmed and quality filtered FASTQ files for matched samples
+│   ├── ms_raw_bam          # Raw alignments for matched samples
+│   ├── personal_ref_fa     # Personalised refernces created for each sample
+│   └── pon_vcf             # Pannel of normals
 │
 ├── rules
 │               
