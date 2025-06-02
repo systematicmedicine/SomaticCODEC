@@ -34,10 +34,10 @@ rule all:
         "metrics/demux_metrics.json",
         "metrics/sample_readcounts_metrics.txt",
         "metrics/batchcontamination_metrics.txt",
-        "exp_correctproduct_metrics/correctproduct_metrics.txt",
-        "exp_duplication_metrics/duplication_metrics.txt",
-        expand("tmp/{sample}/{sample}_r1_raw.fastq.gz", sample=sample_names),
-        expand("tmp/{sample}/{sample}_r2_raw.fastq.gz", sample=sample_names),
+        "metrics/correctproduct_metrics.txt",
+        "metrics/duplication_metrics.txt",
+        expand("tmp/{sample}_r1_raw.fastq.gz", sample=sample_names),
+        expand("tmp/{sample}_r2_raw.fastq.gz", sample=sample_names),
         expand("tmp/{sample}/{sample}_r1_trim.fastq.gz", sample=sample_names),
         expand("tmp/{sample}/{sample}_r2_trim.fastq.gz", sample=sample_names),
         expand("metrics/{sample}/{sample}_trim_metrics.txt", sample=sample_names),
@@ -100,8 +100,8 @@ rule exp_demux:
         r1_start = "tmp/r1start.fasta",
         r2_start = "tmp/r2start.fasta"
     output:
-        demuxed_r1 = temp(expand("tmp/{sample}/{sample}_r1_raw.fastq.gz", sample=sample_names)),
-        demuxed_r2 = temp(expand("tmp/{sample}/{sample}_r2_raw.fastq.gz", sample=sample_names)),
+        demuxed_r1 = temp(expand("tmp/{sample}_r1_raw.fastq.gz", sample=sample_names)),
+        demuxed_r2 = temp(expand("tmp/{sample}_r2_raw.fastq.gz", sample=sample_names)),
         report = "metrics/demux_metrics.txt",
         json = "metrics/demux_metrics.json"
     threads:
@@ -130,8 +130,8 @@ rule exp_demux:
 
 rule exp_trim:
     input:
-        r1 = "tmp/{sample}/{sample}_r1_raw.fastq.gz",
-        r2 = "tmp/{sample}/{sample}_r2_raw.fastq.gz",
+        r1 = "tmp/{sample}_r1_raw.fastq.gz",
+        r2 = "tmp/{sample}_r2_raw.fastq.gz",
         r1_end = "tmp/r1end.fasta",
         r2_end = "tmp/r2end.fasta"
     output:
@@ -426,9 +426,9 @@ rule exp_sscdepth_metrics:
     
 rule exp_duplication_metrics:
     input:
-        expand("tmp/{sample}/{sample}_map_umi3_metrics.txt", sample=sample_names)
+        expand("metrics/{sample}/{sample}_map_umi3_metrics.txt", sample=sample_names)
     output:
-        "exp_duplication_metrics/duplication_metrics.txt"
+        "metrics/duplication_metrics.txt"
     script:
         "scripts/duplication.py"
 
@@ -438,7 +438,7 @@ rule exp_correctproduct_metrics:
         trim_reports = expand("metrics/{sample}/{sample}_trimfilter_metrics.json", sample=sample_names),
         flagstats = expand("metrics/{sample}/{sample}_map_metrics.txt", sample=sample_names)
     output:
-        "exp_correctproduct_metrics/correctproduct_metrics.txt"
+        "metrics/correctproduct_metrics.txt"
     params:
         samples = sample_names
     script:
