@@ -18,8 +18,9 @@ ncores = config["ncores"]
 # Load sample metadata
 inputdata = pd.read_csv(inputdata_file, sep="\t")
 sample_names = list(inputdata["samplename"])
-all_index_names = set(record.id for record in SeqIO.parse(r1start, "fasta"))
-unused_indexes = sorted(all_index_names - set(sample_names))
+used_indexes = list(inputdata["sample"])
+all_indexes = set(record.id for record in SeqIO.parse(r1start, "fasta"))
+unused_indexes = sorted(all_indexes - set(used_indexes))
 raw_fastq1 = inputdata.iloc[0]["fastq1"]
 raw_fastq2 = inputdata.iloc[0]["fastq2"]
 

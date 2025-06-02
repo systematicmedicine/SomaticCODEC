@@ -1,26 +1,34 @@
-FROM ubuntu:24.04.1
-WORKDIR /work
+FROM ubuntu:24.04
 
-# Avoid prompts during package installs
+# Set working directory (overridden later to /work)
+WORKDIR /root
+
+# Avoid interactive prompts during package installs
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Set PATH for conda and conda env
 ENV PATH="/opt/conda/bin:/opt/conda/envs/codec-env/bin:/root/.cargo/bin:$PATH"
+
+# Use bash as default shell
+SHELL ["/bin/bash", "-c"]
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    wget curl git nano awscli \
+    wget curl git nano python3-pip \
     ca-certificates bzip2 liblzma-dev zlib1g-dev libbz2-dev \
     build-essential \
+ && pip install --break-system-packages awscli \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
-    bash miniconda.sh -b -p /opt/conda --no-default-packages && \
-    rm miniconda.sh
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_24.1.2-0-Linux-x86_64.sh -O miniconda.sh && \
+    bash miniconda.sh -b -p /opt/conda && \
+    rm miniconda.sh && \
+    /opt/conda/bin/conda init bash
 
 # Create and populate conda environment
-RUN conda create -y -n codec-env python=3.9 && \
-    /opt/conda/envs/codec-env/bin/conda install -y -c conda-forge -c bioconda \
-        bwa \
+RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
+    /opt/conda/bin/conda run -n codec-env conda install -y -c conda-forge -c bioconda \
         bwa-mem2 \
         samtools \
         fgbio \
@@ -44,5 +52,15 @@ RUN conda create -y -n codec-env python=3.9 && \
         umi_tools \
         graphviz \
         python-graphviz \
-        perl \
- && conda clean -afy
+        perl && \
+    /opt/conda/bin/conda clean -afy
+
+# Auto-activate codec-env when bash starts
+RUN echo "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env" >> ~/.bashrc
+
+# Declare volume and set default working directory
+VOLUME ["/work"]
+WORKDIR /work
+
+# Default command: activate env and launch bash
+CMD ["bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env && exec bash"]
