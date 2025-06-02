@@ -1,0 +1,14 @@
+---
+cwd: ../
+tmpdir: ../tmp
+ref: ../tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
+region_bed: ../tmp/reference/GRCh38_notinalldifficultregions.bed
+region_interval_list: ../tmp/reference/GRCh38_notinalldifficultregions.interval_list
+dbsnp: ../tmp/reference/common_all_20180418_with_chr.vcf.gz
+ref_dict: ../tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.dict
+input_meta: input.tsv
+r1start: r1start.fasta
+r2start: r2start.fasta
+r1end: r1end.fasta
+r2end: r2end.fasta
+ncores: 6
