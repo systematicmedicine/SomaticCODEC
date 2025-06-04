@@ -34,6 +34,8 @@ RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
         samtools \
         fgbio \
         picard \
+        gatk4 \
+        bcftools \
         pandas \
         seaborn \
         pysam \
