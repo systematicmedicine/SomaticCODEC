@@ -1,24 +1,8 @@
 
 """
---- Snakefile ---
+--- Snakefile_dev_JJ ---
 
-Top-level Snakefile that runs entire pipeline.
-All rules (except rule all) are defined in .smk files in /rules directory.
-
-Inputs: 
-    - Raw FASTQ files of Illumina sequenced CODEC libraries
-    - Raw FASTQ files of Illumina sequenced matched samples
-    - Reference files (e.g. GRCh38)
-
-Outputs:
-    - Called somatic variants
-    - Metrics files
-
-Authors:
-    - James Phie
-    - Cameron Fraser
-    - Joshua Johnstone
-    - Benjamin Barry
+Temporary Snakefile for use during pipeline development
 
 """
 
