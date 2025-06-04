@@ -23,12 +23,13 @@ Authors:
 """
 
 # Load libraries
-
 import pandas as pd
 from Bio import SeqIO
 
-# Include rules files
+# Set working directory
+workdir: config["cwd"]
 
+# Include rules files
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_ssc.smk"
@@ -40,33 +41,10 @@ include: "rules/ms_call_germ.smk"
 include: "rules/ms_personal_ref.smk"
 include: "rules/masked_regions.smk"
 
-# Load config
-
-workdir: config["cwd"]
-REF = config['ref']
-EVAL_REGION_BED = config['region_bed']
-EVAL_REGION_IL = config['region_interval_list']
-DBSNP = config['dbsnp']
-tmpdir = config['tmpdir']
-inputdata_file = config["input_meta"]
-r1start = config["r1start"]
-r2start = config["r2start"]
-r1end = config["r1end"]
-r2end = config["r2end"]
-ncores = config["ncores"]
-
-# Load sample metadata
-
-inputdata = pd.read_csv(inputdata_file, sep="\t")
-sample_names = list(inputdata["samplename"])
-used_indexes = list(inputdata["sample"])
-all_indexes = set(record.id for record in SeqIO.parse(r1start, "fasta"))
-unused_indexes = sorted(all_indexes - set(used_indexes))
-raw_fastq1 = inputdata.iloc[0]["fastq1"]
-raw_fastq2 = inputdata.iloc[0]["fastq2"]
+# Load sample list
+sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 
 # Rule all defines all the output that the pipeline will create
-
 rule all:
     input:
         expand("tmp/{sample}/{sample}_map_ssc_anno.bam", sample=sample_names),
@@ -86,25 +64,3 @@ rule all:
         expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.txt", sample=sample_names),
         expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.pdf", sample=sample_names),
         expand("metrics/{sample}/{sample}_ssc_depth_metrics.txt", sample=sample_names)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

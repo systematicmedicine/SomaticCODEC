@@ -10,6 +10,9 @@ Author: James Phie
 
 """
 
+# Load sample metadata
+sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
+
 rule exp_umitag:
     input:
         bam = "tmp/{sample}/{sample}_map.bam"

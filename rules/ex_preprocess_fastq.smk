@@ -9,6 +9,13 @@ Output: Fully processed FASTQ files ready for alignment
 Author: James Phie
 
 """
+# Load sample metadata
+sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
+used_indexes = list(pd.read_csv(config["ex_samples"])["sample"])
+all_indexes = set(record.id for record in SeqIO.parse(r1start, "fasta"))
+unused_indexes = sorted(all_indexes - set(used_indexes))
+raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
+raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
 
 # Replace default index names with experiment specific sample names as defined in the input.tsv
 rule ex_namesamples:

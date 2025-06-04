@@ -10,6 +10,9 @@ Author: James Phie
 
 """
 
+# Load sample metadata
+sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
+
 # Creates an aligned bam from trimmed and filtered fastq files. Softclipping allowed.
 rule ex_align:
     input:
@@ -20,7 +23,7 @@ rule ex_align:
     threads: 
         ncores
     params:
-        reference = REF,
+        reference = config["ref"],
     shell:
         """
         #0x2 flag calculated based on ... first 256k high-confidence read pairs, >~500bp gap between R1R2 not properly paired
