@@ -30,6 +30,7 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_24.1.2-0-Linux-x86_
 RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
     /opt/conda/bin/conda run -n codec-env conda install -y -c conda-forge -c bioconda \
         bwa-mem2 \
+        tmux \
         samtools \
         fgbio \
         picard \
