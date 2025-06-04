@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv(snakemake.input.mapping, sep="\t")
+df = pd.read_csv(snakemake.input.mapping)
 name_map = dict(zip(df["sample"], df["samplename"]))
 
 def rename(infasta, outfasta):

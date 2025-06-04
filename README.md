@@ -89,30 +89,21 @@ source ~/.bashrc
   ```
 
 #### Modify config files
-* config/input.tsv:
+* config/ex_samples.csv (for codec samples):
   * The 'samples' column should only include the indices being used (must follow the indices naming system Sample01, Sample02, Sample03, Sample04 .. Sample12)
   * The 'samplename' column should match the actual samples being run to the sample indices used (e.g. buffycoat1.1, buffycoat1.2, buffycoat2.1, etc.)
-    * Note that experimental samples will have a different name to reference samples from the same donors. 'samplename' may need to be changed to 'exp_samplename', and a column should be added for reference samples.
   * Contamination data will be generated on any indices not included in this list.
-  
 * Modify config.yaml to match the number of cores on the system (e.g. increase to 96 cores if running on a 96 core EC2 instance). 
 * Other file paths should not need to be modified, regardless of chosen repository name.
 
-#### Activate docker
-* In the repository directory:
+#### Activate tmux and docker
+* Build docker
 
 ```bash
 docker build -t codec .
 ```
 
-```bash
-docker run -it --rm \
-  -v ~/<folder>/<repo_name>:/work \
-  codec
-```
-## Running the Snakefile
-
-* Set up tmux session (in this example, the session is called pipeline, but it can be called anything)
+* Set up a tmux session (in this example, the session is called pipeline, but it can be called anything)
 
   ```bash
   tmux new -s pipeline
@@ -127,6 +118,14 @@ docker run -it --rm \
 ```bash
 tmux attach -t pipeline
 ```
+* In the tmux session, run docker:
+
+```bash
+docker run -it --rm \
+  -v ~/<folder>/<repo_name>:/work \
+  codec
+```
+## Running the Snakefile
   
 * Run snakemake
   ```bash

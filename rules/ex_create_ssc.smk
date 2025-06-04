@@ -19,7 +19,7 @@ rule exp_umitag:
     output:
         bam = temp("tmp/{sample}/{sample}_map_umi1.bam")
     threads:
-        ncores
+        config['ncores']
     resources:
         mem = 32
     shell:
@@ -53,7 +53,7 @@ rule exp_groupbyumi:
         bam = temp("tmp/{sample}/{sample}_map_umi3.bam"),
         histogram = "metrics/{sample}/{sample}_map_umi3_metrics.txt"
     threads:
-        ncores
+        config['ncores']
     resources:
         mem = 32
     shell:
@@ -115,9 +115,9 @@ rule exp_map_ssc:
     output:
         bam = temp("tmp/{sample}/{sample}_map_ssc.bam")
     threads: 
-        ncores
+        config['ncores']
     params:
-        reference = REF,
+        reference = config['ref'],
     shell:
         """
         samtools fastq {input.bam} \
@@ -137,14 +137,14 @@ rule exp_zipdata:
         bam = temp("tmp/{sample}/{sample}_map_ssc_anno.bam"),
         bai = temp("tmp/{sample}/{sample}_map_ssc_anno.bam.bai")
     params:
-        reference = REF,
+        reference = config['ref'],
     resources:
         mem = 4,
     threads:
-        ncores
+        config['ncores']
     shell:
         """
-        fgbio -Xmx{resources.mem}g -Djava.io.tmpdir={tmpdir} \
+        fgbio -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
             --compression 0 --async-io ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
@@ -164,10 +164,9 @@ rule exp_sscinsert_metrics:
         mem = 32
     shell:
         """
-        mkdir -p {tmpdir}
         picard \
             -Xmx{resources.mem}g \
-            -Djava.io.tmpdir={tmpdir} \
+            -Djava.io.tmpdir=tmp \
             CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.txt} \
@@ -183,12 +182,12 @@ rule exp_sscdepth_metrics:
     output:
         metrics = "metrics/{sample}/{sample}_ssc_depth_metrics.txt",
     params:
-        ref = REF,
+        ref = config['ref'],
     resources:
         mem = 30,
     shell:
         """
-        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp/picard \
+        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
             CollectWgsMetrics \
             I={input.bam} \
             O={output.metrics} \
@@ -203,4 +202,4 @@ rule exp_duplication_metrics:
     output:
         "metrics/duplication_metrics.txt"
     script:
-        "scripts/duplication.py"
+        "../scripts/duplication.py"

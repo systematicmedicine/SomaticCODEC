@@ -12,7 +12,7 @@ Author: James Phie
 # Load sample metadata
 sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 used_indexes = list(pd.read_csv(config["ex_samples"])["sample"])
-all_indexes = set(record.id for record in SeqIO.parse(r1start, "fasta"))
+all_indexes = set(record.id for record in SeqIO.parse(config["r1start"], "fasta"))
 unused_indexes = sorted(all_indexes - set(used_indexes))
 raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
 raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
@@ -20,18 +20,18 @@ raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
 # Replace default index names with experiment specific sample names as defined in the input.tsv
 rule ex_namesamples:
     input:
-        r1start=r1start,
-        r1end=r1end,
-        r2start=r2start,
-        r2end=r2end,
-        mapping=inputdata_file,
+        r1start=config['r1start'],
+        r1end=config['r1end'],
+        r2start=config['r2start'],
+        r2end=config['r2end'],
+        mapping=config['ex_samples'],
     output:
         r1start_out="tmp/r1start.fasta",
         r1end_out="tmp/r1end.fasta",
         r2start_out="tmp/r2start.fasta",
         r2end_out="tmp/r2end.fasta"
     script:
-        "scripts/samplenames.py"
+        "../scripts/samplenames.py"
 
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
@@ -66,7 +66,7 @@ rule ex_demux:
         report = "metrics/demux_metrics.txt",
         json = "metrics/demux_metrics.json"
     threads:
-        ncores
+        config['ncores']
     shell:
         """
         #Trim the UMI (first 3 bases) of each read and append to read name
@@ -102,7 +102,7 @@ rule ex_trim:
         report = "metrics/{sample}/{sample}_trim_metrics.txt",
         json = "metrics/{sample}/{sample}_trim_metrics.json"
     threads:
-        ncores
+        config['ncores']
     shell:
         """
         #Trim 1bp from 5' end (T from ligation)
@@ -133,7 +133,7 @@ rule ex_trimfilter:
         report = "metrics/{sample}/{sample}_trimfilter_metrics.txt",
         json = "metrics/{sample}/{sample}_trimfilter_metrics.json"
     threads:
-        ncores
+        config['ncores']
     shell:  
         """
         #Trim 8 bases from 3' end of read 1 and read 2 to remove any remaining short (<7bp) sample indices.
@@ -168,8 +168,8 @@ rule ex_fastqctrim_metrics:
         fastqc {input.fastq1} -o metrics/{wildcards.sample}
         fastqc {input.fastq2} -o metrics/{wildcards.sample}
 
-        mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
-        mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
+        mv metrics/{wildcards.sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
+        mv metrics/{wildcards.sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
         """
 
 # Custom python script to assess demultiplexing. 
@@ -179,10 +179,10 @@ rule ex_rawreadcounts_metrics:
     output:
         readcounts = "metrics/sample_readcounts_metrics.txt"
     params:
-        fasta = r1start,
+        fasta = config['r1start'],
         used = sample_names
     script:
-        "scripts/rawreadcounts.py"
+        "../scripts/rawreadcounts.py"
 
 # Custom python script to assess how many unused indices were detected from other experiments (similar metrics to rawreadcounts). This should always be 0. 
 rule ex_batchcontamination_metrics:
@@ -191,7 +191,7 @@ rule ex_batchcontamination_metrics:
     output:
         contamination = "metrics/batchcontamination_metrics.txt"
     params:
-        fasta = r1start,
+        fasta = config['r1start'],
         used = sample_names
     script:
-        "scripts/batchcontamination.py"
+        "../scripts/batchcontamination.py"

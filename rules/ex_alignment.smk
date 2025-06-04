@@ -21,7 +21,7 @@ rule ex_align:
     output:
         bam = temp("tmp/{sample}/{sample}_map.bam")
     threads: 
-        ncores
+        config['ncores']
     params:
         reference = config["ref"],
     shell:
@@ -58,4 +58,4 @@ rule ex_correctproduct_metrics:
     params:
         samples = sample_names
     script:
-        "scripts/correctproduct.py"
+        "../scripts/correctproduct.py"
