@@ -129,8 +129,6 @@ rule exp_map_ssc:
         config['ncores']
     params:
         reference = config['ref'],
-    resources:
-        map_ssc_jobs=1
     shell:
         """
         set -o pipefail
