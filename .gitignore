@@ -7,3 +7,10 @@
 # Intermediate files generated while running pipeline
 tmp/*
 !tmp/.gitkeep
+
+# During development, dont push results and metrics files to remote repo
+results/*
+!results/.gitkeep
+
+metrics/*
+!metrics/.gitkeep
