@@ -7,6 +7,7 @@ Input: ...
 Output: ...
 
 Author: Ben Barry
+Dev Status: not operational
 
 """
 
@@ -58,7 +59,8 @@ rule ms_alignment_metrics:
         samtools flagstat {input.bam} > {output.stats}
         """
 
-# This needs a comment
+# using Haplotypecaller to call germline varients
+# note - here Chr is explicitly being called on to speed things up.
 rule ms_call_germ_variants:
     input:
         bam=rules.ms_sort_bam.output.bam,
@@ -71,7 +73,7 @@ rule ms_call_germ_variants:
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            -L chr1 \
+            -L chr1 \ 
             
         """
 #rule all:
