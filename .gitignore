@@ -1,8 +1,9 @@
-# Ignore runtime temp directory
-tmp/
-
 # Snakemake temporary and metadata files
 .snakemake/
 *.snakemake.*
 *.snakemake-tmp*
 *.snakemake-tmp/
+
+# Intermediate files generated while running pipeline
+tmp/*
+!tmp/.gitkeep
