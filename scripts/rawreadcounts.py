@@ -1,3 +1,15 @@
+"""
+--- rawreadcounts.py ---
+
+Brief description
+
+More detailed paragrph (optional)
+
+Author: James Phie
+Date: 
+
+"""
+
 import json
 from Bio import SeqIO
 
