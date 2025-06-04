@@ -26,13 +26,15 @@ rule ex_align:
         reference = config["ref"],
     shell:
         """
-        #0x2 flag calculated based on ... first 256k high-confidence read pairs, >~500bp gap between R1R2 not properly paired
+        set -o pipefail
+
         bwa-mem2 mem \
             -t {threads} \
             -Y \
-            {params.reference} {input.fastq1} {input.fastq2} | \
-        samtools view -o {output.bam}
+            {params.reference} {input.fastq1} {input.fastq2} \
+        | samtools view -bS -o {output.bam}
         """
+
 
 # Collects alignment metrics from the aligned bam using samtools flagstat
 rule ex_map_metrics:

@@ -9,7 +9,6 @@ Output: Same as input, but PCR duplicates collapsed
 Author: James Phie
 
 """
-
 # Load sample metadata
 sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 
@@ -109,24 +108,39 @@ rule exp_addrg:
             VALIDATION_STRINGENCY=LENIENT
         """
 
-rule exp_map_ssc:
+rule exp_bam_to_fastq:
     input:
         bam = "tmp/{sample}/{sample}_unmap_ssc_rg.bam"
+    output:
+        fastq = temp("tmp/{sample}/{sample}_ssc.fastq")
+    threads:
+        1
+    shell:
+        """
+        samtools fastq {input.bam} > {output.fastq}
+        """
+
+rule exp_map_ssc:
+    input:
+        fastq = "tmp/{sample}/{sample}_ssc.fastq",
     output:
         bam = temp("tmp/{sample}/{sample}_map_ssc.bam")
     threads: 
         config['ncores']
     params:
         reference = config['ref'],
+    resources:
+        map_ssc_jobs=1
     shell:
         """
-        samtools fastq {input.bam} \
-        | bwa-mem2 mem \
+        set -o pipefail
+
+        bwa-mem2 mem \
         -t {threads} \
         -p \
         -Y \
-        {params.reference} - \
-        | samtools view -b - -o {output}
+        {params.reference} {input.fastq} \
+        | samtools view -bS - -o {output}
         """
 
 rule exp_zipdata: 
