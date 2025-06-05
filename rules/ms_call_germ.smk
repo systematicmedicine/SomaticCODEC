@@ -11,7 +11,8 @@ Dev Status: not operational
 
 """
 
-# this rule is purely for dev purposes to make the pipeline fast locally
+#this rule is purely for dev purposes to make the pipeline fast locally
+
 rule slice_bam_region:
     input:
         bam="tmp/data/raw/Sample01_map_ssc_anno_chr1.bam"
@@ -74,10 +75,27 @@ rule ms_call_germ_variants:
             -I {input.bam} \
             -O {output.vcf} \
             -L chr1 \ 
-            
+
         """
-#rule all:
-#    input:
- #       "tmp/data/processed/Sample01_sort.bam",
-  #      "tmp/data/processed/Sample01_chr1_flagstat.txt",
-   #     "tmp/data/processed/Sample01_chr1.vcf.gz"
+# intial hard filtering params
+#note: these are the most basic parameters
+rule Hard_filter_variants:
+    input:
+        vcf= rules.ms_call_germ_variants.output.vcf,
+        ref="tmp/data/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
+    output:
+        vcf="tmp/data/processed/Sample01_hardFilter.vcf"
+    shell:
+        """
+        gatk VariantFiltration \
+        -V {input.vcf} \
+        -filter "QD < 2.0" --filter-name "QD2" \
+        -filter "QUAL < 30.0" --filter-name "QUAL30" \
+        -filter "SOR > 3.0" --filter-name "SOR3" \
+        -filter "FS > 60.0" --filter-name "FS60" \
+        -filter "MQ < 40.0" --filter-name "MQ40" \
+        -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
+        -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
+        -O {output.vcf}
+        """    
+

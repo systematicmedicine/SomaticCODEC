@@ -14,8 +14,6 @@ sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 used_indexes = list(pd.read_csv(config["ex_samples"])["sample"])
 all_indexes = set(record.id for record in SeqIO.parse(config["r1start"], "fasta"))
 unused_indexes = sorted(all_indexes - set(used_indexes))
-raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
-raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
 
 # Replace default index names with experiment specific sample names as defined in ex_samples.csv
 rule ex_namesamples:
@@ -36,8 +34,8 @@ rule ex_namesamples:
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
-        fastq1 = raw_fastq1,
-        fastq2 = raw_fastq2
+        fastq1 = ex_raw_fastq1,
+        fastq2 = ex_raw_fastq2
     output:
         fastqc_report1 = "metrics/r1_fastqc_raw_metrics.html",
         fastqc_report2 = "metrics/r2_fastqc_raw_metrics.html"
@@ -56,8 +54,8 @@ rule ex_fastqcraw_metrics:
 # Removes first 3bp of R1 and R2 to read name as 6 base UMI. Demultiplexes using R1 and R2 5' sample indices (both must agree). Trims 5' sample indices. 
 rule ex_demux:
     input:
-        fastq1 = raw_fastq1,
-        fastq2 = raw_fastq2,
+        fastq1 = ex_raw_fastq1,
+        fastq2 = ex_raw_fastq2,
         r1_start = "tmp/r1start.fasta",
         r2_start = "tmp/r2start.fasta"
     output:
