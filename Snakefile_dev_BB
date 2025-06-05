@@ -12,7 +12,7 @@ Temporary Snakefile for use during pipeline development
 # Include rules files
 
 include: "rules/ms_call_germ.smk"
-
+include: "rules/ms_personal_ref.smk"
 
 # hardcoded conifg (later will merge into config.yaml)
 
@@ -25,8 +25,8 @@ include: "rules/ms_call_germ.smk"
 
 rule all:
     input:
-        rules.ms_call_germ_variants.output.vcf
-
+        rules.Hard_filter_variants.output.vcf,
+        rules.ms_generate_reference.output.fasta
 
 
 
