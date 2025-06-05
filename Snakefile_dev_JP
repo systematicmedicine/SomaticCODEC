@@ -37,6 +37,7 @@ from Bio import SeqIO
 workdir: config["cwd"]
 
 # Include rules files
+include: "rules/download_data.smk"
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_ssc.smk"
