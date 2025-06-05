@@ -4,73 +4,69 @@
 
 Temporary Snakefile for use during pipeline development
 
+Runs matched sample pipeline from demuxed FASTQs to raw alignment
+
+Input: Demuxed FASTQ files generated from Illumina sequencing of Illumina PCR-free libraries 
+Output: 
+    - ms raw alignment BAM
+    - Metrics files
+
+Author: Joshua Johnstone
+
 """
 
 # Load libraries
 
-import pandas as pd
-from Bio import SeqIO
+#import pandas as pd
+#from Bio import SeqIO
+
+# Hard-code paths for example data and reference
+sample = "ERR274697_subset"
+ref = "tmp/ref/chr21.fa"
 
 # Include rules files
 
-include: "rules/ex_preprocess_fastq.smk"
-include: "rules/ex_alignment.smk"
-include: "rules/ex_create_ssc.smk"
-include: "rules/ex_create_dsc.smk"
-include: "rules/ex_call_somatic.smk"
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
-include: "rules/ms_call_germ.smk"
-include: "rules/ms_personal_ref.smk"
 include: "rules/masked_regions.smk"
 
 # Load config
 
-workdir: config["cwd"]
-REF = config['ref']
-EVAL_REGION_BED = config['region_bed']
-EVAL_REGION_IL = config['region_interval_list']
-DBSNP = config['dbsnp']
-tmpdir = config['tmpdir']
-inputdata_file = config["input_meta"]
-r1start = config["r1start"]
-r2start = config["r2start"]
-r1end = config["r1end"]
-r2end = config["r2end"]
-ncores = config["ncores"]
+# workdir: config["cwd"]
+# REF = config['ref']
+# EVAL_REGION_BED = config['region_bed']
+# EVAL_REGION_IL = config['region_interval_list']
+# DBSNP = config['dbsnp']
+# tmpdir = config['tmpdir']
+# inputdata_file = config["input_meta"]
+# r1start = config["r1start"]
+# r2start = config["r2start"]
+# r1end = config["r1end"]
+# r2end = config["r2end"]
+# ncores = config["ncores"]
 
 # Load sample metadata
 
-inputdata = pd.read_csv(inputdata_file, sep="\t")
-sample_names = list(inputdata["samplename"])
-used_indexes = list(inputdata["sample"])
-all_indexes = set(record.id for record in SeqIO.parse(r1start, "fasta"))
-unused_indexes = sorted(all_indexes - set(used_indexes))
-raw_fastq1 = inputdata.iloc[0]["fastq1"]
-raw_fastq2 = inputdata.iloc[0]["fastq2"]
+# inputdata = pd.read_csv(inputdata_file, sep="\t")
+# sample_names = list(inputdata["samplename"])
+# used_indexes = list(inputdata["sample"])
+# all_indexes = set(record.id for record in SeqIO.parse(r1start, "fasta"))
+# unused_indexes = sorted(all_indexes - set(used_indexes))
+# raw_fastq1 = inputdata.iloc[0]["fastq1"]
+# raw_fastq2 = inputdata.iloc[0]["fastq2"]
 
 # Rule all defines all the output that the pipeline will create
 
 rule all:
     input:
-        expand("tmp/{sample}/{sample}_map_ssc_anno.bam", sample=sample_names),
-        expand("tmp/{sample}/{sample}_map_ssc_anno.bam.bai", sample=sample_names),
-        "metrics/demux_metrics.txt",
-        "metrics/demux_metrics.json",
-        "metrics/sample_readcounts_metrics.txt",
-        "metrics/batchcontamination_metrics.txt",
-        "metrics/correctproduct_metrics.txt",
-        "metrics/duplication_metrics.txt",
-        expand("metrics/{sample}/{sample}_trim_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_trimfilter_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_r1_trimfilter_metrics.html", sample=sample_names),
-        expand("metrics/{sample}/{sample}_r2_trimfilter_metrics.html", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_umi3_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.pdf", sample=sample_names),
-        expand("metrics/{sample}/{sample}_ssc_depth_metrics.txt", sample=sample_names)
-
+        expand("tmp/metrics/{sample}_r1_fastqc.html", sample = sample),
+        expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample),
+        expand("tmp/data/processed/{sample}_r1.fastq", sample = sample),
+        expand("tmp/data/processed/{sample}_r1.fastq", sample = sample),
+        expand("tmp/metrics/{sample}_fastp.html", sample = sample),
+        expand("tmp/metrics/{sample}_fastp.json", sample = sample),
+        expand("tmp/metrics/{sample}_r1_fastqc.html", sample = sample),
+        expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample)
 
 
 
