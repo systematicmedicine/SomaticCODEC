@@ -20,7 +20,7 @@ rule fastqc_demuxed_FASTQ:
     output:
         r1_report = "tmp/metrics/{sample}_r1_fastqc.html",
         r2_report = "tmp/metrics/{sample}_r2_fastqc.html"
-    threads: 2
+    threads: 4
     shell:
         """
         fastqc -t {threads} -o tmp/metrics {input.r1} {input.r2}
@@ -41,7 +41,7 @@ rule trim_filter:
         r2_processed = "tmp/data/processed/{sample}_r2.fastq",
         html = "tmp/metrics/{sample}_fastp.html",
         json = "tmp/metrics/{sample}_fastp.json"
-    threads: 4
+    threads: 8
     shell: 
         """
         fastp \

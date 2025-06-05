@@ -62,11 +62,13 @@ rule all:
         expand("tmp/metrics/{sample}_r1_fastqc.html", sample = sample),
         expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample),
         expand("tmp/data/processed/{sample}_r1.fastq", sample = sample),
-        expand("tmp/data/processed/{sample}_r1.fastq", sample = sample),
+        expand("tmp/data/processed/{sample}_r2.fastq", sample = sample),
         expand("tmp/metrics/{sample}_fastp.html", sample = sample),
         expand("tmp/metrics/{sample}_fastp.json", sample = sample),
         expand("tmp/metrics/{sample}_r1_fastqc.html", sample = sample),
-        expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample)
+        expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample),
+        "tmp/ref/chr21.fa.bwt",
+        expand("tmp/results/{sample}_aligned.bam", sample = sample)
 
 
 
