@@ -193,3 +193,7 @@ docker run -it --rm -v ~/project1/codec-opensource:/work codec
   ```bash
   snakemake --configfile config/config.yaml --notemp --rerun-incomplete --cores all --stats runstats.json
   ```
+  #Example 3 (Running a dev master snakefile)
+  ```bash
+  snakemake -s Snakefile_dev_JP --configfile config/config.yaml --notemp --rerun-incomplete --cores all
+  ```
