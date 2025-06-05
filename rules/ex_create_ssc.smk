@@ -4,7 +4,7 @@
 Rules for creating a single strand consensus from aligned BAM
 
 Input: Reads aligned to reference genome (BAM), for experimental samples
-Output: Same as input, but PCR duplicates collapsed
+Output: Same as input, but PCR duplicates collapsed based on UMI to create a molecular consensus of read 1s and read 2s
 
 Author: James Phie
 
@@ -12,7 +12,7 @@ Author: James Phie
 # Load sample metadata
 sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 
-rule exp_umitag:
+rule ex_umitag:
     input:
         bam = "tmp/{sample}/{sample}_map.bam"
     output:
@@ -32,8 +32,8 @@ rule exp_umitag:
             --remove-umi true | \
         samtools sort -n -@ {threads} -o {output.bam}
         """
-
-rule exp_addmate:
+# Adds mate information to PE reads (e.g. read 1's information to read 2, read 2's information to read 1). Tags include MC:Z:, MQ:i, RNEXT, PNEXT, TLEN, FLAGs. These tags are required for groupbyUMI, SSC and DSC. 
+rule ex_addmate:
     input:
         bam = "tmp/{sample}/{sample}_map_umi1.bam"
     output:
@@ -45,7 +45,8 @@ rule exp_addmate:
         -o {output.bam}
         """
 
-rule exp_groupbyumi:
+# Uses UMI tags (RX:Z:<UMI>) to assign identical MI tags to any reads within 1 edit distance of each other, for later SSC and DSC collapse.  
+rule ex_groupbyumi:
     input:
         bam = "tmp/{sample}/{sample}_map_umi2.bam"
     output:
@@ -69,8 +70,8 @@ rule exp_groupbyumi:
             -m 0 \
             --strategy=adjacency
         """
-
-rule exp_ssc:
+# Collects a consensus of all read 1's of the same MI, and all read 2's of the same MI, to make use of PCR/optical duplicates and create a more accurate single strand consensus. Due to the changes in sequences, this bam is now unmapped and will require realignment. 
+rule ex_ssc:
     input:
         bam = "tmp/{sample}/{sample}_map_umi3.bam"
     output:
@@ -87,8 +88,8 @@ rule exp_ssc:
             --consensus-call-overlapping-bases false \
             -M 1
         """
-
-rule exp_addrg:
+# Adds read group information to the ssc bam. This information is not particularly useful, but required by downstream fgbio tools. 
+rule ex_addrg:
     input:
         bam = "tmp/{sample}/{sample}_unmap_ssc.bam"
     output:
@@ -107,8 +108,8 @@ rule exp_addrg:
             RGSM={params.sample} \
             VALIDATION_STRINGENCY=LENIENT
         """
-
-rule exp_bam_to_fastq:
+# Converts unmapped ssc bam to fastq in preparation for realignment
+rule ex_bam_to_fastq:
     input:
         bam = "tmp/{sample}/{sample}_unmap_ssc_rg.bam"
     output:
@@ -120,28 +121,41 @@ rule exp_bam_to_fastq:
         samtools fastq {input.bam} > {output.fastq}
         """
 
-rule exp_map_ssc:
+# Realigns the unmapped ssc bam. Uses BWA-mem2 with the same arguments as the original alignment, with the addition of -p to indicate the input bam is interleaved PE reads. 
+rule ex_map_ssc:
     input:
         fastq = "tmp/{sample}/{sample}_ssc.fastq",
     output:
-        bam = temp("tmp/{sample}/{sample}_map_ssc.bam")
+        sam = temp("tmp/{sample}/{sample}_map_ssc.sam")
     threads: 
         config['ncores']
     params:
         reference = config['ref'],
     shell:
         """
-        set -o pipefail
-
         bwa-mem2 mem \
         -t {threads} \
         -p \
         -Y \
         {params.reference} {input.fastq} \
-        | samtools view -bS - -o {output}
+        > {output.sam}
         """
 
-rule exp_zipdata: 
+# Creates an aligned bam from the aligned sam file output from bwa-mem2.
+rule ex_sscsamtobam:
+    input:
+        sam = "tmp/{sample}/{sample}_map_ssc.sam",
+    output:
+        bam = temp("tmp/{sample}/{sample}_map_ssc.bam")
+    threads: 
+        config['ncores']
+    shell:
+        """
+        samtools view -@ {threads} -bS -o {output.bam} {input.sam}
+        """
+
+# Adds metadata (e.g. MI, rg tags from addrg) to the mapped bam from the unmapped bam. This is required because alignment tools remove all metadata from the bam. 
+rule ex_zipdata: 
     input:
         mapped = "tmp/{sample}/{sample}_map_ssc.bam",
         unmapped = "tmp/{sample}/{sample}_unmap_ssc_rg.bam",
@@ -165,8 +179,8 @@ rule exp_zipdata:
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}
         """
-
-rule exp_sscinsert_metrics:
+# Calculates insert size (genome positions covered by R1 + R2 of each read)
+rule ex_sscinsert_metrics:
     input:
         bam = "tmp/{sample}/{sample}_map_ssc_anno.bam",
     output:
@@ -188,7 +202,8 @@ rule exp_sscinsert_metrics:
             DEVIATIONS=100
         """
 
-rule exp_sscdepth_metrics:
+# Standard WGS metrics including depth and genome territory covered, applied to the ssc bam. 
+rule ex_sscdepth_metrics:
     input:
         bam = "tmp/{sample}/{sample}_map_ssc_anno.bam",
     output:
@@ -207,8 +222,8 @@ rule exp_sscdepth_metrics:
             INCLUDE_BQ_HISTOGRAM=true \
             MINIMUM_BASE_QUALITY=30
         """
-    
-rule exp_duplication_metrics:
+# Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
+rule ex_duplication_metrics:
     input:
         expand("metrics/{sample}/{sample}_map_umi3_metrics.txt", sample=sample_names)
     output:

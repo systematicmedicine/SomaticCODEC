@@ -17,7 +17,7 @@ unused_indexes = sorted(all_indexes - set(used_indexes))
 raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
 raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
 
-# Replace default index names with experiment specific sample names as defined in the input.tsv
+# Replace default index names with experiment specific sample names as defined in ex_samples.csv
 rule ex_namesamples:
     input:
         r1start=config['r1start'],

@@ -1,9 +1,9 @@
 """
 --- ex_create_dsc.smk ---
 
-Rules for creating a double stranded consensus, for experimental samples
+Rules for creating a double stranded (duplex) consensus for experimental samples
 
-Input: Single stranded consessus
+Input: Single stranded consensus
 Output: Double stranded consensus
 
 Author: James Phie

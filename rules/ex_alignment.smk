@@ -1,9 +1,9 @@
 """
 --- ex_alignment.smk ---
 
-Rules for aligning reads to reference genome, for experimental samples
+Rules for aligning umapped, non-deduplicated reads to reference genome, for experimental samples
 
-Input: Processed FASTQ files
+Input: Processed (trimmed and length filtered) FASTQ files
 Output: Reads aligned to a reference genome (BAM) 
 
 Author: James Phie
@@ -13,28 +13,38 @@ Author: James Phie
 # Load sample metadata
 sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 
-# Creates an aligned bam from trimmed and filtered fastq files. Softclipping allowed.
-rule ex_align:
+# Creates an aligned sam from trimmed and filtered fastq files. Softclipping allowed.
+rule ex_map:
     input:
         fastq1 = "tmp/{sample}/{sample}_r1_trimfilter.fastq.gz",
         fastq2 = "tmp/{sample}/{sample}_r2_trimfilter.fastq.gz"
     output:
-        bam = temp("tmp/{sample}/{sample}_map.bam")
+        sam = temp("tmp/{sample}/{sample}_map.sam")
     threads: 
         config['ncores']
     params:
         reference = config["ref"],
     shell:
         """
-        set -o pipefail
-
         bwa-mem2 mem \
             -t {threads} \
             -Y \
             {params.reference} {input.fastq1} {input.fastq2} \
-        | samtools view -bS -o {output.bam}
+            > {output.sam}
         """
 
+# Creates an aligned bam from the aligned sam file output from bwa-mem2.
+rule ex_samtobam:
+    input:
+        sam = "tmp/{sample}/{sample}_map.sam",
+    output:
+        bam = temp("tmp/{sample}/{sample}_map.bam")
+    threads: 
+        config['ncores']
+    shell:
+        """
+        samtools view -@ {threads} -bS -o {output.bam} {input.sam}
+        """
 
 # Collects alignment metrics from the aligned bam using samtools flagstat
 rule ex_map_metrics:
