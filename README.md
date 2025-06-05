@@ -90,9 +90,7 @@ source ~/.bashrc
   sudo snap install aws-cli --classic
   ```
 
-* Download the relevant fastq files from s3 or AGRF to codec-opensource/tmp/raw
-  * Once files are downloaded to sysmed-seq-s3, the master snakefile will take care of downloads provided that the fastq folder is provided in the config.yaml
-  * Note only 1 set of codec fastqs (R1 and R2) can be used per experimental pipeline currently.
+* Fastq and reference file downloads should be performed by updating config.yaml and ex_samples.csv and running the master snakefile
 
 ### General setup (both local and EC2)
 
