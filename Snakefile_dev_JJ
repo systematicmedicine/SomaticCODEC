@@ -68,7 +68,11 @@ rule all:
         expand("tmp/metrics/{sample}_r1_fastqc.html", sample = sample),
         expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample),
         "tmp/ref/chr21.fa.bwt",
-        expand("tmp/results/{sample}_aligned.bam", sample = sample)
+        expand("tmp/results/{sample}_aligned.bam", sample = sample),
+        expand("tmp/results/{sample}_sorted.bam", sample = sample),
+        expand("tmp/metrics/{sample}_samtools_stats.txt", sample = sample),
+        expand("tmp/metrics/{sample}_insert_size_metrics.txt", sample = sample),
+        expand("tmp/metrics/{sample}_insert_size_histogram.pdf", sample = sample)
 
 
 

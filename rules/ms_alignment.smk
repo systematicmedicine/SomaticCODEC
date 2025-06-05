@@ -20,6 +20,7 @@ rule index_ref:
     shell:
         "bwa index {input.ref}"
 
+# Aligns reads to Chr21 reference
 rule raw_alignment:
     input: 
         ref = ref,
@@ -39,20 +40,46 @@ rule raw_alignment:
 
         """
 
-# rule sort_bam:
-#     input:
-#         bam = "results/{sample}_aligned.bam"
-#     output:
-#         bam_sorted =  "results/{sample}_sorted.bam"
-#     shell:
-#         "samtools sort -o {output.bam_sorted} {input.bam}"
+# Sorts bam by coordinate
+rule sort_bam:
+    input:
+        bam = "tmp/results/{sample}_aligned.bam"
+    output:
+        bam_sorted =  "tmp/results/{sample}_sorted.bam"
+    shell:
+        "samtools sort -o {output.bam_sorted} {input.bam}"
+
+# Generates alignment metrics
+
+rule alignment_metrics:
+    input:
+        bam = "tmp/results/{sample}_sorted.bam"
+    output:
+        stats = "tmp/metrics/{sample}_samtools_stats.txt",
+        insert_metrics = "tmp/metrics/{sample}_insert_size_metrics.txt",
+        insert_hist = "tmp/metrics/{sample}_insert_size_histogram.pdf"
+    shell:
+        """
+        # Generate alignment stats
+        samtools stats {input.bam} > {output.stats}
+
+        # Collect insert size metrics
+        # M = 0.5 means 50% of reads must fall within the insert size peak to generate metrics
+        picard CollectInsertSizeMetrics \
+            I = {input.bam} \
+            O = {output.insert_metrics} \
+            H = {output.insert_hist} \
+            M = 0.5
+            
+        """ 
+
 
 # rule mark_duplicates:
 #     input:
-#         bam_sorted = "results/{sample}_sorted.bam"
+#         bam_sorted = "tmp/results/{sample}_sorted.bam"
 #     output:
-#         bam_markdup = "results/{sample}_markdup.bam",
-#         metrics = "results/{sample}_markdup_metrics.txt"
+#         bam_markdup = "tmp/results/{sample}_markdup.bam",
+#         metrics = "tmp/results/{sample}_markdup_metrics.txt"
 #     shell:
 #         "picard MarkDuplicates "
 #         "I={input.bam_sorted} "
