@@ -36,9 +36,9 @@ from Bio import SeqIO
 # Set working directory
 workdir: config["cwd"]
 
-# Set fastq file paths (dynamic)
-raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
-raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
+# Set codec/experimental fastq file paths (dynamic)
+ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
+ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
 
 # Include rules files
 include: "rules/download_data.smk"

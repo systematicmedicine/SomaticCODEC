@@ -32,12 +32,12 @@ rule download_reference_files:
         """
 
 
-rule download_raw_fastq:
+rule download_ex_raw_fastq:
     params:
         fastqfolder = config["s3seq_fastq_folder"]
     output:
-        raw_fastq1,
-        raw_fastq2
+        ex_raw_fastq1,
+        ex_raw_fastq2
     shell:
         """
         mkdir -p tmp/raw
