@@ -16,7 +16,6 @@ sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 # Creates an aligned sam from trimmed and filtered fastq files. Softclipping allowed.
 rule ex_map:
     input:
-        "tmp/reference/.complete"
         fastq1 = "tmp/{sample}/{sample}_r1_trimfilter.fastq.gz",
         fastq2 = "tmp/{sample}/{sample}_r2_trimfilter.fastq.gz"
     output:
