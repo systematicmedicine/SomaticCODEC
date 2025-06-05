@@ -1,3 +1,16 @@
+"""
+--- correctproduct.py ---
+
+To be considered a CODECseq correct product, the following criteria must be met:
+1. Read 1 and read 2 both present at >minimum insert size (typically 70bp, set in ex_preprocess_fastq.smk, rule ex_trimfilter)
+2. Read 1 and read 2 align to the same chromosome, with the start of read 1 being within ~500 base pairs of the end of read 2 (determined in rule ex_map, 'properly paired')
+3. Read 1 and read 2 are read in the expected direction
+
+A large proportion (>20%) of CODECseq byproducts are expected to be intermolecular byproducts, where a different dsDNA molecule binds to each end of the adapter quadruplex.
+These byproducts should mainly be filtered in step 2 above. 
+
+Author: James Phie
+"""
 import json
 import pandas as pd
 

@@ -1,3 +1,13 @@
+"""
+--- batchcontamination.py ---
+
+Calculates the number and percentage of reads that map to sample indices that were not used in the current experiment.
+
+Previous tests on sample indices that have never been used suggest that unused sample indices should account for <0.0001% of total reads if no contamination has taken place. 
+
+Author: James Phie
+"""
+
 import json
 from Bio import SeqIO
 

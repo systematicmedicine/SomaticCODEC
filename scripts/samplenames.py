@@ -1,3 +1,13 @@
+"""
+--- rawreadcounts.py ---
+
+Replace default fasta file index names with experiment specific sample names as defined in ex_samples.csv
+
+Author: James Phie
+Date: 
+
+"""
+
 import pandas as pd
 
 df = pd.read_csv(snakemake.input.mapping)

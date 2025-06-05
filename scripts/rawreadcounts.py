@@ -1,9 +1,7 @@
 """
 --- rawreadcounts.py ---
 
-Brief description
-
-More detailed paragrph (optional)
+Calculates the number and percentage of raw read pairs that demultiplexed to each sample. 
 
 Author: James Phie
 Date: 
