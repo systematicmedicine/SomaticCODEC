@@ -36,6 +36,7 @@ An bioinformatics pipeline for calling somatic mutations in sequenced CODEC libr
 echo 'export PATH="$PATH:/mnt/c/Program Files/Docker/Docker/resources/bin"' >> ~/.bashrc
 source ~/.bashrc
 ```
+* Note: Docker desktop may require up to 32GB ram to run human whole genome alignment steps locally. 
 
 #### Collect reference files
 * Download the following files from S3 (sysmed-ref-s3) to codec-opensource/tmp/reference
@@ -70,15 +71,31 @@ source ~/.bashrc
 * Generate GitHub SSH key (change to relevant email address):
 
   ```bash
-  ssh-keygen -t ed25519 -C "user.lastname@systematicmedicine.com" -f ~/.ssh/EC2_git_key
-  eval "$(ssh-agent -s)"
-  ssh-add ~/.ssh/EC2_git_key
+  ssh-keygen -t ed25519 -C "user.lastname@systematicmedicine.com" -f ~/.ssh/EC2_git_key && \
+  eval "$(ssh-agent -s)" && \
+  ssh-add ~/.ssh/EC2_git_key && \
   cat ~/.ssh/EC2_git_key.pub
   ```
 * Copy the key output and go to https://github.com/settings/keys  
 * Click **New SSH key**  
 * Title it (e.g. "EC2_git_key")  
 * Paste the copied key and save
+* Ensure github authentication works after restart (Make SSH agent start every time a shell session starts)
+
+  ```bash
+  nano ~/.bashrc
+  ```
+* Add the following lines to the end of ~/.bashrc
+
+  eval "$(ssh-agent -s)" > /dev/null
+  ssh-add ~/.ssh/home_key 2>/dev/null
+  
+* Save and exit (ctrl + o, ctrl + x)
+* Reload shell
+
+  ```bash
+  source ~/.bashrc
+  ```
 
 #### Clone github repository
 * Clone the GitHub repository:
