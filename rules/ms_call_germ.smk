@@ -61,7 +61,7 @@ rule ms_alignment_metrics:
         """
 
 # using Haplotypecaller to call germline varients
-# note - here Chr is explicitly being called on to speed things up.
+# note - here Chr1 is explicitly being called on to speed things up.
 rule ms_call_germ_variants:
     input:
         bam=rules.ms_sort_bam.output.bam,
@@ -78,7 +78,7 @@ rule ms_call_germ_variants:
 
         """
 # intial hard filtering params
-#note: these are the most basic parameters
+#note: these are the most basic parameters - significant review required to tune to best fit for this application
 rule Hard_filter_variants:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
@@ -98,4 +98,6 @@ rule Hard_filter_variants:
         -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
         -O {output.vcf}
         """    
+
+
 
