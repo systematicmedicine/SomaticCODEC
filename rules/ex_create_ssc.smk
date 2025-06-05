@@ -179,7 +179,7 @@ rule ex_zipdata:
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}
         """
-# Calculates insert size (genome positions covered by R1 + R2 of each read)
+# Calculates 'insert size' (distance between start of watson and end of crick)
 rule ex_sscinsert_metrics:
     input:
         bam = "tmp/{sample}/{sample}_map_ssc_anno.bam",
