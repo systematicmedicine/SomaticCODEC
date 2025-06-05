@@ -71,7 +71,7 @@ source ~/.bashrc
 * Configure storage
   * 5000GB (5TB) recommended for large pipelines
 * Select IAM instance profile
-  * Add EC2_S3_ReadOnly role to EC2 instance
+  * Add EC2_S3_Write role to EC2 instance
 * Click Launch instance
 
 #### Connect to and set up EC2 instance
@@ -168,9 +168,7 @@ tmux attach -t pipeline
 * In the tmux session, run docker:
 
 ```bash
-docker run -it --rm \
-  -v ~/<folder>/<repo_name>:/work \
-  codec
+docker run -it --rm -v ~/project1/codec-opensource:/work codec
 ```
 ## Running the Snakefile
   

@@ -36,6 +36,7 @@ rule ex_namesamples:
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
+        "tmp/raw/.complete",
         fastq1 = raw_fastq1,
         fastq2 = raw_fastq2
     output:
@@ -56,6 +57,7 @@ rule ex_fastqcraw_metrics:
 # Removes first 3bp of R1 and R2 to read name as 6 base UMI. Demultiplexes using R1 and R2 5' sample indices (both must agree). Trims 5' sample indices. 
 rule ex_demux:
     input:
+        "tmp/raw/.complete",
         fastq1 = raw_fastq1,
         fastq2 = raw_fastq2,
         r1_start = "tmp/r1start.fasta",
