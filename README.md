@@ -60,9 +60,39 @@ source ~/.bashrc
 * Download any raw fastq files (most likely smaller test files if running locally)
 
 ### EC2 setup (skip for local use)
-* Add read-from-S3 role to EC2 instance (if working from EC2)
+
+#### Launch new EC2 instance
+* Name instance according to project and user
+* Select Deep Learning base OSS Nvidia Driver GPU AMI (Ubuntu 24.04)
+* Select instance type (recommended m6i.24xlarge if running large fastq's)
+  * Note: Running this instance costs ~10.00 AUD per hour, so pause the instance whenever bioinformatics pipelines are not running.
+* Select key pair name (set up .ssh key with aws if none pre-existing)
+* Allow SSH traffic from 'my IP'
+* Configure storage
+  * 5000GB (5TB) recommended for large pipelines
+* Select IAM instance profile
+  * Add EC2_S3_ReadOnly role to EC2 instance
+* Click Launch instance
+
+#### Connect to and set up EC2 instance
+* Select the desired instance, and check details for Public IPv4 address
+* SSH into instance using local Ubuntu
+  ```bash
+  ssh -i ~/.ssh/<key.pem> ubuntu@<Public IPv4 address>
+  ```
+* Update system packages
+
+  ```bash
+  sudo apt update && sudo apt upgrade -y
+  ```
+* Download aws-cli
+  ```bash
+  sudo snap install aws-cli --classic
+  ```
+
 * Download the relevant fastq files from s3 or AGRF to codec-opensource/tmp/raw
-  * Note only 1 set of codec fastqs (R1 and R2) can be used per exp pipeline currently.
+  * Once files are downloaded to sysmed-seq-s3, the master snakefile will take care of downloads provided that the fastq folder is provided in the config.yaml
+  * Note only 1 set of codec fastqs (R1 and R2) can be used per experimental pipeline currently.
 
 ### General setup (both local and EC2)
 
@@ -88,7 +118,7 @@ source ~/.bashrc
 * Add the following lines to the end of ~/.bashrc
 
   eval "$(ssh-agent -s)" > /dev/null
-  ssh-add ~/.ssh/home_key 2>/dev/null
+  ssh-add ~/.ssh/EC2_git_key 2>/dev/null
   
 * Save and exit (ctrl + o, ctrl + x)
 * Reload shell
