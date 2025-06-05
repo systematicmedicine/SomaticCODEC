@@ -10,4 +10,4 @@ r1start: config/r1start.fasta
 r2start: config/r2start.fasta
 r1end: config/r1end.fasta
 r2end: config/r2end.fasta
-ncores: 6
+ncores: 4
