@@ -1,11 +1,11 @@
 """
 --- ex_alignment.smk ---
 
-Downloads data from AWS S3:
-    * Sample FASTQ files 
-    * Reference files (e.g. GCRh38)
+Downloads required raw data and reference files from AWS S3:
+    * Experimental fastq files
+    * Reference files (GRCH38 and associated alignment files)
 
-Author: ...
+Author: James Phie
 
 """
 
