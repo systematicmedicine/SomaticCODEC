@@ -1,5 +1,5 @@
 """
---- ex_alignment.smk ---
+--- download_data.smk ---
 
 Downloads required raw data and reference files from AWS S3:
     * Experimental fastq files
