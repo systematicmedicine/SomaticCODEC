@@ -1,5 +1,5 @@
 # codec-opensource
-An bioinformatics pipeline for calling somatic mutations in sequenced CODEC libraries.
+A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libraries.
 
 ## Key differences from [`broadinstitute/CODECsuite`](https://github.com/broadinstitute/CODECsuite)
 
@@ -7,7 +7,7 @@ An bioinformatics pipeline for calling somatic mutations in sequenced CODEC libr
 - Tailored for detecting somatic mutations in normal tissue
 - Incorporates independent samples to build personalized reference genomes
 - Additional QC metrics (e.g. `fastqc`)
-- Additional pipeline testing
+- Fully containersied docker workflow
 
 ## Intended use
 * Quanityifying SNVs in genomic DNA
@@ -156,6 +156,8 @@ source ~/.bashrc
 * Other file paths should not need to be modified, regardless of chosen repository name.
 
 #### Activate tmux and docker
+Note that use of tmux is optional for local devices.
+
 * Build docker
 
 ```bash
