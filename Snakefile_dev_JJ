@@ -72,7 +72,10 @@ rule all:
         expand("tmp/results/{sample}_sorted.bam", sample = sample),
         expand("tmp/metrics/{sample}_samtools_stats.txt", sample = sample),
         expand("tmp/metrics/{sample}_insert_size_metrics.txt", sample = sample),
-        expand("tmp/metrics/{sample}_insert_size_histogram.pdf", sample = sample)
+        expand("tmp/metrics/{sample}_insert_size_histogram.pdf", sample = sample),
+        expand("tmp/results/{sample}_markdup.bam", sample = sample),
+        expand("tmp/results/{sample}_markdup.bai", sample = sample),
+        expand("tmp/metrics/{sample}_markdup_metrics.txt", sample = sample)
 
 
 

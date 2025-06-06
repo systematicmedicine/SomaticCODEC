@@ -50,7 +50,8 @@ rule sort_bam:
         "samtools sort -o {output.bam_sorted} {input.bam}"
 
 # Generates alignment metrics
-
+# Need to define path for picard.jar
+picard = "/home/joshj/tools/picard/picard.jar"
 rule alignment_metrics:
     input:
         bam = "tmp/results/{sample}_sorted.bam"
@@ -65,28 +66,30 @@ rule alignment_metrics:
 
         # Collect insert size metrics
         # M = 0.5 means 50% of reads must fall within the insert size peak to generate metrics
-        picard CollectInsertSizeMetrics \
-            I = {input.bam} \
-            O = {output.insert_metrics} \
-            H = {output.insert_hist} \
-            M = 0.5
+        java -jar {picard} CollectInsertSizeMetrics \
+            I={input.bam} \
+            O={output.insert_metrics} \
+            H={output.insert_hist} \
+            M=0.5
             
         """ 
 
+rule mark_duplicates:
+    input:
+        bam_sorted = "tmp/results/{sample}_sorted.bam"
+    output:
+        bam_markdup = "tmp/results/{sample}_markdup.bam",
+        bai_markdup = "tmp/results/{sample}_markdup.bai",
+        metrics = "tmp/metrics/{sample}_markdup_metrics.txt"
+    shell:
+        """
+        java -jar {picard} MarkDuplicates \
+        I={input.bam_sorted} \
+        O={output.bam_markdup} \
+        M={output.metrics} \
+        CREATE_INDEX=true
 
-# rule mark_duplicates:
-#     input:
-#         bam_sorted = "tmp/results/{sample}_sorted.bam"
-#     output:
-#         bam_markdup = "tmp/results/{sample}_markdup.bam",
-#         metrics = "tmp/results/{sample}_markdup_metrics.txt"
-#     shell:
-#         "picard MarkDuplicates "
-#         "I={input.bam_sorted} "
-#         "O={output.bam_markdup} "
-#         "M={output.metrics} "
-#         "CREATE_INDEX=true "
-#         "VALIDATION_STRINGENCY=SILENT"
+        """
 
 # rule index_bam:
 #     input:
