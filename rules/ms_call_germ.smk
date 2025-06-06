@@ -13,29 +13,29 @@ Dev Status: not operational
 
 #this rule is purely for dev purposes to make the pipeline fast locally
 
-rule slice_bam_region:
-    input:
-        bam="tmp/data/raw/Sample01_map_ssc_anno_chr1.bam"
-    output:
-        bam="tmp/data/processed/Sample01_map_ssc_anno_chr1_filter.bam",
-        bai="tmp/data/processed/Sample01_map_ssc_anno_chr1_filter.bam.bai"
-    shell:
-        """
-        # Index the input BAM (in-place)
-        samtools index {input.bam}
-
-        # Filter region from indexed BAM
-        samtools view -b {input.bam} chr1:1000000-1500000 > {output.bam}
-
-        # Index the output BAM
-        samtools index {output.bam}
-        """
+#rule slice_bam_region:
+#    input:
+#        bam="tmp/data/raw/Sample01_map_ssc_anno_chr1.bam"
+#    output:
+#        bam="tmp/data/processed/Sample01_map_ssc_anno_chr1_filter.bam",
+#        bai="tmp/data/processed/Sample01_map_ssc_anno_chr1_filter.bam.bai"
+#    shell:
+#        """
+#        # Index the input BAM (in-place)
+#        samtools index {input.bam}
+#
+#        # Filter region from indexed BAM
+#        samtools view -b {input.bam} chr1:1000000-1500000 > {output.bam}
+#
+#        # Index the output BAM
+#        samtools index {output.bam}
+#        """
 
 #in a main application the pipeline would start here.
 # Sort the input BAM file, this might not be necescary/previously done. 
 rule ms_sort_bam:
     input:
-        bam= "tmp/data/processed/Sample01_map_ssc_anno_chr1_filter.bam"
+        bam= "tmp/data/raw/Sample01_map_ssc_anno_chr1.bam"
     output:
         bam="tmp/data/processed/Sample01_sort.bam"
     shell:
@@ -74,12 +74,12 @@ rule ms_call_germ_variants:
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            -L chr1 \ 
+            -L chr1
 
         """
 # intial hard filtering params
 #note: these are the most basic parameters - significant review required to tune to best fit for this application
-rule Hard_filter_variants:
+rule ms_hard_filter_variants:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
         ref="tmp/data/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
@@ -99,5 +99,37 @@ rule Hard_filter_variants:
         -O {output.vcf}
         """    
 
+rule ms_filter_pass_variants:
+    input:
+        vcf =rules.ms_hard_filter_variants
+    output:
+        vcf = "tmp/data/processed/Sample01_hardFilter_passed.vcf"
+    shell:
+        """
+        gatk SelectVariants
+        -V {input.vcf} \
+        --exclude-filtered true \
+        -O {output.vcf}
 
+        """
+
+
+
+
+#create filter for heterozygous regions which pass the hard filtering
+rule: heterozygous_bed:
+    input:
+        vcf= rules.ms_filter_pass_variants
+    output:
+        vcf= "tmp/data/processed/Sample01_het_variants.vcf"
+        bed= "tmp/data/bed/Sample01_het_variants_bed"
+    shell:
+        """
+        # create a vcf file of het regions only
+        bcftools view -f PASS -g het -Ov -o {output.vcf} {input.vcf}
+
+        
+        # Convert filtered VCF to BED format
+        vcf2bed < {output.vcf} > {output.bed}
+        """
 
