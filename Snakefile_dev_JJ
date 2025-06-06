@@ -21,8 +21,13 @@ Author: Joshua Johnstone
 #from Bio import SeqIO
 
 # Hard-code paths for example data and reference
-sample = "ERR274697_subset"
+sample = "sperm_l5_subsample"
 ref = "tmp/ref/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+
+# Code to generate subset of data
+# seqtk sample -s100 <R1>.fastq.gz 100000 > <R1.subsampled>.fastq
+# seqtk subseq <R2>.fastq.gz <(seqtk seq -l0 <R1.subsampled>.fastq | grep '^@' | cut -d ' ' -f1 | sed 's/^@//') > <R2>.subsampled.fastq
+
 
 # Include rules files
 
@@ -61,13 +66,17 @@ rule all:
     input:
         expand("tmp/metrics/fastqc/{sample}_r1_fastqc.html", sample = sample),
         expand("tmp/metrics/fastqc/{sample}_r2_fastqc.html", sample = sample),
-        expand("tmp/data/processed/{sample}_r1.fastq", sample = sample),
-        expand("tmp/data/processed/{sample}_r2.fastq", sample = sample),
+        expand("tmp/data/{sample}_processed_r1.fastq.gz", sample = sample),
+        expand("tmp/data/{sample}_processed_r2.fastq.gz", sample = sample),
         expand("tmp/metrics/fastp/{sample}_fastp.html", sample = sample),
         expand("tmp/metrics/fastp/{sample}_fastp.json", sample = sample),
-        expand("tmp/metrics/fastqc/{sample}_r1_fastqc.html", sample = sample),
-        expand("tmp/metrics/fastqc/{sample}_r2_fastqc.html", sample = sample),
-        "tmp/ref/chr21.fa.bwt",
+        expand("tmp/metrics/fastqc/{sample}_processed_r1_fastqc.html", sample = sample),
+        expand("tmp/metrics/fastqc/{sample}_processed_r2_fastqc.html", sample = sample),
+        expand("{ref}.bwt", ref = ref),
+        expand("{ref}.pac", ref = ref),
+        expand("{ref}.ann", ref = ref),
+        expand("{ref}.amb", ref = ref),
+        expand("{ref}.sa", ref = ref),
         expand("tmp/results/{sample}_aligned.bam", sample = sample),
         expand("tmp/results/{sample}_sorted.bam", sample = sample),
         expand("tmp/metrics/alignment/{sample}_samtools_stats.txt", sample = sample),

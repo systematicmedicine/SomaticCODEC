@@ -16,7 +16,11 @@ rule index_ref:
     input:
         ref = ref
     output:
-        bwt = ref + ".bwt"
+        bwt = ref + ".bwt",
+        pac = ref + ".pac",
+        ann = ref + ".ann",
+        amb = ref + ".amb",
+        sa = ref + ".sa"
     shell:
         "bwa index {input.ref}"
 
@@ -24,8 +28,8 @@ rule index_ref:
 rule raw_alignment:
     input: 
         ref = ref,
-        r1_processed = "tmp/data/processed/{sample}_r1.fastq",
-        r2_processed = "tmp/data/processed/{sample}_r2.fastq"
+        r1_processed = "tmp/data/{sample}_processed_r1.fastq.gz",
+        r2_processed = "tmp/data/{sample}_processed_r2.fastq.gz"
     output:
         bam = "tmp/results/{sample}_aligned.bam"
     threads: 8

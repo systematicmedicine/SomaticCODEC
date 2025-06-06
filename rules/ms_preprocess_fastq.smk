@@ -23,7 +23,7 @@ rule fastqc_demuxed_FASTQ:
     threads: 4
     shell:
         """
-        fastqc -t {threads} -o tmp/metrics {input.r1} {input.r2}
+        fastqc -t {threads} -o tmp/metrics/fastqc {input.r1} {input.r2}
 
         """
 
@@ -37,8 +37,8 @@ rule trim_filter:
         r1 = "tmp/data/{sample}_r1.fastq.gz",
         r2 = "tmp/data/{sample}_r2.fastq.gz"
     output:
-        r1_processed = "tmp/data/processed/{sample}_r1.fastq",
-        r2_processed = "tmp/data/processed/{sample}_r2.fastq",
+        r1_processed = "tmp/data/{sample}_processed_r1.fastq.gz",
+        r2_processed = "tmp/data/{sample}_processed_r2.fastq.gz",
         html = "tmp/metrics/fastp/{sample}_fastp.html",
         json = "tmp/metrics/fastp/{sample}_fastp.json"
     threads: 8
@@ -62,11 +62,11 @@ rule trim_filter:
 # Generates a new fastqc report for processed reads
 rule fastqc_processed:
     input:
-        r1="tmp/data/processed/{sample}_r1.fastq.gz",
-        r2="tmp/data/processed/{sample}_r2.fastq.gz"
+        r1 = "tmp/data/{sample}_processed_r1.fastq.gz",
+        r2 = "tmp/data/{sample}_processed_r2.fastq.gz"
     output:
-        r1_report="tmp/metrics/fastqc/{sample}_r1_fastqc.html",
-        r2_report="tmp/metrics/fastqc/{sample}_r2_fastqc.html"
+        r1_report = "tmp/metrics/fastqc/{sample}_r1_processed_fastqc.html",
+        r2_report = "tmp/metrics/fastqc/{sample}_r2_processed_fastqc.html"
     threads: 2
     shell:
         """
