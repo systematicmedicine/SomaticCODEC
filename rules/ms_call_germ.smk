@@ -101,34 +101,30 @@ rule ms_hard_filter_variants:
 
 rule ms_filter_pass_variants:
     input:
-        vcf =rules.ms_hard_filter_variants
+        vcf = rules.ms_hard_filter_variants.output.vcf
     output:
         vcf = "tmp/data/processed/Sample01_hardFilter_passed.vcf"
     shell:
         """
-        gatk SelectVariants
+        gatk SelectVariants \
         -V {input.vcf} \
         --exclude-filtered true \
         -O {output.vcf}
 
         """
 
-
-
-
 #create filter for heterozygous regions which pass the hard filtering
-rule: heterozygous_bed:
+rule ms_heterozygous_bed:
     input:
-        vcf= rules.ms_filter_pass_variants
+        vcf= rules.ms_filter_pass_variants.output.vcf
     output:
-        vcf= "tmp/data/processed/Sample01_het_variants.vcf"
-        bed= "tmp/data/bed/Sample01_het_variants_bed"
+        vcf= "tmp/data/processed/Sample01_het_variants.vcf",
+        bed= "tmp/data/bed/Sample01_het_variants.bed"
     shell:
         """
         # create a vcf file of het regions only
         bcftools view -f PASS -g het -Ov -o {output.vcf} {input.vcf}
 
-        
         # Convert filtered VCF to BED format
         vcf2bed < {output.vcf} > {output.bed}
         """

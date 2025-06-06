@@ -25,27 +25,5 @@ include: "rules/ms_personal_ref.smk"
 
 rule all:
     input:
-        rules.Hard_filter_variants.output.vcf,
+        rules.ms_heterozygous_bed.output.bed,
         rules.ms_generate_reference.output.fasta
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
