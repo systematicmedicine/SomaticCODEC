@@ -90,7 +90,21 @@ source ~/.bashrc
   sudo snap install aws-cli --classic
   ```
 
-* Fastq and reference file downloads should be performed by updating config.yaml and ex_samples.csv and running the master snakefile
+#### Download fastq and reference files
+* Fastq and reference file downloads from S3 should be performed by updating config.yaml and ex_samples.csv and running the master snakefile
+
+* To download fastq files from AGRF to S3
+  * Download to EC2 instance
+  ```bash
+  rsync -avh --info=progress2 -e ssh \
+  <address given by AGRF> \
+  /path/to/ec2/directory/
+  ```
+  * Copy from EC2 to S3
+    ```bash
+    aws s3 cp /path/to/ec2/directory/ \
+    s3://sysmed-seq-s3/<work-unit-name>/ --recursive
+  ```
 
 ### General setup (both local and EC2)
 
