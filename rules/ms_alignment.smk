@@ -56,9 +56,9 @@ rule alignment_metrics:
     input:
         bam = "tmp/results/{sample}_sorted.bam"
     output:
-        stats = "tmp/metrics/{sample}_samtools_stats.txt",
-        insert_metrics = "tmp/metrics/{sample}_insert_size_metrics.txt",
-        insert_hist = "tmp/metrics/{sample}_insert_size_histogram.pdf"
+        stats = "tmp/metrics/alignment/{sample}_samtools_stats.txt",
+        insert_metrics = "tmp/metrics/alignment/{sample}_insert_size_metrics.txt",
+        insert_hist = "tmp/metrics/alignment/{sample}_insert_size_histogram.pdf"
     shell:
         """
         # Generate alignment stats
@@ -80,21 +80,13 @@ rule mark_duplicates:
     output:
         bam_markdup = "tmp/results/{sample}_markdup.bam",
         bai_markdup = "tmp/results/{sample}_markdup.bai",
-        metrics = "tmp/metrics/{sample}_markdup_metrics.txt"
+        dup_metrics = "tmp/metrics/markdup/{sample}_markdup_metrics.txt"
     shell:
         """
         java -jar {picard} MarkDuplicates \
         I={input.bam_sorted} \
         O={output.bam_markdup} \
-        M={output.metrics} \
+        M={output.dup_metrics} \
         CREATE_INDEX=true
 
         """
-
-# rule index_bam:
-#     input:
-#         bam_markdup = "results/{sample}_markdup.bam"
-#     output:
-#         bai_markdup = "results/{sample}_markdup.bam.bai"
-#     shell:
-#         "samtools index {input.bam_markdup}"

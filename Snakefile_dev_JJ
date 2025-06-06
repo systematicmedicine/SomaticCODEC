@@ -22,7 +22,7 @@ Author: Joshua Johnstone
 
 # Hard-code paths for example data and reference
 sample = "ERR274697_subset"
-ref = "tmp/ref/chr21.fa"
+ref = "tmp/ref/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
 
 # Include rules files
 
@@ -59,23 +59,23 @@ include: "rules/masked_regions.smk"
 
 rule all:
     input:
-        expand("tmp/metrics/{sample}_r1_fastqc.html", sample = sample),
-        expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample),
+        expand("tmp/metrics/fastqc/{sample}_r1_fastqc.html", sample = sample),
+        expand("tmp/metrics/fastqc/{sample}_r2_fastqc.html", sample = sample),
         expand("tmp/data/processed/{sample}_r1.fastq", sample = sample),
         expand("tmp/data/processed/{sample}_r2.fastq", sample = sample),
-        expand("tmp/metrics/{sample}_fastp.html", sample = sample),
-        expand("tmp/metrics/{sample}_fastp.json", sample = sample),
-        expand("tmp/metrics/{sample}_r1_fastqc.html", sample = sample),
-        expand("tmp/metrics/{sample}_r2_fastqc.html", sample = sample),
+        expand("tmp/metrics/fastp/{sample}_fastp.html", sample = sample),
+        expand("tmp/metrics/fastp/{sample}_fastp.json", sample = sample),
+        expand("tmp/metrics/fastqc/{sample}_r1_fastqc.html", sample = sample),
+        expand("tmp/metrics/fastqc/{sample}_r2_fastqc.html", sample = sample),
         "tmp/ref/chr21.fa.bwt",
         expand("tmp/results/{sample}_aligned.bam", sample = sample),
         expand("tmp/results/{sample}_sorted.bam", sample = sample),
-        expand("tmp/metrics/{sample}_samtools_stats.txt", sample = sample),
-        expand("tmp/metrics/{sample}_insert_size_metrics.txt", sample = sample),
-        expand("tmp/metrics/{sample}_insert_size_histogram.pdf", sample = sample),
+        expand("tmp/metrics/alignment/{sample}_samtools_stats.txt", sample = sample),
+        expand("tmp/metrics/alignment/{sample}_insert_size_metrics.txt", sample = sample),
+        expand("tmp/metrics/alignment/{sample}_insert_size_histogram.pdf", sample = sample),
         expand("tmp/results/{sample}_markdup.bam", sample = sample),
         expand("tmp/results/{sample}_markdup.bai", sample = sample),
-        expand("tmp/metrics/{sample}_markdup_metrics.txt", sample = sample)
+        expand("tmp/metrics/markdup/{sample}_markdup_metrics.txt", sample = sample)
 
 
 
