@@ -40,37 +40,42 @@ workdir: config["cwd"]
 ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
 ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
 
+# Extract experimental sample names from ex_samples.csv
+ex_sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
+
+# Pull used and unused codec adapter indexes from config files
+ex_indexes_all = set(record.id for record in SeqIO.parse(config["r1start"], "fasta"))
+ex_indexes_used = list(pd.read_csv(config["ex_samples"])["sample"])
+ex_indexes_unused = sorted(ex_indexes_all - set(ex_indexes_used))
+
 # Include rules files
-include: "rules/download_data.smk"
+#include: "rules/download_data.smk"
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_ssc.smk"
 #include: "rules/ex_create_dsc.smk"
 #include: "rules/ex_call_somatic.smk"
 
-# Load sample list
-sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
-
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("tmp/{sample}/{sample}_map_ssc_anno.bam", sample=sample_names),
-        expand("tmp/{sample}/{sample}_map_ssc_anno.bam.bai", sample=sample_names),
+        expand("tmp/{sample}/{sample}_map_ssc_anno.bam", sample=ex_sample_names),
+        expand("tmp/{sample}/{sample}_map_ssc_anno.bam.bai", sample=ex_sample_names),
         "metrics/demux_metrics.txt",
         "metrics/demux_metrics.json",
         "metrics/sample_readcounts_metrics.txt",
         "metrics/batchcontamination_metrics.txt",
         "metrics/correctproduct_metrics.txt",
         "metrics/duplication_metrics.txt",
-        expand("metrics/{sample}/{sample}_trim_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_trimfilter_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_r1_trimfilter_metrics.html", sample=sample_names),
-        expand("metrics/{sample}/{sample}_r2_trimfilter_metrics.html", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_umi3_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.txt", sample=sample_names),
-        expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.pdf", sample=sample_names),
-        expand("metrics/{sample}/{sample}_ssc_depth_metrics.txt", sample=sample_names)
+        expand("metrics/{sample}/{sample}_trim_metrics.txt", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_trimfilter_metrics.txt", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_r1_trimfilter_metrics.html", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_r2_trimfilter_metrics.html", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_map_metrics.txt", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_map_umi3_metrics.txt", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.txt", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_map_ssc_insert_metrics.pdf", sample=ex_sample_names),
+        expand("metrics/{sample}/{sample}_ssc_depth_metrics.txt", sample=ex_sample_names)
 
 
 

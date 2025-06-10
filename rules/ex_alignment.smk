@@ -10,9 +10,6 @@ Author: James Phie
 
 """
 
-# Load sample metadata
-sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
-
 # Creates an aligned sam from trimmed and filtered fastq files. Softclipping allowed.
 rule ex_map:
     input:
@@ -63,11 +60,11 @@ rule ex_map_metrics:
 rule ex_correctproduct_metrics:
     input:
         demux_json = "metrics/demux_metrics.json",
-        trim_reports = expand("metrics/{sample}/{sample}_trimfilter_metrics.json", sample=sample_names),
-        flagstats = expand("metrics/{sample}/{sample}_map_metrics.txt", sample=sample_names)
+        trim_reports = expand("metrics/{sample}/{sample}_trimfilter_metrics.json", sample=ex_sample_names),
+        flagstats = expand("metrics/{sample}/{sample}_map_metrics.txt", sample=ex_sample_names)
     output:
         "metrics/correctproduct_metrics.txt"
     params:
-        samples = sample_names
+        samples = ex_sample_names
     script:
         "../scripts/correctproduct.py"

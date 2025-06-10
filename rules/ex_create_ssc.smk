@@ -9,9 +9,6 @@ Output: Same as input, but PCR duplicates collapsed based on UMI to create a mol
 Author: James Phie
 
 """
-# Load sample metadata
-sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
-
 rule ex_umitag:
     input:
         bam = "tmp/{sample}/{sample}_map.bam"
@@ -225,7 +222,7 @@ rule ex_sscdepth_metrics:
 # Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
 rule ex_duplication_metrics:
     input:
-        expand("metrics/{sample}/{sample}_map_umi3_metrics.txt", sample=sample_names)
+        expand("metrics/{sample}/{sample}_map_umi3_metrics.txt", sample=ex_sample_names)
     output:
         "metrics/duplication_metrics.txt"
     script:

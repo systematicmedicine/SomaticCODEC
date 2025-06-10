@@ -9,12 +9,6 @@ Output: Fully processed FASTQ files ready for alignment
 Author: James Phie
 
 """
-# Load sample metadata
-sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
-used_indexes = list(pd.read_csv(config["ex_samples"])["sample"])
-all_indexes = set(record.id for record in SeqIO.parse(config["r1start"], "fasta"))
-unused_indexes = sorted(all_indexes - set(used_indexes))
-
 # Replace default index names with experiment specific sample names as defined in ex_samples.csv
 rule ex_namesamples:
     input:
@@ -59,8 +53,8 @@ rule ex_demux:
         r1_start = "tmp/r1start.fasta",
         r2_start = "tmp/r2start.fasta"
     output:
-        demuxed_r1 = temp(expand("tmp/{sample}_r1_raw.fastq.gz", sample=sample_names)),
-        demuxed_r2 = temp(expand("tmp/{sample}_r2_raw.fastq.gz", sample=sample_names)),
+        demuxed_r1 = temp(expand("tmp/{sample}_r1_raw.fastq.gz", sample=ex_sample_names)),
+        demuxed_r2 = temp(expand("tmp/{sample}_r2_raw.fastq.gz", sample=ex_sample_names)),
         report = "metrics/demux_metrics.txt",
         json = "metrics/demux_metrics.json"
     threads:
@@ -178,7 +172,7 @@ rule ex_rawreadcounts_metrics:
         readcounts = "metrics/sample_readcounts_metrics.txt"
     params:
         fasta = config['r1start'],
-        used = sample_names
+        used = ex_sample_names
     script:
         "../scripts/rawreadcounts.py"
 
@@ -190,6 +184,6 @@ rule ex_batchcontamination_metrics:
         contamination = "metrics/batchcontamination_metrics.txt"
     params:
         fasta = config['r1start'],
-        used = sample_names
+        used = ex_sample_names
     script:
         "../scripts/batchcontamination.py"
