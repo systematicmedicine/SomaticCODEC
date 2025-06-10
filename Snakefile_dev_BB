@@ -15,9 +15,9 @@ include: "rules/ms_call_germ.smk"
 include: "rules/ms_personal_ref.smk"
 
 # hardcoded conifg (later will merge into config.yaml)
-
-
-
+input_bam = "tmp/data/raw/Sample01_map_ssc_anno_chr1.bam"
+HG38 = "tmp/data/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
+sample = "Sample01"
 # Load data
 
 

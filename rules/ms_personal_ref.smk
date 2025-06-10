@@ -7,7 +7,6 @@ Input: Varient Filtered VCF
 Output: Fasta
 
 Author: Ben Barry
-Dev Status: Not operational
 
 """
 #generating the personal reference file
@@ -29,4 +28,5 @@ rule ms_generate_reference:
         -V {input.var} \
         -O {output.fasta} \
         -L chr1 \
+        --use-iupac-sample Sample01
         """

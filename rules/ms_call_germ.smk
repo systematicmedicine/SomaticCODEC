@@ -7,7 +7,6 @@ Input: ...
 Output: ...
 
 Author: Ben Barry
-Dev Status: not operational
 
 """
 
@@ -106,6 +105,7 @@ rule ms_filter_pass_variants:
         vcf = "tmp/data/processed/Sample01_hardFilter_passed.vcf"
     shell:
         """
+        # select only variants which pass filter metrics
         gatk SelectVariants \
         -V {input.vcf} \
         --exclude-filtered true \
