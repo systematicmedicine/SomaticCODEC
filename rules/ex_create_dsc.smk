@@ -15,10 +15,6 @@ Temporary dev notes:
 to speed up the pipeline
 
 """
-
-# Load sample metadata
-sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
-
 import pandas as pd
 from Bio import SeqIO
 
@@ -154,3 +150,5 @@ rule exp_zipdata:
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}
         """
+
+# Add metrics files (e.g. duplex depth (considering ss overhangs), etc.)
