@@ -11,20 +11,8 @@ Outputs:
 Author: Joshua Johnstone
 
 """
-# Indexes reference for use in alignment
-rule index_ref:
-    input:
-        ref = ref
-    output:
-        bwt = ref + ".bwt",
-        pac = ref + ".pac",
-        ann = ref + ".ann",
-        amb = ref + ".amb",
-        sa = ref + ".sa"
-    shell:
-        "bwa index {input.ref}"
 
-# Aligns reads to Chr21 reference
+# Aligns reads to reference
 rule raw_alignment:
     input: 
         ref = ref,
@@ -53,12 +41,29 @@ rule sort_bam:
     shell:
         "samtools sort -o {output.bam_sorted} {input.bam}"
 
+rule mark_duplicates:
+    input:
+        bam_sorted = "tmp/results/{sample}_sorted.bam"
+    output:
+        bam_markdup = "tmp/results/{sample}_markdup.bam",
+        bai_markdup = "tmp/results/{sample}_markdup.bai",
+        dup_metrics = "tmp/metrics/markdup/{sample}_markdup_metrics.txt"
+    shell:
+        """
+        java -jar {picard} MarkDuplicates \
+        I={input.bam_sorted} \
+        O={output.bam_markdup} \
+        M={output.dup_metrics} \
+        CREATE_INDEX=true
+
+        """
+
 # Generates alignment metrics
 # Need to define path for picard.jar
 picard = "/home/joshj/tools/picard/picard.jar"
 rule alignment_metrics:
     input:
-        bam = "tmp/results/{sample}_sorted.bam"
+        bam = "tmp/results/{sample}_markdup.bam"
     output:
         stats = "tmp/metrics/alignment/{sample}_samtools_stats.txt",
         insert_metrics = "tmp/metrics/alignment/{sample}_insert_size_metrics.txt",
@@ -77,20 +82,3 @@ rule alignment_metrics:
             M=0.5
             
         """ 
-
-rule mark_duplicates:
-    input:
-        bam_sorted = "tmp/results/{sample}_sorted.bam"
-    output:
-        bam_markdup = "tmp/results/{sample}_markdup.bam",
-        bai_markdup = "tmp/results/{sample}_markdup.bai",
-        dup_metrics = "tmp/metrics/markdup/{sample}_markdup_metrics.txt"
-    shell:
-        """
-        java -jar {picard} MarkDuplicates \
-        I={input.bam_sorted} \
-        O={output.bam_markdup} \
-        M={output.dup_metrics} \
-        CREATE_INDEX=true
-
-        """

@@ -13,7 +13,7 @@ Author: Joshua Johnstone
 """
 
 # Generates a fastqc report for the demuxed FASTQs
-rule fastqc_demuxed_FASTQ:
+rule ms_fastqc_raw_metrics:
     input:
         r1 = "tmp/data/{sample}_r1.fastq.gz",
         r2 = "tmp/data/{sample}_r2.fastq.gz"
@@ -27,40 +27,61 @@ rule fastqc_demuxed_FASTQ:
 
         """
 
-# Auto-detects and trims adaptors 
-# Trims bases with quality <15 from read ends 
-# Filters reads that are shorter than 15 bases after trimming
-# Filters reads that have >40% bases with quality <15
-# Filters reads that have more than 5 Ns
-rule trim_filter:
+# Identifies and trims adaptors
+rule ms_trim_adaptors:
     input:
         r1 = "tmp/data/{sample}_r1.fastq.gz",
         r2 = "tmp/data/{sample}_r2.fastq.gz"
     output:
-        r1_processed = "tmp/data/{sample}_processed_r1.fastq.gz",
-        r2_processed = "tmp/data/{sample}_processed_r2.fastq.gz",
-        html = "tmp/metrics/fastp/{sample}_fastp.html",
-        json = "tmp/metrics/fastp/{sample}_fastp.json"
+        r1 = "tmp/data/{sample}_trim_r1.fastq.gz",
+        r2 = "tmp/data/{sample}_trim_r2.fastq.gz",
+        report = "tmp/metrics/cutadapt/{sample}_trim_metrics.html",
+        json = "tmp/metrics/cutadapt/{sample}_trim_metrics.json"
     threads: 8
     shell: 
         """
-        fastp \
-            -i {input.r1} \
-            -I {input.r2} \
-            -o {output.r1_processed} \
-            -O {output.r2_processed} \
-            --detect_adapter_for_pe \
-            --thread {threads} \
-            --qualified_quality_phred 15 \
-            --length_required 15 \
-            --unqualified_percent_limit 40 \
-            --n_base_limit 5 \
-            --html {output.html} \
-            --json {output.json}
+        cutadapt \
+            -j {threads} \
+            -a CTGTCTCTTATACACATCT \
+            -A CTGTCTCTTATACACATCT \
+            -a ATGTGTATAAGAGACA \
+            -A ATGTGTATAAGAGACA \
+            -o {output.r1} \
+            -p {output.r2} \
+            {input.r1} {input.r2} \
+            --report=full > {output.report} \
+            --json={output.json}
+
         """
 
+# Trims reads by quality and filters by length and quality
+# rule ms_trim_qual_filter:
+#     input:
+#         r1 = "tmp/data/{sample}_trim_r1.fastq.gz",
+#         r2 = "tmp/data/{sample}_trim_r2.fastq.gz"
+#     output:
+#         r1 = "tmp/data/{sample}_trimfilter_r1.fastq.gz",
+#         r2 = "tmp/data/{sample}_trimfilter_r2.fastq.gz",
+#         report = "tmp/metrics/cutadapt/{sample}_trimfilter_metrics.html",
+#         json = "tmp/metrics/cutadapt/{sample}_trimfilter_metrics.json"
+#     threads: 8
+#     shell: 
+#         """
+#         cutadapt \
+#             {params.adapters} \
+#             -q 15,15 \
+#             --minimum-length {params.min_length} \
+#             --max-n 5 \
+#             -o {output.r1} \
+#             -p {output.r2} \
+#             {input.r1} {input.r2} \
+#             > {output.report}
+
+#         """
+
+
 # Generates a new fastqc report for processed reads
-rule fastqc_processed:
+rule ms_fastqc_trimmed:
     input:
         r1 = "tmp/data/{sample}_processed_r1.fastq.gz",
         r2 = "tmp/data/{sample}_processed_r2.fastq.gz"

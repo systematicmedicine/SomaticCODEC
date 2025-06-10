@@ -21,12 +21,15 @@ Author: Joshua Johnstone
 #from Bio import SeqIO
 
 # Hard-code paths for example data and reference
-sample = "sperm_l5_subsample"
-ref = "tmp/ref/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+sample = "sperm_l5_subsample_sorted"
+ref = "tmp/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 
 # Code to generate subset of data
 # seqtk sample -s100 <R1>.fastq.gz 100000 > <R1.subsampled>.fastq
 # seqtk subseq <R2>.fastq.gz <(seqtk seq -l0 <R1.subsampled>.fastq | grep '^@' | cut -d ' ' -f1 | sed 's/^@//') > <R2>.subsampled.fastq
+
+# zcat R1.fastq.gz | head -n 400000 > downsampled_R1.fastq
+# zcat R2.fastq.gz | head -n 400000 > downsampled_R2.fastq
 
 
 # Include rules files
@@ -66,43 +69,26 @@ rule all:
     input:
         expand("tmp/metrics/fastqc/{sample}_r1_fastqc.html", sample = sample),
         expand("tmp/metrics/fastqc/{sample}_r2_fastqc.html", sample = sample),
-        expand("tmp/data/{sample}_processed_r1.fastq.gz", sample = sample),
-        expand("tmp/data/{sample}_processed_r2.fastq.gz", sample = sample),
-        expand("tmp/metrics/fastp/{sample}_fastp.html", sample = sample),
-        expand("tmp/metrics/fastp/{sample}_fastp.json", sample = sample),
-        expand("tmp/metrics/fastqc/{sample}_processed_r1_fastqc.html", sample = sample),
-        expand("tmp/metrics/fastqc/{sample}_processed_r2_fastqc.html", sample = sample),
-        expand("{ref}.bwt", ref = ref),
-        expand("{ref}.pac", ref = ref),
-        expand("{ref}.ann", ref = ref),
-        expand("{ref}.amb", ref = ref),
-        expand("{ref}.sa", ref = ref),
-        expand("tmp/results/{sample}_aligned.bam", sample = sample),
-        expand("tmp/results/{sample}_sorted.bam", sample = sample),
-        expand("tmp/metrics/alignment/{sample}_samtools_stats.txt", sample = sample),
-        expand("tmp/metrics/alignment/{sample}_insert_size_metrics.txt", sample = sample),
-        expand("tmp/metrics/alignment/{sample}_insert_size_histogram.pdf", sample = sample),
-        expand("tmp/results/{sample}_markdup.bam", sample = sample),
-        expand("tmp/results/{sample}_markdup.bai", sample = sample),
-        expand("tmp/metrics/markdup/{sample}_markdup_metrics.txt", sample = sample)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        expand("tmp/data/{sample}_trim_r1.fastq.gz", sample = sample),
+        expand("tmp/data/{sample}_trim_r2.fastq.gz", sample = sample),
+        expand("tmp/metrics/cutadapt/{sample}_trim_metrics.html", sample = sample),
+        expand("tmp/metrics/cutadapt/{sample}_trim_metrics.json", sample = sample)
+        # expand("tmp/data/{sample}_trimfilter_r1.fastq.gz", sample = sample),
+        # expand("tmp/data/{sample}_trimfilter_r2.fastq.gz", sample = sample),
+        # expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.html", sample = sample),
+        # expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.json", sample = sample),
+        # expand("tmp/metrics/fastqc/{sample}_trimfilter_r1_fastqc.html", sample = sample),
+        # expand("tmp/metrics/fastqc/{sample}_trimfilter_r2_fastqc.html", sample = sample)
+        # expand("{ref}.bwt", ref = ref),
+        # expand("{ref}.pac", ref = ref),
+        # expand("{ref}.ann", ref = ref),
+        # expand("{ref}.amb", ref = ref),
+        # expand("{ref}.sa", ref = ref),
+        # expand("tmp/results/{sample}_aligned.bam", sample = sample),
+        # expand("tmp/results/{sample}_sorted.bam", sample = sample),
+        # expand("tmp/metrics/alignment/{sample}_samtools_stats.txt", sample = sample),
+        # expand("tmp/metrics/alignment/{sample}_insert_size_metrics.txt", sample = sample),
+        # expand("tmp/metrics/alignment/{sample}_insert_size_histogram.pdf", sample = sample),
+        # expand("tmp/results/{sample}_markdup.bam", sample = sample),
+        # expand("tmp/results/{sample}_markdup.bai", sample = sample),
+        # expand("tmp/metrics/markdup/{sample}_markdup_metrics.txt", sample = sample)
