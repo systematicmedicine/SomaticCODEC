@@ -36,8 +36,8 @@ rule download_ex_raw_fastq:
     params:
         fastqfolder = config["s3seq_fastq_folder"]
     output:
-        ex_raw_fastq1,
-        ex_raw_fastq2
+        ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"],
+        ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
     shell:
         """
         mkdir -p tmp/raw

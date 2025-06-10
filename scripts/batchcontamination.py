@@ -17,8 +17,10 @@ output_path = snakemake.output.contamination
 fasta_path = snakemake.params.fasta
 used_samples = set(snakemake.params.used)
 
-# Parse all known barcodes from the FASTA
+# Parse all known experimental codec barcodes from the FASTA
 all_index_names = {record.id for record in SeqIO.parse(fasta_path, "fasta")}
+
+# Determine unused experimental codec barcodes 
 unused_indexes = sorted(all_index_names - used_samples)
 
 # Load demux JSON

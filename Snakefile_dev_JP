@@ -36,17 +36,12 @@ from Bio import SeqIO
 # Set working directory
 workdir: config["cwd"]
 
-# Set codec/experimental fastq file paths (dynamic)
-ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"]
-ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
-
 # Extract experimental sample names from ex_samples.csv
 ex_sample_names = list(pd.read_csv(config["ex_samples"])["samplename"])
 
-# Pull used and unused codec adapter indexes from config files
-ex_indexes_all = set(record.id for record in SeqIO.parse(config["r1start"], "fasta"))
-ex_indexes_used = list(pd.read_csv(config["ex_samples"])["sample"])
-ex_indexes_unused = sorted(ex_indexes_all - set(ex_indexes_used))
+# Temporary fastq hardcoding (for offline use)
+ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"],
+ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
 
 # Include rules files
 #include: "rules/download_data.smk"
