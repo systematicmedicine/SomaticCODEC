@@ -13,7 +13,7 @@ Author: Joshua Johnstone
 """
 
 # Combines reads from samples run across two lanes
-rule_combine_lanes:
+rule combine_lanes:
     input:
         r1_l5 = "tmp/data/{sample}_L005_R1.fastq.gz",
         r2_l5 = "tmp/data/{sample}_L005_R2.fastq.gz",
