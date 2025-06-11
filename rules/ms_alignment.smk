@@ -27,7 +27,7 @@ rule raw_alignment:
             -t {threads} \
             {input.ref} \
             {input.r1_processed} \
-            {input.r1_processed} | \
+            {input.r2_processed} | \
         samtools view -bS - > {output.bam}
 
         """
@@ -59,7 +59,7 @@ rule mark_duplicates:
         """
 
 # Generates alignment metrics
-# Need to define path for picard.jar
+# Picard tools require path to picard.jar
 picard = "/home/joshj/tools/picard/picard.jar"
 rule alignment_metrics:
     input:

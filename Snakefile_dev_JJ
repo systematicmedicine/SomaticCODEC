@@ -20,17 +20,16 @@ Author: Joshua Johnstone
 #import pandas as pd
 #from Bio import SeqIO
 
-# Hard-code paths for example data and reference
-sample = "sperm_l5_subsample_sorted"
+# Provide sample names and reference path
+sample = ["Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT", 
+"Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG",
+ "Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC"]
+
 ref = "tmp/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 
 # Code to generate subset of data
-# seqtk sample -s100 <R1>.fastq.gz 100000 > <R1.subsampled>.fastq
-# seqtk subseq <R2>.fastq.gz <(seqtk seq -l0 <R1.subsampled>.fastq | grep '^@' | cut -d ' ' -f1 | sed 's/^@//') > <R2>.subsampled.fastq
-
-# zcat R1.fastq.gz | head -n 400000 > downsampled_R1.fastq
-# zcat R2.fastq.gz | head -n 400000 > downsampled_R2.fastq
-
+# zcat R1.fastq.gz | head -n 400000 | gzip > downsampled_R1.fastq.gz
+# zcat R2.fastq.gz | head -n 400000 | gzip > downsampled_R2.fastq.gz
 
 # Include rules files
 
@@ -67,28 +66,21 @@ include: "rules/masked_regions.smk"
 
 rule all:
     input:
+        expand("tmp/data/{sample}_r1.fastq.gz", sample = sample),
+        expand("tmp/data/{sample}_r2.fastq.gz", sample = sample),
         expand("tmp/metrics/fastqc/{sample}_r1_fastqc.html", sample = sample),
         expand("tmp/metrics/fastqc/{sample}_r2_fastqc.html", sample = sample),
-        expand("tmp/data/{sample}_trim_r1.fastq.gz", sample = sample),
-        expand("tmp/data/{sample}_trim_r2.fastq.gz", sample = sample),
-        expand("tmp/metrics/cutadapt/{sample}_trim_metrics.html", sample = sample),
-        expand("tmp/metrics/cutadapt/{sample}_trim_metrics.json", sample = sample)
-        # expand("tmp/data/{sample}_trimfilter_r1.fastq.gz", sample = sample),
-        # expand("tmp/data/{sample}_trimfilter_r2.fastq.gz", sample = sample),
-        # expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.html", sample = sample),
-        # expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.json", sample = sample),
-        # expand("tmp/metrics/fastqc/{sample}_trimfilter_r1_fastqc.html", sample = sample),
-        # expand("tmp/metrics/fastqc/{sample}_trimfilter_r2_fastqc.html", sample = sample)
-        # expand("{ref}.bwt", ref = ref),
-        # expand("{ref}.pac", ref = ref),
-        # expand("{ref}.ann", ref = ref),
-        # expand("{ref}.amb", ref = ref),
-        # expand("{ref}.sa", ref = ref),
-        # expand("tmp/results/{sample}_aligned.bam", sample = sample),
-        # expand("tmp/results/{sample}_sorted.bam", sample = sample),
-        # expand("tmp/metrics/alignment/{sample}_samtools_stats.txt", sample = sample),
-        # expand("tmp/metrics/alignment/{sample}_insert_size_metrics.txt", sample = sample),
-        # expand("tmp/metrics/alignment/{sample}_insert_size_histogram.pdf", sample = sample),
-        # expand("tmp/results/{sample}_markdup.bam", sample = sample),
-        # expand("tmp/results/{sample}_markdup.bai", sample = sample),
-        # expand("tmp/metrics/markdup/{sample}_markdup_metrics.txt", sample = sample)
+        expand("tmp/data/{sample}_processed_r1.fastq.gz", sample = sample),
+        expand("tmp/data/{sample}_processed_r2.fastq.gz", sample = sample),
+        expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.html", sample = sample),
+        expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.json", sample = sample),
+        expand("tmp/metrics/fastqc/processed/{sample}_processed_r1_fastqc.html", sample = sample),
+        expand("tmp/metrics/fastqc/processed/{sample}_processed_r2_fastqc.html", sample = sample),
+        expand("tmp/results/{sample}_aligned.bam", sample = sample),
+        expand("tmp/results/{sample}_sorted.bam", sample = sample),
+        expand("tmp/metrics/alignment/{sample}_samtools_stats.txt", sample = sample),
+        expand("tmp/metrics/alignment/{sample}_insert_size_metrics.txt", sample = sample),
+        expand("tmp/metrics/alignment/{sample}_insert_size_histogram.pdf", sample = sample),
+        expand("tmp/results/{sample}_markdup.bam", sample = sample),
+        expand("tmp/results/{sample}_markdup.bai", sample = sample),
+        expand("tmp/metrics/markdup/{sample}_markdup_metrics.txt", sample = sample)
