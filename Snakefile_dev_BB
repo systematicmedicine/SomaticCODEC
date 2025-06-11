@@ -9,21 +9,25 @@ Temporary Snakefile for use during pipeline development
 # Load libraries
 
 
-# Include rules files
-
-include: "rules/ms_call_germ.smk"
-include: "rules/ms_personal_ref.smk"
-
 # hardcoded conifg (later will merge into config.yaml)
 input_bam = "tmp/data/raw/Sample01_map_ssc_anno_chr1.bam"
 HG38 = "tmp/data/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 sample = "Sample01"
+SAMPLES = ["Sample01"]
+
+
+# Include rules files
+include: "rules/ms_call_germ.smk"
+include: "rules/ms_personal_ref.smk"
+
+
+
 # Load data
 
 
 # Rule all defines all the output that the pipeline will create
-
 rule all:
     input:
-        rules.ms_heterozygous_bed.output.bed,
-        rules.ms_generate_reference.output.fasta
+        expand("tmp/metrics/{sample}_variantCall_summary.txt", sample=SAMPLES),
+        expand("tmp/data/bed/{sample}_het_variants.bed", sample=SAMPLES),
+        expand("tmp/data/pseudoref/{sample}_personalised_ref.fasta", sample=SAMPLES)

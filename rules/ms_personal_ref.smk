@@ -17,10 +17,10 @@ Author: Ben Barry
     # This tool works only for SNPs and for simple indels (but not for things like complex substitutions).
 rule ms_generate_reference:
     input:
-        ref = "tmp/data/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna",
-        var = rules.ms_filter_pass_variants.output.vcf
+        ref = HG38,
+        var = rules.ms_merge_filtered.output.vcf
     output:
-        fasta = "tmp/data/pseudoref/Sample01_personalised_ref.fasta"
+        fasta = "tmp/data/pseudoref/{sample}_personalised_ref.fasta"
     shell:
         """
         gatk FastaAlternateReferenceMaker \
@@ -28,5 +28,8 @@ rule ms_generate_reference:
         -V {input.var} \
         -O {output.fasta} \
         -L chr1 \
-        --use-iupac-sample Sample01
         """
+
+
+
+#NEED a metric to compare new ref to old ref
