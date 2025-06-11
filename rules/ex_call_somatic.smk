@@ -130,10 +130,10 @@ samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fn
   > tmp/varscan_output.vcf
 
 #indel test (with SNP)
-samtools view -Sb tmp/indel_example.sam > tmp/indel_example.bam && \
-samtools index tmp/indel_example.bam && \
+samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
+samtools index tmp/first_read_4somatic.bam && \
 samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -r chr1:16000-18000 -B -q 0 -Q 0 tmp/indel_example.bam | \
+  -r chr1:1000000-1001000 -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
   java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
   --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
   > tmp/varscan_indel_example.vcf
@@ -159,8 +159,71 @@ samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fn
 #call varscan directly
 samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
 samtools index tmp/first_read_4somatic.bam && \
+
+
 samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -l tmp/position_1000342.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
+  -l tmp/<bedfile>.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
   varscan mpileup2snp \
   --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
   > tmp/varscan_output.vcf
+
+
+#Step by step mpileup and varscan
+samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+  -l tmp/<bedfile>.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam > tmp/<mpileup>.txt
+
+varscan mpileup2snp tmp/<mpileup>.txt \
+  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
+  > tmp/varscan_output.vcf
+
+
+
+#Snakefile/pipeline version
+##Create samtools pileup for variant calling of double strand consensus bam
+samtools mpileup -f tmp/<ms_personalized_fasta>.fna \
+  -l tmp/<ms_bedfile>.bed -B -q 0 -Q 0 tmp/<dsc_vc.bam > tmp/<mpileup>.txt
+
+##Call somatic mutations
+varscan mpileup2snp tmp/<mpileup>.txt \
+  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
+  > tmp/<somatic_mutations>.vcf
+
+
+rule ex_dsc_mpileup:
+    input:
+        pers_fasta = "tmp/{sample}/{sample}_ms_personalized_fasta.fna" #Need to add in ms vs ex sample conversion. Rename.
+        regions_bed = "tmp/{sample}/{sample}_ms_bed_file.bed" #Need to add in ms vs ex sample conversion. Rename. 
+        dsc_bam = "tmp/{sample}/{sample}_dsc_anno.bam" #Rename
+    output:
+        mpileup = "tmp/dsc_mpileup.txt" #Rename
+    threads: 
+        x =
+    params:
+        x = 
+    shell:
+        """
+        samtools mpileup -f {input.pers_fasta} \
+            -l {input.regions_bed} -B -q 0 -Q 0 \
+            {input.dsc_bam} > {output.mpileup}
+        """
+
+rule ex_somatic_variants:
+    input:
+        mpileup = "tmp/dsc_mpileup.txt"
+    output:
+        vcf =   
+    threads: 
+        x =
+    params:
+        x =  
+    shell:
+        """
+        varscan mpileup2snp {input.mpileup} \
+            --min-coverage 1 \
+            --min-var-freq 0 \
+            --strand-filter 0 \
+            --min-reads2 1 \
+            --min-avg-qual 0 \
+            --p-value 1 \
+            --output-vcf 1 > tmp/<somatic_mutations>.vcf
+        """
