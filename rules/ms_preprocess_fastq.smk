@@ -89,7 +89,7 @@ rule ms_fastqc_processed:
     output:
         r1_report = "tmp/metrics/fastqc/processed/{sample}_processed_r1_fastqc.html",
         r2_report = "tmp/metrics/fastqc/processed/{sample}_processed_r2_fastqc.html"
-    threads: 2
+    threads: 4
     shell:
         """
         fastqc -t {threads} -o tmp/metrics/fastqc/processed {input.r1} {input.r2}

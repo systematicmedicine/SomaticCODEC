@@ -20,10 +20,10 @@ rule raw_alignment:
         r2_processed = "tmp/data/{sample}_processed_r2.fastq.gz"
     output:
         bam = "tmp/results/{sample}_aligned.bam"
-    threads: 8
+    threads: 32
     shell:
         """
-        bwa mem -R "@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPL:ILLUMINA" \
+        bwa-mem2 mem -R "@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPL:ILLUMINA" \
             -t {threads} \
             {input.ref} \
             {input.r1_processed} \
@@ -38,8 +38,9 @@ rule sort_bam:
         bam = "tmp/results/{sample}_aligned.bam"
     output:
         bam_sorted =  "tmp/results/{sample}_sorted.bam"
+    threads: 8
     shell:
-        "samtools sort -o {output.bam_sorted} {input.bam}"
+        "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
 
 rule mark_duplicates:
     input:
