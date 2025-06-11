@@ -93,7 +93,7 @@ vardict-java \
   cat tmp/vardict_output.tsv
 ) > tmp/vardict_output_4somatictest.tsv
 
-
+# Bcftools
 samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
 samtools index tmp/first_read_4somatic.bam && \
 bcftools mpileup \
@@ -106,3 +106,62 @@ bcftools mpileup \
 bcftools call \
   -mv \
   -Ov -o tmp/bcftest.vcf
+
+# Varscan
+samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -r chr1:1000000-1001000 -B -q 0 -Q 0 tmp/first_read_4somatic.bam | varscan mpileup2snp --min-var-freq 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 > tmp/varscan_output.vcf
+
+
+samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
+samtools index tmp/first_read_4somatic.bam && \
+samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+  -r chr1:1000000-1001000 -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
+  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
+  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
+  > tmp/varscan_output.vcf
+
+  cat tmp/varscan_input.pileup | java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
+  --min-coverage 1 \
+  --min-reads2 1 \
+  --min-avg-qual 0 \
+  --min-var-freq 0 \
+  --p-value 1 \
+  --strand-filter 0 \
+  --output-vcf 1 \
+  > tmp/varscan_output.vcf
+
+#indel test (with SNP)
+samtools view -Sb tmp/indel_example.sam > tmp/indel_example.bam && \
+samtools index tmp/indel_example.bam && \
+samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+  -r chr1:16000-18000 -B -q 0 -Q 0 tmp/indel_example.bam | \
+  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
+  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
+  > tmp/varscan_indel_example.vcf
+
+#indel test (with indel call)
+samtools view -Sb tmp/indel_example.sam > tmp/indel_example.bam && \
+samtools index tmp/indel_example.bam && \
+samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+  -r chr1:16000-18000 -B -q 0 -Q 0 tmp/indel_example.bam | \
+  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2indel \
+  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
+  > tmp/varscan_indel_example.vcf
+
+#varscan test with bed file
+samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
+samtools index tmp/first_read_4somatic.bam && \
+samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+  -l tmp/position_1000342.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
+  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
+  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
+  > tmp/varscan_output.vcf
+
+#call varscan directly
+#varscan test with bed file
+samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
+samtools index tmp/first_read_4somatic.bam && \
+samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
+  -l tmp/position_1000342.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
+  varscan mpileup2snp \
+  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
+  > tmp/varscan_output.vcf
