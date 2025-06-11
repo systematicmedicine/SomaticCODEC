@@ -17,9 +17,14 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 ## Installation and setup
 
-### Local setup (skip for EC2 instances)
+### WSL setup (skip for EC2 instances)
 
-#### Docker desktop setup (skip for EC2 instances)
+#### GitHub access
+
+* Create a personal access token with an expiry not greater than 90 days
+* Store this personal access token using your WSL crediential manager of choice
+
+#### Docker desktop setup
 * Download docker desktop from https://www.docker.com/products/docker-desktop
 * During installation:
   * Enable WSL2 backend
@@ -53,7 +58,12 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 * Download any raw fastq files (most likely smaller test files if running locally)
 
-### EC2 setup (skip for local use)
+### EC2 setup (skip for WSL)
+
+#### GitHub access
+
+* The repository has deploy key that allows read-only access to this repository only
+* The private key can be found at <I>\RwoD Research\Personal\Cameron\Misc\codec-opensource deploy key</I>
 
 #### Launch new EC2 instance
 * Name instance according to project and user
@@ -101,37 +111,6 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
   ```
 
 ### General setup (both local and EC2)
-
-#### Set up github
-
-* Generate GitHub SSH key (change to relevant email address):
-
-  ```bash
-  ssh-keygen -t ed25519 -C "user.lastname@systematicmedicine.com" -f ~/.ssh/EC2_git_key && \
-  eval "$(ssh-agent -s)" && \
-  ssh-add ~/.ssh/EC2_git_key && \
-  cat ~/.ssh/EC2_git_key.pub
-  ```
-* Copy the key output and go to https://github.com/settings/keys  
-* Click **New SSH key**  
-* Title it (e.g. "EC2_git_key")  
-* Paste the copied key and save
-* Ensure github authentication works after restart (Make SSH agent start every time a shell session starts)
-
-  ```bash
-  nano ~/.bashrc
-  ```
-* Add the following lines to the end of ~/.bashrc
-
-  eval "$(ssh-agent -s)" > /dev/null
-  ssh-add ~/.ssh/EC2_git_key 2>/dev/null
-  
-* Save and exit (ctrl + o, ctrl + x)
-* Reload shell
-
-  ```bash
-  source ~/.bashrc
-  ```
 
 #### Clone github repository
 * Clone the GitHub repository:
