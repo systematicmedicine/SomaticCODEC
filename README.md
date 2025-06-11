@@ -43,7 +43,6 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
   * GRCh38_notinalldifficultregions.bed
   * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.ann
   * GRCh38_notinalldifficultregions.interval_list
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwa_index.tar.gz
   * common_all_20180418_with_chr.vcf.gz
   * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt
   * common_all_20180418_with_chr.vcf.gz.tbi
