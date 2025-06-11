@@ -31,12 +31,7 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 * Test:
   * docker version
   * docker run hello-world
-* Add Docker CLI to WSL PATH:
-```bash
-echo 'export PATH="$PATH:/mnt/c/Program Files/Docker/Docker/resources/bin"' >> ~/.bashrc
-source ~/.bashrc
-```
-* Note: Docker desktop may require up to 32GB ram to run human whole genome alignment steps locally. 
+* Note: Docker desktop may require up to 32GB RAM to run human whole genome alignment steps locally. 
 
 #### Collect reference files
 * Download the following files from S3 (sysmed-ref-s3) to codec-opensource/tmp/reference
