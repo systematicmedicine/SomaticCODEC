@@ -56,10 +56,14 @@ RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
         umi_tools \
         graphviz \
         python-graphviz \
-        vardict-java \
         varscan \
         perl && \
     /opt/conda/bin/conda clean -afy
+
+# Make varscan available as a direct command
+RUN VARSCAN_JAR=$(find /opt/conda/envs/codec-env -name 'VarScan.jar') && \
+    echo -e '#!/bin/bash\nexec java -jar '"$VARSCAN_JAR"' "$@"' > /opt/conda/envs/codec-env/bin/varscan && \
+    chmod +x /opt/conda/envs/codec-env/bin/varscan
 
 # Auto-activate codec-env when bash starts
 RUN echo "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env" >> ~/.bashrc
