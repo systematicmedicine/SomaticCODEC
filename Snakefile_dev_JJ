@@ -25,6 +25,7 @@ sample = ["Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT",
 "Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG",
  "Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC"]
 
+# sample = "sperm_l5_subset_larger"
 ref = "tmp/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 
 # Code to generate subset of data
