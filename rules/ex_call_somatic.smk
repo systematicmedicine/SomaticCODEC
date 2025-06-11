@@ -157,7 +157,6 @@ samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fn
   > tmp/varscan_output.vcf
 
 #call varscan directly
-#varscan test with bed file
 samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
 samtools index tmp/first_read_4somatic.bam && \
 samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
