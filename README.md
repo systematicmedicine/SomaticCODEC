@@ -55,6 +55,10 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
   * common_all_20180418_with_chr.vcf.gz
   * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.0123
   * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt.2bit.64
+  * ex_r1start.fasta
+  * ex_r1end.fasta
+  * ex_r2start.fasta
+  * ex_r2end.fasta
 
 * Download any raw fastq files (most likely smaller test files if running locally)
 
