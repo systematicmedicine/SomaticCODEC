@@ -36,7 +36,7 @@ ref = "tmp/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
-include: "rules/masked_regions.smk"
+#include: "rules/masked_regions.smk"
 
 # Load config
 
