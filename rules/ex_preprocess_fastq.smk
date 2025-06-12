@@ -53,8 +53,8 @@ rule ex_demux:
         r1_start = "tmp/r1start.fasta",
         r2_start = "tmp/r2start.fasta"
     output:
-        demuxed_r1 = temp(expand("tmp/{sample}_r1_raw.fastq.gz", sample=ex_sample_names)),
-        demuxed_r2 = temp(expand("tmp/{sample}_r2_raw.fastq.gz", sample=ex_sample_names)),
+        demuxed_r1 = temp(expand("tmp/{ex_sample}_r1_raw.fastq.gz", ex_sample=ex_sample_names)),
+        demuxed_r2 = temp(expand("tmp/{ex_sample}_r2_raw.fastq.gz", ex_sample=ex_sample_names)),
         report = "metrics/demux_metrics.txt",
         json = "metrics/demux_metrics.json"
     threads:
@@ -84,15 +84,15 @@ rule ex_demux:
 # Identifies and trims 3' sample indices from R1 and R2 when present
 rule ex_trim:
     input:
-        r1 = "tmp/{sample}_r1_raw.fastq.gz",
-        r2 = "tmp/{sample}_r2_raw.fastq.gz",
+        r1 = "tmp/{ex_sample}_r1_raw.fastq.gz",
+        r2 = "tmp/{ex_sample}_r2_raw.fastq.gz",
         r1_end = "tmp/r1end.fasta",
         r2_end = "tmp/r2end.fasta"
     output:
-        r1 = temp("tmp/{sample}/{sample}_r1_trim.fastq.gz"),
-        r2 = temp("tmp/{sample}/{sample}_r2_trim.fastq.gz"),
-        report = "metrics/{sample}/{sample}_trim_metrics.txt",
-        json = "metrics/{sample}/{sample}_trim_metrics.json"
+        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
+        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
+        report = "metrics/{ex_sample}/{ex_sample}_trim_metrics.txt",
+        json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     threads:
         config['ncores']
     shell:
@@ -117,13 +117,13 @@ rule ex_trim:
 # Trims 5' and 3' ends to remove residual adapter/A-tailing bases. Filters inserts size <15bp. 
 rule ex_trimfilter:
     input: 
-        r1 = "tmp/{sample}/{sample}_r1_trim.fastq.gz",
-        r2 = "tmp/{sample}/{sample}_r2_trim.fastq.gz",  
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",  
     output:
-        r1 = temp("tmp/{sample}/{sample}_r1_trimfilter.fastq.gz"),
-        r2 = temp("tmp/{sample}/{sample}_r2_trimfilter.fastq.gz"),
-        report = "metrics/{sample}/{sample}_trimfilter_metrics.txt",
-        json = "metrics/{sample}/{sample}_trimfilter_metrics.json"
+        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trimfilter.fastq.gz"),
+        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trimfilter.fastq.gz"),
+        report = "metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.txt",
+        json = "metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json"
     threads:
         config['ncores']
     shell:  
@@ -150,18 +150,18 @@ rule ex_trimfilter:
 # FastQC on demultiplexed, trimmed FASTQs 
 rule ex_fastqctrim_metrics:
     input:
-        fastq1 = "tmp/{sample}/{sample}_r1_trimfilter.fastq.gz",
-        fastq2 = "tmp/{sample}/{sample}_r2_trimfilter.fastq.gz"
+        fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_trimfilter.fastq.gz",
+        fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_trimfilter.fastq.gz"
     output:
-        fastqc_report1 = "metrics/{sample}/{sample}_r1_trimfilter_metrics.html",
-        fastqc_report2 = "metrics/{sample}/{sample}_r2_trimfilter_metrics.html"
+        fastqc_report1 = "metrics/{ex_sample}/{ex_sample}_r1_trimfilter_metrics.html",
+        fastqc_report2 = "metrics/{ex_sample}/{ex_sample}_r2_trimfilter_metrics.html"
     shell:
         """
-        fastqc {input.fastq1} -o metrics/{wildcards.sample}
-        fastqc {input.fastq2} -o metrics/{wildcards.sample}
+        fastqc {input.fastq1} -o metrics/{wildcards.ex_sample}
+        fastqc {input.fastq2} -o metrics/{wildcards.ex_sample}
 
-        mv metrics/{wildcards.sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
-        mv metrics/{wildcards.sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
+        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
+        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
         """
 
 # Custom python script to assess demultiplexing. 
