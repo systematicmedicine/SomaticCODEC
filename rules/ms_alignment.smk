@@ -51,7 +51,7 @@ rule mark_duplicates:
         dup_metrics = "tmp/metrics/markdup/{ms_sample}_markdup_metrics.txt"
     shell:
         """
-        java -jar {picard} MarkDuplicates \
+        picard MarkDuplicates \
         I={input.bam_sorted} \
         O={output.bam_markdup} \
         M={output.dup_metrics} \
@@ -60,8 +60,6 @@ rule mark_duplicates:
         """
 
 # Generates alignment metrics
-# Picard tools require path to picard.jar
-picard = "/home/joshj/tools/picard/picard.jar"
 rule alignment_metrics:
     input:
         bam = "tmp/results/{ms_sample}_markdup.bam"
@@ -76,7 +74,7 @@ rule alignment_metrics:
 
         # Collect insert size metrics
         # M = 0.5 means 50% of reads must fall within the insert size peak to generate metrics
-        java -jar {picard} CollectInsertSizeMetrics \
+        picard CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.insert_metrics} \
             H={output.insert_hist} \
