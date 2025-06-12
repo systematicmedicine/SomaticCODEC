@@ -1,5 +1,5 @@
-sample,samplename,fastq1,fastq2
-Sample01,ex_hek1.1,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
-Sample02,ex_hek1.2,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
-Sample03,ex_hek1.3,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
-Sample04,ex_hek1.4,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
+sample,ex_samplename,ms_samplename,ex_fastq1,ex_fastq2
+Sample01,ex_hek1.1,ms_hek1.1,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
+Sample02,ex_hek1.2,ms_hek1.2,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
+Sample03,ex_hek1.3,ms_hek1.3,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
+Sample04,ex_hek1.4,ms_hek1.4,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R1.fastq.gz,tmp/raw/AGRF25010244_22W3W3LT3_NoIndex_L007_R2.fastq.gz
