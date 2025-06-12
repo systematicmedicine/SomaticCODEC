@@ -12,11 +12,11 @@ ENV PATH="/opt/conda/bin:/opt/conda/envs/codec-env/bin:/root/.cargo/bin:$PATH"
 # Use bash as default shell
 SHELL ["/bin/bash", "-c"]
 
-# Install system dependencies
+# Install system dependencies (including Java runtime for fgbio)
 RUN apt-get update && apt-get install -y \
-    wget curl git nano python3-pip \
+    wget curl git nano python3-pip unzip default-jdk \
     ca-certificates bzip2 liblzma-dev zlib1g-dev libbz2-dev \
-    build-essential \
+    build-essential openjdk-11-jre \
  && pip install --break-system-packages awscli \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -32,7 +32,7 @@ RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
         bwa-mem2 \
         tmux \
         samtools \
-        fgbio \
+        #fgbio \ This will be added in place of feature branch build once CallCodecConsensusReads is added to fgbio
         picard \
         gatk4 \
         bcftools \
@@ -64,6 +64,24 @@ RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
 RUN VARSCAN_JAR=$(find /opt/conda/envs/codec-env -name 'VarScan.jar') && \
     echo -e '#!/bin/bash\nexec java -jar '"$VARSCAN_JAR"' "$@"' > /opt/conda/envs/codec-env/bin/varscan && \
     chmod +x /opt/conda/envs/codec-env/bin/varscan
+
+# Install feature branch of fgbio (replace with conda install when CallCodecConsensusReads is added to main branch)
+RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | \
+    gpg --dearmor > /usr/share/keyrings/sbt-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/sbt-keyring.gpg] https://repo.scala-sbt.org/scalasbt/debian all main" \
+    > /etc/apt/sources.list.d/sbt.list && \
+    apt-get update && \
+    apt-get install -y sbt git default-jdk && \
+    git clone --single-branch --branch feature/codec https://github.com/fulcrumgenomics/fgbio.git && \
+    cd fgbio && sbt assembly && \
+    mkdir -p /opt/fgbio && \
+    cp target/scala-2.13/fgbio-*.jar /opt/fgbio/fgbio.jar && \
+    echo -e '#!/bin/bash\nexec java ${JAVA_OPTS} -jar /opt/fgbio/fgbio.jar "$@"' > /usr/local/bin/fgbio && \
+    chmod +x /usr/local/bin/fgbio && \
+    rm -rf ~/.sbt ~/.ivy2 ~/.cache /var/lib/apt/lists/*
+
+# Optional: set workdir and default entrypoint
+WORKDIR /work
 
 # Auto-activate codec-env when bash starts
 RUN echo "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env" >> ~/.bashrc
