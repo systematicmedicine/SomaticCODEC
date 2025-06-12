@@ -18,7 +18,7 @@ Author: Ben Barry
 rule ms_generate_reference:
     input:
         ref = HG38,
-        var = rules.ms_merge_filtered.output.vcf
+        var = rules.ms_filter_pass_variants.output.vcf
     output:
         fasta = "tmp/data/pseudoref/{sample}_personalised_ref.fasta"
     shell:

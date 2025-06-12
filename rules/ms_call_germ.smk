@@ -3,8 +3,8 @@
 
 Rules for ...
 
-Input: ...
-Output: ...
+Input: aligned, sorted and dulpicate marked BAM
+Output: filtered VCF file
 
 Author: Ben Barry
 
@@ -36,7 +36,7 @@ rule ms_sort_bam:
     input:
         bam= input_bam
     output:
-        bam= temp("tmp/data/processed/{sample}_sort.bam")
+        bam= temp("tmp/data/processed/{ms_sample}_sort.bam")
     shell:
         """
         picard -Xmx7g SortSam \
@@ -48,16 +48,18 @@ rule ms_sort_bam:
             MAX_RECORDS_IN_RAM=3000000
         """
 
+
 # create a summary statistic which can be viewed for QC - again may not be necescecary 
 rule ms_alignment_metrics:
     input:
         bam=rules.ms_sort_bam.output.bam
     output:
-        stats="tmp/data/processed/{sample}_chr1_flagstat.txt"
+        stats="tmp/data/processed/{ms_sample}_chr1_flagstat.txt"
     shell:
         """
         samtools flagstat {input.bam} > {output.stats}
         """
+
 
 # using Haplotypecaller to call germline varients
 # note - here Chr1 is explicitly being called on to speed things up.
@@ -66,7 +68,7 @@ rule ms_call_germ_variants:
         bam=rules.ms_sort_bam.output.bam,
         ref= HG38
     output:
-        vcf="tmp/data/processed/{sample}_chr1.vcf.gz"
+        vcf="tmp/data/processed/{ms_sample}_chr1.vcf.gz"
     shell:
         """
         gatk --java-options "-Xmx8g" HaplotypeCaller  \
@@ -85,8 +87,8 @@ rule ms_hard_filter_SNV:
         vcf= rules.ms_call_germ_variants.output.vcf,
         ref= HG38
     output:
-        SNV_vcf= temp("tmp/data/processed/{sample}_SNV.vcf.gz"),
-        SNV_filtered = "tmp/data/processed/{sample}_SNV_filtered.vcf.gz"
+        SNV_vcf= temp("tmp/data/processed/{ms_sample}_SNV.vcf.gz"),
+        SNV_filtered = "tmp/data/processed/{ms_sample}_SNV_filtered.vcf.gz"
     shell:
         """
         gatk SelectVariants \
@@ -109,14 +111,15 @@ rule ms_hard_filter_SNV:
 
         """    
 
+
 #select and filter indel calls
 rule ms_hard_filter_INDEL:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
         ref= HG38
     output:
-        INDEL_vcf= temp("tmp/data/processed/{sample}_INDEL.vcf.gz"),
-        INDEL_filtered = "tmp/data/processed/{sample}_INDEL_filtered.vcf.gz"
+        INDEL_vcf= temp("tmp/data/processed/{ms_sample}_INDEL.vcf.gz"),
+        INDEL_filtered = "tmp/data/processed/{ms_sample}_INDEL_filtered.vcf.gz"
     shell:
         """
         gatk SelectVariants \
@@ -136,13 +139,14 @@ rule ms_hard_filter_INDEL:
 
         """
 
+
 #merge filtered vcfs
 rule ms_merge_filtered:
     input:
         SNV= rules.ms_hard_filter_SNV.output.SNV_filtered,
         INDEL= rules.ms_hard_filter_INDEL.output.INDEL_filtered
     output:
-        vcf = "tmp/data/processed/{sample}_hardfilter.vcf.gz"
+        vcf = "tmp/data/processed/{ms_sample}_hardfilter.vcf.gz"
     shell:
         """
         gatk MergeVcfs \
@@ -151,28 +155,42 @@ rule ms_merge_filtered:
         -O {output.vcf} 
 
         """
-#select only the variants which pass
+        
+
+#split variants based on their zygosity
 rule ms_filter_pass_variants:
     input:
         vcf = rules.ms_merge_filtered.output.vcf
     output:
-        vcf = "tmp/data/processed/{sample}_hardFilter_passed.vcf.gz"
+        vcf = "tmp/data/processed/{ms_sample}_hardFilter_passed_all.vcf.gz",
+        vcf_index = "tmp/data/processed/{ms_sample}_hardFilter_passed_all.vcf.gz.tbi",
+        het = "tmp/data/processed/{ms_sample}_hardFilter_passed_het.vcf.gz",
+        het_index = "tmp/data/processed/{ms_sample}_hardFilter_passed_het.vcf.gz.tbi",
+        hom = "tmp/data/processed/{ms_sample}_hardFilter_passed_hom.vcf.gz",
+        hom_index = "tmp/data/processed/{ms_sample}_hardFilter_passed_hom.vcf.gz.tbi"
     shell:
         """
-        # select only variants which pass filter metrics
-        gatk SelectVariants \
-        -V {input.vcf} \
-        --exclude-filtered true \
-        -O {output.vcf}
+        # Combined variants for metric purposes
+        bcftools view -f PASS -Oz -o {output.vcf} {input.vcf}
+        tabix -p vcf {output.vcf}
+
+        # Select only homozygous variants which pass filter metrics
+        bcftools view -f PASS -g hom -Oz -o {output.hom} {input.vcf}
+        tabix -p vcf {output.hom}
+
+        # Select only heterozygous variants which pass filter metrics
+        bcftools view -f PASS -g het -Oz -o {output.het} {input.vcf}
+        tabix -p vcf {output.het}
 
         """
+
 
 #output variant call summary metrics
 rule ms_variant_call_metrics:
     input: 
         vcf =rules.ms_filter_pass_variants.output.vcf
     output:
-        stat = "tmp/metrics/{sample}_variantCall_summary.txt"
+        stat = "tmp/metrics/{ms_sample}_variantCall_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
@@ -180,21 +198,22 @@ rule ms_variant_call_metrics:
         """
 
 
-
 #create filter for heterozygous regions which pass the hard filtering
+# create bed files for each of the heterozygous in/dels and SNVs
+# at this stage i think this is an incorrect method - unless im mistaken there is with result in a mis aligned mask on the newly created ref FASTA.
 rule ms_heterozygous_bed:
     input:
-        vcf= rules.ms_filter_pass_variants.output.vcf
+        vcf= rules.ms_filter_pass_variants.output.het
     output:
-        vcf= "tmp/data/processed/{sample}_het_variants.vcf",
-        bed= "tmp/data/bed/{sample}_het_variants.bed"
+        del_bed= "tmp/data/bed/{ms_sample}_het_variants_del.bed",
+        in_bed= "tmp/data/bed/{ms_sample}_het_variants_in.bed",
+        snv_bed = "tmp/data/bed/{ms_sample}_het_variants_snv.bed"
     shell:
         """
-        # create a vcf file of het regions only
-        bcftools view -f PASS -g het -Ov -o {output.vcf} {input.vcf}
-
         # Convert filtered VCF to BED format
-        vcf2bed < {output.vcf} > {output.bed}
+        zcat {input.vcf} | vcf2bed --deletions > {output.del_bed}
+        zcat {input.vcf} | vcf2bed --insertions > {output.in_bed}
+        zcat {input.vcf} | vcf2bed --snvs > {output.snv_bed}
 
         """
 

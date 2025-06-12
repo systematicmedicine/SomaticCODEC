@@ -12,8 +12,7 @@ Temporary Snakefile for use during pipeline development
 # hardcoded conifg (later will merge into config.yaml)
 input_bam = "tmp/data/raw/Sample01_map_ssc_anno_chr1.bam"
 HG38 = "tmp/data/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
-sample = "Sample01"
-SAMPLES = ["Sample01"]
+ms_sample = "Sample01"
 
 
 # Include rules files
@@ -28,6 +27,8 @@ include: "rules/ms_personal_ref.smk"
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("tmp/metrics/{sample}_variantCall_summary.txt", sample=SAMPLES),
-        expand("tmp/data/bed/{sample}_het_variants.bed", sample=SAMPLES),
-        expand("tmp/data/pseudoref/{sample}_personalised_ref.fasta", sample=SAMPLES)
+        expand("tmp/metrics/{ms_sample}_variantCall_summary.txt", ms_sample=ms_sample),
+        expand("tmp/data/bed/{ms_sample}_het_variants_del.bed", ms_sample=ms_sample), #wrong co-ordinates
+        expand("tmp/data/bed/{ms_sample}_het_variants_in.bed", ms_sample=ms_sample),  #wrong co-ordinates
+        expand("tmp/data/bed/{ms_sample}_het_variants_snv.bed", ms_sample=ms_sample), #wrong co-ordinates
+        expand("tmp/data/pseudoref/{ms_sample}_personalised_ref.fasta", ms_sample=ms_sample)
