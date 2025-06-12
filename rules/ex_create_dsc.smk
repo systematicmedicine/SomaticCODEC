@@ -15,67 +15,107 @@ Temporary dev notes:
 to speed up the pipeline
 
 """
-import pandas as pd
-from Bio import SeqIO
 
-# Load config
-workdir: config["cwd"]
-REF = config['ref']
-EVAL_REGION_BED = config['region_bed']
-EVAL_REGION_IL = config['region_interval_list']
-DBSNP = config['dbsnp']
-tmpdir = config['tmpdir']
-inputdata_file = config["input_meta"]
-r1start = config["r1start"]
-r2start = config["r2start"]
-r1end = config["r1end"]
-r2end = config["r2end"]
-ncores = config["ncores"]
-
-rule all:
+#Move UMI from readname to RX:Z: tag and sort by name for UMI consensus steps
+rule ex_umitag:
     input:
-        "../raw/ex_hek1.1_unmap_dsc.bam",
-        "exp_map_dsc/ex_hek1.1_map_dsc.bam",
-        "exp_addrg/ex_hek1.1_unmap_dsc_rg.bam",
-        "exp_annotate_dsc/ex_hek1.1_map_dsc_anno.bam",
-        "exp_annotate_dsc/ex_hek1.1_map_dsc_anno.bam.bai"
-
-# Sort MI marked bam (before duplicate collapse) by coordinates for callcodecconsensusreads
-rule exp_sort_for_dsc:
-    input:
-        "../raw/ex_hek1.1_map_umi3_chr1.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
     output:
-        "../raw/ex_hek1.1_map_umi3_chr1_sorted.bam"
-    shell:
-        """
-        fgbio SortBam \
-            -i {input} \
-            -o {output} \
-            -s TemplateCoordinate
-        """
-
-# Call codec consensus reads using MI marked bam (before duplicate collapse)
-rule exp_dsc:
-    input:
-        bam = "../raw/ex_hek1.1_map_umi3_chr1_sorted.bam"
-    output:
-        bam = "../raw/ex_hek1.1_unmap_dsc.bam"
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi1.bam")
+    threads:
+        config['ncores']
     resources:
         mem = 32
     shell:
         """
-        fgbio CallCodecConsensusReads \
+        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+            CopyUmiFromReadName \
+            -i {input.bam} \
+            -o /dev/stdout \
+            --remove-umi true | \
+        samtools sort -n -@ {threads} -o {output.bam}
+        """
+# Adds mate information to PE reads (e.g. read 1's information to read 2, read 2's information to read 1). Tags include MC:Z:, MQ:i, RNEXT, PNEXT, TLEN, FLAGs. These tags are required for groupbyUMI, SSC and DSC. 
+rule ex_addmate:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_umi1.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi2.bam")
+    resources:
+        mem = 32
+    shell:
+        """
+        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        SetMateInformation \
+        -i {input.bam} \
+        -o {output.bam}
+        """
+
+# Uses UMI tags (RX:Z:<UMI>) to assign identical MI tags to any reads within 1 edit distance of each other, for later SSC and DSC collapse.  
+rule ex_groupbyumi:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_umi2.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi3.bam"),
+        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt"
+    threads:
+        config['ncores']
+    resources:
+        mem = 32
+    shell:
+        """
+        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression 1 --async-io \
+            GroupReadsByUmi \
+            --min-umi-length 6 \
+            -i {input.bam} \
+            -o {output.bam} \
+            -f {output.histogram} \
+            -@ {threads}
+            -m 0 \
+            --strategy=adjacency
+        """
+
+# Sort MI marked bam (before duplicate collapse) by coordinates for callcodecconsensusreads
+rule ex_sort_for_dsc:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_umi3.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi3_sorted.bam")
+    resources:
+        mem = 16
+    shell:
+        """
+        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+            SortBam \
+            -i {input.bam} \
+            -o {output.bam} \
+            -s TemplateCoordinate
+        """
+
+# Call codec consensus reads using MI marked bam (before duplicate collapse)
+rule ex_dsc:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_umi3_sorted.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam")
+    resources:
+        mem = 32
+    shell:
+        """
+        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+         CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
             -M 1
         """
 
 # Add read group information to the dsc bam file (not particularly useful information, but required by downstream tools)
-rule exp_addrg:
+rule ex_addrg:
     input:
-        bam = "../raw/ex_hek1.1_unmap_dsc.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"
     output:
-        bam = "exp_addrg/ex_hek1.1_unmap_dsc_rg.bam"
+        bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam")
     shell:
         """
         picard AddOrReplaceReadGroups \
@@ -90,65 +130,116 @@ rule exp_addrg:
         """
 
 # Convert the unmapped dsc bam to an unmapped fastq file for realignment 
-rule exp_dsc_bam_to_fastq:
+rule ex_dsc_bam_to_fastq:
     input:
-        bam = "exp_addrg/ex_hek1.1_unmap_dsc_rg.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam"
     output:
-        fq = temp("tmp/ex_hek1.1.fastq")
+        fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.fastq")
     shell:
         """
-        samtools fastq {input.bam} > {output.fq}
+        samtools fastq {input.bam} > {output.fastq}
         """
 
 # Align the dsc (with ss overhangs) to the reference genome as sequences have changed
-rule exp_map_dsc:
+rule ex_map_dsc:
     input:
-        fq = "tmp/ex_hek1.1.fastq"
+        fq = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.fastq",
+        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta"
     output:
-        sam = temp("tmp/ex_hek1.1.sam")
-    threads: ncores
-    params:
-        reference = REF
+        sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.sam")
+    threads: 
+        ncores
     shell:
         """
-        bwa-mem2 mem -t {threads} -Y {params.reference} {input.fq} > {output.sam}
+        bwa-mem2 mem -t {threads} -Y {input.pers_ref} {input.fq} > {output.sam}
         """
 
 # Convert dsc sam to dsc bam and sort by readname (querynamesort)
-rule exp_sam_to_bam_dsc:
+rule ex_samtobam_dsc:
     input:
-        sam = "tmp/ex_hek1.1.sam"
+        sam = "tmp/{ex_sample}/{ex_sample}_map_dsc.sam"
     output:
-        bam = "exp_map_dsc/ex_hek1.1_map_dsc.bam"
-    threads: ncores
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
+    threads: 
+        ncores
     shell:
         """
         samtools sort -n -@ {threads} -o {output.bam} {input.sam}
         """
 
 # Add metadata from unmapped dsc bam back to the mapped dsc bam
-rule exp_zipdata: 
+rule ex_zipdata: 
     input:
-        mapped = "exp_map_dsc/ex_hek1.1_map_dsc.bam",
-        unmapped = "exp_addrg/ex_hek1.1_unmap_dsc_rg.bam",
+        mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
+        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam",
+        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta"
     output:
-        bam = "exp_annotate_dsc/ex_hek1.1_map_dsc_anno.bam",
-        bai = "exp_annotate_dsc/ex_hek1.1_map_dsc_anno.bam.bai"
-    params:
-        reference = REF,
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
+        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
     resources:
         mem = 4,
     threads:
         ncores
     shell:
         """
-        fgbio ZipperBams \
+        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+            ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
-            --ref {params.reference} \
+            --ref {input.pers_ref} \
             --tags-to-revcomp Consensus \
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}
         """
 
-# Add metrics files (e.g. duplex depth (considering ss overhangs), etc.)
+# Add a rule to filter dsc for only duplex bases (ie. remove single strand overhangs and R1R2 disagreements) - functionality not yet built into CallCodecConsensusReads
+
+# Depth and genome territory covered, applied to the dsc bam. Currently without filtering, so this includes single strand overhangs (ie. not true duplex depth)
+rule ex_sscdepth_metrics:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta" #Rename based on ms pipeline
+    output:
+        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt",
+    resources:
+        mem = 30,
+    shell:
+        """
+        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
+            CollectWgsMetrics \
+            I={input.bam} \
+            O={output.metrics} \
+            R={input.pers_ref} \
+            INCLUDE_BQ_HISTOGRAM=true \
+            MINIMUM_BASE_QUALITY=30
+        """
+
+# Calculates insert size (distance between start of watson and end of crick, includes ss overhangs)
+rule ex_insert_metrics:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+    output:
+        txt = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt",
+        hist = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf",
+    resources:
+        mem = 32
+    shell:
+        """
+        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
+            CollectInsertSizeMetrics \
+            I={input.bam} \
+            O={output.txt} \
+            H={output.hist} \
+            M=0.5 \
+            W=600 \
+            DEVIATIONS=100
+        """
+
+# Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
+rule ex_duplication_metrics:
+    input:
+        expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names)
+    output:
+        "metrics/duplication_metrics.txt"
+    script:
+        "../scripts/duplication.py"
