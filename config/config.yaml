@@ -6,9 +6,9 @@ region_interval_list: tmp/reference/GRCh38_notinalldifficultregions.interval_lis
 dbsnp: tmp/reference/common_all_20180418_with_chr.vcf.gz
 ref_dict: tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.dict
 ex_samples: config/ex_samples.csv
-r1start: config/r1start.fasta
-r2start: config/r2start.fasta
-r1end: config/r1end.fasta
-r2end: config/r2end.fasta
+r1start: tmp/reference/ex_r1start.fasta
+r2start: tmp/reference/ex_r2start.fasta
+r1end: tmp/reference/ex_r1end.fasta
+r2end: tmp/reference/ex_r2end.fasta
 s3seq_fastq_folder: 20250121-CODECseq-pilot-2
 ncores: 4
