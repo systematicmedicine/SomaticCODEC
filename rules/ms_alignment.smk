@@ -16,14 +16,14 @@ Author: Joshua Johnstone
 rule raw_alignment:
     input: 
         ref = ref,
-        r1_processed = "tmp/data/{sample}_processed_r1.fastq.gz",
-        r2_processed = "tmp/data/{sample}_processed_r2.fastq.gz"
+        r1_processed = "tmp/data/{ms_sample}_processed_r1.fastq.gz",
+        r2_processed = "tmp/data/{ms_sample}_processed_r2.fastq.gz"
     output:
-        bam = "tmp/results/{sample}_aligned.bam"
+        bam = "tmp/results/{ms_sample}_aligned.bam"
     threads: 32
     shell:
         """
-        bwa-mem2 mem -R "@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPL:ILLUMINA" \
+        bwa-mem2 mem -R "@RG\\tID:{wildcards.ms_sample}\\tSM:{wildcards.ms_sample}\\tPL:ILLUMINA" \
             -t {threads} \
             {input.ref} \
             {input.r1_processed} \
@@ -35,20 +35,20 @@ rule raw_alignment:
 # Sorts bam by coordinate
 rule sort_bam:
     input:
-        bam = "tmp/results/{sample}_aligned.bam"
+        bam = "tmp/results/{ms_sample}_aligned.bam"
     output:
-        bam_sorted =  "tmp/results/{sample}_sorted.bam"
+        bam_sorted =  "tmp/results/{ms_sample}_sorted.bam"
     threads: 8
     shell:
         "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
 
 rule mark_duplicates:
     input:
-        bam_sorted = "tmp/results/{sample}_sorted.bam"
+        bam_sorted = "tmp/results/{ms_sample}_sorted.bam"
     output:
-        bam_markdup = "tmp/results/{sample}_markdup.bam",
-        bai_markdup = "tmp/results/{sample}_markdup.bai",
-        dup_metrics = "tmp/metrics/markdup/{sample}_markdup_metrics.txt"
+        bam_markdup = "tmp/results/{ms_sample}_markdup.bam",
+        bai_markdup = "tmp/results/{ms_sample}_markdup.bai",
+        dup_metrics = "tmp/metrics/markdup/{ms_sample}_markdup_metrics.txt"
     shell:
         """
         java -jar {picard} MarkDuplicates \
@@ -64,11 +64,11 @@ rule mark_duplicates:
 picard = "/home/joshj/tools/picard/picard.jar"
 rule alignment_metrics:
     input:
-        bam = "tmp/results/{sample}_markdup.bam"
+        bam = "tmp/results/{ms_sample}_markdup.bam"
     output:
-        stats = "tmp/metrics/alignment/{sample}_samtools_stats.txt",
-        insert_metrics = "tmp/metrics/alignment/{sample}_insert_size_metrics.txt",
-        insert_hist = "tmp/metrics/alignment/{sample}_insert_size_histogram.pdf"
+        stats = "tmp/metrics/alignment/{ms_sample}_samtools_stats.txt",
+        insert_metrics = "tmp/metrics/alignment/{ms_sample}_insert_size_metrics.txt",
+        insert_hist = "tmp/metrics/alignment/{ms_sample}_insert_size_histogram.pdf"
     shell:
         """
         # Generate alignment stats

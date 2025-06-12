@@ -21,7 +21,7 @@ Author: Joshua Johnstone
 #from Bio import SeqIO
 
 # Provide sample names and reference path
-sample = ["Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT", 
+ms_sample = ["Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT", 
 "Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG",
  "Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC"]
 
@@ -67,21 +67,21 @@ include: "rules/masked_regions.smk"
 
 rule all:
     input:
-        expand("tmp/data/{sample}_r1.fastq.gz", sample = sample),
-        expand("tmp/data/{sample}_r2.fastq.gz", sample = sample),
-        expand("tmp/metrics/fastqc/{sample}_r1_fastqc.html", sample = sample),
-        expand("tmp/metrics/fastqc/{sample}_r2_fastqc.html", sample = sample),
-        expand("tmp/data/{sample}_processed_r1.fastq.gz", sample = sample),
-        expand("tmp/data/{sample}_processed_r2.fastq.gz", sample = sample),
-        expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.html", sample = sample),
-        expand("tmp/metrics/cutadapt/{sample}_trimfilter_metrics.json", sample = sample),
-        expand("tmp/metrics/fastqc/processed/{sample}_processed_r1_fastqc.html", sample = sample),
-        expand("tmp/metrics/fastqc/processed/{sample}_processed_r2_fastqc.html", sample = sample),
-        expand("tmp/results/{sample}_aligned.bam", sample = sample),
-        expand("tmp/results/{sample}_sorted.bam", sample = sample),
-        expand("tmp/metrics/alignment/{sample}_samtools_stats.txt", sample = sample),
-        expand("tmp/metrics/alignment/{sample}_insert_size_metrics.txt", sample = sample),
-        expand("tmp/metrics/alignment/{sample}_insert_size_histogram.pdf", sample = sample),
-        expand("tmp/results/{sample}_markdup.bam", sample = sample),
-        expand("tmp/results/{sample}_markdup.bai", sample = sample),
-        expand("tmp/metrics/markdup/{sample}_markdup_metrics.txt", sample = sample)
+        expand("tmp/data/{ms_sample}_r1.fastq.gz", ms_sample = ms_sample),
+        expand("tmp/data/{ms_sample}_r2.fastq.gz", ms_sample = ms_sample),
+        expand("tmp/metrics/fastqc/{ms_sample}_r1_fastqc.html", ms_sample = ms_sample),
+        expand("tmp/metrics/fastqc/{ms_sample}_r2_fastqc.html", ms_sample = ms_sample),
+        expand("tmp/data/{ms_sample}_processed_r1.fastq.gz", ms_sample = ms_sample),
+        expand("tmp/data/{ms_sample}_processed_r2.fastq.gz", ms_sample = ms_sample),
+        expand("tmp/metrics/cutadapt/{ms_sample}_trimfilter_metrics.html", ms_sample = ms_sample),
+        expand("tmp/metrics/cutadapt/{ms_sample}_trimfilter_metrics.json", ms_sample = ms_sample),
+        expand("tmp/metrics/fastqc/processed/{ms_sample}_processed_r1_fastqc.html", ms_sample = ms_sample),
+        expand("tmp/metrics/fastqc/processed/{ms_sample}_processed_r2_fastqc.html", ms_sample = ms_sample),
+        expand("tmp/results/{ms_sample}_aligned.bam", ms_sample = ms_sample),
+        expand("tmp/results/{ms_sample}_sorted.bam", ms_sample = ms_sample),
+        expand("tmp/metrics/alignment/{ms_sample}_samtools_stats.txt", ms_sample = ms_sample),
+        expand("tmp/metrics/alignment/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample),
+        expand("tmp/metrics/alignment/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample),
+        expand("tmp/results/{ms_sample}_markdup.bam", ms_sample = ms_sample),
+        expand("tmp/results/{ms_sample}_markdup.bai", ms_sample = ms_sample),
+        expand("tmp/metrics/markdup/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample)
