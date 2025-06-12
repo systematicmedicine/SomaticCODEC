@@ -18,14 +18,14 @@ rule combine_lanes:
         r1_l5 = "tmp/data/{ms_sample}_L005_R1.fastq.gz",
         r2_l5 = "tmp/data/{ms_sample}_L005_R2.fastq.gz",
         r1_l6 = "tmp/data/{ms_sample}_L006_R1.fastq.gz",
-        r2_l6 = "tmp/data/{ms_sample}_L006_R1.fastq.gz"
+        r2_l6 = "tmp/data/{ms_sample}_L006_R2.fastq.gz"
     output:
         r1 = "tmp/data/{ms_sample}_r1.fastq.gz",
         r2 = "tmp/data/{ms_sample}_r2.fastq.gz"
     shell:
         """
-        zcat {input.r1_l5} {input.r1_l6} | gzip -c > {output.r1}
-        zcat {input.r2_l5} {input.r2_l6} | gzip -c > {output.r2}
+        cat {input.r1_l5} {input.r1_l6} > {output.r1}
+        cat {input.r2_l5} {input.r2_l6} > {output.r2}
 
         """
 
