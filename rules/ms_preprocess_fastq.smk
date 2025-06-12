@@ -24,8 +24,8 @@ rule combine_lanes:
         r2 = "tmp/data/{ms_sample}_r2.fastq.gz"
     shell:
         """
-        cat {input.r1_l5} {input.r1_l6} > {output.r1} \
-        cat {input.r2_l5} {input.r2_l6} > {output.r2}
+        zcat {input.r1_l5} {input.r1_l6} | gzip -c > {output.r1}
+        zcat {input.r2_l5} {input.r2_l6} | gzip -c > {output.r2}
 
         """
 
