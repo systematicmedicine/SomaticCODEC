@@ -21,201 +21,29 @@ tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno.bam
 tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno.bam.bai
 
 """
-# Call variants
-vardict-java \
-  -G tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -f 0 \
-  -N test \
-  -b tmp/first_read_4somatic.bam \
-  -z \
-  -c 1 -S 2 -E 3 -g 4 \
-  -R "chr1:1000000-1001000" \
-  -Q 0 \
-  -r 1 \
-  -d 1 \
-  -q 0 \
-  -U \
-  -e 0 \
-  -X 1 \
-> tmp/vardict_output.tsv 
-
-# Add headers to variants.tsv
-(echo -e "Sample\tGene\tChr\tStart\tEnd\tRef\tAlt\tDepth\tAltDepth\tRefFwdReads\tRefRevReads\tAltFwdReads\tAltRevReads\tGenotype\tAF\tBias\tPMean\tPStd\tQMean\tQStd\tMQ\tSN\tHIAF\tAdjAF\tShift3\tMSI\tMSILEN\tNM\tHiCnt\tHiCov\t5pFlankSeq\t3pFlankSeq\tSeg\tVarType"; cat tmp/vardict_output.tsv) > tmp/vardict_output_with_header.tsv
-(echo -e "Sample\tChr\tStart\tEnd\tRef\tAlt\tVarType\tReadCount\tRefCount\tAltCount\tStrandBias\tRefBias\tAltBias\tRef/Alt\tVAF\tPCRdupRate\tMQ0\tNM\tAvgReadLen\tPosMean\tPhred\tReads\tAF\tPV\tHP\tConservativeCall\tMQMean\tRefQ\tAltQ\tRefBiasBases\tAltBiasBases\tRegion\tType\tFilter\tCluster"; cat tmp/vardict_output.tsv) > tmp/vardict_output_with_header.tsv
-
-(echo -e "Sample\tGene\tChr\tStart\tEnd\tRef\tAlt\tDepth\tAltDepth\tRefFwdReads\tRefRevReads\tAltFwdReads\tAltRevReads\tGenotype\tAF\tBias\tPMean\tPStd\tQMean\tQStd\tMQ\tSN\tHIAF\tAdjAF\tShift3\tMSI\tMSILEN\tNM\tHiCnt\tHiCov\t5pFlankSeq\t3pFlankSeq\tSeg\tVarType"; cat tmp/vardict_output.tsv) > tmp/vardict_output_with_header.tsv
-
-
-
-
-#Testprocess
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam
-samtools index tmp/first_read_4somatic.bam
-vardict-java   -G tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna   -f 0   -N test   -b tmp/first_read_4somatic.bam   -z   -c 1 -S 2 -E 3 -g 4   -R "chr1:1000000-1001000"   -Q 0   -r 1   -d 1   -q 0   -U   -e 0   -X 1 > tmp/vardict_output.tsv
-(echo -e "Sample\tGene\tChr\tStart\tEnd\tRef\tAlt\tDepth\tAltDepth\tRefFwdReads\tRefRevReads\tAltFwdReads\tAltRevReads\tGenotype\tAF\tBias\tPMean\tPStd\tQMean\tQStd\tMQ\tSN\tHIAF\tAdjAF\tShift3\tMSI\tMSILEN\tNM\tHiCnt\tHiCov\t5pFlankSeq\t3pFlankSeq\tSeg\tVarType"; cat tmp/vardict_output.tsv) > tmp/vardict_output_4somatictest.tsv
-
-#one-liner
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && samtools index tmp/first_read_4somatic.bam && vardict-java -G tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -f 0 -N test -b tmp/first_read_4somatic.bam -z -c 1 -S 2 -E 3 -g 4 -R "chr1:1000000-1001000" -Q 0 -r 1 -d 1 -q 0 -U -e 0 -X 0 -y -T 300 -P 0 -th 6 > tmp/vardict_output.tsv && (echo -e "Sample\tGene\tChr\tStart\tEnd\tRef\tAlt\tDepth\tAltDepth\tRefFwdReads\tRefRevReads\tAltFwdReads\tAltRevReads\tGenotype\tAF\tBias\tPMean\tPStd\tQMean\tQStd\tMQ\tSN\tHIAF\tAdjAF\tShift3\tMSI\tMSILEN\tNM\tHiCnt\tHiCov\t5pFlankSeq\t3pFlankSeq\tSeg\tVarType" && cat tmp/vardict_output.tsv) > tmp/vardict_output_4somatictest.tsv
-
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && samtools index tmp/first_read_4somatic.bam && vardict-java -G tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna   -f 0 -N test   -b tmp/first_read_4somatic.bam   -z -c 1 -S 2 -E 3 -g 4   -R "chr1:1000000-1001000"   -Q 0 -r 1 -d 1 -q 0 -U -e 0 -X 0 -p > tmp/vardict_output.tsv && (echo -e "Sample\tGene\tChr\tStart\tEnd\tRef\tAlt\tDepth\tAltDepth\tRefFwdReads\tRefRevReads\tAltFwdReads\tAltRevReads\tGenotype\tAF\tBias\tPMean\tPStd\tQMean\tQStd\tMQ\tSN\tHIAF\tAdjAF\tShift3\tMSI\tMSILEN\tNM\tHiCnt\tHiCov\t5pFlankSeq\t3pFlankSeq\tSeg\tVarType" && cat tmp/vardict_output.tsv) > tmp/vardict_output_4somatictest.tsv
-
-
-
-# Full readable code
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
-samtools index tmp/first_read_4somatic.bam && \
-
-vardict-java \
-  -G tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -f 0 \
-  -N test \
-  -b tmp/first_read_4somatic.bam \
-  -z \
-  -c 1 \
-  -S 2 \
-  -E 3 \
-  -g 4 \
-  -R "chr1:1000000-1001000" \
-  -Q 0 \
-  -r 1 \
-  -d 1 \
-  -q 0 \
-  -U \
-  -e 0 \
-  -X 0 \
-  -T 300 \
-  -P 0 \
-  -th 6 \
-  -y > tmp/vardict_output.tsv && \
-
-(
-  echo -e "Sample\tGene\tChr\tStart\tEnd\tRef\tAlt\tDepth\tAltDepth\tRefFwdReads\tRefRevReads\tAltFwdReads\tAltRevReads\tGenotype\tAF\tBias\tPMean\tPStd\tQMean\tQStd\tMQ\tSN\tHIAF\tAdjAF\tShift3\tMSI\tMSILEN\tNM\tHiCnt\tHiCov\t5pFlankSeq\t3pFlankSeq\tSeg\tVarType" && \
-  cat tmp/vardict_output.tsv
-) > tmp/vardict_output_4somatictest.tsv
-
-# Bcftools
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
-samtools index tmp/first_read_4somatic.bam && \
-bcftools mpileup \
-  -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -r chr1:1000000-1001000 \
-  -a AD,DP \
-  -Q 0 \
-  -q 0 \
-  -Ou tmp/first_read_4somatic.bam | \
-bcftools call \
-  -mv \
-  -Ov -o tmp/bcftest.vcf
-
-# Varscan
-samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna -r chr1:1000000-1001000 -B -q 0 -Q 0 tmp/first_read_4somatic.bam | varscan mpileup2snp --min-var-freq 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 > tmp/varscan_output.vcf
-
-
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
-samtools index tmp/first_read_4somatic.bam && \
-samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -r chr1:1000000-1001000 -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
-  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
-  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
-  > tmp/varscan_output.vcf
-
-  cat tmp/varscan_input.pileup | java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
-  --min-coverage 1 \
-  --min-reads2 1 \
-  --min-avg-qual 0 \
-  --min-var-freq 0 \
-  --p-value 1 \
-  --strand-filter 0 \
-  --output-vcf 1 \
-  > tmp/varscan_output.vcf
-
-#indel test (with SNP)
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
-samtools index tmp/first_read_4somatic.bam && \
-samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -r chr1:1000000-1001000 -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
-  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
-  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
-  > tmp/varscan_indel_example.vcf
-
-#indel test (with indel call)
-samtools view -Sb tmp/indel_example.sam > tmp/indel_example.bam && \
-samtools index tmp/indel_example.bam && \
-samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -r chr1:16000-18000 -B -q 0 -Q 0 tmp/indel_example.bam | \
-  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2indel \
-  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
-  > tmp/varscan_indel_example.vcf
-
-#varscan test with bed file
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
-samtools index tmp/first_read_4somatic.bam && \
-samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -l tmp/position_1000342.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
-  java -jar /opt/conda/envs/codec-env/share/varscan-2.4.6-0/VarScan.jar mpileup2snp \
-  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
-  > tmp/varscan_output.vcf
-
-#call varscan directly
-samtools view -Sb tmp/first_read_4somatic.sam > tmp/first_read_4somatic.bam && \
-samtools index tmp/first_read_4somatic.bam && \
-
-
-samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -l tmp/<bedfile>.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam | \
-  varscan mpileup2snp \
-  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
-  > tmp/varscan_output.vcf
-
-
-#Step by step mpileup and varscan
-samtools mpileup -f tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna \
-  -l tmp/<bedfile>.bed -B -q 0 -Q 0 tmp/first_read_4somatic.bam > tmp/<mpileup>.txt
-
-varscan mpileup2snp tmp/<mpileup>.txt \
-  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
-  > tmp/varscan_output.vcf
-
-
-
-#Snakefile/pipeline version
-##Create samtools pileup for variant calling of double strand consensus bam
-samtools mpileup -f tmp/<ms_personalized_fasta>.fna \
-  -l tmp/<ms_bedfile>.bed -B -q 0 -Q 0 tmp/<dsc_vc.bam > tmp/<mpileup>.txt
-
-##Call somatic mutations
-varscan mpileup2snp tmp/<mpileup>.txt \
-  --min-coverage 1 --min-var-freq 0 --strand-filter 0 --min-reads2 1 --min-avg-qual 0 --p-value 1 --output-vcf 1 \
-  > tmp/<somatic_mutations>.vcf
-
-
 rule ex_dsc_mpileup:
     input:
-        pers_fasta = "tmp/{sample}/{sample}_ms_personalized_fasta.fna" #Need to add in ms vs ex sample conversion. Rename.
-        regions_bed = "tmp/{sample}/{sample}_ms_bed_file.bed" #Need to add in ms vs ex sample conversion. Rename. 
-        dsc_bam = "tmp/{sample}/{sample}_dsc_anno.bam" #Rename
+        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta" #Rename based on ms pipeline
+        masked = f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_masked_regions.bed" #Rename based on ms pipeline
+        dsc_bam = "tmp/{ex_sample}/{ex_sample}_dsc_map_anno.bam" #Rename
     output:
-        mpileup = "tmp/dsc_mpileup.txt" #Rename
+        mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
     threads: 
         x =
-    params:
-        x = 
     shell:
         """
-        samtools mpileup -f {input.pers_fasta} \
-            -l {input.regions_bed} -B -q 0 -Q 0 \
+        samtools mpileup -f {input.pers_ref} \
+            -l {input.masked} -B -q 0 -Q 0 \
             {input.dsc_bam} > {output.mpileup}
         """
 
 rule ex_somatic_variants:
     input:
-        mpileup = "tmp/dsc_mpileup.txt"
+        mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
     output:
-        vcf =   
+        vcf = "results/{ex_sample}_somatic_mutations.vcf"
     threads: 
         x =
-    params:
-        x =  
     shell:
         """
         varscan mpileup2snp {input.mpileup} \
@@ -225,5 +53,5 @@ rule ex_somatic_variants:
             --min-reads2 1 \
             --min-avg-qual 0 \
             --p-value 1 \
-            --output-vcf 1 > tmp/<somatic_mutations>.vcf
+            --output-vcf 1 > {output.vcf}
         """
