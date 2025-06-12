@@ -3,29 +3,20 @@
 
 Rules for calling somatic mutations
 
-Input: ...
-Output: ...
+Input: Filtered double stranded consensus (.bam)
+Output: Somatic mutation calls (.vcf)
 
-Author: ...
+Somatic mutations are directly called against the filtered double stranded consensus bam (single stranded overhangs and read 1 read 2 disagreements removed).
+Some areas are masked using bed files (illumina difficlut regions, areas where germline depth is insufficient)
 
-Temporary working comments:
-
-# Personalized vcf name:
-tmp/ms_hek1.1/ms_hek1.1.vcf
-tmp/ms_hek1.1/ms_hek1.1.vcf.idx
-
-# Personalized fasta name:
-
-# Duplex bam name: 
-tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno.bam
-tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno.bam.bai
-
+Author: James Phie
 """
+# Create a basic samtools mpileup which lists all disagreements with reference at each position
 rule ex_dsc_mpileup:
     input:
         pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta" #Rename based on ms pipeline
         masked = f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_masked_regions.bed" #Rename based on ms pipeline
-        dsc_bam = "tmp/{ex_sample}/{ex_sample}_dsc_map_anno.bam" #Rename
+        dsc_bam = "tmp/{ex_sample}/{ex_sample}_dsc_map_anno.bam" #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
     output:
         mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
     threads: 
@@ -37,6 +28,7 @@ rule ex_dsc_mpileup:
             {input.dsc_bam} > {output.mpileup}
         """
 
+# Extract single nucleotide variant calls from the samtools mpileup file into vcf format
 rule ex_somatic_variants:
     input:
         mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"

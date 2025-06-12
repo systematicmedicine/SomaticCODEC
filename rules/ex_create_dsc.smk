@@ -1,18 +1,16 @@
 """
 --- ex_create_dsc.smk ---
 
-Rules for creating a double stranded (duplex) consensus for experimental samples
+Rules for creating a collapsed (deduplicated) double stranded (duplex) consensus for experimental samples
 
-Input: Single stranded consensus
+Input: Reads aligned to reference genome (BAM), for experimental samples
 Output: Double stranded consensus
 
-Author: James Phie
+1. Reads are marked as duplicates using molecular UMIs, which were originally extracted into the readnames from raw reads during trimming. 
+2. Duplicate reads are then collapsed into consensus sequences for read 1 and read 2
+3. Read 1 and read 2 are collapsed to create a double stranded consensus, which includes single strand overhangs and read 1 read 2 disagreements marked as N
 
-Temporary dev notes:
-- The below is a placeholder from a single sample from codec dev (working code)
-- This will be converted once fulcrum publishes CallCodecConsensusReads (potentially sooner if required)
-- Once ex_create_dsc.smk is added to the pipeline, some steps in ex_create_ssc may be redundant, and we should consider removing them (or moving to optional snakefile)
-to speed up the pipeline
+Author: James Phie
 
 """
 

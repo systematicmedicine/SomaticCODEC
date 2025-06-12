@@ -117,5 +117,3 @@ rule ex_zipdata:
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}
         """
-
-
