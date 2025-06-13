@@ -39,7 +39,7 @@ workdir: config["cwd"]
 ex_sample_names = list(pd.read_csv(config["ex_samples"])["ex_sample"])
 
 # Create mapping between experimental (codec) and matched sample (standard ngs) sample names
-ex_to_ms = pd.read_csv("config/ex_samples.csv").set_index("ex_sample")["ms_sample"].to_dict()
+ex_to_ms = pd.read_csv(config["ex_samples"]).set_index("ex_sample")["ms_sample"].to_dict()
 
 # Temporary fastq hardcoding (for offline use)
 ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"],
