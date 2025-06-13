@@ -31,7 +31,6 @@ Authors:
 
 # Load libraries
 import pandas as pd
-from Bio import SeqIO
 
 # Set working directory
 workdir: config["cwd"]
