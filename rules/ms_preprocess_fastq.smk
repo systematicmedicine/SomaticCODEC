@@ -20,8 +20,8 @@ rule combine_lanes:
         r1_l6 = "tmp/data/{ms_sample}_L006_R1.fastq.gz",
         r2_l6 = "tmp/data/{ms_sample}_L006_R2.fastq.gz"
     output:
-        r1 = "tmp/data/{ms_sample}_r1.fastq.gz",
-        r2 = "tmp/data/{ms_sample}_r2.fastq.gz"
+        r1 = temp("tmp/data/{ms_sample}_r1.fastq.gz"),
+        r2 = temp("tmp/data/{ms_sample}_r2.fastq.gz")
     shell:
         """
         cat {input.r1_l5} {input.r1_l6} > {output.r1}
@@ -57,8 +57,8 @@ rule ms_trim_filter:
         r1 = "tmp/data/{ms_sample}_r1.fastq.gz",
         r2 = "tmp/data/{ms_sample}_r2.fastq.gz"
     output:
-        r1 = "tmp/data/{ms_sample}_processed_r1.fastq.gz",
-        r2 = "tmp/data/{ms_sample}_processed_r2.fastq.gz",
+        r1 = temp("tmp/data/{ms_sample}_processed_r1.fastq.gz"),
+        r2 = temp("tmp/data/{ms_sample}_processed_r2.fastq.gz"),
         report = "tmp/metrics/cutadapt/{ms_sample}_trimfilter_metrics.html",
         json = "tmp/metrics/cutadapt/{ms_sample}_trimfilter_metrics.json"
     threads: 8

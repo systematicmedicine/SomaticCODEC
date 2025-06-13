@@ -85,3 +85,16 @@ rule all:
         expand("tmp/results/{ms_sample}_markdup.bam", ms_sample = ms_sample),
         expand("tmp/results/{ms_sample}_markdup.bai", ms_sample = ms_sample),
         expand("tmp/metrics/markdup/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample)
+
+        # # Create bed file for gnomAD common variants with AF > 0.01
+# parallel -j 48 '
+#   aws s3 cp \
+#     s3://gnomad-public-us-east-1/release/4.1/vcf/genomes/gnomad.genomes.v4.1.sites.chr{1}.vcf.bgz \
+#     . --no-sign-request &&
+
+#   bcftools view -i "INFO/AF[0] >= 0.01" gnomad.genomes.v4.1.sites.chr{1}.vcf.bgz -Ou | \
+#     bcftools query -f "%CHROM\t%POS0\t[%POS+length(REF)]\n" > tmp_chr{1}.bed
+# ' ::: {1..22} X Y
+
+# # Combine and sort
+# cat tmp_chr*.bed | sort -k1,1 -k2,2n | bedtools merge -i - > gnomad_common_af01_merged.bed

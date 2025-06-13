@@ -4,28 +4,30 @@
 Rules for masking genomic regions where somatic variant cannot be confidently called.
 
 Inputs:
-    - gnomAD common variants
-    - Illumina all difficult regions
-    - Low depth regions from raw alignment (ms)
-    - Heterozygous regions from filtered germline variants (ms)
+    - gnomAD common variants (1% VAF)
+    - GIAB all difficult regions
+    - Low depth regions from ms raw alignment (<30x)
+    - ms germline variant positions
     
 Output: BED file containing all regions to mask
 
 Author: Joshua Johnstone
 
 """
-# Filters and creates a mask for low depth regions of ms raw alignment
+
+# Creates a mask for low depth (<30x) positions of ms raw alignment
 rule low_depth_mask:
     input:
         markdup_bam = "tmp/results/{ms_sample}_markdup.bam",
         markdup_bai = "tmp/results/{ms_sample}_markdup.bai"
     output:
         depth_stats = "tmp/metrics/alignment/{ms_sample}_depth.txt",
-        bed = "tmp/masks/{ms_sample}_lowdepth.bed"
+        bed = "tmp/ref/{ms_sample}_lowdepth.bed"
     params:
         threshold = 30
     shell:
         r"""
+
         # Get depth per base
         # -aa option includes all positions even if 0 depth
         samtools depth -aa {input.markdup_bam} > {output.depth_stats} 
@@ -72,27 +74,25 @@ rule low_depth_mask:
 
         """
 
-# Filters and creates a mask for heterozygous regions from ms filtered germline variants 
-#rule heterozygous_mask:
-# BB working on this rule
+# Filters and creates a mask for ms germline variant positions
 
 # Combines all masks into one bed file
-# rule combine_masks:
-#     input:
-#         gnomAD_bed =
-#         illumina_bed = "tmp/masks/GRCh38_alldifficultregions.bed.gz",
-#         lowdepth_bed = "tmp/masks/{ms_sample}_lowdepth.bed",
-#         heterozygous_bed = 
-#     output:
-#         combined_bed = "tmp/masks/{ms_sample}_combined.bed"
-#     shell:
-#         """
-#         cat {input.gnomAD_bed} \
-#         {input.illumina_bed} \
-#         {input.lowdepth_bed} \
-#         {input.lowmap_bed} \
-#         {input.heterozygous_bed} | \
-#         sort -k1,1 -k2,2n | \
-#         bedtools merge -i - > {output.combined_bed}
+rule combine_masks:
+    input:
+        gnomAD_bed = "tmp/ref/gnomad_common_af01_merged.bed",
+        illumina_bed =
+        GIAB_bed = "tmp/ref/GRCh38_alldifficultregions.bed.gz",
+        lowdepth_bed = "tmp/ref/{ms_sample}_lowdepth.bed",
+        ms_germline_bed = ""
+    output:
+        combined_bed = "tmp/ref/{ms_sample}_combined.bed"
+    shell:
+        """
+        cat {input.gnomAD_bed} \
+        {input.GIAB_bed} \
+        {input.lowdepth_bed} \
+        {input.ms_germline_bed}
+        sort -k1,1 -k2,2n | \
+        bedtools merge -i - > {output.combined_bed}
 
-#         """
+        """

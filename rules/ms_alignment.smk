@@ -19,7 +19,7 @@ rule raw_alignment:
         r1_processed = "tmp/data/{ms_sample}_processed_r1.fastq.gz",
         r2_processed = "tmp/data/{ms_sample}_processed_r2.fastq.gz"
     output:
-        bam = "tmp/results/{ms_sample}_aligned.bam"
+        bam = temp("tmp/results/{ms_sample}_aligned.bam")
     threads: 32
     shell:
         """
@@ -37,7 +37,7 @@ rule sort_bam:
     input:
         bam = "tmp/results/{ms_sample}_aligned.bam"
     output:
-        bam_sorted =  "tmp/results/{ms_sample}_sorted.bam"
+        bam_sorted =  temp("tmp/results/{ms_sample}_sorted.bam")
     threads: 8
     shell:
         "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
