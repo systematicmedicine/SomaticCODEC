@@ -190,7 +190,7 @@ rule ms_variant_call_metrics:
 #convert VCF file to BED for masking of germline variants
 #When using --deletions, the stop value of the BED output is determined by the length difference between ALT and REF alleles. 
     #Use of --insertions or --snvs yields a one-base BED element.
-rule ms_heterozygous_bed:
+rule ms_germline_variants_bed:
     input:
         vcf= rules.ms_filter_pass_variants.output.vcf
     output:
@@ -208,6 +208,6 @@ rule ms_heterozygous_bed:
         # Concatenate all into a single BED file, preserving exact regions
         cat {output.del_bed} {output.in_bed} {output.snv_bed} | \
             sort -k1,1 -k2,2n > {output.bed}
-            
+
         """
 
