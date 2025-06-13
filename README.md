@@ -91,7 +91,7 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 #### Launch new EC2 instance
 * Name instance according to project and user
-* Select Deep Learning base OSS Nvidia Driver GPU AMI (Ubuntu 24.04)
+* Select Ubuntu Server 24.04 LTS (HVM), SSD Volume Type
 * Select instance type (recommended m6i.24xlarge if running large fastq's)
   * Note: Running this instance costs ~10.00 AUD per hour, so pause the instance whenever bioinformatics pipelines are not running.
 * Select key pair name (set up .ssh key with aws if none pre-existing)
