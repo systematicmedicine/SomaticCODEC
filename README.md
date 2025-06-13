@@ -68,6 +68,26 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 * The repository has deploy key that allows read-only access to this repository only
 * The private key can be found at <I>\RwoD Research\Personal\Cameron\Misc\codec-opensource deploy key</I>
+* Copy and paste contents of codec-opensource deploy key into ~/.ssh/deploy_key
+
+  ```bash
+  nano ~/.ssh/deploy_key
+  ```
+* Set correct permissions (SSH will refuse to use the key if it's too open)
+
+  ```bash
+  chmod 600 ~/.ssh/deploy_key
+  ```
+* Add github to known hosts
+
+  ```bash
+  ssh-keyscan github.com >> ~/.ssh/known_hosts
+  ```
+* Clone the repository using the deploy key
+
+  ```bash
+  GIT_SSH_COMMAND='ssh -i ~/.ssh/deploy_key' git clone git@github.com:systematicmedicine/codec-opensource.git
+  ```
 
 #### Launch new EC2 instance
 * Name instance according to project and user
@@ -127,7 +147,8 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 #### Modify config files
 * config/ex_samples.csv (for codec samples):
   * The 'samples' column should only include the indices being used (must follow the indices naming system Sample01, Sample02, Sample03, Sample04 .. Sample12)
-  * The 'samplename' column should match the actual samples being run to the sample indices used (e.g. buffycoat1.1, buffycoat1.2, buffycoat2.1, etc.)
+  * The 'ex_samplename' column is the name of experimental samples (e.g. buffycoat1.1, buffycoat1.2, buffycoat2.1, etc.)
+  * The 'ms_samplename' column should provide the name of the matched sample for each experimental sample
   * Contamination data will be generated on any indices not included in this list.
 * Modify config.yaml to match the number of cores on the system (e.g. increase to 96 cores if running on a 96 core EC2 instance). 
 * Other file paths should not need to be modified, regardless of chosen repository name.
