@@ -1,10 +1,6 @@
 ---
 cwd: /work
 ref: tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
-region_bed: tmp/reference/GRCh38_notinalldifficultregions.bed
-region_interval_list: tmp/reference/GRCh38_notinalldifficultregions.interval_list
-dbsnp: tmp/reference/common_all_20180418_with_chr.vcf.gz
-ref_dict: tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.dict
 ex_samples: config/ex_samples.csv
 r1start: tmp/reference/ex_r1start.fasta
 r2start: tmp/reference/ex_r2start.fasta
