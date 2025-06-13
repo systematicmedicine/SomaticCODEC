@@ -157,30 +157,19 @@ rule ms_merge_filtered:
         """
         
 
-#split variants based on their zygosity
+#filter PASS variants
 rule ms_filter_pass_variants:
     input:
         vcf = rules.ms_merge_filtered.output.vcf
     output:
-        vcf = "tmp/data/processed/{ms_sample}_hardFilter_passed_all.vcf.gz",
-        vcf_index = "tmp/data/processed/{ms_sample}_hardFilter_passed_all.vcf.gz.tbi",
-        het = "tmp/data/processed/{ms_sample}_hardFilter_passed_het.vcf.gz",
-        het_index = "tmp/data/processed/{ms_sample}_hardFilter_passed_het.vcf.gz.tbi",
-        hom = "tmp/data/processed/{ms_sample}_hardFilter_passed_hom.vcf.gz",
-        hom_index = "tmp/data/processed/{ms_sample}_hardFilter_passed_hom.vcf.gz.tbi"
+        vcf = "tmp/data/processed/{ms_sample}_hardFilter_passed.vcf.gz",
+        vcf_index = "tmp/data/processed/{ms_sample}_hardFilter_passed.vcf.gz.tbi",
+
     shell:
         """
         # Combined variants for metric purposes
         bcftools view -f PASS -Oz -o {output.vcf} {input.vcf}
         tabix -p vcf {output.vcf}
-
-        # Select only homozygous variants which pass filter metrics
-        bcftools view -f PASS -g hom -Oz -o {output.hom} {input.vcf}
-        tabix -p vcf {output.hom}
-
-        # Select only heterozygous variants which pass filter metrics
-        bcftools view -f PASS -g het -Oz -o {output.het} {input.vcf}
-        tabix -p vcf {output.het}
 
         """
 
@@ -198,16 +187,17 @@ rule ms_variant_call_metrics:
         """
 
 
-#create filter for heterozygous regions which pass the hard filtering
-# create bed files for each of the heterozygous in/dels and SNVs
-# at this stage i think this is an incorrect method - unless im mistaken there is with result in a mis aligned mask on the newly created ref FASTA.
+#convert VCF file to BED for masking of germline variants
+#When using --deletions, the stop value of the BED output is determined by the length difference between ALT and REF alleles. 
+    #Use of --insertions or --snvs yields a one-base BED element.
 rule ms_heterozygous_bed:
     input:
-        vcf= rules.ms_filter_pass_variants.output.het
+        vcf= rules.ms_filter_pass_variants.output.vcf
     output:
-        del_bed= "tmp/data/bed/{ms_sample}_het_variants_del.bed",
-        in_bed= "tmp/data/bed/{ms_sample}_het_variants_in.bed",
-        snv_bed = "tmp/data/bed/{ms_sample}_het_variants_snv.bed"
+        del_bed= "tmp/data/bed/{ms_sample}_GL_variants_del.bed",
+        in_bed= "tmp/data/bed/{ms_sample}_GL_variants_in.bed",
+        snv_bed = "tmp/data/bed/{ms_sample}_GL_variants_snv.bed",
+        bed = "tmp/data/bed/{ms_sample}_GL_variants.bed"
     shell:
         """
         # Convert filtered VCF to BED format
@@ -215,5 +205,9 @@ rule ms_heterozygous_bed:
         zcat {input.vcf} | vcf2bed --insertions > {output.in_bed}
         zcat {input.vcf} | vcf2bed --snvs > {output.snv_bed}
 
+        # Concatenate all into a single BED file, preserving exact regions
+        cat {output.del_bed} {output.in_bed} {output.snv_bed} | \
+            sort -k1,1 -k2,2n > {output.bed}
+            
         """
 

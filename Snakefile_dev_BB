@@ -17,7 +17,6 @@ ms_sample = "Sample01"
 
 # Include rules files
 include: "rules/ms_call_germ.smk"
-include: "rules/ms_personal_ref.smk"
 
 
 
@@ -28,7 +27,5 @@ include: "rules/ms_personal_ref.smk"
 rule all:
     input:
         expand("tmp/metrics/{ms_sample}_variantCall_summary.txt", ms_sample=ms_sample),
-        expand("tmp/data/bed/{ms_sample}_het_variants_del.bed", ms_sample=ms_sample), #wrong co-ordinates
-        expand("tmp/data/bed/{ms_sample}_het_variants_in.bed", ms_sample=ms_sample),  #wrong co-ordinates
-        expand("tmp/data/bed/{ms_sample}_het_variants_snv.bed", ms_sample=ms_sample), #wrong co-ordinates
-        expand("tmp/data/pseudoref/{ms_sample}_personalised_ref.fasta", ms_sample=ms_sample)
+        expand("tmp/data/bed/{ms_sample}_GL_variants.bed", ms_sample=ms_sample),
+        expand("tmp/metrics/{ms_sample}_variantCall_summary.txt", ms_sample=ms_sample)
