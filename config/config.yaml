@@ -10,5 +10,4 @@ r1start: tmp/reference/ex_r1start.fasta
 r2start: tmp/reference/ex_r2start.fasta
 r1end: tmp/reference/ex_r1end.fasta
 r2end: tmp/reference/ex_r2end.fasta
-s3seq_fastq_folder: 20250121-CODECseq-pilot-2
 ncores: 4
