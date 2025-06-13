@@ -11,7 +11,6 @@ Author: Ben Barry
 """
 
 # using Haplotypecaller to call germline varients
-# note - here Chr1 is explicitly being called on to speed things up.
 rule ms_call_germ_variants:
     input:
         bam= rules.mark_duplicates.output.bam_markdup,
@@ -24,7 +23,7 @@ rule ms_call_germ_variants:
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            -L chr1
+            --native-pair-hmm-threads 4
 
         """
 
