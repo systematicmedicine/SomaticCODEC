@@ -16,7 +16,7 @@ Author: Joshua Johnstone
 """
 
 # Creates a mask for low depth (<30x) positions of ms raw alignment
-rule low_depth_mask:
+rule ms_low_depth_mask:
     input:
         markdup_bam = "tmp/results/{ms_sample}_markdup.bam",
         markdup_bai = "tmp/results/{ms_sample}_markdup.bai"
@@ -74,16 +74,38 @@ rule low_depth_mask:
 
         """
 
-# Filters and creates a mask for ms germline variant positions
+# Creates a mask for ms germline variant positions
+#When using --deletions, the stop value of the BED output is determined by the length difference between ALT and REF alleles. 
+    #Use of --insertions or --snvs yields a one-base BED element.
+rule ms_germline_variants_bed:
+    input:
+        vcf= rules.ms_filter_pass_variants.output.vcf
+    output:
+        del_bed= "tmp/ref/{ms_sample}_GL_variants_del.bed",
+        in_bed= "tmp/ref/{ms_sample}_GL_variants_in.bed",
+        snv_bed = "tmp/ref/{ms_sample}_GL_variants_snv.bed",
+        bed = "tmp/ref/{ms_sample}_GL_variants.bed"
+    shell:
+        """
+        # Convert filtered VCF to BED format
+        zcat {input.vcf} | vcf2bed --deletions > {output.del_bed}
+        zcat {input.vcf} | vcf2bed --insertions > {output.in_bed}
+        zcat {input.vcf} | vcf2bed --snvs > {output.snv_bed}
+
+        # Concatenate all into a single BED file, preserving exact regions
+        cat {output.del_bed} {output.in_bed} {output.snv_bed} | \
+            sort -k1,1 -k2,2n > {output.bed}
+            
+        """
 
 # Combines all masks into one bed file
-rule combine_masks:
+rule ms_combine_masks:
     input:
         gnomAD_bed = "tmp/ref/gnomad_common_af01_merged.bed",
         illumina_bed =
         GIAB_bed = "tmp/ref/GRCh38_alldifficultregions.bed.gz",
         lowdepth_bed = "tmp/ref/{ms_sample}_lowdepth.bed",
-        ms_germline_bed = ""
+        ms_germline_bed = "tmp/ref/{ms_sample}_GL_variants.bed"
     output:
         combined_bed = "tmp/ref/{ms_sample}_combined.bed"
     shell:

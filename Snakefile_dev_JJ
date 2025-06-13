@@ -36,6 +36,7 @@ ref = "tmp/ref/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna"
 
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
+include: "rules/ms_call_germ.smk"
 #include: "rules/masked_regions.smk"
 
 # Load config
@@ -84,7 +85,10 @@ rule all:
         expand("tmp/metrics/alignment/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample),
         expand("tmp/results/{ms_sample}_markdup.bam", ms_sample = ms_sample),
         expand("tmp/results/{ms_sample}_markdup.bai", ms_sample = ms_sample),
-        expand("tmp/metrics/markdup/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample)
+        expand("tmp/metrics/markdup/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample),
+        expand("tmp/metrics/{ms_sample}_variantCall_summary.txt", ms_sample=ms_sample),
+        expand("tmp/data/bed/{ms_sample}_GL_variants.bed", ms_sample=ms_sample),
+        expand("tmp/metrics/{ms_sample}_variantCall_summary.txt", ms_sample=ms_sample)
 
         # # Create bed file for gnomAD common variants with AF > 0.01
 # parallel -j 48 '
