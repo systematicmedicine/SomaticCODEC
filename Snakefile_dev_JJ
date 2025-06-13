@@ -97,8 +97,17 @@ rule all:
 #     . --no-sign-request &&
 
 #   bcftools view -i "INFO/AF[0] >= 0.01" gnomad.genomes.v4.1.sites.chr{1}.vcf.bgz -Ou | \
-#     bcftools query -f "%CHROM\t%POS0\t[%POS+length(REF)]\n" > tmp_chr{1}.bed
+#     bcftools query -f "%CHROM\t%POS0\t%REF\n" | \
+#     awk -F"\t" '"'"'{len=length($3); end=$2+len; print $1"\t"$2"\t"end}'"'"' \
+#     > tmp_chr{1}.bed
 # ' ::: {1..22} X Y
 
 # # Combine and sort
 # cat tmp_chr*.bed | sort -k1,1 -k2,2n | bedtools merge -i - > gnomad_common_af01_merged.bed
+
+# parallel -j 48 '
+#   bcftools view -i "INFO/AF[0] >= 0.01" gnomad.genomes.v4.1.sites.chr{1}.vcf.bgz -Ou | \
+#     bcftools query -f "%CHROM\t%POS0\t%REF\n" | \
+#     awk -F"\t" '\''{len=length($3); end=$2+len; print $1"\t"$2"\t"end}'\'' \
+#     > tmp_chr{1}.bed
+# ' ::: {1..22} X Y

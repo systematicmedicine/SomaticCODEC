@@ -102,7 +102,6 @@ rule ms_germline_variants_bed:
 rule ms_combine_masks:
     input:
         gnomAD_bed = "tmp/ref/gnomad_common_af01_merged.bed",
-        illumina_bed =
         GIAB_bed = "tmp/ref/GRCh38_alldifficultregions.bed.gz",
         lowdepth_bed = "tmp/ref/{ms_sample}_lowdepth.bed",
         ms_germline_bed = "tmp/ref/{ms_sample}_GL_variants.bed"
