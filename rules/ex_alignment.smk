@@ -9,37 +9,23 @@ Output: Reads aligned to a reference genome (BAM)
 Author: James Phie
 
 """
-#Creates required index files from personalized fasta for alignment (Move this to ms_personal_ref.smk?)
-rule ms_index_personalref:
-    input:
-        fasta = "tmp/{ms_sample}/{ms_sample}_personalized_ref.fasta"
-    output:
-        complete = "tmp/{ms_sample}/{ms_sample}_bwa_index.complete"
-    threads: 
-        config['ncores']
-    shell:
-        """
-        bwa-mem2 index {input.fasta}
-        touch {output.complete}
-        """
-
 # Creates an aligned sam from trimmed and filtered fastq files. Softclipping allowed.
 rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_trimfilter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_trimfilter.fastq.gz",
-        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta", #Rename based on ms pipeline
-        complete = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_bwa_index.complete"
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map.sam")
     threads: 
         config['ncores']
+    params:
+        ref = config['ref']
     shell:
         """
         bwa-mem2 mem \
             -t {threads} \
             -Y \
-            {input.pers_ref} {input.fastq1} {input.fastq2} \
+            {params.ref} {input.fastq1} {input.fastq2} \
             > {output.sam}
         """
 

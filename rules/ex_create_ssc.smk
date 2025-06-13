@@ -69,14 +69,14 @@ rule ex_map_ssc:
     threads: 
         config['ncores']
     params:
-        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta" #Rename based on ms pipeline
+        ref = config['ref']
     shell:
         """
         bwa-mem2 mem \
         -t {threads} \
         -p \
         -Y \
-        {params.pers_ref} {input.fastq} \
+        {params.ref} {input.fastq} \
         > {output.sam}
         """
 
@@ -98,7 +98,6 @@ rule ex_zipdata:
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_ssc.bam",
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_ssc_rg.bam",
-        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta" #Rename based on ms pipeline
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_ssc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_ssc_anno.bam.bai")
@@ -106,13 +105,15 @@ rule ex_zipdata:
         mem = 4,
     threads:
         config['ncores']
+    params:
+        ref = config['ref']
     shell:
         """
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             --compression 0 --async-io ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
-            --ref {input.pers_ref} \
+            --ref {params.ref} \
             --tags-to-revcomp Consensus \
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}

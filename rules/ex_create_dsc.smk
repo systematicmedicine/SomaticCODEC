@@ -114,16 +114,18 @@ rule ex_addrg:
         bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam")
+    params:
+        ex_sample = lambda wildcards: wildcards.ex_sample
     shell:
         """
         picard AddOrReplaceReadGroups \
             I={input.bam} \
             O={output.bam} \
-            RGID=ex_hek1.1 \
+            RGID={params.ex_sample} \
             RGLB=lib1 \
             RGPL=illumina \
             RGPU=unit1 \
-            RGSM=ex_hek1.1 \
+            RGSM={params.ex_sample} \
             VALIDATION_STRINGENCY=LENIENT
         """
 
@@ -142,14 +144,15 @@ rule ex_dsc_bam_to_fastq:
 rule ex_map_dsc:
     input:
         fq = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.fastq",
-        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta"
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.sam")
     threads: 
         ncores
+    params:
+        ref = config['ref']
     shell:
         """
-        bwa-mem2 mem -t {threads} -Y {input.pers_ref} {input.fq} > {output.sam}
+        bwa-mem2 mem -t {threads} -Y {params.ref} {input.fq} > {output.sam}
         """
 
 # Convert dsc sam to dsc bam and sort by readname (querynamesort)
@@ -169,8 +172,7 @@ rule ex_samtobam_dsc:
 rule ex_zipdata: 
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
-        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam",
-        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta"
+        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
@@ -178,13 +180,15 @@ rule ex_zipdata:
         mem = 4,
     threads:
         ncores
+    params:
+        ref = config['ref']
     shell:
         """
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
-            --ref {input.pers_ref} \
+            --ref {params.ref} \
             --tags-to-revcomp Consensus \
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}
@@ -196,18 +200,19 @@ rule ex_zipdata:
 rule ex_sscdepth_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
-        pers_ref = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_personalized_ref.fasta" #Rename based on ms pipeline
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt",
     resources:
         mem = 30,
+    params:
+        ref = config['ref']
     shell:
         """
         picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
             CollectWgsMetrics \
             I={input.bam} \
             O={output.metrics} \
-            R={input.pers_ref} \
+            R={params.ref} \
             INCLUDE_BQ_HISTOGRAM=true \
             MINIMUM_BASE_QUALITY=30
         """
