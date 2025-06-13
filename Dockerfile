@@ -35,7 +35,6 @@ RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
         #fgbio \ This will be added in place of feature branch build once CallCodecConsensusReads is added to fgbio
         picard \
         gatk4 \
-	whatshap \
         bcftools \
         bedops \
         pandas \
