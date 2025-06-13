@@ -55,7 +55,6 @@ rule ex_demux:
     output:
         demuxed_r1 = temp(expand("tmp/{ex_sample}_r1_raw.fastq.gz", ex_sample=ex_sample_names)),
         demuxed_r2 = temp(expand("tmp/{ex_sample}_r2_raw.fastq.gz", ex_sample=ex_sample_names)),
-        report = "metrics/demux_metrics.txt",
         json = "metrics/demux_metrics.json"
     threads:
         config['ncores']
@@ -91,7 +90,6 @@ rule ex_trim:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
-        report = "metrics/{ex_sample}/{ex_sample}_trim_metrics.txt",
         json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     threads:
         config['ncores']
@@ -122,7 +120,6 @@ rule ex_trimfilter:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trimfilter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trimfilter.fastq.gz"),
-        report = "metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.txt",
         json = "metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json"
     threads:
         config['ncores']
