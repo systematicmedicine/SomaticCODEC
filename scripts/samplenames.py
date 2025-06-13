@@ -11,7 +11,7 @@ Date:
 import pandas as pd
 
 df = pd.read_csv(snakemake.input.mapping)
-name_map = dict(zip(df["sample"], df["samplename"]))
+name_map = dict(zip(df["adapter"], df["ex_sample"]))
 
 def rename(infasta, outfasta):
     with open(infasta) as fin, open(outfasta, 'w') as fout:
