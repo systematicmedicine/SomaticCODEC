@@ -33,8 +33,6 @@ rule ex_somatic_variants:
         mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
     output:
         vcf = "results/{ex_sample}_somatic_mutations.vcf"
-    threads: 
-        x =
     shell:
         """
         varscan mpileup2snp {input.mpileup} \
