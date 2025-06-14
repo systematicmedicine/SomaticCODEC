@@ -76,7 +76,6 @@ rule ex_demux:
           -o tmp/{{name}}_r1_raw.fastq.gz \
           -p tmp/{{name}}_r2_raw.fastq.gz \
           {input.fastq1} {input.fastq2} \
-          --report=full > {output.report} \
           --json={output.json}
         """
 
@@ -108,7 +107,6 @@ rule ex_trim:
           -o {output.r1} \
           -p {output.r2} \
           {input.r1} {input.r2} \
-          --report=full > {output.report} \
           --json={output.json}
         """
 
@@ -140,7 +138,6 @@ rule ex_trimfilter:
         -o {output.r1} \
         -p {output.r2} \
         {input.r1} {input.r2} \
-        --report=full > {output.report} \
         --json={output.json}
         """
 
