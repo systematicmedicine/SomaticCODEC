@@ -51,7 +51,7 @@ include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 #include: "rules/ex_create_ssc.smk"
 include: "rules/ex_create_dsc.smk"
-include: "rules/ex_call_somatic.smk"
+#include: "rules/ex_call_somatic.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
@@ -68,21 +68,13 @@ rule all:
         expand("metrics/{ex_sample}/{ex_sample}_r2_trimfilter_metrics.html", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_map_ssc_insert_metrics.txt", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_map_ssc_insert_metrics.pdf", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_ssc_depth_metrics.txt", ex_sample=ex_sample_names),
+        expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt", ex_sample=ex_sample_names),
+        expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf", ex_sample=ex_sample_names),
         expand("metrics/duplication_metrics.txt", ex_sample=ex_sample_names),
-        expand("results/{ex_sample}_somatic_mutations.vcf", ex_sample=ex_sample_names)
-
-
-
-
-
-
-
+        #expand("results/{ex_sample}_somatic_mutations.vcf", ex_sample=ex_sample_names)
 
 
 
