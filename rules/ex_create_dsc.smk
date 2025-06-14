@@ -147,7 +147,7 @@ rule ex_map_dsc:
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.sam")
     threads: 
-        ncores
+        config['ncores']
     params:
         ref = config['ref']
     shell:
@@ -162,7 +162,7 @@ rule ex_samtobam_dsc:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
     threads: 
-        ncores
+        config['ncores']
     shell:
         """
         samtools sort -n -@ {threads} -o {output.bam} {input.sam}
@@ -179,7 +179,7 @@ rule ex_zipdata:
     resources:
         mem = 4,
     threads:
-        ncores
+        config['ncores']
     params:
         ref = config['ref']
     shell:
