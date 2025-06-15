@@ -18,10 +18,10 @@ rule ex_namesamples:
         r2end=config['r2end'],
         mapping=config['ex_samples'],
     output:
-        r1start_out="tmp/r1start.fasta",
-        r1end_out="tmp/r1end.fasta",
-        r2start_out="tmp/r2start.fasta",
-        r2end_out="tmp/r2end.fasta"
+        r1start_out="tmp/reference/renamed_r1start.fasta",
+        r1end_out="tmp/reference/renamed_r1end.fasta",
+        r2start_out="tmp/reference/renamed_r2start.fasta",
+        r2end_out="tmp/reference/renamed_r2end.fasta"
     script:
         "../scripts/samplenames.py"
 
@@ -50,8 +50,8 @@ rule ex_demux:
     input:
         fastq1 = ex_raw_fastq1,
         fastq2 = ex_raw_fastq2,
-        r1_start = "tmp/r1start.fasta",
-        r2_start = "tmp/r2start.fasta"
+        r1_start = "tmp/reference/renamed_r1start.fasta",
+        r2_start = "tmp/reference/renamed_r2start.fasta"
     output:
         demuxed_r1 = temp(expand("tmp/{ex_sample}_r1_raw.fastq.gz", ex_sample=ex_sample_names)),
         demuxed_r2 = temp(expand("tmp/{ex_sample}_r2_raw.fastq.gz", ex_sample=ex_sample_names)),
@@ -84,8 +84,8 @@ rule ex_trim:
     input:
         r1 = "tmp/{ex_sample}_r1_raw.fastq.gz",
         r2 = "tmp/{ex_sample}_r2_raw.fastq.gz",
-        r1_end = "tmp/r1end.fasta",
-        r2_end = "tmp/r2end.fasta"
+        r1_end = "tmp/reference/renamed_r1end.fasta",
+        r2_end = "tmp/reference/renamed_r2end.fasta"
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
