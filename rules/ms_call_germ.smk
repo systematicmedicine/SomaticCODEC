@@ -14,9 +14,9 @@ Author: Ben Barry
 rule ms_call_germ_variants:
     input:
         bam= rules.mark_duplicates.output.bam_markdup,
-        ref= HG38
+        ref= ref
     output:
-        vcf= temp("tmp/data/processed/{ms_sample}_ms_call_germ_variants.vcf.gz")
+        vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz")
     shell:
         """
         gatk --java-options "-Xmx8g" HaplotypeCaller  \
@@ -33,10 +33,10 @@ rule ms_call_germ_variants:
 rule ms_hard_filter_SNV:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
-        ref= HG38
+        ref= ref
     output:
-        SNV_vcf= temp("tmp/data/processed/{ms_sample}_ms_hard_filter_SNV.vcf.gz"),
-        SNV_filtered = temp("tmp/data/processed/{ms_sample}_ms_hard_filtered_SNV.vcf.gz")
+        SNV_vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filter_SNV.vcf.gz"),
+        SNV_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_SNV.vcf.gz")
     shell:
         """
         gatk SelectVariants \
@@ -64,10 +64,10 @@ rule ms_hard_filter_SNV:
 rule ms_hard_filter_INDEL:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
-        ref= HG38
+        ref= ref
     output:
-        INDEL_vcf= temp("tmp/data/processed/{ms_sample}_ms_hard_filter_INDEL.vcf.gz"),
-        INDEL_filtered = temp("tmp/data/processed/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz")
+        INDEL_vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filter_INDEL.vcf.gz"),
+        INDEL_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz")
     shell:
         """
         gatk SelectVariants \
@@ -94,7 +94,7 @@ rule ms_merge_filtered:
         SNV= rules.ms_hard_filter_SNV.output.SNV_filtered,
         INDEL= rules.ms_hard_filter_INDEL.output.INDEL_filtered
     output:
-        vcf = temp("tmp/data/processed/{ms_sample}_ms_merge_filtered.vcf.gz")
+        vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_merge_filtered.vcf.gz")
     shell:
         """
         gatk MergeVcfs \
@@ -110,8 +110,8 @@ rule ms_filter_pass_variants:
     input:
         vcf = rules.ms_merge_filtered.output.vcf
     output:
-        vcf = temp("tmp/data/processed/{ms_sample}_ms_filter_pass_variants.vcf.gz"),
-        vcf_index = temp("tmp/data/processed/{ms_sample}_ms_filter_pass_variants.vcf.gz.tbi")
+        vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"),
+        vcf_index = temp("tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz.tbi")
 
     shell:
         """
@@ -127,7 +127,7 @@ rule ms_variant_call_metrics:
     input: 
         vcf =rules.ms_filter_pass_variants.output.vcf
     output:
-        stat = "tmp/metrics/{ms_sample}_variantCall_summary.txt"
+        stat = "/metrics/{ms_sample}_variantCall_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
