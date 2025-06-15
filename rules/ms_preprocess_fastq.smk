@@ -12,36 +12,18 @@ Author: Joshua Johnstone
 
 """
 
-# Combines reads from samples run across two lanes
-# rule combine_lanes:
-#     input:
-#         r1_l5 = "tmp/data/{ms_sample}_L005_R1.fastq.gz",
-#         r2_l5 = "tmp/data/{ms_sample}_L005_R2.fastq.gz",
-#         r1_l6 = "tmp/data/{ms_sample}_L006_R1.fastq.gz",
-#         r2_l6 = "tmp/data/{ms_sample}_L006_R2.fastq.gz"
-#     output:
-#         r1 = temp("tmp/data/{ms_sample}_r1.fastq.gz"),
-#         r2 = temp("tmp/data/{ms_sample}_r2.fastq.gz")
-#     shell:
-#         """
-#         cat {input.r1_l5} {input.r1_l6} > {output.r1}
-#         cat {input.r2_l5} {input.r2_l6} > {output.r2}
-
-#         """
-
-
 # Generates a fastqc report for the demuxed FASTQs
 rule ms_fastqc_raw:
     input:
-        r1 = "tmp/data/{ms_sample}_r1.fastq.gz",
-        r2 = "tmp/data/{ms_sample}_r2.fastq.gz"
+        r1 = "tmp/{ms_sample}/{ms_sample}_r1.fastq.gz",
+        r2 = "tmp/{ms_sample}/{ms_sample}_r2.fastq.gz"
     output:
-        r1_report = "tmp/metrics/fastqc/{ms_sample}_r1_fastqc.html",
-        r2_report = "tmp/metrics/fastqc/{ms_sample}_r2_fastqc.html"
+        r1_report = "metrics/{ms_sample}/{ms_sample}_r1_fastqc.html",
+        r2_report = "metrics/{ms_sample}/{ms_sample}_r2_fastqc.html"
     threads: 4
     shell:
         """
-        fastqc -t {threads} -o tmp/metrics/fastqc {input.r1} {input.r2}
+        fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
 
         """
 
@@ -54,13 +36,13 @@ rule ms_fastqc_raw:
 
 rule ms_trim_filter:
     input:
-        r1 = "tmp/data/{ms_sample}_r1.fastq.gz",
-        r2 = "tmp/data/{ms_sample}_r2.fastq.gz"
+        r1 = "tmp/{ms_sample}/{ms_sample}_r1.fastq.gz",
+        r2 = "tmp/{ms_sample}/{ms_sample}_r2.fastq.gz"
     output:
-        r1 = temp("tmp/data/{ms_sample}_processed_r1.fastq.gz"),
-        r2 = temp("tmp/data/{ms_sample}_processed_r2.fastq.gz"),
-        report = "tmp/metrics/cutadapt/{ms_sample}_trimfilter_metrics.html",
-        json = "tmp/metrics/cutadapt/{ms_sample}_trimfilter_metrics.json"
+        r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
+        report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.html",
+        json = "metrics/{ms_sample}_trimfilter_metrics.json"
     threads: 8
     shell: 
         """
@@ -84,14 +66,14 @@ rule ms_trim_filter:
 # Generates a new fastqc report for processed reads
 rule ms_fastqc_processed:
     input:
-        r1 = "tmp/data/{ms_sample}_processed_r1.fastq.gz",
-        r2 = "tmp/data/{ms_sample}_processed_r2.fastq.gz"
+        r1 = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
+        r2 = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
-        r1_report = "tmp/metrics/fastqc/processed/{ms_sample}_processed_r1_fastqc.html",
-        r2_report = "tmp/metrics/fastqc/processed/{ms_sample}_processed_r2_fastqc.html"
+        r1_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html",
+        r2_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html"
     threads: 4
     shell:
         """
-        fastqc -t {threads} -o tmp/metrics/fastqc/processed {input.r1} {input.r2}
+        fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
 
         """

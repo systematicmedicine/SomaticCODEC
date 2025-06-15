@@ -16,10 +16,10 @@ Author: Joshua Johnstone
 rule raw_alignment:
     input: 
         ref = ref,
-        r1_processed = "tmp/data/{ms_sample}_processed_r1.fastq.gz",
-        r2_processed = "tmp/data/{ms_sample}_processed_r2.fastq.gz"
+        r1_processed = "tmp/{ms_sample}/{ms_sample}_processed_r1.fastq.gz",
+        r2_processed = "tmp/{ms_sample}/{ms_sample}_processed_r2.fastq.gz"
     output:
-        bam = temp("tmp/results/{ms_sample}_aligned.bam")
+        bam = temp("tmp/{ms_sample}/{ms_sample}_aligned.bam")
     threads: 32
     shell:
         """
@@ -35,20 +35,20 @@ rule raw_alignment:
 # Sorts bam by coordinate
 rule sort_bam:
     input:
-        bam = "tmp/results/{ms_sample}_aligned.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam"
     output:
-        bam_sorted =  temp("tmp/results/{ms_sample}_sorted.bam")
+        bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted.bam")
     threads: 8
     shell:
         "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
 
 rule mark_duplicates:
     input:
-        bam_sorted = "tmp/results/{ms_sample}_sorted.bam"
+        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted.bam"
     output:
-        bam_markdup = "tmp/results/{ms_sample}_markdup.bam",
-        bai_markdup = "tmp/results/{ms_sample}_markdup.bai",
-        dup_metrics = "tmp/metrics/markdup/{ms_sample}_markdup_metrics.txt"
+        bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bam"),
+        bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bai"),
+        dup_metrics = temp("tmp/{ms_sample}/{ms_sample}_markdup_metrics.txt")
     shell:
         """
         picard MarkDuplicates \
@@ -62,22 +62,20 @@ rule mark_duplicates:
 # Generates alignment metrics
 rule alignment_metrics:
     input:
-        bam = "tmp/results/{ms_sample}_markdup.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam"
     output:
-        stats = "tmp/metrics/alignment/{ms_sample}_samtools_stats.txt",
-        insert_metrics = "tmp/metrics/alignment/{ms_sample}_insert_size_metrics.txt",
-        insert_hist = "tmp/metrics/alignment/{ms_sample}_insert_size_histogram.pdf"
+        stats = "metrics/{ms_sample}/{ms_sample}_samtools_stats.txt",
+        insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
+        insert_hist = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
     shell:
         """
         # Generate alignment stats
         samtools stats {input.bam} > {output.stats}
 
         # Collect insert size metrics
-        # M = 0.5 means 50% of reads must fall within the insert size peak to generate metrics
         picard CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.insert_metrics} \
-            H={output.insert_hist} \
-            M=0.5
+            H={output.insert_hist}
             
         """ 
