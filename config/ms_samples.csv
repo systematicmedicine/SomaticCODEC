@@ -1,4 +1,4 @@
 ms_sample,fastq1,fastq2
-Buffy-young,tmp/data/Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r1.fastq.gz,tmp/data/Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r2.fastq.gz
-Buffy-old,tmp/data/Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r1.fastq.gz,tmp/data/Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r2.fastq.gz
-Sperm,tmp/data/Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r1.fastq.gz,tmp/data/Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r2.fastq.gz
+ms001,tmp/data/Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r1.fastq.gz,tmp/data/Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r2.fastq.gz
+ms002,tmp/data/Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r1.fastq.gz,tmp/data/Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r2.fastq.gz
+ms003,tmp/data/Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r1.fastq.gz,tmp/data/Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r2.fastq.gz
