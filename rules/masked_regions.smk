@@ -18,11 +18,11 @@ Author: Joshua Johnstone
 # Creates a mask for low depth (<30x) positions of ms raw alignment
 rule ms_low_depth_mask:
     input:
-        markdup_bam = "tmp/results/{ms_sample}_markdup.bam",
-        markdup_bai = "tmp/results/{ms_sample}_markdup.bai"
+        markdup_bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam",
+        markdup_bai = "tmp/{ms_sample}/{ms_sample}_markdup.bai"
     output:
-        depth_stats = "tmp/metrics/alignment/{ms_sample}_depth.txt",
-        bed = "tmp/ref/{ms_sample}_lowdepth.bed"
+        depth_stats = "metrics/{ms_sample}/{ms_sample}_depth.txt",
+        bed = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.bed")
     params:
         threshold = 30
     shell:
@@ -81,10 +81,10 @@ rule ms_germline_variants_bed:
     input:
         vcf= rules.ms_filter_pass_variants.output.vcf
     output:
-        del_bed= "tmp/ref/{ms_sample}_GL_variants_del.bed",
-        in_bed= "tmp/ref/{ms_sample}_GL_variants_in.bed",
-        snv_bed = "tmp/ref/{ms_sample}_GL_variants_snv.bed",
-        bed = "tmp/ref/{ms_sample}_GL_variants.bed"
+        del_bed= temp("tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed"),
+        in_bed= temp("tmp/{ms_sample}/{ms_sample}_GL_variants_in.bed"),
+        snv_bed = temp("tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed"),
+        bed = temp("tmp/{ms_sample}/{ms_sample}_GL_variants.bed")
     shell:
         """
         # Convert filtered VCF to BED format
@@ -101,12 +101,12 @@ rule ms_germline_variants_bed:
 # Combines all masks into one bed file
 rule ms_combine_masks:
     input:
-        gnomAD_bed = "tmp/ref/gnomad_common_af01_merged.bed",
-        GIAB_bed = "tmp/ref/GRCh38_alldifficultregions.bed.gz",
-        lowdepth_bed = "tmp/ref/{ms_sample}_lowdepth.bed",
-        ms_germline_bed = "tmp/ref/{ms_sample}_GL_variants.bed"
+        gnomAD_bed = "reference/gnomad_common_af01_merged.bed",
+        GIAB_bed = "reference/GRCh38_alldifficultregions.bed.gz",
+        lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
+        ms_germline_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants.bed"
     output:
-        combined_bed = "tmp/ref/{ms_sample}_combined.bed"
+        combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined.bed")
     shell:
         """
         cat {input.gnomAD_bed} \
