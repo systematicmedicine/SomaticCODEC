@@ -16,7 +16,7 @@ rule ms_call_germ_variants:
         bam= rules.mark_duplicates.output.bam_markdup,
         ref= HG38
     output:
-        vcf="tmp/data/processed/{ms_sample}_chr1.vcf.gz"
+        vcf= temp("tmp/data/processed/{ms_sample}_ms_call_germ_variants.vcf.gz")
     shell:
         """
         gatk --java-options "-Xmx8g" HaplotypeCaller  \
@@ -35,8 +35,8 @@ rule ms_hard_filter_SNV:
         vcf= rules.ms_call_germ_variants.output.vcf,
         ref= HG38
     output:
-        SNV_vcf= temp("tmp/data/processed/{ms_sample}_SNV.vcf.gz"),
-        SNV_filtered = "tmp/data/processed/{ms_sample}_SNV_filtered.vcf.gz"
+        SNV_vcf= temp("tmp/data/processed/{ms_sample}_ms_hard_filter_SNV.vcf.gz"),
+        SNV_filtered = temp("tmp/data/processed/{ms_sample}_ms_hard_filtered_SNV.vcf.gz")
     shell:
         """
         gatk SelectVariants \
@@ -66,8 +66,8 @@ rule ms_hard_filter_INDEL:
         vcf= rules.ms_call_germ_variants.output.vcf,
         ref= HG38
     output:
-        INDEL_vcf= temp("tmp/data/processed/{ms_sample}_INDEL.vcf.gz"),
-        INDEL_filtered = "tmp/data/processed/{ms_sample}_INDEL_filtered.vcf.gz"
+        INDEL_vcf= temp("tmp/data/processed/{ms_sample}_ms_hard_filter_INDEL.vcf.gz"),
+        INDEL_filtered = temp("tmp/data/processed/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz")
     shell:
         """
         gatk SelectVariants \
@@ -94,7 +94,7 @@ rule ms_merge_filtered:
         SNV= rules.ms_hard_filter_SNV.output.SNV_filtered,
         INDEL= rules.ms_hard_filter_INDEL.output.INDEL_filtered
     output:
-        vcf = "tmp/data/processed/{ms_sample}_hardfilter.vcf.gz"
+        vcf = temp("tmp/data/processed/{ms_sample}_ms_merge_filtered.vcf.gz")
     shell:
         """
         gatk MergeVcfs \
@@ -110,8 +110,8 @@ rule ms_filter_pass_variants:
     input:
         vcf = rules.ms_merge_filtered.output.vcf
     output:
-        vcf = "tmp/data/processed/{ms_sample}_hardFilter_passed.vcf.gz",
-        vcf_index = "tmp/data/processed/{ms_sample}_hardFilter_passed.vcf.gz.tbi",
+        vcf = temp("tmp/data/processed/{ms_sample}_ms_filter_pass_variants.vcf.gz"),
+        vcf_index = temp("tmp/data/processed/{ms_sample}_ms_filter_pass_variants.vcf.gz.tbi")
 
     shell:
         """
