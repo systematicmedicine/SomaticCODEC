@@ -48,7 +48,7 @@ ex_raw_fastq2 = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").s
 #Lists ex_sample names that belong to each lane
 samples_by_lane = pd.read_csv(config["ex_samples_path"]).groupby("lane")["ex_sample"].apply(list).to_dict()
 
-#Creates mapping between lane and ex_sample to determine which fasta file should be applied to each sample during trimming
+#Creates mapping between lane and ex_sample to determine which fasta file should be applied to each ex_sample during trimming
 ex_sample_to_lane = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["lane"].to_dict()
 
 #Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
