@@ -197,7 +197,7 @@ rule ex_zipdata:
 # Add a rule to filter dsc for only duplex bases (ie. remove single strand overhangs and R1R2 disagreements) - functionality not yet built into CallCodecConsensusReads
 
 # Depth and genome territory covered, applied to the dsc bam. Currently without filtering, so this includes single strand overhangs (ie. not true duplex depth)
-rule ex_sscdepth_metrics:
+rule ex_dscdepth_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
     output:
@@ -216,33 +216,3 @@ rule ex_sscdepth_metrics:
             INCLUDE_BQ_HISTOGRAM=true \
             MINIMUM_BASE_QUALITY=30
         """
-
-# Calculates insert size (distance between start of watson and end of crick, includes ss overhangs)
-rule ex_insert_metrics:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
-    output:
-        txt = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt",
-        hist = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf",
-    resources:
-        mem = 32
-    shell:
-        """
-        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
-            CollectInsertSizeMetrics \
-            I={input.bam} \
-            O={output.txt} \
-            H={output.hist} \
-            M=0.5 \
-            W=600 \
-            DEVIATIONS=100
-        """
-
-# Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
-rule ex_duplication_metrics:
-    input:
-        expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names)
-    output:
-        "metrics/duplication_metrics.txt"
-    script:
-        "../scripts/duplication.py"

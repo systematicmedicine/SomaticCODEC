@@ -36,3 +36,33 @@ rule ex_batchcontamination_metrics:
         used = config['ex_samples']
     script:
         "../scripts/batchcontamination.py"
+
+# Calculates insert size (distance between start of watson and end of crick, includes ss overhangs)
+rule ex_insert_metrics:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+    output:
+        txt = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt",
+        hist = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf",
+    resources:
+        mem = 32
+    shell:
+        """
+        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
+            CollectInsertSizeMetrics \
+            I={input.bam} \
+            O={output.txt} \
+            H={output.hist} \
+            M=0.5 \
+            W=600 \
+            DEVIATIONS=100
+        """
+
+# Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
+rule ex_duplication_metrics:
+    input:
+        expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names)
+    output:
+        "metrics/duplication_metrics.txt"
+    script:
+        "../scripts/duplication.py"

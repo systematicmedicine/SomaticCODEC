@@ -34,9 +34,10 @@ import pandas as pd
 os.chdir(workflow.basedir)
 
 # Load lane and sample names
-ex_lanes = list(pd.read_csv(config["ex_samples_path"])["lane"].unique())
-ex_sample_names = list(pd.read_csv(config["ex_samples_path"])["ex_sample"])
-ms_sample_names = list(pd.read_csv(config["ms_samples_path"])["ms_sample"])
+ex_lanes = pd.read_csv(config["ex_samples_path"])["lane"].unique().to_list()
+ex_sample_names = pd.read_csv(config["ex_samples_path"])["ex_sample"].to_list()
+ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
+assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
 
 # Include rules files
 include: "rules/ms_preprocess_fastq.smk"
