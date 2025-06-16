@@ -65,7 +65,7 @@ rule ms_alignment_metrics:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam"
     output:
-        stats = "metrics/{ms_sample}/{ms_sample}_samtools_stats.txt",
+        stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt",
         insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
         insert_hist = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
     shell:
