@@ -11,6 +11,11 @@ Some areas are masked using bed files (illumina difficlut regions, areas where g
 
 Author: James Phie
 """
+
+#Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
+ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sample"].to_dict()
+
+
 # Create a basic samtools mpileup which lists all disagreements with reference at each position
 rule ex_dsc_mpileup:
     input:

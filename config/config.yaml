@@ -1,5 +1,4 @@
 ---
-cwd: /work
 GRCh38_path: tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
 ex_samples_path: config/ex_samples.csv
 ms_samples_path: config/ms_samples.csv

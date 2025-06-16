@@ -1,4 +1,4 @@
-ex_sample,lane,adapter,ms_sample,fastq1,fastq2
+ex_sample,ex_lane,adapter,ms_sample,fastq1,fastq2
 S001,Lane1,Quadruplex001,S007,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
 S002,Lane1,Quadruplex002,S008,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
 S003,Lane1,Quadruplex003,S009,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz

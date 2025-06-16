@@ -55,15 +55,4 @@ rule ex_map_metrics:
         samtools flagstat {input.bam} > {output.txt}
         """
 
-# Replace default index names with experiment specific sample names as defined in the input.tsv
-rule ex_correctproduct_metrics:
-    input:
-        demux_json = "metrics/{lane}_demux_metrics.json",
-        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=samples_by_lane[wildcards.lane]),
-        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=samples_by_lane[wildcards.lane])
-    output:
-        "metrics/{lane}_correctproduct_metrics.txt"
-    params:
-        samples = lambda wildcards: samples_by_lane[wildcards.lane]
-    script:
-        "../scripts/correctproduct.py"
+

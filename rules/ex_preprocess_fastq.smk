@@ -9,11 +9,19 @@ Output: Fully processed FASTQ files ready for alignment
 Author: James Phie
 
 """
+# Create lists of raw experimental FASTQ files
+ex_raw_r1_list = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq1"].to_dict()
+ex_raw_r2_list = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq2"].to_dict()
+
+#Creates mapping between lane and ex_sample to determine which fasta file should be applied to each ex_sample during trimming
+ex_sample_to_lane = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["lane"].to_dict()
+
+
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
-        fastq1 = lambda wildcards: ex_raw_fastq1[wildcards.lane],
-        fastq2 = lambda wildcards: ex_raw_fastq2[wildcards.lane]
+        fastq1 = lambda wildcards: ex_raw_r1_list[wildcards.lane],
+        fastq2 = lambda wildcards: ex_raw_r2_list[wildcards.lane]
     output:
         fastqc_report1 = "metrics/{lane}_r1_fastqc_raw_metrics.html",
         fastqc_report2 = "metrics/{lane}_r2_fastqc_raw_metrics.html"
@@ -33,7 +41,7 @@ rule ex_fastqcraw_metrics:
 # Replace default index names with experiment specific sample names as defined in ex_samples.csv for each lane
 for lane in lanes:
     #Generate 1 rule per lane
-    rule_name = f"ex_namesamples_{lane}"
+    rule_name = f"ex_name_indicies_{lane}"
 
     rule:
         name: rule_name
@@ -67,8 +75,8 @@ for lane in lanes:
     rule:
         name: rule_name
         input:
-            fastq1 = ex_raw_fastq1[lane],
-            fastq2 = ex_raw_fastq2[lane],
+            fastq1 = ex_raw_r1_list[lane],
+            fastq2 = ex_raw_r2_list[lane],
             r1_start = f"tmp/reference/{lane}_r1start.fasta",
             r2_start = f"tmp/reference/{lane}_r2start.fasta"
         output:
@@ -107,7 +115,7 @@ rule ex_trim:
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
         json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     threads:
-        config['ncores']
+        os.cpu_count()
     shell:
         """
         #Trim 1bp from 5' end (T from ligation)
@@ -186,14 +194,3 @@ rule ex_rawreadcounts_metrics:
     script:
         "../scripts/rawreadcounts.py"
 
-# Custom python script to assess how many unused indices were detected from other experiments (similar metrics to rawreadcounts). This should always be 0. 
-rule ex_batchcontamination_metrics:
-    input:
-        json = "metrics/{lane}_demux_metrics.json"
-    output:
-        contamination = "metrics/{lane}_batchcontamination_metrics.txt"
-    params:
-        fasta = config['r1start'],
-        used = config['ex_samples']
-    script:
-        "../scripts/batchcontamination.py"
