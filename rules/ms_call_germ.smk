@@ -144,7 +144,7 @@ rule ms_variant_call_metrics:
     input: 
         vcf =rules.ms_filter_pass_variants.output.vcf
     output:
-        stat = "/metrics/{ms_sample}_variantCall_summary.txt"
+        stat = "/metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
