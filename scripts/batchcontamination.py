@@ -10,12 +10,15 @@ Author: James Phie
 
 import json
 from Bio import SeqIO
+import pandas as pd
 
 # Inputs from Snakemake
 json_path = snakemake.input.json
 output_path = snakemake.output.contamination
 fasta_path = snakemake.params.fasta
-used_samples = set(snakemake.params.used)
+lane = snakemake.wildcards.lane
+df = pd.read_csv(snakemake.params.used)
+used_samples = set(df[df["lane"] == lane]["ex_sample"])
 
 # Parse all known experimental codec barcodes from the FASTA
 all_index_names = {record.id for record in SeqIO.parse(fasta_path, "fasta")}

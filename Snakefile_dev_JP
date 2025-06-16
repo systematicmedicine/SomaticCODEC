@@ -35,33 +35,43 @@ import pandas as pd
 # Set working directory
 workdir: config["cwd"]
 
-# Extract experimental sample names from ex_samples.csv
+# Extract experimental sample details from ex_samples.csv
 ex_sample_names = list(pd.read_csv(config["ex_samples"])["ex_sample"])
 
-# Create mapping between experimental (codec) and matched sample (standard ngs) sample names
-ex_to_ms = pd.read_csv(config["ex_samples"]).set_index("ex_sample")["ms_sample"].to_dict()
+#Lists all lanes defined in ex_samples.csv to create by lane fasta renaming and demultiplexing rules
+lanes = list(pd.read_csv(config["ex_samples"])["lane"].unique())
 
-# Temporary fastq hardcoding (for offline use)
-#ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq1"],
-#ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).iloc[0]["fastq2"]
+#Lists fastqs by lane
+ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).drop_duplicates("lane").set_index("lane")["fastq1"].to_dict()
+ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).drop_duplicates("lane").set_index("lane")["fastq2"].to_dict()
+
+#Lists ex_sample names that belong to each lane
+samples_by_lane = pd.read_csv(config["ex_samples"]).groupby("lane")["ex_sample"].apply(list).to_dict()
+
+#Creates mapping between lane and sample to determine which fasta file should be applied to each sample during trimming
+ex_sample_to_lane = pd.read_csv(config["ex_samples"]).set_index("ex_sample")["lane"].to_dict()
+
+#Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
+ex_to_ms = pd.read_csv(config["ex_samples"]).set_index("ex_sample")["ms_sample"].to_dict()
 
 # Include rules files
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 #include: "rules/ex_create_ssc.smk"
 include: "rules/ex_create_dsc.smk"
-#include: "rules/ex_call_somatic.smk"
+include: "rules/ex_call_somatic.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        "metrics/demux_metrics.json",
-        "metrics/sample_readcounts_metrics.txt",
-        "metrics/batchcontamination_metrics.txt",
-        "metrics/correctproduct_metrics.txt",
-        "metrics/duplication_metrics.txt",
-        expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_samples=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_samples=ex_sample_names),
+        expand("metrics/{lane}_demux_metrics.json", lane=lanes),
+        expand("metrics/{lane}_r1_fastqc_raw_metrics.html",lane=lanes),
+        expand("metrics/{lane}_r2_fastqc_raw_metrics.html",lane=lanes),
+        expand("metrics/{lane}_sample_readcounts_metrics.txt", lane=lanes),
+        expand("metrics/{lane}_batchcontamination_metrics.txt", lane=lanes),
+        expand("metrics/{lane}_correctproduct_metrics.txt", lane=lanes),
+        expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_sample=ex_sample_names),
+        expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_r1_trimfilter_metrics.html", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_r2_trimfilter_metrics.html", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names),
@@ -69,5 +79,6 @@ rule all:
         expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample=ex_sample_names),
-        expand("metrics/duplication_metrics.txt", ex_sample=ex_sample_names),
-        #expand("results/{ex_sample}_somatic_mutations.vcf", ex_sample=ex_sample_names)
+        expand("results/{ex_sample}_somatic_mutations.vcf", ex_sample=ex_sample_names),
+        "metrics/duplication_metrics.txt"
+        

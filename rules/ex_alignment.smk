@@ -58,12 +58,12 @@ rule ex_map_metrics:
 # Replace default index names with experiment specific sample names as defined in the input.tsv
 rule ex_correctproduct_metrics:
     input:
-        demux_json = "metrics/demux_metrics.json",
-        trim_reports = expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=ex_sample_names),
-        flagstats = expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names)
+        demux_json = "metrics/{lane}_demux_metrics.json",
+        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=samples_by_lane[wildcards.lane]),
+        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=samples_by_lane[wildcards.lane])
     output:
-        "metrics/correctproduct_metrics.txt"
+        "metrics/{lane}_correctproduct_metrics.txt"
     params:
-        ex_samples = ex_sample_names
+        samples = lambda wildcards: samples_by_lane[wildcards.lane]
     script:
         "../scripts/correctproduct.py"

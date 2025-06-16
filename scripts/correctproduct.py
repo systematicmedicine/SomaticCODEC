@@ -20,6 +20,7 @@ trim_reports = snakemake.input.trim_reports
 flagstats = snakemake.input.flagstats
 samples = snakemake.params.samples
 output_file = snakemake.output[0]
+lane = snakemake.wildcards.lane
 
 # Load global adapter match stats from demux_report
 with open(demux_json) as f:
