@@ -4,13 +4,15 @@
 Rules for ...
 
 Input: aligned, sorted and dulpicate marked BAM
-Output: filtered VCF file
+Output: 
+    - Filtered VCF file
+    - Germline Variant metric file
 
 Author: Ben Barry
 
 """
 
-# using Haplotypecaller to call germline varients
+# Use Haplotypecaller to call germline varients
 rule ms_call_germ_variants:
     input:
         bam= rules.mark_duplicates.output.bam_markdup,
@@ -28,8 +30,16 @@ rule ms_call_germ_variants:
         """
 
 
-# select and filter SNV calls
-#note: these are the most basic parameters - significant review required to tune to best fit for this application
+# Apply standard hard filters to flag low-quality SNVs:
+
+    # - QD < 2.0: Low variant confidence relative to depth
+    # - QUAL < 30.0: Low overall variant confidence
+    # - SOR > 3.0 and FS > 60.0: Evidence of strand bias
+    # - MQ < 40.0: Poor average mapping quality
+    # - MQRankSum < -12.5: Alt reads have lower mapping quality than ref
+    # - ReadPosRankSum < -8.0: Alt alleles biased toward read ends
+
+# Note: these are the most basic parameters - significant review required to tune to best fit for this application
 rule ms_hard_filter_SNV:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
@@ -60,7 +70,14 @@ rule ms_hard_filter_SNV:
         """    
 
 
-#select and filter indel calls
+# Apply standard hard filters to flag low-quality INDELs:
+
+    # - QD < 2.0: Low variant confidence relative to depth
+    # - QUAL < 30.0: Low overall variant confidence
+    # - FS > 200.0: Strong strand bias (Fisher's exact test)
+    # - ReadPosRankSum < -20.0: Alt alleles biased toward read ends
+
+#note: these are the most basic parameters - significant review required to tune to best fit for this application
 rule ms_hard_filter_INDEL:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
