@@ -19,7 +19,7 @@ rule ms_call_germ_variants:
         vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz")
     shell:
         """
-        gatk --java-options "-Xmx8g" HaplotypeCaller  \
+        gatk --java-options "-Xmx32g" HaplotypeCaller  \
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
