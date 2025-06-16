@@ -32,6 +32,7 @@ rule ex_fastqcraw_metrics:
 # For each lane, generate a separate ex_namesamples_{lane} rule
 # Replace default index names with experiment specific sample names as defined in ex_samples.csv for each lane
 for lane in lanes:
+    #Generate 1 rule per lane
     rule_name = f"ex_namesamples_{lane}"
 
     rule:
@@ -55,8 +56,9 @@ for lane in lanes:
 # For each lane, generate a separate ex_demux_{lane} rule
 # Removes first 3bp of R1 and R2 to read name as 6 base UMI. Demultiplexes using R1 and R2 5' sample indices (both must agree). Trims 5' sample indices. 
 for lane in lanes:
-    #Determine which samples are to be generated from the lane
+    #Determine which samples are present in the lane
     samples = pd.read_csv(config["ex_samples_path"])[pd.read_csv(config["ex_samples_path"])["lane"] == lane]["ex_sample"].tolist()
+    #Create list of file outputs based on samples present in the lane
     demuxed_r1 = [f"tmp/{s}_r1_raw.fastq.gz" for s in samples]
     demuxed_r2 = [f"tmp/{s}_r2_raw.fastq.gz" for s in samples]
     #Generate 1 rule per lane
