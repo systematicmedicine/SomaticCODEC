@@ -18,12 +18,15 @@ rule ms_fastqc_raw:
         r1 = "tmp/{ms_sample}/{ms_fastq1}",
         r2 = "tmp/{ms_sample}/{ms_fastq2}"
     output:
-        r1_report = "metrics/{ms_sample}/{ms_sample}_r1_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_r2_fastqc.html"
+        r1_report = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html",
+        r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html"
     threads: 4
     shell:
         """
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
+
+        mv metrics/{wildcards.ms_sample}/$(basename {wildcards.ms_fastq1} .fastq.gz)_fastqc.html {output.r1_report}
+        mv metrics/{wildcards.ms_sample}/$(basename {wildcards.ms_fastq2} .fastq.gz)_fastqc.html {output.r2_report}
 
         """
 
@@ -41,17 +44,16 @@ rule ms_trim_filter:
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.html",
-        json = "metrics/{ms_sample}_trimfilter_metrics.json"
+        report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.html"
     threads: 8
     shell: 
         """
         cutadapt \
             -j {threads} \
-            -a CTGTCTCTTATACACATCT \
-            -A CTGTCTCTTATACACATCT \
-            -a ATGTGTATAAGAGACA \
-            -A ATGTGTATAAGAGACA \
+            -a {config[ms_adaptor_1]} \
+            -A {config[ms_adaptor_1]} \
+            -a {config[ms_adaptor_2]} \
+            -A {config[ms_adaptor_2]} \
             -a "G{{10}}" \
             -A "G{{10}}" \
             --quality-cutoff 20 \
@@ -59,8 +61,7 @@ rule ms_trim_filter:
             -o {output.r1} \
             -p {output.r2} \
             {input.r1} {input.r2} \
-            --report=full > {output.report} \
-            --json={output.json}
+            --report=full > {output.report}
 
         """
 # Generates a new fastqc report for processed reads
@@ -75,5 +76,8 @@ rule ms_fastqc_processed:
     shell:
         """
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
+
+        mv metrics/{wildcards.ms_sample}/$(basename {input.r1} .fastq.gz)_fastqc.html {output.r1_report}
+        mv metrics/{wildcards.ms_sample}/$(basename {input.r2} .fastq.gz)_fastqc.html {output.r2_report}
 
         """

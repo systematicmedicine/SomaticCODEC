@@ -23,7 +23,7 @@ rule ms_raw_alignment:
     threads: 32
     shell:
         """
-        bwa-mem2 mem -R "@RG\\tID:{wildcards.ms_sample}\\tSM:{wildcards.ms_sample}\\tPL:ILLUMINA" \
+        bwa-mem2 mem \
             -t {threads} \
             {input.ref} \
             {input.r1_processed} \
