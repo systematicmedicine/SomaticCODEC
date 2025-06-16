@@ -149,7 +149,7 @@ rule ex_map_dsc:
     threads: 
         config['ncores']
     params:
-        ref = config['ref']
+        ref = config["GRCh38_path"]
     shell:
         """
         bwa-mem2 mem -t {threads} -Y {params.ref} {input.fq} > {output.sam}
@@ -181,7 +181,7 @@ rule ex_zipdata:
     threads:
         config['ncores']
     params:
-        ref = config['ref']
+        ref = config["GRCh38_path"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
@@ -205,7 +205,7 @@ rule ex_sscdepth_metrics:
     resources:
         mem = 30,
     params:
-        ref = config['ref']
+        ref = config["GRCh38_path"]
     shell:
         """
         picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \

@@ -69,7 +69,7 @@ rule ex_map_ssc:
     threads: 
         config['ncores']
     params:
-        ref = config['ref']
+        ref = config["GRCh38_path"]
     shell:
         """
         bwa-mem2 mem \
@@ -106,7 +106,7 @@ rule ex_zipdata:
     threads:
         config['ncores']
     params:
-        ref = config['ref']
+        ref = config["GRCh38_path"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \

@@ -36,23 +36,23 @@ import pandas as pd
 workdir: config["cwd"]
 
 # Extract experimental sample details from ex_samples.csv
-ex_sample_names = list(pd.read_csv(config["ex_samples"])["ex_sample"])
+ex_sample_names = list(pd.read_csv(config["ex_samples_path"])["ex_sample"])
 
 #Lists all lanes defined in ex_samples.csv to create by lane fasta renaming and demultiplexing rules
-lanes = list(pd.read_csv(config["ex_samples"])["lane"].unique())
+lanes = list(pd.read_csv(config["ex_samples_path"])["lane"].unique())
 
 #Lists fastqs by lane
-ex_raw_fastq1 = pd.read_csv(config["ex_samples"]).drop_duplicates("lane").set_index("lane")["fastq1"].to_dict()
-ex_raw_fastq2 = pd.read_csv(config["ex_samples"]).drop_duplicates("lane").set_index("lane")["fastq2"].to_dict()
+ex_raw_fastq1 = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq1"].to_dict()
+ex_raw_fastq2 = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq2"].to_dict()
 
 #Lists ex_sample names that belong to each lane
-samples_by_lane = pd.read_csv(config["ex_samples"]).groupby("lane")["ex_sample"].apply(list).to_dict()
+samples_by_lane = pd.read_csv(config["ex_samples_path"]).groupby("lane")["ex_sample"].apply(list).to_dict()
 
 #Creates mapping between lane and sample to determine which fasta file should be applied to each sample during trimming
-ex_sample_to_lane = pd.read_csv(config["ex_samples"]).set_index("ex_sample")["lane"].to_dict()
+ex_sample_to_lane = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["lane"].to_dict()
 
 #Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
-ex_to_ms = pd.read_csv(config["ex_samples"]).set_index("ex_sample")["ms_sample"].to_dict()
+ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sample"].to_dict()
 
 # Include rules files
 include: "rules/ex_preprocess_fastq.smk"

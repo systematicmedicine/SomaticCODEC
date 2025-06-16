@@ -19,7 +19,7 @@ rule ex_map:
     threads: 
         config['ncores']
     params:
-        ref = config['ref']
+        ref = config["GRCh38_path"]
     shell:
         """
         bwa-mem2 mem \

@@ -19,7 +19,7 @@ rule ex_dsc_mpileup:
     output:
         mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
     params:
-        ref = config['ref']
+        ref = config["GRCh38_path"]
     shell:
         """
         samtools mpileup -f {params.ref} \

@@ -37,11 +37,11 @@ for lane in lanes:
     rule:
         name: rule_name
         input:
-            r1start = config["r1start"],
-            r1end   = config["r1end"],
-            r2start = config["r2start"],
-            r2end   = config["r2end"],
-            mapping = config["ex_samples"]
+            r1start = config["codec_r1start_path"],
+            r1end   = config["codec_r1end_path"],
+            r2start = config["codec_r2start_path"],
+            r2end   = config["codec_r2end_path"],
+            mapping = config["ex_samples_path"]
         output:
             r1start_out = f"tmp/reference/{lane}_r1start.fasta",
             r1end_out   = f"tmp/reference/{lane}_r1end.fasta",
@@ -56,7 +56,7 @@ for lane in lanes:
 # Removes first 3bp of R1 and R2 to read name as 6 base UMI. Demultiplexes using R1 and R2 5' sample indices (both must agree). Trims 5' sample indices. 
 for lane in lanes:
     #Determine which samples are to be generated from the lane
-    samples = pd.read_csv(config["ex_samples"])[pd.read_csv(config["ex_samples"])["lane"] == lane]["ex_sample"].tolist()
+    samples = pd.read_csv(config["ex_samples_path"])[pd.read_csv(config["ex_samples_path"])["lane"] == lane]["ex_sample"].tolist()
     demuxed_r1 = [f"tmp/{s}_r1_raw.fastq.gz" for s in samples]
     demuxed_r2 = [f"tmp/{s}_r2_raw.fastq.gz" for s in samples]
     #Generate 1 rule per lane
