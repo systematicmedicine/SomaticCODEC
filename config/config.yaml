@@ -1,10 +1,10 @@
 ---
-GRCh38_path: tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
+GRCh38_path: tmp/downloads/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
 ex_samples_path: config/ex_samples.csv
 ms_samples_path: config/ms_samples.csv
-codec_r1start_path: tmp/reference/ex_r1start.fasta
-codec_r2start_path: tmp/reference/ex_r2start.fasta
-codec_r1end_path: tmp/reference/ex_r1end.fasta
-codec_r2end_path: tmp/reference/ex_r2end.fasta
+codec_r1start_path: tmp/downloads/ex_r1start.fasta
+codec_r2start_path: tmp/downloads/ex_r2start.fasta
+codec_r1end_path: tmp/downloads/ex_r1end.fasta
+codec_r2end_path: tmp/downloads/ex_r2end.fasta
 ms_adaptor_1: CTGTCTCTTATACACATCT
 ms_adaptor_2: ATGTGTATAAGAGACA

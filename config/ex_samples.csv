@@ -1,7 +1,7 @@
 ex_sample,ex_lane,adapter,ms_sample,fastq1,fastq2
-S001,Lane1,Quadruplex001,S007,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
-S002,Lane1,Quadruplex002,S008,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
-S003,Lane1,Quadruplex003,S009,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
-S004,Lane1,Quadruplex004,S010,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
-S005,Lane1,Quadruplex005,S011,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
-S006,Lane1,Quadruplex006,S012,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/undemuxed/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
+S001,Lane1,Quadruplex001,S007,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
+S002,Lane1,Quadruplex002,S008,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
+S003,Lane1,Quadruplex003,S009,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
+S004,Lane1,Quadruplex004,S010,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
+S005,Lane1,Quadruplex005,S011,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz
+S006,Lane1,Quadruplex006,S012,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,tmp/downloads/QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz

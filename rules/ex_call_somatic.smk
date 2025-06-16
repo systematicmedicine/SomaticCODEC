@@ -19,7 +19,7 @@ ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sam
 # Create a basic samtools mpileup which lists all disagreements with reference at each position
 rule ex_dsc_mpileup:
     input:
-        masked = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_masked_regions.bed", #Rename based on ms pipeline
+        masked = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_combined_mask.bed",
         dsc_bam = "tmp/{ex_sample}/{ex_sample}_dsc_map_anno.bam" #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
     output:
         mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"

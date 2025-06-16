@@ -34,7 +34,7 @@ import pandas as pd
 os.chdir(workflow.basedir)
 
 # Load lane and sample names
-ex_lanes = pd.read_csv(config["ex_samples_path"])["lane"].unique().to_list()
+ex_lanes = pd.read_csv(config["ex_samples_path"])["ex_lane"].unique().to_list()
 ex_sample_names = pd.read_csv(config["ex_samples_path"])["ex_sample"].to_list()
 ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
 assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
@@ -54,12 +54,12 @@ include: "rules/ex_additional_metrics.smk"
 rule all:
     input:
         expand("results/{ex_sample}_somatic_mutations.vcf", ex_sample=ex_sample_names),
-        expand("metrics/{lane}_demux_metrics.json", lane=lanes),
-        expand("metrics/{lane}_r1_fastqc_raw_metrics.html",lane=lanes),
-        expand("metrics/{lane}_r2_fastqc_raw_metrics.html",lane=lanes),
-        expand("metrics/{lane}_sample_readcounts_metrics.txt", lane=lanes),
-        expand("metrics/{lane}_batchcontamination_metrics.txt", lane=lanes),
-        expand("metrics/{lane}_correctproduct_metrics.txt", lane=lanes),
+        expand("metrics/{lane}_demux_metrics.json", lane=ex_lanes),
+        expand("metrics/{lane}_r1_fastqc_raw_metrics.html",lane=ex_lanes),
+        expand("metrics/{lane}_r2_fastqc_raw_metrics.html",lane=ex_lanes),
+        expand("metrics/{lane}_sample_readcounts_metrics.txt", lane=ex_lanes),
+        expand("metrics/{lane}_batchcontamination_metrics.txt", lane=ex_lanes),
+        expand("metrics/{lane}_correctproduct_metrics.txt", lane=ex_lanes),
         expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_r1_trimfilter_metrics.html", ex_sample=ex_sample_names),
@@ -71,14 +71,14 @@ rule all:
         expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample=ex_sample_names),
         "metrics/duplication_metrics.txt",
         expand("metrics/duplication_metrics.txt", ex_sample=ex_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_depth_stats.txt", ms_sample = ms_sample),
-        expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample)
+        expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_depth_stats.txt", ms_sample = ms_sample_names),
+        expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names)

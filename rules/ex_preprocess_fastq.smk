@@ -10,11 +10,11 @@ Author: James Phie
 
 """
 # Create lists of raw experimental FASTQ files
-ex_raw_r1_list = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq1"].to_dict()
-ex_raw_r2_list = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq2"].to_dict()
+ex_raw_r1_list = pd.read_csv(config["ex_samples_path"]).drop_duplicates("ex_lane").set_index("ex_lane")["fastq1"].to_dict()
+ex_raw_r2_list = pd.read_csv(config["ex_samples_path"]).drop_duplicates("ex_lane").set_index("ex_lane")["fastq2"].to_dict()
 
 #Creates mapping between lane and ex_sample to determine which fasta file should be applied to each ex_sample during trimming
-ex_sample_to_lane = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["lane"].to_dict()
+ex_sample_to_lane = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ex_lane"].to_dict()
 
 
 # FastQC on raw fastq files (before demultiplexing or any processing)
@@ -41,7 +41,7 @@ rule ex_fastqcraw_metrics:
 # Replace default index names with experiment specific sample names as defined in ex_samples.csv for each lane
 for lane in lanes:
     #Generate 1 rule per lane
-    rule_name = f"ex_name_indicies_{lane}"
+    rule_name = f"ex_name_indices_{lane}"
 
     rule:
         name: rule_name
@@ -52,10 +52,10 @@ for lane in lanes:
             r2end   = config["codec_r2end_path"],
             mapping = config["ex_samples_path"]
         output:
-            r1start_out = f"tmp/reference/{lane}_r1start.fasta",
-            r1end_out   = f"tmp/reference/{lane}_r1end.fasta",
-            r2start_out = f"tmp/reference/{lane}_r2start.fasta",
-            r2end_out   = f"tmp/reference/{lane}_r2end.fasta"
+            r1start_out = f"tmp/downloads/{lane}_r1start.fasta",
+            r1end_out   = f"tmp/downloads/{lane}_r1end.fasta",
+            r2start_out = f"tmp/downloads/{lane}_r2start.fasta",
+            r2end_out   = f"tmp/downloads/{lane}_r2end.fasta"
         params:
             lane = lane
         script:
@@ -77,8 +77,8 @@ for lane in lanes:
         input:
             fastq1 = ex_raw_r1_list[lane],
             fastq2 = ex_raw_r2_list[lane],
-            r1_start = f"tmp/reference/{lane}_r1start.fasta",
-            r2_start = f"tmp/reference/{lane}_r2start.fasta"
+            r1_start = f"tmp/downloads/{lane}_r1start.fasta",
+            r2_start = f"tmp/downloads/{lane}_r2start.fasta"
         output:
             demuxed_r1 = demuxed_r1,
             demuxed_r2 = demuxed_r2,
@@ -108,8 +108,8 @@ rule ex_trim:
     input:
         r1 = "tmp/{ex_sample}_r1_raw.fastq.gz",
         r2 = "tmp/{ex_sample}_r2_raw.fastq.gz",
-        r1_end = lambda wildcards: f"tmp/reference/{ex_sample_to_lane[wildcards.ex_sample]}_r1end.fasta",
-        r2_end = lambda wildcards: f"tmp/reference/{ex_sample_to_lane[wildcards.ex_sample]}_r2end.fasta"
+        r1_end = lambda wildcards: f"tmp/downloads/{ex_sample_to_lane[wildcards.ex_sample]}_r1end.fasta",
+        r2_end = lambda wildcards: f"tmp/downloads/{ex_sample_to_lane[wildcards.ex_sample]}_r2end.fasta"
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
