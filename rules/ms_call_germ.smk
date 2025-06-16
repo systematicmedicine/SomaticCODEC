@@ -1,9 +1,11 @@
 """
 --- ms_call_germ.smk ---
 
-Rules for ...
+Rules for calling and filtering germline variants
 
-Input: aligned, sorted and dulpicate marked BAM
+Input: 
+    -aligned, sorted and dulpicate marked BAM
+    -GRCh38_path
 Output: 
     - Filtered VCF file
     - Germline Variant metric file
@@ -13,10 +15,12 @@ Author: Ben Barry
 """
 
 # Use Haplotypecaller to call germline varients
+    # "-Xmx32g" allocates 32GB of RAM - can optimised based on prior file sizes
+    # "--native-pair-hmm-threads 48" Parallelises HMM across 48 cores
 rule ms_call_germ_variants:
     input:
         bam= rules.mark_duplicates.output.bam_markdup,
-        ref= ref
+        ref= GRCh38_path
     output:
         vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz")
     shell:
@@ -25,7 +29,7 @@ rule ms_call_germ_variants:
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            --native-pair-hmm-threads 4
+            --native-pair-hmm-threads 48
 
         """
 
@@ -43,7 +47,7 @@ rule ms_call_germ_variants:
 rule ms_hard_filter_SNV:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
-        ref= ref
+        ref= GRCh38_path
     output:
         SNV_vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filter_SNV.vcf.gz"),
         SNV_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_SNV.vcf.gz")
@@ -81,7 +85,7 @@ rule ms_hard_filter_SNV:
 rule ms_hard_filter_INDEL:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
-        ref= ref
+        ref= GRCh38_path
     output:
         INDEL_vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filter_INDEL.vcf.gz"),
         INDEL_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz")
