@@ -77,7 +77,7 @@ rule ms_hard_filter_SNV:
     # - FS > 200.0: Strong strand bias (Fisher's exact test)
     # - ReadPosRankSum < -20.0: Alt alleles biased toward read ends
 
-#note: these are the most basic parameters - significant review required to tune to best fit for this application
+# Note: these are the most basic parameters - significant review required to tune to best fit for this application
 rule ms_hard_filter_INDEL:
     input:
         vcf= rules.ms_call_germ_variants.output.vcf,
@@ -105,7 +105,7 @@ rule ms_hard_filter_INDEL:
         """
 
 
-#merge filtered vcfs
+# Merge filtered vcfs
 rule ms_merge_filtered:
     input:
         SNV= rules.ms_hard_filter_SNV.output.SNV_filtered,
@@ -122,7 +122,8 @@ rule ms_merge_filtered:
         """
         
 
-#filter PASS variants
+# Filter PASS variants
+    # generate an index file
 rule ms_filter_pass_variants:
     input:
         vcf = rules.ms_merge_filtered.output.vcf
@@ -132,14 +133,13 @@ rule ms_filter_pass_variants:
 
     shell:
         """
-        # Combined variants for metric purposes
         bcftools view -f PASS -Oz -o {output.vcf} {input.vcf}
         tabix -p vcf {output.vcf}
 
         """
 
 
-#output variant call summary metrics
+# Output variant call summary metrics
 rule ms_variant_call_metrics:
     input: 
         vcf =rules.ms_filter_pass_variants.output.vcf
@@ -152,8 +152,8 @@ rule ms_variant_call_metrics:
         """
 
 
-#convert VCF file to BED for masking of germline variants
-#When using --deletions, the stop value of the BED output is determined by the length difference between ALT and REF alleles. 
+# Convert VCF file to BED for masking of germline variants
+# When using --deletions, the stop value of the BED output is determined by the length difference between ALT and REF alleles. 
     #Use of --insertions or --snvs yields a one-base BED element.
 rule ms_germline_variants_bed:
     input:
