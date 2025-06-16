@@ -15,7 +15,7 @@ Author: Joshua Johnstone
 # Aligns reads to reference
 rule ms_raw_alignment:
     input: 
-        ref = ref,
+        ref = config['GRCh38_path'],
         r1_processed = "tmp/{ms_sample}/{ms_sample}_processed_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_processed_r2.fastq.gz"
     output:
@@ -42,13 +42,14 @@ rule ms_sort_bam:
     shell:
         "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
 
+# Marks duplicate reads in bam file
 rule ms_mark_duplicates:
     input:
         bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted.bam"
     output:
         bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bam"),
         bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bai"),
-        dup_metrics = temp("tmp/{ms_sample}/{ms_sample}_markdup_metrics.txt")
+        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
     shell:
         """
         picard MarkDuplicates \

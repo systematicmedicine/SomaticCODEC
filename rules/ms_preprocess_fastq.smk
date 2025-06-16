@@ -15,8 +15,8 @@ Author: Joshua Johnstone
 # Generates a fastqc report for the demuxed FASTQs
 rule ms_fastqc_raw:
     input:
-        r1 = "tmp/{ms_sample}/{ms_sample}_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_r2.fastq.gz"
+        r1 = "tmp/{ms_sample}/{ms_fastq1}",
+        r2 = "tmp/{ms_sample}/{ms_fastq2}"
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_r1_fastqc.html",
         r2_report = "metrics/{ms_sample}/{ms_sample}_r2_fastqc.html"
@@ -36,8 +36,8 @@ rule ms_fastqc_raw:
 
 rule ms_trim_filter:
     input:
-        r1 = "tmp/{ms_sample}/{ms_sample}_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_r2.fastq.gz"
+        r1 = "tmp/{ms_sample}/{ms_fastq1}",
+        r2 = "tmp/{ms_sample}/{ms_fastq2}"
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),

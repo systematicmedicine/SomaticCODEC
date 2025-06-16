@@ -26,52 +26,10 @@ rule ms_low_depth_mask:
     params:
         threshold = 30
     shell:
-        r"""
-
-        # Get depth per base
-        # -aa option includes all positions even if 0 depth
-        samtools depth -aa {input.markdup_bam} > {output.depth_stats} 
-
-        # Convert low-depth positions into BED regions
-        # Steps as follows:
-        # Sets depth threshold as variable inside awk
-        # Runs following code block only on bases where 3rd column (depth) is less than the threshold
-        # If chromosome has changed since previous base, closes region and starts new region
-        # For first base, chrom will be undefined so != $1
-        # If current base is not yet in a bed region:
-        # Saves chromosome name with $1
-        # Starts a new region at position $2
-        # Sets start and end to this position
-        # If current base is next to previous:
-        # Extends the region (moves end forward)
-        # If current base is not next to previous:
-        # Prints the finished bed region start to end
-        # Starts a new bed region at the current position
-        # END statement prints the last open region after all lines read
-
-        awk -v threshold={params.threshold} '
-        $3 < threshold {{
-            if (chrom != $1) {{
-                if (start != "") print chrom "\t" start-1 "\t" end;
-                chrom = $1;
-                start = $2;
-                end = $2;
-            }} else if (start == "") {{
-                start = $2;
-                end = $2;
-            }} else if ($2 == end + 1) {{
-                end = $2;
-            }} else {{
-                print chrom "\t" start-1 "\t" end;
-                start = $2;
-                end = $2;
-            }}
-        }}
-        END {{
-            if (start != "") print chrom "\t" start-1 "\t" end;
-        }}
-        ' {output.depth_stats} > {output.bed}
-
+        """
+        samtools depth -aa {input.markdup_bam} > {output.depth_stats}
+        awk '$3 < {params.threshold} {{print $1"\\t"$2-1"\\t"$2}}' {output.depth_stats} > {output.bed}
+       
         """
 
 # Creates a mask for ms germline variant positions
@@ -79,7 +37,7 @@ rule ms_low_depth_mask:
     #Use of --insertions or --snvs yields a one-base BED element.
 rule ms_germline_variants_bed:
     input:
-        vcf= rules.ms_filter_pass_variants.output.vcf
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
     output:
         del_bed= temp("tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed"),
         in_bed= temp("tmp/{ms_sample}/{ms_sample}_GL_variants_in.bed"),
@@ -102,7 +60,7 @@ rule ms_germline_variants_bed:
 rule ms_combine_masks:
     input:
         gnomAD_bed = "reference/gnomad_common_af01_merged.bed",
-        GIAB_bed = "reference/GRCh38_alldifficultregions.bed.gz",
+        GIAB_bed = "reference/GRCh38_alldifficultregions.bed",
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germline_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants.bed"
     output:
