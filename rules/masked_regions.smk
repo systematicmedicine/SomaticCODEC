@@ -103,7 +103,7 @@ rule ms_combine_masks:
     input:
         gnomAD_bed = "reference/gnomad_common_af01_merged.bed",
         GIAB_bed = "reference/GRCh38_alldifficultregions.bed.gz",
-        lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
+        ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germline_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants.bed"
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined.bed")
@@ -111,7 +111,7 @@ rule ms_combine_masks:
         """
         cat {input.gnomAD_bed} \
         {input.GIAB_bed} \
-        {input.lowdepth_bed} \
+        {input.ms_lowdepth_bed} \
         {input.ms_germline_bed}
         sort -k1,1 -k2,2n | \
         bedtools merge -i - > {output.combined_bed}
