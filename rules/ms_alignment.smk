@@ -1,7 +1,7 @@
 """
 --- ms_alignment.smk ---
 
-Rules for performing a raw alignment with matched sample trimmed and filtered reads
+Rules for performing a raw alignment with matched sample processed reads
 
 Input: Processed ms FASTQ files
 Outputs: 
@@ -13,7 +13,7 @@ Author: Joshua Johnstone
 """
 
 # Aligns reads to reference
-rule raw_alignment:
+rule ms_raw_alignment:
     input: 
         ref = ref,
         r1_processed = "tmp/{ms_sample}/{ms_sample}_processed_r1.fastq.gz",
@@ -33,7 +33,7 @@ rule raw_alignment:
         """
 
 # Sorts bam by coordinate
-rule sort_bam:
+rule ms_sort_bam:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam"
     output:
@@ -42,7 +42,7 @@ rule sort_bam:
     shell:
         "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
 
-rule mark_duplicates:
+rule ms_mark_duplicates:
     input:
         bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted.bam"
     output:
@@ -60,7 +60,7 @@ rule mark_duplicates:
         """
 
 # Generates alignment metrics
-rule alignment_metrics:
+rule ms_alignment_metrics:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam"
     output:
