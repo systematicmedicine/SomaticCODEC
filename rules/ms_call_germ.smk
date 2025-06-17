@@ -163,8 +163,8 @@ rule ms_filter_pass_variants:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_merge_filtered.vcf.gz"
     output:
-        vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"),
-        vcf_index = temp("tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz.tbi")
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz", #Make temp once development is complete
+        vcf_index = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz.tbi" #Make temp once development is complete
 
     shell:
         """

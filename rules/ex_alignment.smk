@@ -38,7 +38,7 @@ rule ex_samtobam:
     input:
         sam = "tmp/{ex_sample}/{ex_sample}_map.sam",
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam")
+        bam = "tmp/{ex_sample}/{ex_sample}_map.bam" #Make temp again once pipeline development is complete
     threads: 
         max(1, os.cpu_count() // 16)
     shell:

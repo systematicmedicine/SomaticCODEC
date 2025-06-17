@@ -30,55 +30,31 @@ Authors:
 """
 
 # Load libraries
+import os
 import pandas as pd
 
 # Set working directory
-workdir: config["cwd"]
+os.chdir(workflow.basedir)
 
-# Extract experimental sample details from ex_samples.csv
-ex_sample_names = list(pd.read_csv(config["ex_samples_path"])["ex_sample"])
-
-#Lists all lanes defined in ex_samples.csv to create by lane fasta renaming and demultiplexing rules
-lanes = list(pd.read_csv(config["ex_samples_path"])["lane"].unique())
-
-#Lists experimental (codec) fastqs by lane
-ex_raw_fastq1 = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq1"].to_dict()
-ex_raw_fastq2 = pd.read_csv(config["ex_samples_path"]).drop_duplicates("lane").set_index("lane")["fastq2"].to_dict()
-
-#Lists ex_sample names that belong to each lane
-samples_by_lane = pd.read_csv(config["ex_samples_path"]).groupby("lane")["ex_sample"].apply(list).to_dict()
-
-#Creates mapping between lane and ex_sample to determine which fasta file should be applied to each ex_sample during trimming
-ex_sample_to_lane = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["lane"].to_dict()
-
-#Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
-ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sample"].to_dict()
+# Load lane and sample names
+ex_lanes = pd.read_csv(config["ex_samples_path"])["ex_lane"].unique().tolist()
+ex_sample_names = pd.read_csv(config["ex_samples_path"])["ex_sample"].to_list()
+ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
+assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
 
 # Include rules files
+include: "rules/index_reference_genome.smk"
+include: "rules/ms_preprocess_fastq.smk"
+include: "rules/ms_alignment.smk"
+include: "rules/ms_call_germ.smk"
+include: "rules/masked_regions.smk"
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
-#include: "rules/ex_create_ssc.smk"
 include: "rules/ex_create_dsc.smk"
 include: "rules/ex_call_somatic.smk"
+include: "rules/ex_additional_metrics.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("metrics/{lane}_demux_metrics.json", lane=lanes),
-        expand("metrics/{lane}_r1_fastqc_raw_metrics.html",lane=lanes),
-        expand("metrics/{lane}_r2_fastqc_raw_metrics.html",lane=lanes),
-        expand("metrics/{lane}_sample_readcounts_metrics.txt", lane=lanes),
-        expand("metrics/{lane}_batchcontamination_metrics.txt", lane=lanes),
-        expand("metrics/{lane}_correctproduct_metrics.txt", lane=lanes),
-        expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_r1_trimfilter_metrics.html", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_r2_trimfilter_metrics.html", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample=ex_sample_names),
         expand("results/{ex_sample}_somatic_mutations.vcf", ex_sample=ex_sample_names),
-        "metrics/duplication_metrics.txt"
-        

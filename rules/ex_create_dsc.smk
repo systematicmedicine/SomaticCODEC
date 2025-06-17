@@ -181,8 +181,8 @@ rule ex_zipdata:
         fai = config["GRCh38_path"] + ".fai",
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
-        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"
     resources:
         mem = 32
     threads:

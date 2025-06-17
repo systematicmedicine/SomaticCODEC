@@ -24,7 +24,7 @@ rule ms_raw_alignment:
         r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_aligned.bam")
+        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam" #Change to temp once pipeline development is complete
     threads: 
         max(1, os.cpu_count() // 4)
     shell:

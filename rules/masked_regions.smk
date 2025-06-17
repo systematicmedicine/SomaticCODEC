@@ -65,7 +65,7 @@ rule ms_combine_masks:
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed"
     output:
-        combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed")
+        combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed" #Make temporary once pipeline development is complete
     shell:
         """
         cat {input.gnomAD_bed} \
