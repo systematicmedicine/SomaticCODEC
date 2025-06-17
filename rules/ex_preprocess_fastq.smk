@@ -16,7 +16,6 @@ ex_raw_r2_list = pd.read_csv(config["ex_samples_path"]).drop_duplicates("ex_lane
 #Creates mapping between lane and ex_sample to determine which fasta file should be applied to each ex_sample during trimming
 ex_sample_to_lane = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ex_lane"].to_dict()
 
-
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
@@ -37,29 +36,15 @@ rule ex_fastqcraw_metrics:
         mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
         """
 
-# For each lane, generate a separate ex_namesamples_{lane} rule
-# Replace default index names with experiment specific sample names as defined in ex_samples.csv for each lane
-for lane in lanes:
-    #Generate 1 rule per lane
-    rule_name = f"ex_name_indices_{lane}"
-
-    rule:
-        name: rule_name
-        input:
-            r1start = config["codec_r1start_path"],
-            r1end   = config["codec_r1end_path"],
-            r2start = config["codec_r2start_path"],
-            r2end   = config["codec_r2end_path"],
-            mapping = config["ex_samples_path"]
-        output:
-            r1start_out = f"tmp/downloads/{lane}_r1start.fasta",
-            r1end_out   = f"tmp/downloads/{lane}_r1end.fasta",
-            r2start_out = f"tmp/downloads/{lane}_r2start.fasta",
-            r2end_out   = f"tmp/downloads/{lane}_r2end.fasta"
-        params:
-            lane = lane
-        script:
-            "../scripts/samplenames.py"
+#Generate adapter fasta files for demultiplexing and trimming using adapter sequences in ex_adapters.csv
+rule ex_generate_adapter_fastas:
+    input:
+        samples=config["ex_samples_path"],
+        adapters=config["ex_adapters_path"]
+    output:
+        adapter_fasta_outputs = expand("tmp/adapter_fastas/{lane}_{region}.fasta", lane=ex_lanes, region=["r1start", "r1end", "r2start", "r2end"])
+    script:
+        "../scripts/generatefastas.py"
 
 # For each lane, generate a separate ex_demux_{lane} rule
 # Removes first 3bp of R1 and R2 to read name as 6 base UMI. Demultiplexes using R1 and R2 5' sample indices (both must agree). Trims 5' sample indices. 
@@ -67,8 +52,8 @@ for lane in lanes:
     #Determine which samples are present in the lane
     samples = pd.read_csv(config["ex_samples_path"])[pd.read_csv(config["ex_samples_path"])["lane"] == lane]["ex_sample"].tolist()
     #Create list of file outputs based on samples present in the lane
-    demuxed_r1 = [f"tmp/{s}_r1_raw.fastq.gz" for s in samples]
-    demuxed_r2 = [f"tmp/{s}_r2_raw.fastq.gz" for s in samples]
+    demuxed_r1 = [f"tmp/{s}_r1_trim5.fastq.gz" for s in samples]
+    demuxed_r2 = [f"tmp/{s}_r2_trim5.fastq.gz" for s in samples]
     #Generate 1 rule per lane
     rule_name = f"ex_demux_{lane}"
 
@@ -77,14 +62,14 @@ for lane in lanes:
         input:
             fastq1 = ex_raw_r1_list[lane],
             fastq2 = ex_raw_r2_list[lane],
-            r1_start = f"tmp/downloads/{lane}_r1start.fasta",
-            r2_start = f"tmp/downloads/{lane}_r2start.fasta"
+            r1_start = f"tmp/adapter_fastas/{lane}_r1start.fasta",
+            r2_start = f"tmp/adapter_fastas/{lane}_r2start.fasta"
         output:
             demuxed_r1 = demuxed_r1,
             demuxed_r2 = demuxed_r2,
             json = f"metrics/{lane}_demux_metrics.json"
         threads:
-            config["ncores"]
+            os.cpu_count()/4
         shell:
             f"""
             cutadapt \
@@ -104,18 +89,18 @@ for lane in lanes:
             """
 
 # Identifies and trims 3' sample indices from R1 and R2 when present
-rule ex_trim:
+rule ex_trim_3prime_indices:
     input:
-        r1 = "tmp/{ex_sample}_r1_raw.fastq.gz",
-        r2 = "tmp/{ex_sample}_r2_raw.fastq.gz",
-        r1_end = lambda wildcards: f"tmp/downloads/{ex_sample_to_lane[wildcards.ex_sample]}_r1end.fasta",
-        r2_end = lambda wildcards: f"tmp/downloads/{ex_sample_to_lane[wildcards.ex_sample]}_r2end.fasta"
+        r1 = "tmp/{ex_sample}_r1_trim5.fastq.gz",
+        r2 = "tmp/{ex_sample}_r2_trim5.fastq.gz",
+        r1_end = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r1end.fasta",
+        r2_end = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r2end.fasta"
     output:
-        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
-        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
+        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim5&3.fastq.gz"),
+        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim5&3.fastq.gz"),
         json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     threads:
-        os.cpu_count()
+        os.cpu_count()/4
     shell:
         """
         #Trim 1bp from 5' end (T from ligation)
@@ -137,14 +122,14 @@ rule ex_trim:
 # Trims 5' and 3' ends to remove residual adapter/A-tailing bases. Filters inserts size <15bp. 
 rule ex_trimfilter:
     input: 
-        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
-        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",  
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim5&3.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim5&3.fastq.gz",  
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trimfilter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trimfilter.fastq.gz"),
         json = "metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json"
     threads:
-        config['ncores']
+        os.cpu_count()/4
     shell:  
         """
         #Trim 8 bases from 3' end of read 1 and read 2 to remove any remaining short (<7bp) sample indices.
