@@ -33,7 +33,8 @@ Refer to [link](#) for more information on configuring config files.
 * The repo deploy key can be found at `\RwoD Research\Personal\Cameron\Misc\codec-opensource deploy key`
 * Copy the deploy key to `~/.ssh/deploy_key`
 * Run the following commands
-```chmod 600 ~/.ssh/deploy_key
+```
+chmod 600 ~/.ssh/deploy_key
 ssh-keyscan github.com >> ~/.ssh/known_hosts
 GIT_SSH_COMMAND='ssh -i ~/.ssh/deploy_key' git clone --branch dev git@github.com:systematicmedicine/codec-opensource.git
 ```
