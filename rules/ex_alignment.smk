@@ -17,7 +17,7 @@ rule ex_map:
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map.sam")
     threads: 
-        max(1, os.cpu_count()//4)
+        max(1, os.cpu_count() // 4)
     params:
         ref = config["GRCh38_path"]
     shell:
@@ -36,7 +36,7 @@ rule ex_samtobam:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam")
     threads: 
-        max(1, os.cpu_count()//16)
+        max(1, os.cpu_count() // 16)
     shell:
         """
         samtools view -@ {threads} -bS -o {output.bam} {input.sam}

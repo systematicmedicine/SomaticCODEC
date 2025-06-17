@@ -16,11 +16,12 @@ Author: Joshua Johnstone
 rule ms_raw_alignment:
     input: 
         ref = config['GRCh38_path'],
-        r1_processed = "tmp/{ms_sample}/{ms_sample}_processed_r1.fastq.gz",
-        r2_processed = "tmp/{ms_sample}/{ms_sample}_processed_r2.fastq.gz"
+        r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
+        r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_aligned.bam")
-    threads: max(1, os.cpu_count() // 4)
+    threads: 
+        max(1, os.cpu_count() // 4)
     shell:
         """
         bwa-mem2 mem \
@@ -38,7 +39,8 @@ rule ms_sort_bam:
         bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam"
     output:
         bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted.bam")
-    threads: max(1, os.cpu_count() // 8)
+    threads: 
+        max(1, os.cpu_count() // 8)
     shell:
         "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
 

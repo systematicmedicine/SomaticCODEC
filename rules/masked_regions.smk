@@ -30,7 +30,7 @@ rule ms_low_depth_mask:
     shell:
         """
         samtools depth -aa {input.markdup_bam} > {output.depth_stats}
-        awk '$3 < {params.threshold} {print $1"\\t"$2-1"\\t"$2}' {output.depth_stats} | \
+        awk '$3 < {params.threshold} {{print $1"\t"$2-1"\t"$2}}' {output.depth_stats} | \
         sort -k1,1 -k2,2n \
         bedtools merge -i - > {output.bed}
        
@@ -58,11 +58,11 @@ rule ms_germline_variants_bed:
 # Combines all masks into one bed file
 rule ms_combine_masks:
     input:
-        gnomAD_bed = "reference/gnomad_common_af01_merged.bed",
-        GIAB_bed = "reference/GRCh38_alldifficultregions.bed",
+        gnomAD_bed = "tmp/downloads/gnomad_common_af01_merged.bed",
+        GIAB_bed = "tmp/downloads/GRCh38_alldifficultregions.bed",
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_in.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed"
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed")
@@ -82,11 +82,11 @@ rule ms_combine_masks:
 # Generates metrics for each mask file
 rule masking_metrics:
     input:
-        gnomAD_bed = "reference/gnomad_common_af01_merged.bed",
-        GIAB_bed = "reference/GRCh38_alldifficultregions.bed",
+        gnomAD_bed = "tmp/downloads/gnomad_common_af01_merged.bed",
+        GIAB_bed = "tmp/downloads/GRCh38_alldifficultregions.bed",
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_in.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
         ref_index = config['GRCh38_path'] + ".fai"

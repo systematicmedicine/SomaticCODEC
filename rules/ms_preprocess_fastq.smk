@@ -22,7 +22,8 @@ rule ms_fastqc_raw:
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html",
         r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html"
-    threads: max(1, os.cpu_count() // 16)
+    threads: 
+        max(1, os.cpu_count() // 16)
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)
@@ -48,7 +49,8 @@ rule ms_trim_filter:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv"
-    threads: max(1, os.cpu_count() // 4)
+    threads: 
+        max(1, os.cpu_count() // 4)
     shell: 
         """
         cutadapt \
@@ -65,7 +67,6 @@ rule ms_trim_filter:
             -p {output.r2} \
             {input.r1} {input.r2} \
             --report=minimal > {output.report}
-
         """
 # Generates a new fastqc report for processed reads
 rule ms_fastqc_processed:
@@ -75,7 +76,8 @@ rule ms_fastqc_processed:
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html",
         r2_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html"
-    threads: max(1, os.cpu_count() // 16)
+    threads:
+        max(1, os.cpu_count() // 16)
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)

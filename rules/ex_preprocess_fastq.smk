@@ -51,9 +51,9 @@ rule ex_generate_adapter_fastas:
 # Removes first 3bp of R1 and R2 to read name as 6 base UMI. 
 # Demultiplexes using R1 and R2 5' sample indices (both must agree). 
 # Trims 5' sample indices used for demultiplexing. 
-for lane in lanes:
+for lane in ex_lanes:
     #Determine which samples are present in the lane
-    samples = pd.read_csv(config["ex_samples_path"])[pd.read_csv(config["ex_samples_path"])["lane"] == lane]["ex_sample"].tolist()
+    samples = pd.read_csv(config["ex_samples_path"])[pd.read_csv(config["ex_samples_path"])["ex_lane"] == lane]["ex_sample"].tolist()
     #Create list of file outputs based on samples present in the lane
     demuxed_r1 = [f"tmp/{s}_r1_trim5.fastq.gz" for s in samples]
     demuxed_r2 = [f"tmp/{s}_r2_trim5.fastq.gz" for s in samples]
@@ -72,7 +72,7 @@ for lane in lanes:
             demuxed_r2 = demuxed_r2,
             json = f"metrics/{lane}_demux_metrics.json"
         threads:
-            max(1, os.cpu_count()//4)
+            max(1, os.cpu_count() // 4)
         shell:
             f"""
             cutadapt \
@@ -103,7 +103,7 @@ rule ex_trim_3prime_indices:
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim5&3.fastq.gz"),
         json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     threads:
-        max(1, os.cpu_count()//4)
+        max(1, os.cpu_count() // 4)
     shell:
         """
         #Trim 3' indices/adapters
@@ -127,6 +127,7 @@ rule ex_trim_remnants:
     output:
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz", 
+    shell:
         """
         cutadapt \
           -j {threads} \
@@ -137,7 +138,6 @@ rule ex_trim_remnants:
           -o {output.r1} \
           -p {output.r2} \
           {input.r1} {input.r2} \
-          --json={output.json}
         """
 
 # Filter trimmed sequences for insert size <70bp and mean quality score >20
@@ -148,9 +148,9 @@ rule ex_filter:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
-        json = "metrics/{ex_sample}/{ex_sample}_filter_metrics.json"
+        json = "metrics/{ex_sample}/{ex_sample}_filter_metrics.json",
     threads:
-        max(1, os.cpu_count()//4)
+        max(1, os.cpu_count() // 4)
     shell:  
         """
         cutadapt \

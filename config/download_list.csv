@@ -4,9 +4,9 @@ GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.pac,s3://sysmed-ref-s3/reference
 GCA_000001405.15_GRCh38_no_alt_analysis_set.fna,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.sa,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.amb,s3://sysmed-ref-s3/reference-files/,tmp/downloads
-GRCh38_notinalldifficultregions.bed,s3://sysmed-ref-s3/reference-files/,tmp/downloads
+GRCh38_alldifficultregions.bed,s3://sysmed-ref-s3/reference-files/,tmp/downloads
+gnomad_common_af01_merged.bed,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.ann,s3://sysmed-ref-s3/reference-files/,tmp/downloads
-GRCh38_notinalldifficultregions.interval_list,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 common_all_20180418_with_chr.vcf.gz,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 common_all_20180418_with_chr.vcf.gz.tbi,s3://sysmed-ref-s3/reference-files/,tmp/downloads
@@ -14,15 +14,7 @@ GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai,s3://sysmed-ref-s3/reference
 common_all_20180418_with_chr.vcf.gz,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.0123,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt.2bit.64,s3://sysmed-ref-s3/reference-files/,tmp/downloads
-ex_r1start.fasta,s3://sysmed-ref-s3/reference-files/,tmp/downloads
-ex_r1end.fasta,s3://sysmed-ref-s3/reference-files/,tmp/downloads
-ex_r2start.fasta,s3://sysmed-ref-s3/reference-files/,tmp/downloads
-ex_r2end.fasta,s3://sysmed-ref-s3/reference-files/,tmp/downloads
 QAGRF25050474_22THKGLT4_NoIndex_L006_R1.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ex_sample_data/,tmp/downloads
 QAGRF25050474_22THKGLT4_NoIndex_L006_R2.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ex_sample_data/,tmp/downloads
-Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r1.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ms_sample_data/,tmp/downloads
-Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r2.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ms_sample_data/,tmp/downloads
 Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r1.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ms_sample_data/,tmp/downloads
 Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r2.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ms_sample_data/,tmp/downloads
-Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r1.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ms_sample_data/,tmp/downloads
-Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r2.fastq.gz,s3://sysmed-seq-s3/20250526-Sequencing-for-pipeline-and-metric-tests/ms_sample_data/,tmp/downloads
