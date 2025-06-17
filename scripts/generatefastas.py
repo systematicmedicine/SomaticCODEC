@@ -1,3 +1,14 @@
+"""
+--- generatefastas.py ---
+
+Generate by lane codec index adapter fasta files for demultiplexing and trimming from the sequences provided in ex_adapters.csv
+
+Input: ex_adapters.csv
+Output: Four fasta files (start and end of R1 and R2)
+
+Author: James Phie
+"""
+
 import pandas as pd
 from pathlib import Path
 import re
