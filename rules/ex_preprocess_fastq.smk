@@ -26,7 +26,7 @@ rule ex_fastqcraw_metrics:
         fastqc_report1 = "metrics/{lane}_r1_fastqc_raw_metrics.html",
         fastqc_report2 = "metrics/{lane}_r2_fastqc_raw_metrics.html"
     resources:
-        mem = 8,
+        mem = 8
         runtime = 24
     shell:
         """
@@ -126,7 +126,9 @@ rule ex_trim_remnants:
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim5&3.fastq.gz", 
     output:
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
-        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz", 
+        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",
+    threads:
+        max(1, os.cpu_count() // 4)
     shell:
         """
         cutadapt \

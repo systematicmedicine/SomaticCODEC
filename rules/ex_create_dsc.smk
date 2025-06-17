@@ -178,12 +178,13 @@ rule ex_zipdata:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam",
         ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai"
+        fai = config["GRCh38_path"] + ".fai",
+        dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
     resources:
-        mem = 4,
+        mem = 32
     threads:
         max(1, os.cpu_count() // 16)
     shell:
@@ -210,7 +211,7 @@ rule ex_dscdepth_metrics:
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt",
     resources:
-        mem = 30,
+        mem = 30
     shell:
         """
         picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
