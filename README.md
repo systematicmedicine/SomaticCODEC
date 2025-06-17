@@ -12,13 +12,12 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 ## Library prep and sequencing
 * Prepare and sequence CODEC libraries as per `SOP0017 CODECseq library preparation`
 * Prepare and sequence matched samples as `\CODECseq\20250526 Sequencing for pipeline and metric tests\Methods`
-* Transfer sequenced FASTQ files to `/s3/buckets/sysmed-seq-s3`
 
 ## Setup instructions
 * [Setup Instructions](docs/setup.md)
 
 ## Running the pipeline
-* Change to codec-opensource directory
+* Change to <I>codec-opensource</I> directory
 * Upload [config files](docs/configs.md) for this run
 * Run docker container
 ```
@@ -36,7 +35,7 @@ tmux new -s pipeline
 ```
 snakemake --configfile config/config.yaml --notemp
 ``` 
-* Create single file of all pipeline outputs (optional)
+* After pipeline has run sucessfullt, create single file of outputs (optional)
 ```
 python3 utils/tar_output.py
 ```
