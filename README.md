@@ -3,211 +3,70 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 ## Key differences from [`broadinstitute/CODECsuite`](https://github.com/broadinstitute/CODECsuite)
 
-- Fully open-source toolchain (e.g. `cutadapt`, `fgbio`, `samtools`, etc)
-- Tailored for detecting somatic mutations in normal tissue
-- Incorporates independent samples to build personalized reference genomes
-- Additional QC metrics (e.g. `fastqc`)
-- Fully containersied docker workflow
+* Fully open-source toolchain (e.g. `cutadapt`, `fgbio`, `samtools`, etc)
+* Tailored for calling somatic mutations in normal tissue
+* Uses independent matched samples (from same individual) to differentiate true somatic variants from germline variants
+* Extensive range of QC metrics generated (e.g. `fastqc`)
+* Fully containerized docker workflow
 
-## Intended use
-* Quanityifying SNVs in genomic DNA
-  * Future updates may include small indels 
-* Libraries prepared as per <I>SOP0017 CODECseq library preparation</I>
-* Libraries sequenced as per <I>SOP0017 CODECseq library preparation</I>
+## Library prep and sequencing
+* Prepare and sequence CODEC libraries as per `SOP0017 CODECseq library preparation`
+* Prepare and sequence matched samples as `\CODECseq\20250526 Sequencing for pipeline and metric tests\Methods`
+* Transfer sequenced FASTQ files to `/s3/buckets/sysmed-seq-s3`
+## Running pipeline on AWS EC2
 
-## Installation and setup
+### Prepare config files
+Refer to [link](#) for more information on configuring config files.
+* config.yaml
+* ms_samples
+* ex_samples.csv
+* ex_adapters.csv
+* download_list.csv
 
-### WSL setup (skip for EC2 instances)
+### Initialise EC2 instance
+* Select `m8g.24xlarge`
+* Configure IAM roles to allow S3 read only access
+* Select an EBS volume size aproximately 4x the size of the input FASTQ files
+* Connect to EC2 instance via SSH
 
-#### GitHub access
+### Clone GitHub repo
+* The repo deploy key can be found at `\RwoD Research\Personal\Cameron\Misc\codec-opensource deploy key`
+* Copy the deploy key to `~/.ssh/deploy_key`
+* Run the following commands
+```chmod 600 ~/.ssh/deploy_key
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+GIT_SSH_COMMAND='ssh -i ~/.ssh/deploy_key' git clone --branch dev git@github.com:systematicmedicine/codec-opensource.git
+```
 
-* Create a personal access token with an expiry not greater than 90 days
-* Store this personal access token using your WSL crediential manager of choice
+### Download FASTQ and reference files
+All required FASTQ and reference files should be defined in config/download_list.csv
+```
+python3 utils/download_S3toEC2.py
+```
 
-#### Docker desktop setup
-* Download docker desktop from https://www.docker.com/products/docker-desktop
-* During installation:
-  * Enable WSL2 backend
-  * Integrate with your Ubuntu distro
-* Once installed, restart your computer
-* Open Docker Desktop
-* Go to settings -> resources -> WSL Integration
-* Turn on integratino for your Ubuntu instance 
-* Test:
-  * docker version
-  * docker run hello-world
-* Note: Docker desktop may require up to 32GB RAM to run human whole genome alignment steps locally. 
+### Upload config files
+* Replace defult config files in the cloned repository
 
-#### Collect reference files
-* Download the following files from S3 (sysmed-ref-s3) to codec-opensource/tmp/reference
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.dict
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.pac
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.sa
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.amb
-  * GRCh38_notinalldifficultregions.bed
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.ann
-  * GRCh38_notinalldifficultregions.interval_list
-  * common_all_20180418_with_chr.vcf.gz
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt
-  * common_all_20180418_with_chr.vcf.gz.tbi
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.fai
-  * common_all_20180418_with_chr.vcf.gz
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.0123
-  * GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bwt.2bit.64
-  * ex_r1start.fasta
-  * ex_r1end.fasta
-  * ex_r2start.fasta
-  * ex_r2end.fasta
-
-* Download any raw fastq files (most likely smaller test files if running locally)
-
-### EC2 setup (skip for WSL)
-
-#### GitHub access
-
-* The repository has deploy key that allows read-only access to this repository only
-* The private key can be found at <I>\RwoD Research\Personal\Cameron\Misc\codec-opensource deploy key</I>
-* Copy and paste contents of codec-opensource deploy key into ~/.ssh/deploy_key
-
-  ```bash
-  nano ~/.ssh/deploy_key
-  ```
-* Set correct permissions (SSH will refuse to use the key if it's too open)
-
-  ```bash
-  chmod 600 ~/.ssh/deploy_key
-  ```
-* Add github to known hosts
-
-  ```bash
-  ssh-keyscan github.com >> ~/.ssh/known_hosts
-  ```
-* Clone the repository using the deploy key
-
-  ```bash
-  GIT_SSH_COMMAND='ssh -i ~/.ssh/deploy_key' git clone git@github.com:systematicmedicine/codec-opensource.git
-  ```
-
-#### Launch new EC2 instance
-* Name instance according to project and user
-* Select Ubuntu Server 24.04 LTS (HVM), SSD Volume Type
-* Select instance type (recommended m6i.24xlarge if running large fastq's)
-  * Note: Running this instance costs ~10.00 AUD per hour, so pause the instance whenever bioinformatics pipelines are not running.
-* Select key pair name (set up .ssh key with aws if none pre-existing)
-* Allow SSH traffic from 'my IP'
-* Configure storage
-  * 5000GB (5TB) recommended for large pipelines
-* Select IAM instance profile
-  * Add EC2_S3_Write role to EC2 instance
-* Click Launch instance
-
-#### Connect to and set up EC2 instance
-* Select the desired instance, and check details for Public IPv4 address
-* SSH into instance using local Ubuntu
-  ```bash
-  ssh -i ~/.ssh/<key.pem> ubuntu@<Public IPv4 address>
-  ```
-* Update system packages
-
-  ```bash
-  sudo apt update && sudo apt upgrade -y
-  ```
-* Download aws-cli
-  ```bash
-  sudo snap install aws-cli --classic
-  ```
-
-#### Download fastq and reference files
-* Fastq and reference file downloads from S3 should be performed by updating config.yaml and ex_samples.csv and running the master snakefile
-
-* To download fastq files from AGRF to S3
-  * Download to EC2 instance
-  ```bash
-  rsync -avh --info=progress2 -e ssh \
-  <address given by AGRF> \
-  /path/to/ec2/directory/
-  ```
-  * Copy from EC2 to S3
-    ```bash
-    aws s3 cp /path/to/ec2/directory/ \
-    s3://sysmed-seq-s3/<work-unit-name>/ --recursive
-  ```
-
-### General setup (both local and EC2)
-
-#### Clone github repository
-* Clone the GitHub repository:
-
-  ```bash
-  cd ~/project1 && \
-  git clone git@github.com:systematicmedicine/codec-opensource.git
-  ```
-
-#### Modify config files
-* config/ex_samples.csv (for codec samples):
-  * The 'samples' column should only include the indices being used (must follow the indices naming system Sample01, Sample02, Sample03, Sample04 .. Sample12)
-  * The 'ex_samplename' column is the name of experimental samples (e.g. buffycoat1.1, buffycoat1.2, buffycoat2.1, etc.)
-  * The 'ms_samplename' column should provide the name of the matched sample for each experimental sample
-  * Contamination data will be generated on any indices not included in this list.
-* Modify config.yaml to match the number of cores on the system (e.g. increase to 96 cores if running on a 96 core EC2 instance). 
-* Other file paths should not need to be modified, regardless of chosen repository name.
-
-#### Activate tmux and docker
-Note that use of tmux is optional for local devices.
-
-* Build docker
-
-```bash
+### Build docker image
+```
 docker build -t codec .
 ```
-
-* Set up a tmux session (in this example, the session is called pipeline, but it can be called anything)
-
-  ```bash
-  tmux new -s pipeline
-  ```
-
-* To exit the session without closing it (e.g. to use instance while the pipeline is running), type:
-  * ctrl + b
-  * d
-
-* To access the tmux session later:
-   
-```bash
-tmux attach -t pipeline
+### Run pipeline
+* Create tmux session
 ```
-* In the tmux session, run docker:
-
-```bash
-docker run -it --rm -v ~/project1/codec-opensource:/work codec
+tmux new -s pipeline
 ```
-## Running the Snakefile
-  
-* Run snakemake
-  ```bash
-  snakemake --configfile config/config.yaml --notemp
-  ```
-  * A list of additional useful snakemake commands:
-  ```bash
-  --notemp #Disables temporary files, meaning all files are saved and a run can be resumed if it crashes. This is useful during development.
-  --dryrun #Pretends to run the snakemake, and outputs a list of what rules would have been run. This should typically always be run first to make sure the correct rules are being run and there are no errors. 
-  --unlock #Unlocks snakemake after a failed run.
-  --rerun-incomplete #Checks if any files are missing, incomplete or outdated (e.g. files from previous rules are newer) and re-runs them
-  <rule-name> #Add the name of a rule at the end of the line to only run that rule (as well as any inputs required to run the rule)
-  --stat #Gives a summary of time taken per rule and size of outputs.
-  --configfile #Points to the config file (relative path config/config.yaml).
-  -s #By default, no snakefile needs to be specified if snakefile is called 'Snakefile' and located in cwd. 
-  ```
-  #Example 1 (Dryrun)
-  ```bash
-  snakemake --configfile config/config.yaml --notemp --rerun-incomplete --dryrun
-  ```
-  #Example 2 (Run data, with stats output, but do not re-do steps that have already been completed)
-  ```bash
-  snakemake --configfile config/config.yaml --notemp --rerun-incomplete --cores all --stats runstats.json
-  ```
-  #Example 3 (Running a dev master snakefile)
-  ```bash
-  snakemake -s Snakefile_dev_JP --configfile config/config.yaml --notemp --rerun-incomplete --cores all
-  ```
+* Run the pipeline
+```
+snakemake --configfile config/config.yaml --notemp
+``` 
+### Download outputs to local
+* Create tar file of key pipeline outputs
+```
+python3 utils/tar_output.py
+```
+* Download outputs using method of choice (e.g. scp to WSL)
+
+### Shut down EC2 instance
+Note: EC2 instances are expensive, do not leave them running when not in use
+
