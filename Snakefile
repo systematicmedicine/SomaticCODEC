@@ -61,9 +61,9 @@ rule all:
         expand("metrics/{lane}_batchcontamination_metrics.txt", lane=ex_lanes),
         expand("metrics/{lane}_correctproduct_metrics.txt", lane=ex_lanes),
         expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_r1_trimfilter_metrics.html", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_r2_trimfilter_metrics.html", ex_sample=ex_sample_names),
+        expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_sample_names),
+        expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample=ex_sample_names),
+        expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt", ex_sample=ex_sample_names),
@@ -83,4 +83,4 @@ rule all:
         expand("metrics/{ms_sample}/{ms_sample}_depth_stats.txt", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_sample_names)
+        expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_sample_names),
