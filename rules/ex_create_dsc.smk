@@ -178,11 +178,7 @@ rule ex_zipdata:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam",
         ref = config["GRCh38_path"],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config["GRCh38_path"] + ".sa"
+        fai = config["GRCh38_path"] + ".fai"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
@@ -209,11 +205,8 @@ rule ex_dscdepth_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
         ref = config["GRCh38_path"],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config["GRCh38_path"] + ".sa"
+        fai = config["GRCh38_path"] + ".fai",
+        dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt",
     resources:

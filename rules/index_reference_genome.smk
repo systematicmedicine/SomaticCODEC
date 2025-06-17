@@ -10,7 +10,7 @@ Author: James Phie
 
 """
 # Creates index files from reference genome
-rule ex_bwamem_index_files:
+rule bwamem_index_files:
     input:
         reference = config['GRCh38_path']
     output:
@@ -26,7 +26,7 @@ rule ex_bwamem_index_files:
         bwa-mem2 index {input.reference}
         """
 
-rule ex_samtools_index_files:
+rule samtools_index_files:
     input:
         reference = config['GRCh38_path']
     output:
@@ -34,4 +34,16 @@ rule ex_samtools_index_files:
     shell:
         """
         samtools faidx {input.reference}
+        """
+
+rule picard_sequence_dict:
+    input:
+        ref = config["GRCh38_path"]
+    output:
+        dict = config["GRCh38_path"].replace(".fna", ".dict")
+    shell:
+        """
+        picard CreateSequenceDictionary \
+            R={input.ref} \
+            O={output.dict}
         """
