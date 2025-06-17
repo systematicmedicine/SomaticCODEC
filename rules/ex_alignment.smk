@@ -12,12 +12,12 @@ Author: James Phie
 # Creates an aligned sam from trimmed and filtered fastq files. Softclipping allowed.
 rule ex_map:
     input:
-        fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_trimfilter.fastq.gz",
-        fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_trimfilter.fastq.gz",
+        fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
+        fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map.sam")
     threads: 
-        os.cpu_count()/4
+        max(1, os.cpu_count()//4)
     params:
         ref = config["GRCh38_path"]
     shell:
@@ -36,7 +36,7 @@ rule ex_samtobam:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam")
     threads: 
-        os.cpu_count()/8
+        max(1, os.cpu_count()//16)
     shell:
         """
         samtools view -@ {threads} -bS -o {output.bam} {input.sam}

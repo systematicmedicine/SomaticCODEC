@@ -16,7 +16,7 @@ samples_by_lane = pd.read_csv(config["ex_samples_path"]).groupby("ex_lane")["ex_
 rule ex_correctproduct_metrics:
     input:
         demux_json = "metrics/{lane}_demux_metrics.json",
-        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_trimfilter_metrics.json", ex_sample=samples_by_lane[wildcards.lane]),
+        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=samples_by_lane[wildcards.lane]),
         flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=samples_by_lane[wildcards.lane])
     output:
         "metrics/{lane}_correctproduct_metrics.txt"
@@ -32,8 +32,8 @@ rule ex_batchcontamination_metrics:
     output:
         contamination = "metrics/{lane}_batchcontamination_metrics.txt"
     params:
-        fasta = config['r1start'],
-        used = config['ex_samples']
+        fasta = lambda wildcards: f"tmp/adapter_fastas/{wildcards.lane}_r1start.fasta",
+        used = config['ex_samples_path']
     script:
         "../scripts/batchcontamination.py"
 

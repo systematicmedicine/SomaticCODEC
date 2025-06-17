@@ -21,7 +21,7 @@ rule ex_umitag:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi1.bam")
     threads:
-        os.cpu_count()/12
+        max(1, os.cpu_count()//16)
     resources:
         mem = 32
     shell:
@@ -57,7 +57,7 @@ rule ex_groupbyumi:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi3.bam"),
         histogram = "metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt"
     threads:
-        os.cpu_count()/12
+        max(1, os.cpu_count()//16)
     resources:
         mem = 32
     shell:
@@ -147,7 +147,7 @@ rule ex_map_dsc:
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.sam")
     threads: 
-        os.cpu_count()/4
+        max(1, os.cpu_count()//4)
     params:
         ref = config["GRCh38_path"]
     shell:
@@ -162,7 +162,7 @@ rule ex_samtobam_dsc:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
     threads: 
-        os.cpu_count()/12
+        max(1, os.cpu_count()//16)
     shell:
         """
         samtools sort -n -@ {threads} -o {output.bam} {input.sam}
@@ -179,7 +179,7 @@ rule ex_zipdata:
     resources:
         mem = 4,
     threads:
-        os.cpu_count()/12
+        max(1, os.cpu_count()//16)
     params:
         ref = config["GRCh38_path"]
     shell:

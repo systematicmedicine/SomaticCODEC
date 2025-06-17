@@ -2,7 +2,7 @@
 --- correctproduct.py ---
 
 To be considered a CODECseq correct product, the following criteria must be met:
-1. Read 1 and read 2 both present at >minimum insert size (typically 70bp, set in ex_preprocess_fastq.smk, rule ex_trimfilter)
+1. Read 1 and read 2 both present at >minimum insert size (typically 70bp, set in ex_preprocess_fastq.smk, rule ex_filter)
 2. Read 1 and read 2 align to the same chromosome, with the start of read 1 being within ~500 base pairs of the end of read 2 (determined in rule ex_map, 'properly paired')
 3. Read 1 and read 2 are read in the expected direction
 
