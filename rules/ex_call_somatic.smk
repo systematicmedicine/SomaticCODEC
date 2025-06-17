@@ -20,7 +20,7 @@ ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sam
 rule ex_dsc_mpileup:
     input:
         masked = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_combined_mask.bed",
-        dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam" #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
+        dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam", #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
         ref = config["GRCh38_path"],
         amb = config["GRCh38_path"] + ".amb",
         ann = config["GRCh38_path"] + ".ann",
