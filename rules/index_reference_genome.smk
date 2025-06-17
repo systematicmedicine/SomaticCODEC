@@ -40,10 +40,10 @@ rule picard_sequence_dict:
     input:
         ref = config["GRCh38_path"]
     output:
-        dict = config["GRCh38_path"].replace(".fna", ".dict")
+        dictf = config["GRCh38_path"].replace(".fna", ".dict")
     shell:
         """
         picard CreateSequenceDictionary \
             R={input.ref} \
-            O={output.dict}
+            O={output.dictf}
         """
