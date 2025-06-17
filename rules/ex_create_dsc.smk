@@ -144,15 +144,19 @@ rule ex_dsc_bam_to_fastq:
 rule ex_map_dsc:
     input:
         fq = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.fastq",
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.sam")
     threads: 
         max(1, os.cpu_count() // 4)
-    params:
-        ref = config["GRCh38_path"]
     shell:
         """
-        bwa-mem2 mem -t {threads} -Y {params.ref} {input.fq} > {output.sam}
+        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fq} > {output.sam}
         """
 
 # Convert dsc sam to dsc bam and sort by readname (querynamesort)
@@ -172,7 +176,13 @@ rule ex_samtobam_dsc:
 rule ex_zipdata: 
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
-        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam"
+        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam",
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
@@ -180,15 +190,13 @@ rule ex_zipdata:
         mem = 4,
     threads:
         max(1, os.cpu_count() // 16)
-    params:
-        ref = config["GRCh38_path"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
-            --ref {params.ref} \
+            --ref {input.ref} \
             --tags-to-revcomp Consensus \
         | samtools sort - -o {output.bam} -O BAM -@ {threads} \
         && samtools index {output.bam} -@ {threads}
@@ -200,19 +208,23 @@ rule ex_zipdata:
 rule ex_dscdepth_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt",
     resources:
         mem = 30,
-    params:
-        ref = config["GRCh38_path"]
     shell:
         """
         picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
             CollectWgsMetrics \
             I={input.bam} \
             O={output.metrics} \
-            R={params.ref} \
+            R={input.ref} \
             INCLUDE_BQ_HISTOGRAM=true \
             MINIMUM_BASE_QUALITY=30
         """

@@ -1,6 +1,8 @@
 ---
 experiment_name: 20250617 Codec-opensource test 1
 GRCh38_path: tmp/downloads/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
+difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions.bed
+common_variants_path: tmp/downloads/gnomad_common_af01_merged.bed
 ex_samples_path: config/ex_samples.csv
 ms_samples_path: config/ms_samples.csv
 ex_adapters_path: config/ex_adapters.csv

@@ -20,7 +20,12 @@ Author: Ben Barry
 rule ms_call_germ_variants:
     input:
         bam= "tmp/{ms_sample}/{ms_sample}_markdup.bam",
-        ref= config['GRCh38_path']
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz")
     threads:
@@ -52,7 +57,12 @@ rule ms_variant_call_unfiltered_metrics:
 rule ms_decompose_variants:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz",
-        ref = config['GRCh38_path']
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz")
     shell:
@@ -75,7 +85,12 @@ rule ms_decompose_variants:
 rule ms_hard_filter_SNV:
     input:
         vcf= "tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz",
-        ref= config['GRCh38_path']
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         SNV_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_SNV.vcf.gz")
     shell:
@@ -111,7 +126,12 @@ rule ms_hard_filter_SNV:
 rule ms_hard_filter_INDEL:
     input:
         vcf= "tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz",
-        ref= config['GRCh38_path']
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         INDEL_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz")
     shell:

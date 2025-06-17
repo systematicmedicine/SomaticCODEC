@@ -21,13 +21,17 @@ rule ex_dsc_mpileup:
     input:
         masked = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_combined_mask.bed",
         dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam" #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
-    params:
-        ref = config["GRCh38_path"]
     shell:
         """
-        samtools mpileup -f {params.ref} \
+        samtools mpileup -f {input.ref} \
             -l {input.masked} -B -q 0 -Q 0 \
             {input.dsc_bam} > {output.mpileup}
         """

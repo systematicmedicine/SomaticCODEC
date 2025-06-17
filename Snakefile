@@ -40,6 +40,7 @@ ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
 assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
 
 # Include rules files
+include: "rules/index_reference_genome.smk"
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
 include: "rules/ms_call_germ.smk"
@@ -84,3 +85,8 @@ rule all:
         expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_sample_names),
+        config['GRCh38_path'] + ".amb",
+        config['GRCh38_path'] + ".ann",
+        config['GRCh38_path'] + ".bwt.2bit.64",
+        config['GRCh38_path'] + ".pac",
+        config['GRCh38_path'] + ".sa"

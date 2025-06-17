@@ -14,18 +14,22 @@ rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
+        ref = config["GRCh38_path"],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map.sam")
     threads: 
         max(1, os.cpu_count() // 4)
-    params:
-        ref = config["GRCh38_path"]
     shell:
         """
         bwa-mem2 mem \
             -t {threads} \
             -Y \
-            {params.ref} {input.fastq1} {input.fastq2} \
+            {input.ref} {input.fastq1} {input.fastq2} \
             > {output.sam}
         """
 

@@ -16,6 +16,11 @@ Author: Joshua Johnstone
 rule ms_raw_alignment:
     input: 
         ref = config['GRCh38_path'],
+        amb = config["GRCh38_path"] + ".amb",
+        ann = config["GRCh38_path"] + ".ann",
+        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
+        pac = config["GRCh38_path"] + ".pac",
+        sa = config["GRCh38_path"] + ".sa"
         r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
