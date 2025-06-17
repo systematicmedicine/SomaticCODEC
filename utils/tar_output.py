@@ -3,13 +3,14 @@
 """
 -- tar_output.py --
 
-Create a tar file containing all key outputs of a successful pipeline run
-    * /results
-    * /metrics
-    * /rules
-    * /scripts
-    * /config
-    * Snakefile
+Create a tar file containing all key outputs of a successful pipeline run,
+structured as follows inside the archive:
+    * /data/results
+    * /data/metrics
+    * /methods/rules
+    * /methods/scripts
+    * /methods/config
+    * /methods/Snakefile
 
 Authors:
     * Chat-GPT
@@ -32,20 +33,20 @@ experiment_name = config["experiment_name"]
 # Define archive path
 archive_path = os.path.join(root_dir, f"{experiment_name}.tar.gz")
 
-# Files and directories to include in the archive
-items_to_archive = [
-    "results",
-    "metrics",
-    "rules",
-    "scripts",
-    "config",
-    "Snakefile"
-]
+# Mapping of source path to target path inside archive
+archive_structure = {
+    "results": "Data/results",
+    "metrics": "Data/metrics",
+    "rules": "Methods/rules",
+    "scripts": "Methods/scripts",
+    "config": "Methods/config",
+    "Snakefile": "Methods/Snakefile"
+}
 
 # Create the archive
 with tarfile.open(archive_path, "w:gz") as tar:
-    for item in items_to_archive:
-        item_path = os.path.join(root_dir, item)
-        tar.add(item_path, arcname=item)
+    for src, dest in archive_structure.items():
+        src_path = os.path.join(root_dir, src)
+        tar.add(src_path, arcname=dest)
 
 print(f"Archive created at {archive_path}")
