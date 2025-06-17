@@ -23,13 +23,15 @@ rule ms_call_germ_variants:
         ref= GRCh38_path
     output:
         vcf= temp("tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz")
+    threads:
+         max(1, os.cpu_count() // 8)
     shell:
         """
         gatk --java-options "-Xmx32g" HaplotypeCaller  \
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            --native-pair-hmm-threads 48
+            --native-pair-hmm-threads {threads}
 
         """
 
@@ -38,7 +40,7 @@ rule ms_variant_call_unfiltered_metrics:
     input: 
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz"
     output:
-        stat = "/metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt"
+        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
@@ -170,7 +172,7 @@ rule ms_variant_call_filtered_metrics:
     input: 
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
     output:
-        stat = "/metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt"
+        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
