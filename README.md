@@ -33,7 +33,8 @@ tmux new -s pipeline
 ```
 * Run pipeline
 ```
-snakemake --configfile config/config.yaml --notemp
+snakemake --configfile config/config.yaml --dryrun
+snakemake --configfile config/config.yaml --cores all --stats metrics/stats.json | tee metrics/snakemake.log
 ``` 
 * After pipeline has run sucessfullt, create single file of outputs (optional)
 ```
