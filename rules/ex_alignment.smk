@@ -19,7 +19,7 @@ rule ex_map:
         ann = config["GRCh38_path"] + ".ann",
         bwt = config["GRCh38_path"] + ".bwt.2bit.64",
         pac = config["GRCh38_path"] + ".pac",
-        sa = config["GRCh38_path"] + ".sa"
+        sa = config['GRCh38_path'] + ".0123"
     output:
         sam = temp("tmp/{ex_sample}/{ex_sample}_map.sam")
     threads: 

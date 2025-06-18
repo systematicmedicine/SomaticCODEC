@@ -23,7 +23,6 @@ assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sa
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("results/ex_hek1.1_somatic_mutations.txt", ex_sample=ex_sample_names),
         "results/ex_hek1.1_somatic_mutations_bcftools_all.vcf",
         "results/ex_hek1.1_somatic_mutations_bcftools_snvs.vcf"
         

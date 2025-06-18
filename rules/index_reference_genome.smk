@@ -18,7 +18,7 @@ rule bwamem_index_files:
         ann = config['GRCh38_path'] + ".ann",
         bwt = config['GRCh38_path'] + ".bwt.2bit.64",
         pac = config['GRCh38_path'] + ".pac",
-        sa = config['GRCh38_path'] + ".sa"
+        sa = config['GRCh38_path'] + ".0123"
     threads:
         max(1, os.cpu_count() // 4)
     shell:
