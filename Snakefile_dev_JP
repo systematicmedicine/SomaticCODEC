@@ -23,7 +23,7 @@ assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sa
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("results/{ex_sample}_somatic_mutations.vcf", ex_sample=ex_sample_names)
+        expand("results/ex_hek1.1_somatic_mutations.vcf", ex_sample=ex_sample_names)
 
 ######ex_call_somatic.smk specific code######
 
@@ -33,33 +33,36 @@ ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sam
 # Create a basic samtools mpileup which lists all disagreements with reference at each position
 rule ex_dsc_mpileup:
     input:
-        masked = config[difficult_regions_path],
+        #masked = config[difficult_regions_path],
         #^Change back to lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_combined_mask.bed" once testing complete
-        dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam", #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
+        dsc_bam = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno.bam", #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
         ref = config['GRCh38_path'],
         fai = config['GRCh38_path'] + ".fai"
     output:
-        mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
+        mpileup = "tmp/ex_hek1.1/ex_hek1.1_dsc_mpileup.txt"
     shell:
         """
         samtools mpileup -f {input.ref} \
-            -l {input.masked} -B -q 0 -Q 0 \
+            -r chr1:1000000-3000000 -B -q 0 -Q 0 \
             {input.dsc_bam} > {output.mpileup}
         """
+
+
+#Re-add bed file and remove chr1
 
 # Extract single nucleotide variant calls from the samtools mpileup file into vcf format
 rule ex_somatic_variants:
     input:
-        mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
+        mpileup = "tmp/ex_hek1.1/ex_hek1.1_dsc_mpileup.txt"
     output:
-        vcf = "results/{ex_sample}_somatic_mutations.vcf"
+        vcf = "results/ex_hek1.1_somatic_mutations.vcf"
     shell:
         """
         varscan mpileup2snp {input.mpileup} \
             --min-coverage 1 \
             --min-var-freq 0 \
             --strand-filter 0 \
-            --min-reads2 1 \
+            --min-reads2 0 \
             --min-avg-qual 0 \
             --p-value 1 \
             --output-vcf 1 > {output.vcf}

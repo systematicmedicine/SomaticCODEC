@@ -25,9 +25,6 @@ rule ex_fastqcraw_metrics:
     output:
         fastqc_report1 = "metrics/{lane}_r1_fastqc_raw_metrics.html",
         fastqc_report2 = "metrics/{lane}_r2_fastqc_raw_metrics.html"
-    resources:
-        mem = 8
-        runtime = 24
     shell:
         """
         fastqc {input.fastq1} -o metrics/
