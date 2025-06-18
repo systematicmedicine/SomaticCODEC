@@ -23,50 +23,41 @@ assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sa
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("results/ex_hek1.1_somatic_mutations.vcf", ex_sample=ex_sample_names)
-
+        expand("results/ex_hek1.1_somatic_mutations.txt", ex_sample=ex_sample_names),
+        "results/ex_hek1.1_somatic_mutations_bcftools_all.vcf",
+        "results/ex_hek1.1_somatic_mutations_bcftools_snvs.vcf"
+        
 ######ex_call_somatic.smk specific code######
 
 #Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
 ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sample"].to_dict()
 
-# Create a basic samtools mpileup which lists all disagreements with reference at each position
-rule ex_dsc_mpileup:
+rule ex_somatic_bcftools:
     input:
-        #masked = config[difficult_regions_path],
-        #^Change back to lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_combined_mask.bed" once testing complete
-        dsc_bam = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno.bam", #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
-        ref = config['GRCh38_path'],
-        fai = config['GRCh38_path'] + ".fai"
+        bam = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam",
+        bai = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam.bai",
+        ref = config["GRCh38_path"]
     output:
-        mpileup = "tmp/ex_hek1.1/ex_hek1.1_dsc_mpileup.txt"
+        vcf_all = "results/ex_hek1.1_somatic_mutations_bcftools_all.vcf",
+        vcf_snvs = "results/ex_hek1.1_somatic_mutations_bcftools_snvs.vcf"
     shell:
         """
-        samtools mpileup -f {input.ref} \
-            -r chr1:1000000-3000000 -B -q 0 -Q 0 \
-            {input.dsc_bam} > {output.mpileup}
+        bcftools mpileup \
+            --fasta-ref {input.ref} \
+            --output-type u \
+            --min-BQ 20 \
+            --min-MQ 1 \
+            --annotate AD,DP \
+            --regions chr1:1000000-3000000 \
+            {input.bam} \
+        | bcftools call \
+            --multiallelic-caller \
+            --keep-alts \
+            --output-type u \
+        | tee >(bcftools view \
+                    -e 'TYPE="indel" || TYPE="ref"' \
+                    -Ov -o {output.vcf_snvs}) \
+        | bcftools view \
+              -e 'TYPE="indel"' \
+              -Ov -o {output.vcf_all}
         """
-
-
-#Re-add bed file and remove chr1
-
-# Extract single nucleotide variant calls from the samtools mpileup file into vcf format
-rule ex_somatic_variants:
-    input:
-        mpileup = "tmp/ex_hek1.1/ex_hek1.1_dsc_mpileup.txt"
-    output:
-        vcf = "results/ex_hek1.1_somatic_mutations.vcf"
-    shell:
-        """
-        varscan mpileup2snp {input.mpileup} \
-            --min-coverage 1 \
-            --min-var-freq 0 \
-            --strand-filter 0 \
-            --min-reads2 0 \
-            --min-avg-qual 0 \
-            --p-value 1 \
-            --output-vcf 1 > {output.vcf}
-        """
-
-
-
