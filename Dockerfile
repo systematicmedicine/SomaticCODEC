@@ -65,6 +65,11 @@ RUN VARSCAN_JAR=$(find /opt/conda/envs/codec-env -name 'VarScan.jar') && \
     echo -e '#!/bin/bash\nexec java -jar '"$VARSCAN_JAR"' "$@"' > /opt/conda/envs/codec-env/bin/varscan && \
     chmod +x /opt/conda/envs/codec-env/bin/varscan
 
+# Install R and required R packages
+RUN apt-get update && apt-get install -y r-base && \
+    Rscript -e 'install.packages(c("tidyverse", "jsonlite"), repos="https://cloud.r-project.org")' && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Install feature branch of fgbio (replace with conda install when CallCodecConsensusReads is added to main branch)
 RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | \
     gpg --dearmor > /usr/share/keyrings/sbt-keyring.gpg && \
