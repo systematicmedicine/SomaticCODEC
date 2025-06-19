@@ -3,8 +3,9 @@
 # 
 # Collection of R functions to collect key metrics from codec-opensource/metrics
 # 
-# Author: Joshua Johnstone
-#         Ben Barry
+# Authors: 
+#     - Joshua Johnstone
+#     - Ben Barry
 # ---
 
 
@@ -19,12 +20,11 @@ get_per_sequence_quality_score_r1 <- function() {
     sample_name <- basename(sample_dir)
     # Get path to zip file (could standardise file names to simplify)
     zip_path <- list.files(sample_dir, 
-                           pattern = "r1_raw_fastqc\\.zip$|_r1_fastqc_raw_metrics\\.zip$", 
+                           pattern = "_r1_raw_fastqc\\.zip$|_r1_fastqc_raw_metrics\\.zip$", 
                            full.names = TRUE)
     
-    # Give warning for missing zip and enter NA value, then skip sample
-    if (length(zip_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
+    # Give if missing zip enter NA value, then skip sample
+    if(length(zip_path) == 0) {
       results <- rbind(results, data.frame(
         metric = "per_sequence_quality_score_r1",
         sample = sample_name,
@@ -66,7 +66,7 @@ get_per_sequence_quality_score_r1 <- function() {
     peak_quality <- quality_df$Quality[which.max(quality_df$Count)]
     
     # Add to results
-    results <- rbind(results, data.frame(metric = "raw_per_seq_quality_score_r1",
+    results <- rbind(results, data.frame(metric = "per_sequence_quality_score_r1",
                                          sample = sample_name,
                                          value = peak_quality))
     
@@ -90,12 +90,11 @@ get_per_sequence_quality_score_r2 <- function() {
     sample_name <- basename(sample_dir)
     # Get path to zip file (could standardise file names to simplify)
     zip_path <- list.files(sample_dir, 
-                           pattern = "r2_raw_fastqc\\.zip$|_r2_fastqc_raw_metrics\\.zip$", 
+                           pattern = "_r2_raw_fastqc\\.zip$|_r2_fastqc_raw_metrics\\.zip$", 
                            full.names = TRUE)
     
-    # Give warning for missing zip and enter NA value, then skip sample
+    # If missing zip enter NA value, then skip sample
     if (length(zip_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
         metric = "per_sequence_quality_score_r2",
         sample = sample_name,
@@ -137,7 +136,7 @@ get_per_sequence_quality_score_r2 <- function() {
     peak_quality <- quality_df$Quality[which.max(quality_df$Count)]
     
     # Add to results
-    results <- rbind(results, data.frame(metric = "raw_per_seq_quality_score_r2",
+    results <- rbind(results, data.frame(metric = "per_sequence_quality_score_r2",
                                          sample = sample_name,
                                          value = peak_quality))
     
@@ -160,15 +159,14 @@ get_percent_reads_remaining_r1 <- function() {
     sample_name <- basename(sample_dir)
     # Get path to zip file (could standardise file names to simplify)
     raw_zip_path <- list.files(sample_dir, 
-                           pattern = "r1_raw_fastqc\\.zip$|_r1_fastqc_raw_metrics\\.zip$", 
+                           pattern = "_r1_raw_fastqc\\.zip$|_r1_fastqc_raw_metrics\\.zip$", 
                            full.names = TRUE)
     proc_zip_path <- list.files(sample_dir, 
                                    pattern = "_processed_r1_fastqc\\.zip$|_r1_filter_metrics\\.zip$", 
                                    full.names = TRUE)
     
-    # Give warning for missing zips and enter NA value, then skip sample
+    # If missing zips enter NA value, then skip sample
     if (length(raw_zip_path) == 0 || length(proc_zip_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
         metric = "percent_reads_remaining_r1",
         sample = sample_name,
@@ -209,7 +207,7 @@ get_percent_reads_remaining_r1 <- function() {
     
     # Add to results
     results <- rbind(results, data.frame(
-      metric = "ms_percent_reads_remaining_r1",
+      metric = "percent_reads_remaining_r1",
       sample = sample_name,
       value = percent_remaining
     ))
@@ -232,17 +230,16 @@ get_percent_reads_remaining_r2 <- function() {
     sample_name <- basename(sample_dir)
     # Get path to zip file (could standardise file names to simplify)
     raw_zip_path <- list.files(sample_dir, 
-                               pattern = "r2_raw_fastqc\\.zip$|_r2_fastqc_raw_metrics\\.zip$", 
+                               pattern = "_r2_raw_fastqc\\.zip$|_r2_fastqc_raw_metrics\\.zip$", 
                                full.names = TRUE)
     proc_zip_path <- list.files(sample_dir, 
                                 pattern = "_processed_r2_fastqc\\.zip$|_r2_filter_metrics\\.zip$", 
                                 full.names = TRUE)
     
-    # Give warning for missing zips and enter NA value, then skip sample
+    # If missing zips enter NA value, then skip sample
     if (length(raw_zip_path) == 0 || length(proc_zip_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
-        metric = "percent_reads_remaining_r1",
+        metric = "percent_reads_remaining_r2",
         sample = sample_name,
         value = NA
       ))
@@ -281,7 +278,7 @@ get_percent_reads_remaining_r2 <- function() {
     
     # Add to results
     results <- rbind(results, data.frame(
-      metric = "ms_percent_reads_remaining_r2",
+      metric = "percent_reads_remaining_r2",
       sample = sample_name,
       value = percent_remaining
     ))
@@ -307,9 +304,8 @@ get_read_alignment_rate <- function() {
                                pattern = "_samtools_stats.txt$|_map_metrics.txt$", 
                                full.names = TRUE)
     
-    # Give warning for missing alignment stats file and enter NA value, then skip sample
+    # If missing alignment stats file enter NA value, then skip sample
     if (length(alignment_stats_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
         metric = "read_alignment_rate",
         sample = sample_name,
@@ -352,9 +348,8 @@ get_mask_coverage <- function(){
                                        pattern = "_mask_metrics.txt$", 
                                        full.names = TRUE)
     
-    # Give warning for missing mask metrics file and enter NA value, then skip sample
+    # If missing mask metrics file enter NA value, then skip sample
     if (length(mask_metrics_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
         metric = "mask_coverage",
         sample = sample_name,
@@ -397,9 +392,8 @@ get_percent_read_contribution <- function(){
                                     pattern = "_demux_metrics.json$", 
                                     full.names = TRUE)
     
-    # Give warning for missing demux metrics file and enter NA value, then skip sample
+    # If missing demux metrics file enter NA value, then skip sample
     if (length(demux_metrics_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
         metric = "percent_read_contribution",
         sample = sample_name,
@@ -454,9 +448,8 @@ get_percent_adaptor_contamination <- function(){
                                      pattern = "batchcontamination_metrics.txt$", 
                                      full.names = TRUE)
     
-    # Give warning for missing batch contamination metrics file and enter NA value, then skip sample
+    # If missing batch contamination metrics file enter NA value, then skip sample
     if (length(contamination_metrics_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
         metric = "percent_adaptor_contamination",
         sample = sample_name,
@@ -496,9 +489,8 @@ get_correct_product_ratio <- function(){
                                     pattern = "_correctproduct_metrics.txt$", 
                                     full.names = TRUE)
     
-    # Give warning for missing correct product metrics file and enter NA value, then skip sample
+    # If missing correct product metrics file enter NA value, then skip sample
     if (length(correct_product_metrics_path) == 0) {
-      warning(paste("Missing file for:", sample_name))
       results <- rbind(results, data.frame(
         metric = "correct_product_ratio",
         sample = sample_name,
@@ -538,9 +530,8 @@ get_duplex_coverage <- function(){
                                                pattern = "_dsc_depth_metrics.txt$", 
                                                full.names = TRUE)
     
-   # Give warning for missing dsc depth metrics file and enter NA value, then skip sample
+   # If missing dsc depth metrics file enter NA value, then skip sample
    if (length(dsc_depth_metrics_path) == 0) {
-     warning(paste("Missing file for:", sample_name))
      results <- rbind(results, data.frame(
        metric = "duplex_coverage",
        sample = sample_name,
@@ -566,9 +557,8 @@ get_duplex_coverage <- function(){
   }
 }
 
-#collate germline variant call metrics
-
-totalGermCall_Metrics <- function(){
+# collate germline variant call metrics
+get_germline_variant_metrics <- function(){
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -581,15 +571,24 @@ totalGermCall_Metrics <- function(){
     stringsAsFactors = FALSE
   )
   
-  #loop  through sample directory and create path files for variantCall files
+  #loop through sample directory and create path files for variantCall files
   for (sample_dir in sample_dirs) {
     sample_name <- basename(sample_dir)
     txt_path <- list.files(sample_dir, pattern = "variantCall_summary.*\\.txt$",
                            ignore.case = TRUE, full.names = TRUE)
     
-    # output warning if summary file not found 
+    # If summary file not found add NA then skip sample
     if (length(txt_path) == 0 || is.na(txt_path)) {
-      warning(paste("No summary file found for", sample_name))
+      results <- rbind(results, data.frame(
+        metric = "germline_variants",
+        sample = sample_name,
+        value = NA))
+        
+        results <- rbind(results, data.frame(
+          metric = "SNV_indel_ratio",
+          sample = sample_name,
+          value = NA))
+          
       next
     }
     
@@ -621,7 +620,7 @@ totalGermCall_Metrics <- function(){
     #put into the results frame
     results <- rbind(results, data.frame(
       sample = sample_name,
-      metric = "Total_Variants",
+      metric = "germline_variants",
       value = total_variants,
       stringsAsFactors = FALSE
     )
@@ -635,7 +634,7 @@ totalGermCall_Metrics <- function(){
     #parse into results frame
     results <- rbind(results, data.frame(
       sample = sample_name,
-      metric = "SNV_INDEL_ratio",
+      metric = "SNV_indel_ratio",
       value = ratio,
       stringsAsFactors = FALSE
     )
@@ -646,8 +645,8 @@ totalGermCall_Metrics <- function(){
 }
 
 
-# extract the duplication rate
-Duplicaiton_rate <- function(){
+# Extract the duplication rate
+get_duplication_rate <- function(){
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -666,20 +665,23 @@ Duplicaiton_rate <- function(){
     txt_path <- list.files(sample_dir, pattern = "_duplication_metrics.*\\.txt$",
                            ignore.case = TRUE, full.names = TRUE)
     
-    #create warning if metric file isnt found
     if (length(txt_path) == 0 || is.na(txt_path)) {
-      warning(paste("No metric file found for", sample_name))
+      results <- rbind(results, data.frame(
+        metric = "duplication_rate",
+        sample = sample_name,
+        value = NA
+      ))
       next
     }
     
     #read file to df
-    df <- read_delim(txt_path, delim = "\t")
+    df <- read.delim(txt_path)
     
     #add key metrics to results format  
     results <- rbind(results, data.frame(
       sample = sample_name,
-      metric = "Library_duplication_rate",
-      value = df$`Duplication rate`)
+      metric = "duplication_rate",
+      value = df$`Duplication.rate`[1])
     ) 
   }
   return(results)
