@@ -32,5 +32,9 @@ key_metrics <- read.csv("config/key_metrics.csv") %>%
 metrics_report <- combined_metrics_values %>% 
   left_join(key_metrics, by = "metric") %>% 
   mutate(nn = ifelse(value >= nn_lower & value <= nn_upper, "PASS", "FAIL"),
-         ideal = ifelse(value >= ideal_lower & value <= ideal_upper, "PASS", "FAIL"))
+         ideal = ifelse(value >= ideal_lower & value <= ideal_upper, "PASS", "FAIL")) %>% 
+  arrange(metric, sample)
+
+# Export metrics report as csv
+write.csv(metrics_report, "metrics_report.csv", row.names = FALSE)
 
