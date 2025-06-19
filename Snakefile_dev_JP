@@ -23,29 +23,31 @@ assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sa
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        "results/ex_hek1.1_somatic_mutations_bcftools_all.vcf",
-        "results/ex_hek1.1_somatic_mutations_bcftools_snvs.vcf"
+        "results/ex_hek1.1/ex_hek1.1_variants.vcf",
+        "results/ex_hek1.1/somatic_variant_rate.txt",
         
 ######ex_call_somatic.smk specific code######
 
 #Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
 ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sample"].to_dict()
 
-rule ex_somatic_bcftools:
+#Call somatic mutations on duplex bases with a quality of >=Q70 (~<200 false positives per diploid genome)
+rule ex_call_somatic:
     input:
         bam = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam",
         bai = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam.bai",
-        ref = config["GRCh38_path"]
+        ref = config["GRCh38_path"],
+        #Bed file
     output:
-        vcf_all = "results/ex_hek1.1_somatic_mutations_bcftools_all.vcf",
-        vcf_snvs = "results/ex_hek1.1_somatic_mutations_bcftools_snvs.vcf"
+        vcf_all = "results/ex_hek1.1/ex_hek1.1_all_positions.vcf",
+        vcf_snvs = "results/ex_hek1.1/ex_hek1.1_variants.vcf"
     shell:
         """
         bcftools mpileup \
             --fasta-ref {input.ref} \
             --output-type u \
-            --min-BQ 20 \
-            --min-MQ 1 \
+            --min-BQ 70 \
+            --min-MQ 60 \
             --annotate AD,DP \
             --regions chr1:1000000-3000000 \
             {input.bam} \
@@ -55,8 +57,18 @@ rule ex_somatic_bcftools:
             --output-type u \
         | tee >(bcftools view \
                     -e 'TYPE="indel" || TYPE="ref"' \
-                    -Ov -o {output.vcf_snvs}) \
+                | bcftools norm -m -both -Ov -o {output.vcf_snvs}) \
         | bcftools view \
               -e 'TYPE="indel"' \
               -Ov -o {output.vcf_all}
         """
+##Do mapQ filtering =60 before variant calling step (since it excludes entire reads)
+##Only do baseQ filtering at the variant calling step
+
+rule ex_somatic_variant_rate:
+    input:
+        vcf_all = "results/ex_hek1.1/ex_hek1.1_all_positions.vcf"
+    output:
+        results = "results/ex_hek1.1/somatic_variant_rate.txt"
+    script:
+        "scripts/somaticvariants.py"
