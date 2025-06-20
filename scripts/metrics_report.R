@@ -8,6 +8,10 @@
 # Load packages
 library(tidyverse)
 
+# Load component metrics
+component_metrics <- read.csv("config/component_metrics.csv") %>% 
+  select(2, 5:9)
+
 # Load get_metrics.R functions
 source("scripts/get_metrics.R")
 
@@ -24,17 +28,13 @@ metric_dataframes <- lapply(all_functions, function(function_name){
 # Combine metrics values into one data frame  
 combined_metrics_values <- do.call(rbind, metric_dataframes)
 
-# Load key metrics
-key_metrics <- read.csv("config/key_metrics.csv") %>% 
-  select(2, 6:9)
-
 # Create metrics report data frame
 metrics_report <- combined_metrics_values %>% 
-  left_join(key_metrics, by = "metric") %>% 
+  left_join(component_metrics, by = "metric") %>% 
   mutate(nn = ifelse(value >= nn_lower & value <= nn_upper, "PASS", "FAIL"),
          ideal = ifelse(value >= ideal_lower & value <= ideal_upper, "PASS", "FAIL")) %>% 
   arrange(metric, sample)
 
 # Export metrics report as csv
-write.csv(metrics_report, "metrics_report.csv", row.names = FALSE)
+write.csv(metrics_report, "metrics/metrics_report.csv", row.names = FALSE)
 

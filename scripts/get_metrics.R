@@ -12,6 +12,9 @@
 # Get peak of per sequence quality score distribution for raw r1
 get_per_sequence_quality_score_r1 <- function() {
   
+  # Store metric name
+  function_metric = "per_sequence_quality_score_r1"
+  
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
   results <- data.frame(metric = character(), sample = character(), value = numeric())
@@ -81,6 +84,9 @@ get_per_sequence_quality_score_r1 <- function() {
 
 # Get peak of per sequence quality score distribution for raw r2
 get_per_sequence_quality_score_r2 <- function() {
+  
+  # Store metric name
+  function_metric = "per_sequence_quality_score_r2"
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -301,8 +307,8 @@ get_read_alignment_rate <- function() {
     sample_name <- basename(sample_dir)
     # Get path to alignment stats file (could standardise file names to simplify)
     alignment_stats_path <- list.files(sample_dir, 
-                               pattern = "_samtools_stats.txt$|_map_metrics.txt$", 
-                               full.names = TRUE)
+                                       pattern = "_samtools_stats.txt$|_map_metrics.txt$", 
+                                       full.names = TRUE)
     
     # If missing alignment stats file enter NA value, then skip sample
     if (length(alignment_stats_path) == 0) {
@@ -318,10 +324,17 @@ get_read_alignment_rate <- function() {
     alignment_stats_lines <- readLines(alignment_stats_path)
     
     # Calculate alignment rate (only works on samtools stats files)
-    total_reads <- as.numeric(sub("SN	sequences:\t", "", 
-                                  grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
-    reads_aligned <- as.numeric(sub("SN	reads mapped:\t", "", 
-                                    grep("^SN	reads mapped:", alignment_stats_lines, value = TRUE)))
+    if(any(grepl("_samtools_stats\\.txt$", alignment_stats_path))){
+      total_reads <- as.numeric(sub("SN	sequences:\t", "", 
+                                    grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
+      reads_aligned <- as.numeric(sub("SN	reads mapped:\t", "", 
+                                      grep("^SN	reads mapped:", alignment_stats_lines, value = TRUE)))
+    } else {
+      total_reads <- as.numeric(sub(" .*", "", grep("in total", alignment_stats_lines, value = TRUE)))
+      reads_aligned <- as.numeric(sub(" .*", "", grep("mapped \\(", alignment_stats_lines, value = TRUE)))
+      
+    }
+    
     alignment_rate <- round((reads_aligned / total_reads) * 100, digits = 1)
     
     # Add to results
@@ -687,6 +700,325 @@ get_duplication_rate <- function(){
   return(results)
 }
 
+get_total_reads <- function() {
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to alignment stats file
+    alignment_stats_path <- list.files(sample_dir, 
+                                       pattern = "_samtools_stats.txt$|_map_metrics.txt$", 
+                                       full.names = TRUE)
+    
+    # If missing alignment stats file enter NA value, then skip sample
+    if (length(alignment_stats_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "total_reads",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Put all lines of txt file into character vector
+    alignment_stats_lines <- readLines(alignment_stats_path)
+    
+    # Calculate alignment rate (only works on samtools stats files)
+    if(any(grepl("_samtools_stats\\.txt$", alignment_stats_path))){
+      total_reads <- as.numeric(sub("SN	sequences:\t", "", 
+                                    grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
+    } else {
+      total_reads <- as.numeric(sub(" .*", "", grep("in total", alignment_stats_lines, value = TRUE)))
+    }
+    
+    total_reads_million <- round(total_reads / 1000000, digits = 0)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "total_reads",
+      sample = sample_name,
+      value = total_reads_million
+    ))
+  }
+  
+  return(results)
+}
 
+get_ex_insert_size <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to dedup insert metrics file
+    dedup_insert_metrics_path <- list.files(sample_dir, 
+                                       pattern = "_deduplicated_insert_metrics.txt$", 
+                                       full.names = TRUE)
+    
+    # If missing dedup insert metrics file enter NA value, then skip sample
+    if (length(dedup_insert_metrics_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "ex_insert_size",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Put all lines of txt file into character vector
+    dedup_insert_metrics_lines <- readLines(dedup_insert_metrics_path)
+    
+    # Find start of metrics table
+    table_start <- grep("^MEDIAN_INSERT_SIZE", dedup_insert_metrics_lines)
+    
+    # Read metrics table
+    dedup_insert_metrics_table <- read.delim(dedup_insert_metrics_path, 
+                                             skip = table_start - 1, 
+                                             header = TRUE)
+    
+    # Get mean insert size
+    ex_insert_size <- dedup_insert_metrics_table$MEAN_INSERT_SIZE
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "ex_insert_size",
+      sample = sample_name,
+      value = ex_insert_size
+    ))
+  }
+  
+  return(results)
+  
+}
 
+get_overrepresented_sequences_r1 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir, 
+                                pattern = "_processed_r1_fastqc\\.zip$|_r1_filter_metrics\\.zip$", 
+                                full.names = TRUE)
+    
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "overrepresented_sequences_r1",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+    
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+    
+    # Find start and end of the overrepresented sequences section
+    start_line <- grep("^>>Overrepresented sequences", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence quality scores section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+    
+    # If pass, add 0 for percent overrepresented sequences
+    if(any(grepl("pass", section_lines))){
+      results <- rbind(results, data.frame(
+        metric = "overrepresented_sequences_r1",
+        sample = sample_name,
+        value = 0))
+    } else {
+      # Parse to dataframe
+      overrepresented_sequences_df <- read.delim(text = section_lines,
+                                                 skip = 1,
+                                                 header = TRUE)
+      
+      # Get percentage represented by most overrepresented sequence
+      overrepresented_sequences <- round(max(overrepresented_sequences_df$Percentage), digits = 1)
+      
+      # Add to results
+      results <- rbind(results, data.frame(
+        metric = "overrepresented_sequences_r1",
+        sample = sample_name,
+        value = overrepresented_sequences))
+    }
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+  }
+  
+  return(results)
+  
+}
 
+get_overrepresented_sequences_r2 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir, 
+                                pattern = "_processed_r2_fastqc\\.zip$|_r2_filter_metrics\\.zip$", 
+                                full.names = TRUE)
+    
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "overrepresented_sequences_r2",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+    
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+    
+    # Find start and end of the overrepresented sequences section
+    start_line <- grep("^>>Overrepresented sequences", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence quality scores section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+    
+    # If pass, add 0 for percent overrepresented sequences
+    if(any(grepl("pass", section_lines))){
+      results <- rbind(results, data.frame(
+        metric = "overrepresented_sequences_r2",
+        sample = sample_name,
+        value = 0))
+    } else {
+      # Parse to dataframe
+      overrepresented_sequences_df <- read.delim(text = section_lines,
+                                                 skip = 1,
+                                                 header = TRUE)
+      
+      # Get percentage represented by most overrepresented sequence
+      overrepresented_sequences <- round(max(overrepresented_sequences_df$Percentage), digits = 1)
+      
+      # Add to results
+      results <- rbind(results, data.frame(
+        metric = "overrepresented_sequences_r2",
+        sample = sample_name,
+        value = overrepresented_sequences))
+    }
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+  }
+  
+  return(results)
+  
+}
+
+# get_gc_deviation_r1 <- function(){
+#   
+#   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+#   results <- data.frame(metric = character(), sample = character(), value = numeric())
+#   
+#   for (sample_dir in sample_dirs) {
+#     sample_name <- basename(sample_dir)
+#     # Get path to processed fastqc file
+#     proc_zip_path <- list.files(sample_dir, 
+#                                 pattern = "_processed_r2_fastqc\\.zip$|_r2_filter_metrics\\.zip$", 
+#                                 full.names = TRUE)
+#     
+#     # If missing processed fastqc zip file enter NA value, then skip sample
+#     if (length(proc_zip_path) == 0) {
+#       results <- rbind(results, data.frame(
+#         metric = "overrepresented_sequences_r2",
+#         sample = sample_name,
+#         value = NA
+#       ))
+#       next
+#     }
+#     
+#     # Unzip fastqc_data.txt from zip file
+#     proc_zip_base <- basename(proc_zip_path)
+#     proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+#     
+#     # Create tmp directory for unzipped files
+#     tmp_dir <- file.path(sample_dir, "tmp")
+#     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+#     
+#     # Unzip metrics txt file
+#     unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+#     
+#     # Get path for unzipped metrics file
+#     proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+#     
+#     # Put all lines of txt file into character vector
+#     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+#     
+#     # Find start and end of per sequence GC content section
+#     start_line <- grep("^>>Per sequence GC content", proc_fastqc_lines)
+#     end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+#     end_line <- end_lines[which(end_lines > start_line)[1]]
+#     
+#     # Extract per sequence GC content section lines (skip headers and end module lines)
+#     section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+#     
+#     # Parse lines to dataframe
+#     gc_content_df <- read.delim(text = section_lines,
+#                                                skip = 1,
+#                                                header = TRUE)
+#     colnames(gc_content_df) <- c("GC_content", "Count")
+#     
+#     
+#     
+#     # Add to results
+#     results <- rbind(results, data.frame(
+#       metric = "overrepresented_sequences_r2",
+#       sample = sample_name,
+#       value = overrepresented_sequences))
+#     
+#       
+#     }
+#     
+#     # Remove tmp directory
+#     Sys.sleep(1) # Pause needed to allow files to be deleted
+#     unlink(tmp_dir, recursive = TRUE)
+#   }
+#   
+#   return(results)
+#   
+# }
