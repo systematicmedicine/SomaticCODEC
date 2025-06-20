@@ -41,7 +41,7 @@ The repository deploy key can be found at `\RwoD Research\Personal\Cameron\Misc\
 
 ```
 # Create empty file using vim, and paste in key
-vim `~/.ssh/deploy_key`
+vim ~/.ssh/deploy_key
 # Update key permissions
 chmod 600 ~/.ssh/deploy_key
 # Add key to known hosts
