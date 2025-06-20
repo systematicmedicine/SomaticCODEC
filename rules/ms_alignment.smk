@@ -24,7 +24,7 @@ rule ms_raw_alignment:
         r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
-        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam" #Change to temp once pipeline development is complete
+        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam" # Change to temp once pipeline development is complete
     threads: 
         max(1, os.cpu_count() // 4)
     shell:
@@ -35,7 +35,6 @@ rule ms_raw_alignment:
             {input.r1_processed} \
             {input.r2_processed} | \
         samtools view -bS - > {output.bam}
-
         """
 
 # Sorts bam by coordinate
@@ -64,7 +63,6 @@ rule ms_mark_duplicates:
         O={output.bam_markdup} \
         M={output.dup_metrics} \
         CREATE_INDEX=true
-
         """
 
 # Generates alignment metrics
@@ -84,6 +82,5 @@ rule ms_alignment_metrics:
         picard CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.insert_metrics} \
-            H={output.insert_hist}
-            
+            H={output.insert_hist}  
         """ 

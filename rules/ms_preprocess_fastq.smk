@@ -11,6 +11,7 @@ Outputs:
 Author: Joshua Johnstone
 
 """
+
 # Create lists of matched sample raw FASTQ files
 ms_raw_fastq_dict = pd.read_csv(config["ms_samples_path"]).set_index("ms_sample").to_dict(orient="index")
 
@@ -33,7 +34,6 @@ rule ms_fastqc_raw:
 
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
         mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
-
         """
 
 # Trims and filters reads
@@ -68,7 +68,8 @@ rule ms_trim_filter:
             {input.r1} {input.r2} \
             --report=minimal > {output.report}
         """
-# Generates a new fastqc report for processed reads
+
+# Generates a fastqc report for processed reads
 rule ms_fastqc_processed:
     input:
         r1 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
@@ -87,5 +88,4 @@ rule ms_fastqc_processed:
 
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
         mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
-
         """
