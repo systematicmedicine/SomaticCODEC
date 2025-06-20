@@ -29,12 +29,12 @@ metric_dataframes <- lapply(all_functions, function(function_name){
 combined_metrics_values <- do.call(rbind, metric_dataframes)
 
 # Create metrics report data frame
-metrics_report <- combined_metrics_values %>% 
+component_metrics_report <- combined_metrics_values %>% 
   left_join(component_metrics, by = "metric") %>% 
   mutate(nn = ifelse(value >= nn_lower & value <= nn_upper, "PASS", "FAIL"),
          ideal = ifelse(value >= ideal_lower & value <= ideal_upper, "PASS", "FAIL")) %>% 
   arrange(metric, sample)
 
 # Export metrics report as csv
-write.csv(metrics_report, "metrics/metrics_report.csv", row.names = FALSE)
+write.csv(component_metrics_report, "metrics/component_metrics_report.csv", row.names = FALSE)
 

@@ -323,7 +323,7 @@ get_read_alignment_rate <- function() {
     # Put all lines of txt file into character vector
     alignment_stats_lines <- readLines(alignment_stats_path)
     
-    # Calculate alignment rate (only works on samtools stats files)
+    # Calculate alignment rate
     if(any(grepl("_alignment_stats\\.txt$", alignment_stats_path))){
       total_reads <- as.numeric(sub("SN	sequences:\t", "", 
                                     grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
@@ -725,7 +725,7 @@ get_total_reads <- function() {
     # Put all lines of txt file into character vector
     alignment_stats_lines <- readLines(alignment_stats_path)
     
-    # Calculate alignment rate (only works on samtools stats files)
+    # Calculate alignment rate
     if(any(grepl("_alignment_stats\\.txt$", alignment_stats_path))){
       total_reads <- as.numeric(sub("SN	sequences:\t", "", 
                                     grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))

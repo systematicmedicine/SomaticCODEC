@@ -1,11 +1,15 @@
 """
---- ex_additional_metrics.smk ---
+--- additional_metrics.smk ---
 
-Rules for creating metrics files, that are not related to the other rule groups.
+Rules for creating metrics files that are not related to the other rule groups and a component metrics report.
 
-Outputs: Multiple metrics files
+Outputs: 
+    - Multiple metrics files
+    - Component metrics report csv
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Joshua Johnstone
 
 """
 
@@ -63,6 +67,15 @@ rule ex_duplication_metrics:
     input:
         expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names)
     output:
-        "metrics/duplication_metrics.txt"
+        "metrics/ex_duplication_metrics.txt"
     script:
         "../scripts/duplication.py"
+
+# Creates a report on which component level metrics have been 
+rule component_metrics_report:
+    input:
+        expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names)
+    output:
+        report = "metrics/component_metrics_report.csv"
+    script:
+        "scripts/component_metrics_report.R"

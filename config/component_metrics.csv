@@ -1,4 +1,4 @@
-sample_type,metric,sescription,stage,metrics_file,nn_lower,nn_upper,ideal_lower,ideal_upper,Rationale/reference
+sample_type,metric,Description,stage,metrics_file,nn_lower,nn_upper,ideal_lower,ideal_upper,Rationale/reference
 Matched/experimental,per_sequence_quality_score_r1,Peak in mean sequence quality across reads (Phred score),Preprocess matched/experimental sample fastq,r1_raw_fastqc.zip$|_r1_fastqc_raw_metrics.zip$,35,39,39,40,Stricter than fastqc warnings due to requirement for increased accuracy
 Matched/experimental,per_sequence_quality_score_r2,Peak in mean sequence quality across reads (Phred score),Preprocess matched/experimental sample fastq,r2_raw_fastqc.zip$|_r2_fastqc_raw_metrics.zip$,35,39,39,40,Stricter than fastqc warnings due to requirement for increased accuracy
 Matched/experimental,percent_reads_remaining_r1,Percentage of initial reads remaining after quality trimming and filtering,Preprocess matched/experimental sample fastq,trimfilter_fastqc.html,70,90,90,100,Losing more than 30% of reads indicates poor quality (as long as filters are set correctly)
