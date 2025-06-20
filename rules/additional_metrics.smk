@@ -71,11 +71,11 @@ rule ex_duplication_metrics:
     script:
         "../scripts/duplication.py"
 
-# Creates a report on which component level metrics have been 
+# Generates a pass/fail report for all component level metrics
 rule component_metrics_report:
     input:
         expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample=ex_sample_names)
+        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names)
     output:
         report = "metrics/component_metrics_report.csv"
     script:
