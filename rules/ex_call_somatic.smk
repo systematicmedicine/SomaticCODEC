@@ -16,36 +16,42 @@ Author: James Phie
 ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sample"].to_dict()
 
 
-# Create a basic samtools mpileup which lists all disagreements with reference at each position
-rule ex_dsc_mpileup:
+#Call somatic mutations on duplex bases with a quality of >=Q70 (~<200 false positives per diploid genome)
+rule ex_call_somatic:
     input:
-        masked = lambda wc: f"tmp/{ex_to_ms[wc.ex_sample]}/{ex_to_ms[wc.ex_sample]}_combined_mask.bed",
-        dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam", #Need to add the filtered bam here, ie. single strand overhangs and R1R2 disagree N bases removed
-        ref = config['GRCh38_path'],
-        fai = config['GRCh38_path'] + ".fai"
+        bam = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam",
+        bai = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam.bai",
+        ref = config["GRCh38_path"],
+        #Bed file
     output:
-        mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
+        vcf_all = "results/ex_hek1.1/ex_hek1.1_all_positions.vcf",
+        vcf_snvs = "results/ex_hek1.1/ex_hek1.1_variants.vcf"
     shell:
         """
-        samtools mpileup -f {input.ref} \
-            -l {input.masked} -B -q 0 -Q 0 \
-            {input.dsc_bam} > {output.mpileup}
+        bcftools mpileup \
+            --fasta-ref {input.ref} \
+            --output-type u \
+            --min-BQ 70 \
+            --min-MQ 60 \
+            --annotate AD,DP \
+            --regions chr1:1000000-3000000 \
+            {input.bam} \
+        | bcftools call \
+            --multiallelic-caller \
+            --keep-alts \
+            --output-type u \
+        | tee >(bcftools view \
+                    -e 'TYPE="indel" || TYPE="ref"' \
+                | bcftools norm -m -both -Ov -o {output.vcf_snvs}) \
+        | bcftools view \
+              -e 'TYPE="indel"' \
+              -Ov -o {output.vcf_all}
         """
 
-# Extract single nucleotide variant calls from the samtools mpileup file into vcf format
-rule ex_somatic_variants:
+rule ex_somatic_variant_rate:
     input:
-        mpileup = "tmp/{ex_sample}/{ex_sample}_dsc_mpileup.txt"
+        vcf_all = "results/ex_hek1.1/ex_hek1.1_all_positions.vcf"
     output:
-        vcf = "results/{ex_sample}_somatic_mutations.vcf"
-    shell:
-        """
-        varscan mpileup2snp {input.mpileup} \
-            --min-coverage 1 \
-            --min-var-freq 0 \
-            --strand-filter 0 \
-            --min-reads2 1 \
-            --min-avg-qual 0 \
-            --p-value 1 \
-            --output-vcf 1 > {output.vcf}
-        """
+        results = "results/ex_hek1.1/somatic_variant_rate.txt"
+    script:
+        "scripts/somaticvariants.py"

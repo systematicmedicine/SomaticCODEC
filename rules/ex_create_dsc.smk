@@ -199,12 +199,36 @@ rule ex_zipdata:
         && samtools index {output.bam} -@ {threads}
         """
 
+
+#Filter the dsc bam for mapQ <= 60
+rule ex_filtermapQ_dsc:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam")
+    shell:
+        samtools view -b -q 60 {input.bam} > {output.bam}
+
+#Filter the dsc bam for any reads with alternative alignments
+
+###
+###
+###
+###
+
 # Add a rule to filter dsc for only duplex bases (ie. remove single strand overhangs and R1R2 disagreements) - functionality not yet built into CallCodecConsensusReads
+#rule ex_filterduplex_dsc:
+    #input:
+        #bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam"
+    #output:
+        #bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam")
+    #shell:
+        #CallCodecConsensusReads filter R1R2 disagree, filter ss overhangs
 
 # Depth and genome territory covered, applied to the dsc bam. Currently without filtering, so this includes single strand overhangs (ie. not true duplex depth)
 rule ex_dscdepth_metrics:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam", #Update to "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam" once fgbio is complete
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
         dictf = config["GRCh38_path"].replace(".fna", ".dict")

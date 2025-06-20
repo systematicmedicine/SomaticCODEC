@@ -46,6 +46,19 @@ rule ex_samtobam:
         samtools view -@ {threads} -bS -o {output.bam} {input.sam}
         """
 
+# Filters reads that are not correctly paired (ie. on the same chromosome within ~500bp, in the correct directions - likely codecseq intermolecular byproducts)
+rule ex_filter_correct:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam")
+    threads: 
+        max(1, os.cpu_count() // 16)
+    shell:
+        """
+        samtools view -b -f 0x2 {input.bam} > {output.bam}
+        """
+
 # Collects alignment metrics from the aligned bam using samtools flagstat
 rule ex_map_metrics:
     input:
@@ -54,9 +67,5 @@ rule ex_map_metrics:
         txt = "metrics/{ex_sample}/{ex_sample}_map_metrics.txt"
     shell:
         """
-        #Alternatively, picard's CollectAlignmentSummaryMetrics has more detailed metrics but will take much longer (?1 hour per sample vs ?2 minutes per sample)
-        #Samtools flagstat has required metrics for this stage
         samtools flagstat {input.bam} > {output.txt}
         """
-
-
