@@ -70,6 +70,7 @@ rule all:
         expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample=ex_sample_names),
+        "metrics/ex_duplication_metrics.txt"
         expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_sample_names),
@@ -83,4 +84,4 @@ rule all:
         expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt", ms_sample = ms_sample_names),
         expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_sample_names),
-        "metrics/duplication_metrics.txt"
+        "metrics/component_metrics_report.csv"
