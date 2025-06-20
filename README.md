@@ -37,7 +37,15 @@ python3 utils/download_S3toEC2.py
 # Dry-run
 snakemake --configfile config/config.yaml --dryrun
 # Run pipeline
-snakemake --configfile config/config.yaml --cores all --stats metrics/stats.json 2>&1 | tee metrics/snakemake.log
+snakemake 
+    --configfile config/config.yaml \
+    --cores all \
+    --keep-going \
+    --verbose \
+    --reason \
+    --stats metrics/pipeline_stats.json \
+    --report metrics/pipeline_report.html
+    2>&1 | tee metrics/snakemake.log
 ``` 
 * Common tmux commands
     * Disconnect: Ctrl + b, d
