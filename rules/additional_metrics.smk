@@ -19,11 +19,11 @@ samples_by_lane = pd.read_csv(config["ex_samples_path"]).groupby("ex_lane")["ex_
 # Replace default index names with experiment specific sample names as defined in the input.tsv
 rule ex_correctproduct_metrics:
     input:
-        demux_json = "metrics/{lane}_demux_metrics.json",
+        demux_json = "metrics/{lane}/{lane}_demux_metrics.json",
         trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=samples_by_lane[wildcards.lane]),
         flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=samples_by_lane[wildcards.lane])
     output:
-        "metrics/{lane}_correctproduct_metrics.txt"
+        "metrics/{lane}/{lane}_correctproduct_metrics.txt"
     params:
         samples = lambda wildcards: samples_by_lane[wildcards.lane]
     script:
@@ -32,22 +32,22 @@ rule ex_correctproduct_metrics:
 # Custom python script to assess how many unused indices were detected from other experiments (similar metrics to rawreadcounts). This should always be 0. 
 rule ex_batchcontamination_metrics:
     input:
-        json = "metrics/{lane}_demux_metrics.json"
+        json = "metrics/{lane}/{lane}_demux_metrics.json"
     output:
-        contamination = "metrics/{lane}_batchcontamination_metrics.txt"
+        contamination = "metrics/{lane}/{lane}_batchcontamination_metrics.txt"
     params:
         fasta = lambda wildcards: f"tmp/adapter_fastas/{wildcards.lane}_r1start.fasta",
         used = config['ex_samples_path']
     script:
         "../scripts/batchcontamination.py"
 
-# Calculates insert size (distance between start of watson and end of crick, includes ss overhangs)
+# Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
 rule ex_insert_metrics:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+        bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam",
     output:
-        txt = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.txt",
-        hist = "metrics/{ex_sample}/{ex_sample}_deduplicated_insert_metrics.pdf",
+        txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
+        hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf",
     resources:
         mem = 32
     shell:

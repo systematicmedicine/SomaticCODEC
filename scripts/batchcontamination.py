@@ -18,7 +18,7 @@ output_path = snakemake.output.contamination
 fasta_path = snakemake.params.fasta
 lane = snakemake.wildcards.lane
 df = pd.read_csv(snakemake.params.used)
-used_samples = set(df[df["lane"] == lane]["ex_sample"])
+used_samples = set(df[df["ex_lane"] == lane]["ex_sample"])
 
 # Parse all known experimental codec barcodes from the FASTA
 all_index_names = {record.id for record in SeqIO.parse(fasta_path, "fasta")}

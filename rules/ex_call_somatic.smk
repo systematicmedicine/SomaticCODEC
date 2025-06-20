@@ -19,13 +19,13 @@ ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sam
 #Call somatic mutations on duplex bases with a quality of >=Q70 (~<200 false positives per diploid genome)
 rule ex_call_somatic:
     input:
-        bam = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam",
-        bai = "tmp/ex_hek1.1/ex_hek1.1_map_dsc_anno_filtered.sorted.bam.bai",
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam", #Change to bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam.bai",
         ref = config["GRCh38_path"],
         #Bed file
     output:
-        vcf_all = "results/ex_hek1.1/ex_hek1.1_all_positions.vcf",
-        vcf_snvs = "results/ex_hek1.1/ex_hek1.1_variants.vcf"
+        vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf",
+        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf"
     shell:
         """
         bcftools mpileup \
@@ -50,8 +50,8 @@ rule ex_call_somatic:
 
 rule ex_somatic_variant_rate:
     input:
-        vcf_all = "results/ex_hek1.1/ex_hek1.1_all_positions.vcf"
+        vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf"
     output:
-        results = "results/ex_hek1.1/somatic_variant_rate.txt"
+        results = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.txt"
     script:
-        "scripts/somaticvariants.py"
+        "../scripts/somaticvariants.py"

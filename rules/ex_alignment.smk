@@ -9,7 +9,7 @@ Output: Reads aligned to a reference genome (BAM)
 Author: James Phie
 
 """
-# Creates an aligned sam from trimmed and filtered fastq files. Softclipping allowed.
+# Creates an aligned bam from trimmed and filtered fastq files. Softclipping allowed.
 rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
@@ -19,31 +19,15 @@ rule ex_map:
         ann = config["GRCh38_path"] + ".ann",
         bwt = config["GRCh38_path"] + ".bwt.2bit.64",
         pac = config["GRCh38_path"] + ".pac",
-        sa = config['GRCh38_path'] + ".0123"
+        sa = config["GRCh38_path"] + ".0123"
     output:
-        sam = temp("tmp/{ex_sample}/{ex_sample}_map.sam")
-    threads: 
+        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
+    threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        bwa-mem2 mem \
-            -t {threads} \
-            -Y \
-            {input.ref} {input.fastq1} {input.fastq2} \
-            > {output.sam}
-        """
-
-# Creates an aligned bam from the aligned sam file output from bwa-mem2.
-rule ex_samtobam:
-    input:
-        sam = "tmp/{ex_sample}/{ex_sample}_map.sam",
-    output:
-        bam = "tmp/{ex_sample}/{ex_sample}_map.bam" #Make temp again once pipeline development is complete
-    threads: 
-        max(1, os.cpu_count() // 16)
-    shell:
-        """
-        samtools view -@ {threads} -bS -o {output.bam} {input.sam}
+        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fastq1} {input.fastq2} | \
+        samtools view -@ {threads} -bS -o {output.bam} -
         """
 
 # Filters reads that are not correctly paired (ie. on the same chromosome within ~500bp, in the correct directions - likely codecseq intermolecular byproducts)

@@ -23,8 +23,10 @@ rule ex_fastqcraw_metrics:
         fastq1 = lambda wildcards: ex_raw_r1_list[wildcards.lane],
         fastq2 = lambda wildcards: ex_raw_r2_list[wildcards.lane]
     output:
-        fastqc_report1 = "metrics/{lane}_r1_fastqc_raw_metrics.html",
-        fastqc_report2 = "metrics/{lane}_r2_fastqc_raw_metrics.html"
+        fastqc_report1 = "metrics/{lane}/{lane}_r1_fastqc_raw_metrics.html",
+        fastqc_report2 = "metrics/{lane}/{lane}_r2_fastqc_raw_metrics.html",
+        zip_r1 = "metrics/{lane}/{lane}_r1_fastqc_raw_metrics.zip",
+        zip_r2 = "metrics/{lane}/{lane}_r2_fastqc_raw_metrics.zip"
     shell:
         """
         fastqc {input.fastq1} -o metrics/
@@ -32,6 +34,8 @@ rule ex_fastqcraw_metrics:
 
         mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
         mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
+        mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.zip {output.zip_r1}
+        mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2}
         """
 
 #Generate adapter fasta files for demultiplexing and trimming using adapter sequences in ex_adapters.csv
@@ -65,9 +69,9 @@ for lane in ex_lanes:
             r1_start = f"tmp/adapter_fastas/{lane}_r1start.fasta",
             r2_start = f"tmp/adapter_fastas/{lane}_r2start.fasta"
         output:
-            demuxed_r1 = demuxed_r1,
-            demuxed_r2 = demuxed_r2,
-            json = f"metrics/{lane}_demux_metrics.json"
+            demuxed_r1 = temp(demuxed_r1),
+            demuxed_r2 = temp(demuxed_r2),
+            json = f"metrics/{lane}/{lane}_demux_metrics.json"
         threads:
             max(1, os.cpu_count() // 4)
         shell:
@@ -85,7 +89,8 @@ for lane in ex_lanes:
               -o tmp/{{{{name}}}}_r1_trim5.fastq.gz \
               -p tmp/{{{{name}}}}_r2_trim5.fastq.gz \
               {{input.fastq1}} {{input.fastq2}} \
-              --json={{output.json}}
+              --json={{output.json}} \
+              --discard-untrimmed
             """
 
 # Identifies and trims 3' sample indices from R1 and R2 when present
@@ -96,8 +101,8 @@ rule ex_trim_3prime_indices:
         r1_end = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r1end.fasta",
         r2_end = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r2end.fasta"
     output:
-        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim5&3.fastq.gz"),
-        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim5&3.fastq.gz"),
+        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim5_3.fastq.gz"),
+        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim5_3.fastq.gz"),
         json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     threads:
         max(1, os.cpu_count() // 4)
@@ -119,8 +124,8 @@ rule ex_trim_3prime_indices:
 #Trim additional bases from 5' and 3' ends to remove remnant adapter sequences (e.g. <7 bases not identified in 3' trimming) and A/T bases from A-tailing
 rule ex_trim_remnants:
     input: 
-        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim5&3.fastq.gz",
-        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim5&3.fastq.gz", 
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim5_3.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim5_3.fastq.gz", 
     output:
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",
@@ -169,7 +174,10 @@ rule ex_fastqctrim_metrics:
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"
     output:
         fastqc_report1 = "metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html",
-        fastqc_report2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html"
+        fastqc_report2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html",
+        zip_r1 = "metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.zip",
+        zip_r2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.zip"
+        
     shell:
         """
         fastqc {input.fastq1} -o metrics/{wildcards.ex_sample}
@@ -177,14 +185,16 @@ rule ex_fastqctrim_metrics:
 
         mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
         mv metrics/{wildcards.ex_sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
+        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.zip {output.zip_r1}
+        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2}
         """
 
 # Custom python script to assess demultiplexing. 
 rule ex_rawreadcounts_metrics:
     input:
-        json = "metrics/{lane}_demux_metrics.json"
+        json = "metrics/{lane}/{lane}_demux_metrics.json"
     output:
-        readcounts = "metrics/{lane}_sample_readcounts_metrics.txt"
+        readcounts = "metrics/{lane}/{lane}_sample_readcounts_metrics.txt"
     params:
         fasta = lambda wildcards: f"tmp/adapter_fastas/{wildcards.lane}_r1start.fasta",
         used = config['ex_samples_path']

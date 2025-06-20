@@ -18,7 +18,7 @@ output_path = snakemake.output.readcounts
 fasta_path = snakemake.params.fasta
 lane = snakemake.wildcards.lane
 df = pd.read_csv(snakemake.params.used)
-used_samples = set(df[df["lane"] == lane]["ex_sample"])
+used_samples = set(df[df["ex_lane"] == lane]["ex_sample"])
 
 # Load demux JSON
 with open(json_path) as f:

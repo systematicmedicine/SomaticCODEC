@@ -17,7 +17,7 @@ Author: James Phie
 #Move UMI from readname to RX:Z: tag and sort by name for UMI consensus steps
 rule ex_umitag:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi1.bam")
     threads:
@@ -69,7 +69,7 @@ rule ex_groupbyumi:
             -i {input.bam} \
             -o {output.bam} \
             -f {output.histogram} \
-            -@ {threads}
+            -@ {threads} \
             -m 0 \
             --strategy=adjacency
         """
@@ -140,7 +140,7 @@ rule ex_dsc_bam_to_fastq:
         samtools fastq {input.bam} > {output.fastq}
         """
 
-# Align the dsc (with ss overhangs) to the reference genome as sequences have changed
+# Align the dsc (with ss overhangs) to the reference genome as sequences have changed, and sort by readname (querynamesort)
 rule ex_map_dsc:
     input:
         fq = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.fastq",
@@ -149,27 +149,15 @@ rule ex_map_dsc:
         ann = config["GRCh38_path"] + ".ann",
         bwt = config["GRCh38_path"] + ".bwt.2bit.64",
         pac = config["GRCh38_path"] + ".pac",
-        sa = config['GRCh38_path'] + ".0123"
+        sa = config["GRCh38_path"] + ".0123"
     output:
-        sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.sam")
-    threads: 
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
+    threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fq} > {output.sam}
-        """
-
-# Convert dsc sam to dsc bam and sort by readname (querynamesort)
-rule ex_samtobam_dsc:
-    input:
-        sam = "tmp/{ex_sample}/{ex_sample}_map_dsc.sam"
-    output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
-    threads: 
-        max(1, os.cpu_count() // 16)
-    shell:
-        """
-        samtools sort -n -@ {threads} -o {output.bam} {input.sam}
+        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fq} | \
+        samtools sort -n -@ {threads} -o {output.bam} -
         """
 
 # Add metadata from unmapped dsc bam back to the mapped dsc bam
@@ -200,16 +188,20 @@ rule ex_zipdata:
         """
 
 
-#Filter the dsc bam for mapQ <= 60
+# Filter the dsc bam for mapQ <= 60 (##Remove index step when filtered.bam is created)
 rule ex_filtermapQ_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam"),
+        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam.bai")
     shell:
+        """
         samtools view -b -q 60 {input.bam} > {output.bam}
+        samtools index {output.bam}
+        """
 
-#Filter the dsc bam for any reads with alternative alignments
+#Filter the dsc bam for any reads with alternative alignments of greater than 60% of main alignment
 
 ###
 ###
