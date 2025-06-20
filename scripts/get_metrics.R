@@ -307,7 +307,7 @@ get_read_alignment_rate <- function() {
     sample_name <- basename(sample_dir)
     # Get path to alignment stats file (could standardise file names to simplify)
     alignment_stats_path <- list.files(sample_dir, 
-                                       pattern = "_samtools_stats.txt$|_map_metrics.txt$", 
+                                       pattern = "_alignment_stats.txt$|_map_metrics.txt$", 
                                        full.names = TRUE)
     
     # If missing alignment stats file enter NA value, then skip sample
@@ -324,7 +324,7 @@ get_read_alignment_rate <- function() {
     alignment_stats_lines <- readLines(alignment_stats_path)
     
     # Calculate alignment rate (only works on samtools stats files)
-    if(any(grepl("_samtools_stats\\.txt$", alignment_stats_path))){
+    if(any(grepl("_alignment_stats\\.txt$", alignment_stats_path))){
       total_reads <- as.numeric(sub("SN	sequences:\t", "", 
                                     grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
       reads_aligned <- as.numeric(sub("SN	reads mapped:\t", "", 
@@ -709,7 +709,7 @@ get_total_reads <- function() {
     sample_name <- basename(sample_dir)
     # Get path to alignment stats file
     alignment_stats_path <- list.files(sample_dir, 
-                                       pattern = "_samtools_stats.txt$|_map_metrics.txt$", 
+                                       pattern = "_alignment_stats.txt$|_map_metrics.txt$", 
                                        full.names = TRUE)
     
     # If missing alignment stats file enter NA value, then skip sample
@@ -726,7 +726,7 @@ get_total_reads <- function() {
     alignment_stats_lines <- readLines(alignment_stats_path)
     
     # Calculate alignment rate (only works on samtools stats files)
-    if(any(grepl("_samtools_stats\\.txt$", alignment_stats_path))){
+    if(any(grepl("_alignment_stats\\.txt$", alignment_stats_path))){
       total_reads <- as.numeric(sub("SN	sequences:\t", "", 
                                     grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
     } else {
