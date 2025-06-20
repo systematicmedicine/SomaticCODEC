@@ -950,75 +950,768 @@ get_overrepresented_sequences_r2 <- function(){
   
 }
 
-# get_gc_deviation_r1 <- function(){
-#   
-#   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-#   results <- data.frame(metric = character(), sample = character(), value = numeric())
-#   
-#   for (sample_dir in sample_dirs) {
-#     sample_name <- basename(sample_dir)
-#     # Get path to processed fastqc file
-#     proc_zip_path <- list.files(sample_dir, 
-#                                 pattern = "_processed_r2_fastqc\\.zip$|_r2_filter_metrics\\.zip$", 
-#                                 full.names = TRUE)
-#     
-#     # If missing processed fastqc zip file enter NA value, then skip sample
-#     if (length(proc_zip_path) == 0) {
-#       results <- rbind(results, data.frame(
-#         metric = "overrepresented_sequences_r2",
-#         sample = sample_name,
-#         value = NA
-#       ))
-#       next
-#     }
-#     
-#     # Unzip fastqc_data.txt from zip file
-#     proc_zip_base <- basename(proc_zip_path)
-#     proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-#     
-#     # Create tmp directory for unzipped files
-#     tmp_dir <- file.path(sample_dir, "tmp")
-#     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
-#     
-#     # Unzip metrics txt file
-#     unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
-#     
-#     # Get path for unzipped metrics file
-#     proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
-#     
-#     # Put all lines of txt file into character vector
-#     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-#     
-#     # Find start and end of per sequence GC content section
-#     start_line <- grep("^>>Per sequence GC content", proc_fastqc_lines)
-#     end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-#     end_line <- end_lines[which(end_lines > start_line)[1]]
-#     
-#     # Extract per sequence GC content section lines (skip headers and end module lines)
-#     section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-#     
-#     # Parse lines to dataframe
-#     gc_content_df <- read.delim(text = section_lines,
-#                                                skip = 1,
-#                                                header = TRUE)
-#     colnames(gc_content_df) <- c("GC_content", "Count")
-#     
-#     
-#     
-#     # Add to results
-#     results <- rbind(results, data.frame(
-#       metric = "overrepresented_sequences_r2",
-#       sample = sample_name,
-#       value = overrepresented_sequences))
-#     
-#       
-#     }
-#     
-#     # Remove tmp directory
-#     Sys.sleep(1) # Pause needed to allow files to be deleted
-#     unlink(tmp_dir, recursive = TRUE)
-#   }
-#   
-#   return(results)
-#   
-# }
+get_gc_deviation_r1 <- function(){
+
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir,
+                                pattern = "_processed_r1_fastqc\\.zip$|_r1_filter_metrics\\.zip$",
+                                full.names = TRUE)
+
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "gc_deviation_r1",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+
+    # Find start and end of per sequence GC content section
+    start_line <- grep("^>>Per sequence GC content", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+
+    # Parse lines to dataframe
+    gc_content_df <- read.delim(text = section_lines,
+                                               skip = 1,
+                                               header = TRUE)
+    colnames(gc_content_df) <- c("GC_content", "Count")
+
+    # Estimate parameters for normal distribution
+    total_reads <- sum(gc_content_df$Count)
+    mean_gc <- sum(gc_content_df$GC_content * gc_content_df$Count) / total_reads
+    sd_gc <- sqrt(sum(gc_content_df$Count * (gc_content_df$GC_content - mean_gc)^2) / total_reads)
+    
+    # Calculate expected counts if normal distribution
+    expected_counts <- dnorm(gc_content_df$`GC_content`, mean = mean_gc, sd = sd_gc) * total_reads
+    
+    # Get sum of deviations from normal distribution counts
+    gc_deviation_r1 <- sum(abs(gc_content_df$Count - expected_counts)) / total_reads * 100
+
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "gc_deviation_r1",
+      sample = sample_name,
+      value = gc_deviation_r1))
+
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+    }
+  return(results)
+}
+
+get_gc_deviation_r2 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir,
+                                pattern = "_processed_r2_fastqc\\.zip$|_r2_filter_metrics\\.zip$",
+                                full.names = TRUE)
+    
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "gc_deviation_r2",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+    
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+    
+    # Find start and end of per sequence GC content section
+    start_line <- grep("^>>Per sequence GC content", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    gc_content_df <- read.delim(text = section_lines,
+                                skip = 1,
+                                header = TRUE)
+    colnames(gc_content_df) <- c("GC_content", "Count")
+    
+    # Estimate parameters for normal distribution
+    total_reads <- sum(gc_content_df$Count)
+    mean_gc <- sum(gc_content_df$GC_content * gc_content_df$Count) / total_reads
+    sd_gc <- sqrt(sum(gc_content_df$Count * (gc_content_df$GC_content - mean_gc)^2) / total_reads)
+    
+    # Calculate expected counts if normal distribution
+    expected_counts <- dnorm(gc_content_df$`GC_content`, mean = mean_gc, sd = sd_gc) * total_reads
+    
+    # Get sum of deviations from normal distribution counts
+    gc_deviation_r2 <- sum(abs(gc_content_df$Count - expected_counts)) / total_reads * 100
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "gc_deviation_r2",
+      sample = sample_name,
+      value = gc_deviation_r2))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_per_base_content_diff_r1 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir,
+                                pattern = "_processed_r1_fastqc\\.zip$|_r1_filter_metrics\\.zip$",
+                                full.names = TRUE)
+    
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_base_content_diff_r1",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+    
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+    
+    # Find start and end of per base sequence content section
+    start_line <- grep("^>>Per base sequence content", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_content_df <- read.delim(text = section_lines,
+                                skip = 1,
+                                header = TRUE)
+    colnames(sequence_content_df) <- c("Base", "G", "A", "T", "C")
+    
+    # Calculate maximum difference between GATC at each base
+    sequence_content_diff <- sequence_content_df %>%
+      rowwise() %>% 
+      mutate(max_diff = max(c_across(c(G, A, T, C))) - min(c_across(c(G, A, T, C)))) %>%
+      ungroup()
+    
+    per_base_content_diff_r1 <- round(max(sequence_content_diff$max_diff), digits = 1)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_base_content_diff_r1",
+      sample = sample_name,
+      value = per_base_content_diff_r1))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_per_base_content_diff_r2 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir,
+                                pattern = "_processed_r2_fastqc\\.zip$|_r2_filter_metrics\\.zip$",
+                                full.names = TRUE)
+    
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_base_content_diff_r2",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+    
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+    
+    # Find start and end of per base sequence content section
+    start_line <- grep("^>>Per base sequence content", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_content_df <- read.delim(text = section_lines,
+                                      skip = 1,
+                                      header = TRUE)
+    colnames(sequence_content_df) <- c("Base", "G", "A", "T", "C")
+    
+    # Calculate maximum difference between GATC at each base
+    sequence_content_diff <- sequence_content_df %>%
+      rowwise() %>% 
+      mutate(max_diff = max(c_across(c(G, A, T, C))) - min(c_across(c(G, A, T, C)))) %>%
+      ungroup()
+    
+    per_base_content_diff_r2 <- round(max(sequence_content_diff$max_diff), digits = 1)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_base_content_diff_r2",
+      sample = sample_name,
+      value = per_base_content_diff_r2))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_per_base_sequencing_quality_r1 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir,
+                                pattern = "_processed_r1_fastqc\\.zip$|_r1_filter_metrics\\.zip$",
+                                full.names = TRUE)
+    
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_base_sequencing_quality_r1",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+    
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+    
+    # Find start and end of Per base sequence quality section
+    start_line <- grep("^>>Per base sequence quality", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_quality_df <- read.delim(text = section_lines,
+                                      skip = 1,
+                                      header = TRUE)
+    
+    # Get lowest lower quartile score
+    per_base_sequencing_quality_r1 <- min(sequence_quality_df$Lower.Quartile)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_base_sequencing_quality_r1",
+      sample = sample_name,
+      value = per_base_sequencing_quality_r1))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_per_base_sequencing_quality_r2 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to processed fastqc file
+    proc_zip_path <- list.files(sample_dir,
+                                pattern = "_processed_r2_fastqc\\.zip$|_r2_filter_metrics\\.zip$",
+                                full.names = TRUE)
+    
+    # If missing processed fastqc zip file enter NA value, then skip sample
+    if (length(proc_zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_base_sequencing_quality_r2",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file
+    proc_zip_base <- basename(proc_zip_path)
+    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
+    
+    # Create tmp directory for unzipped files
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(proc_zip_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped metrics file
+    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
+    
+    # Find start and end of Per base sequence quality section
+    start_line <- grep("^>>Per base sequence quality", proc_fastqc_lines)
+    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_quality_df <- read.delim(text = section_lines,
+                                      skip = 1,
+                                      header = TRUE)
+    
+    # Get lowest lower quartile score
+    per_base_sequencing_quality_r2 <- min(sequence_quality_df$Lower.Quartile)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_base_sequencing_quality_r2",
+      sample = sample_name,
+      value = per_base_sequencing_quality_r2))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_per_tile_sequencing_quality_r1 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to zip file (could standardise file names to simplify)
+    zip_path <- list.files(sample_dir, 
+                           pattern = "_r1_raw_fastqc\\.zip$|_r1_fastqc_raw_metrics\\.zip$", 
+                           full.names = TRUE)
+    
+    # Give if missing zip enter NA value, then skip sample
+    if(length(zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_sequence_quality_score_r1",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
+    zip_base <- basename(zip_path)
+    zip_name <- sub("\\.zip$", "", zip_base)
+    
+    # Create tmp directory for unzipped file
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(zip_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    fastqc_data_lines <- readLines(fastqc_data_path)
+    
+    # Find start and end of Per base sequence quality section
+    start_line <- grep("^>>Per base sequence quality", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_quality_df <- read.delim(text = section_lines,
+                                      skip = 1,
+                                      header = TRUE)
+    
+    # Get mean quality score
+    mean_seq_quality <- mean(sequence_quality_df$Mean)
+    
+    # Find start and end of Per base sequence quality section
+    start_line <- grep("^>>Per tile sequence quality", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    tile_quality_df <- read.delim(text = section_lines,
+                                      skip = 1,
+                                      header = TRUE)
+    
+    colnames(tile_quality_df) <- c("tile", "base", "mean_quality")
+    
+    # Calculate deviation from mean quality score
+    per_tile_deviation <- tile_quality_df %>%
+      mutate(mean_quality_overall = mean_seq_quality,
+             deviation = (abs(mean_quality) / mean_quality_overall) * 100)
+    
+    per_tile_sequencing_quality_r1 <- round(max(per_tile_deviation$deviation), digits = 1)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_tile_sequencing_quality_r1",
+      sample = sample_name,
+      value = per_tile_sequencing_quality_r1))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_per_tile_sequencing_quality_r2 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to zip file (could standardise file names to simplify)
+    zip_path <- list.files(sample_dir, 
+                           pattern = "_r1_raw_fastqc\\.zip$|_r2_fastqc_raw_metrics\\.zip$", 
+                           full.names = TRUE)
+    
+    # Give if missing zip enter NA value, then skip sample
+    if(length(zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_sequence_quality_score_r2",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
+    zip_base <- basename(zip_path)
+    zip_name <- sub("\\.zip$", "", zip_base)
+    
+    # Create tmp directory for unzipped file
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(zip_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    fastqc_data_lines <- readLines(fastqc_data_path)
+    
+    # Find start and end of Per base sequence quality section
+    start_line <- grep("^>>Per base sequence quality", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_quality_df <- read.delim(text = section_lines,
+                                      skip = 1,
+                                      header = TRUE)
+    
+    # Get mean quality score
+    mean_seq_quality <- mean(sequence_quality_df$Mean)
+    
+    # Find start and end of Per base sequence quality section
+    start_line <- grep("^>>Per tile sequence quality", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    tile_quality_df <- read.delim(text = section_lines,
+                                  skip = 1,
+                                  header = TRUE)
+    
+    colnames(tile_quality_df) <- c("tile", "base", "mean_quality")
+    
+    # Calculate deviation from mean quality score
+    per_tile_deviation <- tile_quality_df %>%
+      mutate(mean_quality_overall = mean_seq_quality,
+             deviation = (abs(mean_quality) / mean_quality_overall) * 100)
+    
+    per_tile_sequencing_quality_r2 <- round(max(per_tile_deviation$deviation), digits = 1)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_tile_sequencing_quality_r2",
+      sample = sample_name,
+      value = per_tile_sequencing_quality_r2))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_sequence_length_r1 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to zip file (could standardise file names to simplify)
+    zip_path <- list.files(sample_dir, 
+                           pattern = "_r1_raw_fastqc\\.zip$|_r1_fastqc_raw_metrics\\.zip$", 
+                           full.names = TRUE)
+    
+    # Give if missing zip enter NA value, then skip sample
+    if(length(zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_sequence_quality_score_r1",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
+    zip_base <- basename(zip_path)
+    zip_name <- sub("\\.zip$", "", zip_base)
+    
+    # Create tmp directory for unzipped file
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(zip_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    fastqc_data_lines <- readLines(fastqc_data_path)
+    
+    # Find start and end of sequence length distribution section
+    start_line <- grep("^>>Sequence Length Distribution", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_length_df <- read.delim(text = section_lines,
+                                      skip = 1,
+                                      header = TRUE)
+    colnames(sequence_length_df) <- c("Length", "Count")
+    
+    # Get sequence length peak
+    sequence_length_r1 <- sequence_length_df$Length[which.max(sequence_length_df$Count)]
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "sequence_length_r1",
+      sample = sample_name,
+      value = sequence_length_r1))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_sequence_length_r2 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to zip file (could standardise file names to simplify)
+    zip_path <- list.files(sample_dir, 
+                           pattern = "_r2_raw_fastqc\\.zip$|_r2_fastqc_raw_metrics\\.zip$", 
+                           full.names = TRUE)
+    
+    # Give if missing zip enter NA value, then skip sample
+    if(length(zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "per_sequence_quality_score_r2",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
+    zip_base <- basename(zip_path)
+    zip_name <- sub("\\.zip$", "", zip_base)
+    
+    # Create tmp directory for unzipped file
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(zip_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    fastqc_data_lines <- readLines(fastqc_data_path)
+    
+    # Find start and end of sequence length distribution section
+    start_line <- grep("^>>Sequence Length Distribution", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    sequence_length_df <- read.delim(text = section_lines,
+                                     skip = 1,
+                                     header = TRUE)
+    colnames(sequence_length_df) <- c("Length", "Count")
+    
+    # Get sequence length peak
+    sequence_length_r2 <- sequence_length_df$Length[which.max(sequence_length_df$Count)]
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "sequence_length_r2",
+      sample = sample_name,
+      value = sequence_length_r2))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}

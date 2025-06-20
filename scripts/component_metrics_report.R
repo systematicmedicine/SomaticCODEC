@@ -10,7 +10,7 @@ library(tidyverse)
 
 # Load component metrics
 component_metrics <- read.csv("config/component_metrics.csv") %>% 
-  select(2, 5:9)
+  select(2:3, 5:9)
 
 # Load get_metrics.R functions
 source("scripts/get_metrics.R")

@@ -16,9 +16,9 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get update && apt-get install -y \
     wget curl git nano python3-pip unzip default-jdk \
     ca-certificates bzip2 liblzma-dev zlib1g-dev libbz2-dev \
-    build-essential openjdk-11-jre \
- && pip install --break-system-packages awscli \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+    build-essential openjdk-11-jre r-base \
+    && pip install --break-system-packages awscli \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Miniconda
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_24.1.2-0-Linux-x86_64.sh -O miniconda.sh && \
@@ -65,18 +65,16 @@ RUN VARSCAN_JAR=$(find /opt/conda/envs/codec-env -name 'VarScan.jar') && \
     echo -e '#!/bin/bash\nexec java -jar '"$VARSCAN_JAR"' "$@"' > /opt/conda/envs/codec-env/bin/varscan && \
     chmod +x /opt/conda/envs/codec-env/bin/varscan
 
-# Install R and required R packages
-RUN apt-get update && apt-get install -y r-base && \
-    Rscript -e 'install.packages(c("tidyverse", "jsonlite"), repos="https://cloud.r-project.org")' && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install required R packages
+RUN Rscript -e 'install.packages(c("tidyverse", "jsonlite"), repos="https://mirror.aarnet.edu.au/pub/CRAN/")' \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install feature branch of fgbio (replace with conda install when CallCodecConsensusReads is added to main branch)
 RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | \
     gpg --dearmor > /usr/share/keyrings/sbt-keyring.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/sbt-keyring.gpg] https://repo.scala-sbt.org/scalasbt/debian all main" \
     > /etc/apt/sources.list.d/sbt.list && \
-    apt-get update && \
-    apt-get install -y sbt git default-jdk && \
+    apt-get update && apt-get install -y sbt git default-jdk && \
     git clone --single-branch --branch feature/codec https://github.com/fulcrumgenomics/fgbio.git && \
     cd fgbio && sbt assembly && \
     mkdir -p /opt/fgbio && \
