@@ -570,8 +570,8 @@ get_duplex_coverage <- function(){
   }
 }
 
-# collate germline variant call metrics
-get_germline_variant_metrics <- function(){
+# Collate germline variant call metrics
+get_germline_variants <- function(){
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -584,30 +584,24 @@ get_germline_variant_metrics <- function(){
     stringsAsFactors = FALSE
   )
   
-  #loop through sample directory and create path files for variantCall files
+  #loop  through sample directory and create path files for variantCall files
   for (sample_dir in sample_dirs) {
     sample_name <- basename(sample_dir)
     txt_path <- list.files(sample_dir, pattern = "variantCall_summary.*\\.txt$",
                            ignore.case = TRUE, full.names = TRUE)
     
-    # If summary file not found add NA then skip sample
+    # Skip sample and insert NA if summary file not found 
     if (length(txt_path) == 0 || is.na(txt_path)) {
       results <- rbind(results, data.frame(
         metric = "germline_variants",
         sample = sample_name,
-        value = NA))
-        
-        results <- rbind(results, data.frame(
-          metric = "SNV_indel_ratio",
-          sample = sample_name,
-          value = NA))
-          
+        value = NA
+      ))
       next
     }
     
     # read file
     lines <- readLines(txt_path)
-    
     #select key metrics 
     obj <- list()
     
@@ -639,6 +633,58 @@ get_germline_variant_metrics <- function(){
     )
     )
     
+  }
+  return(results)
+}
+
+get_SNV_indel_ratio <- function(){
+  
+  # Get list of sample directories within metrics directory
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  
+  #create empty object to store metrics
+  results <- data.frame(
+    sample = character(),
+    metric = character(),
+    value = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  #loop  through sample directory and create path files for variantCall files
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    txt_path <- list.files(sample_dir, pattern = "variantCall_summary.*\\.txt$",
+                           ignore.case = TRUE, full.names = TRUE)
+    
+    # Insert NA and skip sample if summary file not found 
+    if (length(txt_path) == 0 || is.na(txt_path)) {
+      results <- rbind(results, data.frame(
+        metric = "SNV_indel_ratio",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # read file
+    lines <- readLines(txt_path)
+    #select key metrics 
+    obj <- list()
+    
+    # Get the data from "SN"
+    SN_data <- grep(paste0("^", "SN", "\t"), lines, value = TRUE)
+    
+    #idenfity the line the data came from
+    SN_info_index <- min(grep(paste("SN", "\t", sep=""), lines))
+    
+    # Clean the decription of the data
+    SN_info <- gsub("\\[[0-9]+\\]", "", 
+                    unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
+    
+    #parse into a DF
+    df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
+    
+    
     # calculate the snv/indel ratio
     snp <- as.numeric(df$value[df$key == "number of SNPs:"])
     indel <- as.numeric(df$value[df$key == "number of indels:"])
@@ -657,6 +703,324 @@ get_germline_variant_metrics <- function(){
   return(results)
 }
 
+get_insertion_deletion_ratio <- function(){
+  
+  # Get list of sample directories within metrics directory
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  
+  #create empty object to store metrics
+  results <- data.frame(
+    sample = character(),
+    metric = character(),
+    value = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  #loop  through sample directory and create path files for variantCall files
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    txt_path <- list.files(sample_dir, pattern = "variantCall_summary.*\\.txt$",
+                           ignore.case = TRUE, full.names = TRUE)
+    
+    # Insert NA and skip sample if summary file not found 
+    if (length(txt_path) == 0 || is.na(txt_path)) {
+      results <- rbind(results, data.frame(
+        metric = "insertion_deletion_ratio",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # read file
+    lines <- readLines(txt_path)
+    #select key metrics 
+    obj <- list()
+    
+    # Get the data from "SN"
+    IDD_data <- grep(paste0("^", "IDD", "\t"), lines, value = TRUE)
+    
+    #idenfity the line the data came from
+    IDD_info_index <- min(grep(paste("IDD", "\t", sep=""), lines))
+    
+    # Clean the decription of the data
+    IDD_info <- gsub("\\[[0-9]+\\]", "", 
+                     unlist(strsplit(gsub("# ", "", lines[IDD_info_index]), "\t")))
+    
+    #parse into a DF
+    df <- read.delim(textConnection(IDD_data), header = FALSE, skip = 1, col.names = IDD_info) %>%
+      rename(indel_len = `length..deletions.negative.`)
+    
+    #select the total variants
+    insetions_deletions <- df %>%
+      dplyr::select(indel_len, `number.of.sites`)
+    
+    #count insertions and deletions 
+    ins_del_count <- insetions_deletions %>%
+      dplyr::mutate(type = case_when(
+        indel_len > 0 ~ "insertion",
+        indel_len < 0 ~ "deletion")
+      ) %>%
+      dplyr::group_by(type) %>%
+      dplyr::summarise(count = sum(number.of.sites)) %>%
+      dplyr::ungroup()
+    
+    ins_count <- ins_del_count$count[ins_del_count$type == "insertion"]
+    del_count <- ins_del_count$count[ins_del_count$type == "deletion"]
+    
+    #put into the results frame
+    results <- rbind(results, data.frame(
+      sample = "sample_name",
+      metric = "insertion_deletion_ratio",
+      value = ins_count/del_count,
+      stringsAsFactors = FALSE
+    )
+    )
+    
+  }
+  return(results)
+}
+
+get_MNP_other_variants <- function(){
+  
+  # Get list of sample directories within metrics directory
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  
+  #create empty object to store metrics
+  results <- data.frame(
+    sample = character(),
+    metric = character(),
+    value = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  #loop  through sample directory and create path files for variantCall files
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    txt_path <- list.files(sample_dir, pattern = "variantCall_summary.*\\.txt$",
+                           ignore.case = TRUE, full.names = TRUE)
+    
+    # Insert NA and skip sample if summary file not found 
+    if (length(txt_path) == 0 || is.na(txt_path)) {
+      results <- rbind(results, data.frame(
+        metric = "MNP_other_variants",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # read file
+    lines <- readLines(txt_path)
+    #select key metrics 
+    obj <- list()
+    
+    # Get the data from "SN"
+    SN_data <- grep(paste0("^", "SN", "\t"), lines, value = TRUE)
+    
+    #idenfity the line the data came from
+    SN_info_index <- min(grep(paste("SN", "\t", sep=""), lines))
+    
+    # Clean the decription of the data
+    SN_info <- gsub("\\[[0-9]+\\]", "", 
+                    unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
+    
+    #parse into a DF
+    df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
+    
+    #select the total variants
+    MNP <- df$value[df$key == "number of MNPs:"]
+    other <- df$value[df$key == "number of others:"]
+    
+    #put into the results frame
+    results <- rbind(results, data.frame(
+      sample = sample_name,
+      metric = "MNP_other_variants",
+      value = MNP + other,
+      stringsAsFactors = FALSE
+    )
+    )
+    
+  }
+  return(results)
+} 
+
+get_transition_transversion_ratio <- function(){
+  
+  # Get list of sample directories within metrics directory
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  
+  #create empty object to store metrics
+  results <- data.frame(
+    sample = character(),
+    metric = character(),
+    value = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  #loop  through sample directory and create path files for variantCall files
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    txt_path <- list.files(sample_dir, pattern = "variantCall_summary.*\\.txt$",
+                           ignore.case = TRUE, full.names = TRUE)
+    
+    # Insert NA and skip sample if summary file not found 
+    if (length(txt_path) == 0 || is.na(txt_path)) {
+      results <- rbind(results, data.frame(
+        metric = "transition_transversion_ratio",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # read file
+    lines <- readLines(txt_path)
+    #select key metrics 
+    obj <- list()
+    
+    # Get the data from "SN"
+    TSTV_data <- grep(paste0("^", "TSTV", "\t"), lines, value = TRUE)
+    
+    #idenfity the line the data came from
+    TSTV_info_index <- min(grep(paste("TSTV", "\t", sep=""), lines))
+    
+    # Clean the decription of the data
+    TSTV_info <- gsub("\\[[0-9]+\\]", "", 
+                      unlist(strsplit(gsub("# ", "", lines[TSTV_info_index]), "\t")))
+    
+    #parse into a DF
+    df <- read.delim(textConnection(TSTV_data), header = FALSE, col.names = TSTV_info)
+    
+    
+    #put into the results frame
+    results <- rbind(results, data.frame(
+      sample = sample_name,
+      metric = "transition_transversion_ratio",
+      value = df$ts.tv[1],
+      stringsAsFactors = FALSE
+    )
+    )
+  }
+  return(results)
+} 
+
+get_het_hom_ratio <- function(){
+  
+  # Get list of sample directories within metrics directory
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  
+  #create empty object to store metrics
+  results <- data.frame(
+    sample = character(),
+    metric = character(),
+    value = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  #loop  through sample directory and create path files for duplication metrics
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    txt_path <- list.files(sample_dir, pattern = "_genotype_summary.*\\.txt$",
+                           ignore.case = TRUE, full.names = TRUE)
+    
+    # Insert NA and skip sample if metric file isnt found
+    if (length(txt_path) == 0 || is.na(txt_path)) {
+      results <- rbind(results, data.frame(
+        metric = "get_het_hom_ratio",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    #read file to df
+    df <- read_delim(txt_path, show_col_types = TRUE, delim = "\t")
+    
+    #add key metrics to results format  
+    results <- rbind(results, data.frame(
+      sample = sample_name,
+      metric = "het_hom_ratio",
+      value = df$ratio)
+    ) 
+    
+  }
+  return(results)
+}
+
+# Get read multimapping rate
+get_multimapping_rate <- function() {
+  
+  # Get list of sample directories within metrics directory
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  
+  # create empty object to store metrics
+  results <- data.frame(
+    metric = character(),
+    sample = character(),
+    value = numeric()
+  )
+  
+  #loop  through sample directory and create path files for duplication metrics
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    
+    # Get path to samtools stat/ flagstat output file (could standardise file names to simplify)
+    alignment_stats_path <- list.files(
+      sample_dir, 
+      pattern = "_alignment_stats.txt$|_map_metrics.txt$", 
+      full.names = TRUE
+    )
+    
+    # If missing alignment stats file enter NA value, then skip sample
+    if (length(alignment_stats_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "multimapping_rate",
+        sample = sample_name,
+        value = NA)
+      )
+      next
+    }
+    
+    # Put all lines of txt file into character vector
+    alignment_stats_lines <- readLines(alignment_stats_path)
+    
+    # extract the total raw sequences and the multimapped 
+    if(any(grepl("_alignment_stats\\.txt$", alignment_stats_path))){
+      
+      raw_total_sequences <- grep("^SN\\s+sequences:", alignment_stats_lines, value = TRUE) %>%
+        sub(pattern = "^SN\\s+sequences:", replacement = "") %>%
+        as.numeric()
+      
+      
+      reads_multimapped <- grep("^SN\tnon-primary alignments:", alignment_stats_lines, value = TRUE) %>%
+        sub(pattern = "SN\tnon-primary alignments:\t", replacement = "") %>%
+        as.numeric()
+    } 
+    
+    else {
+      
+      raw_total_sequences <- grep("in total", alignment_stats_lines, value = TRUE) %>%
+        sub(pattern = " .*", replacement = "") %>%
+        as.numeric()
+      
+      reads_multimapped <- grep("secondary", alignment_stats_lines, value = TRUE) %>%
+        sub(pattern = " .*", replacement = "") %>%
+        as.numeric()
+    }
+    
+    multimapping <- round((reads_multimapped / raw_total_sequences) * 100, 1)
+    
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "multimapping_rate",
+      sample = sample_name,
+      value = multimapping)
+    )
+  }
+  return(results)
+}
 
 # Extract the duplication rate
 get_duplication_rate <- function(){
@@ -1715,3 +2079,155 @@ get_sequence_length_r2 <- function(){
   }
   return(results)
 }
+
+get_per_base_N_content_r1 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to zip file (could standardise file names to simplify)
+    zip_path <- list.files(sample_dir, 
+                           pattern = "_r1_raw_fastqc\\.zip$|_r1_fastqc_raw_metrics\\.zip$", 
+                           full.names = TRUE)
+    
+    # Give if missing zip enter NA value, then skip sample
+    if(length(zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "get_per_base_N_content_r1",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
+    zip_base <- basename(zip_path)
+    zip_name <- sub("\\.zip$", "", zip_base)
+    
+    # Create tmp directory for unzipped file
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(zip_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    fastqc_data_lines <- readLines(fastqc_data_path)
+    
+    # Find start and end of sequence length distribution section
+    start_line <- grep("^>>Per base N content", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    N_content_df <- read.delim(text = section_lines,
+                                     skip = 1,
+                                     header = TRUE)
+    colnames(N_content_df) <- c("base", "count")
+    
+    # Calculate percent N at each base
+    N_content_percent <- N_content_df %>% 
+      mutate(percent_N = count * 100)
+    
+    # Get max N content
+    per_base_N_content_r1 <- round(max(N_content_percent$percent_N), digits = 1)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_base_N_content_r1",
+      sample = sample_name,
+      value = per_base_N_content_r1))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+get_per_base_N_content_r2 <- function(){
+  
+  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  
+  for (sample_dir in sample_dirs) {
+    sample_name <- basename(sample_dir)
+    # Get path to zip file (could standardise file names to simplify)
+    zip_path <- list.files(sample_dir, 
+                           pattern = "_r2_raw_fastqc\\.zip$|_r2_fastqc_raw_metrics\\.zip$", 
+                           full.names = TRUE)
+    
+    # Give if missing zip enter NA value, then skip sample
+    if(length(zip_path) == 0) {
+      results <- rbind(results, data.frame(
+        metric = "get_per_base_N_content_r2",
+        sample = sample_name,
+        value = NA
+      ))
+      next
+    }
+    
+    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
+    zip_base <- basename(zip_path)
+    zip_name <- sub("\\.zip$", "", zip_base)
+    
+    # Create tmp directory for unzipped file
+    tmp_dir <- file.path(sample_dir, "tmp")
+    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+    
+    # Unzip metrics txt file
+    unzip(zip_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    
+    # Get path for unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    
+    # Put all lines of txt file into character vector
+    fastqc_data_lines <- readLines(fastqc_data_path)
+    
+    # Find start and end of sequence length distribution section
+    start_line <- grep("^>>Per base N content", fastqc_data_lines)
+    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+    end_line <- end_lines[which(end_lines > start_line)[1]]
+    
+    # Extract per sequence GC content section lines (skip headers and end module lines)
+    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
+    
+    # Parse lines to dataframe
+    N_content_df <- read.delim(text = section_lines,
+                               skip = 1,
+                               header = TRUE)
+    colnames(N_content_df) <- c("base", "count")
+    
+    # Calculate percent N at each base
+    N_content_percent <- N_content_df %>% 
+      mutate(percent_N = count * 100)
+    
+    # Get max N content
+    per_base_N_content_r2 <- round(max(N_content_percent$percent_N), digits = 1)
+    
+    # Add to results
+    results <- rbind(results, data.frame(
+      metric = "per_base_N_content_r2",
+      sample = sample_name,
+      value = per_base_N_content_r2))
+    
+    # Remove tmp directory
+    Sys.sleep(1) # Pause needed to allow files to be deleted
+    unlink(tmp_dir, recursive = TRUE)
+    
+  }
+  return(results)
+}
+
+
+
+

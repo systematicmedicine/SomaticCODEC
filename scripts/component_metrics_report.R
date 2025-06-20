@@ -6,7 +6,7 @@
 # Author: Joshua Johnstone
 
 # Load packages
-library(tidyverse)
+library(dplyr)
 
 # Load component metrics
 component_metrics <- read.csv("config/component_metrics.csv") %>% 

@@ -66,7 +66,7 @@ RUN VARSCAN_JAR=$(find /opt/conda/envs/codec-env -name 'VarScan.jar') && \
     chmod +x /opt/conda/envs/codec-env/bin/varscan
 
 # Install required R packages
-RUN Rscript -e 'install.packages(c("tidyverse", "jsonlite"), repos="https://mirror.aarnet.edu.au/pub/CRAN/")' \
+RUN Rscript -e 'install.packages(c("dplyr", "jsonlite"), repos="https://mirror.aarnet.edu.au/pub/CRAN/")' \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install feature branch of fgbio (replace with conda install when CallCodecConsensusReads is added to main branch)
