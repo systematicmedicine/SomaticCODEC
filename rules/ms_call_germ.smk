@@ -14,7 +14,7 @@ Author: Ben Barry
 
 """
 
-# Use Haplotypecaller to call germline variants (unfiltered)
+# Use Haplotypecaller to call germline variants (no filtering)
 rule ms_call_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam",
@@ -45,7 +45,7 @@ rule ms_variant_call_unfiltered_metrics:
         bcftools stats {input.vcf} > {output.stat}
         """
 
-# Convert MNPs to SNVs and complicated subsitutions into SNV + INDEL
+# Convert MNVs to SNVs and complicated subsitutions into SNV + INDEL
 rule ms_decompose_variants:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz",
@@ -114,7 +114,7 @@ rule ms_hard_filter_INDEL:
         -O {output.INDEL_filtered}
         """
 
-# Merge filtered vcfs
+# Merge flagged vcfs (SVNs and indels)
 rule ms_merge_filtered:
     input:
         SNV = "tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_SNV.vcf.gz",
