@@ -46,6 +46,9 @@ snakemake \
     --reason \
     --stats metrics/pipeline_stats.json \
     2>&1 | tee metrics/snakemake.log
+
+# Generate report
+snakemake --configfile config/config.yaml --report report.html
 ``` 
 * Common tmux commands
     * Disconnect: Ctrl + b, d
