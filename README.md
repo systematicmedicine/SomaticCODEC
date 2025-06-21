@@ -9,6 +9,9 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 * Extensive range of QC metrics generated (e.g. `fastqc`)
 * Fully containerized docker workflow
 
+## Contribution guidleines
+* [Contribution guidelines](docs/contrib.md)
+
 ## Library prep and sequencing
 * Prepare and sequence CODEC libraries as per `SOP0017 CODECseq library preparation`
 * Prepare and sequence matched samples as `\CODECseq\20250526 Sequencing for pipeline and metric tests\Methods`
