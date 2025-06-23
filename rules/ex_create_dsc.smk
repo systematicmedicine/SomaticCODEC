@@ -106,7 +106,8 @@ rule ex_call_dsc:
          CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
-            -M 1
+            --max-duplex-disagreements 3 \
+            -M 1 
         """
 
 # Realign the double strand consensus (DSC) to the reference genome, as sequences have changed
@@ -192,6 +193,7 @@ rule ex_filter_dsc:
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
     shell:
         """
-        samtools view -b -q 60 {input.bam} > {output.bam}
+        samtools view -b -q 60 {input.bam} | \
+        fgbio SortBam -i /dev/stdin -o {output.bam} -s TemplateCoordinate
         samtools index {output.bam}
         """
