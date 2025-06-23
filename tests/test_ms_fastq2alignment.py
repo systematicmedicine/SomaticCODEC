@@ -2,6 +2,7 @@ import subprocess
 from pathlib import Path
 import shutil
 import pytest
+import pandas as pd
 
 def clean_workspace():
     for folder in ["metrics", "results", "tmp"]:
@@ -24,6 +25,7 @@ def clean_workspace_fixture():
     # Run cleanup after the test
     clean_workspace()                   
 
+# Tests if a non-empty BAM can be created from raw ms fastq files
 def test_ms_alignment_output_exists(clean_workspace_fixture):
 
     snakemake_cmd = [
@@ -34,7 +36,7 @@ def test_ms_alignment_output_exists(clean_workspace_fixture):
         "--notemp"
     ]
 
-    subprocess.run(snakemake_cmd, capture_output=True, text=True)
+    subprocess.run(snakemake_cmd, capture_output=False)
 
     # Check for expected output
     sample = "S001"
