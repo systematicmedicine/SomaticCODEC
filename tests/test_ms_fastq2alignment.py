@@ -39,11 +39,13 @@ def test_ms_alignment_output_exists(clean_workspace_fixture):
     subprocess.run(snakemake_cmd, capture_output=False)
 
     # Check for expected output
-    sample = "S001"
-    bam_path = Path("tmp") / sample / f"{sample}_markdup.bam"
+    ms_samples = pd.read_csv("tests/configs/ms_samples_test.csv")["ms_sample"].to_list()
 
-    # Check if markdup bam exists
-    assert bam_path.exists(), f"BAM file not found: {bam_path}"
+    for sample in ms_samples:
+        bam_path = Path("tmp") / sample / f"{sample}_markdup.bam"
 
-    # Check if markdup bam is empty
-    assert bam_path.stat().st_size > 0, f"BAM file is empty: {bam_path}"
+        # Check if markdup bam exists
+        assert bam_path.exists(), f"BAM file not found: {bam_path}"
+
+        # Check if markdup bam is not empty
+        assert bam_path.stat().st_size > 0, f"BAM file is empty: {bam_path}"
