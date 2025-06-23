@@ -48,7 +48,7 @@ snakemake \
     --verbose \
     --reason \
     --stats metrics/pipeline_stats.json \
-    2>&1 | tee metrics/snakemake.log
+    2>&1 | tee metrics/snakemake_log.log
 
 # Generate report
 snakemake --configfile config/config.yaml --report report.html
