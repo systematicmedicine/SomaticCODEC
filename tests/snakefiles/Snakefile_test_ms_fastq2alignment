@@ -19,9 +19,6 @@ Author: Joshua Johnstone
 import os
 import pandas as pd
 
-# Set working directory
-#os.chdir(workflow.basedir)
-
 # Load sample names
 ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
 

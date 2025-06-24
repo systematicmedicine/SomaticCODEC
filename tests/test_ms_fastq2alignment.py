@@ -1,29 +1,17 @@
+
+"""
+--- test_ms_fastq2alignment.py ---
+
+Function for testing if a non-empty BAM can be created from raw ms fastq files
+
+Author: Joshua Johnstone
+
+"""
+
 import subprocess
 from pathlib import Path
-import shutil
-import pytest
 import pandas as pd
-
-def clean_workspace():
-    for folder in ["metrics", "results", "tmp"]:
-        path = Path(folder)
-        for item in path.iterdir():
-            if item.name != ".gitkeep":
-                if item.is_dir():
-                    shutil.rmtree(item)
-                else:
-                    item.unlink()
-
-@pytest.fixture
-def clean_workspace_fixture():
-    # Run cleanup before the test
-    clean_workspace()
-
-    # Run test
-    yield
-
-    # Run cleanup after the test
-    clean_workspace()                   
+import time
 
 # Tests if a non-empty BAM can be created from raw ms fastq files
 def test_ms_alignment_output_exists(clean_workspace_fixture):
@@ -32,14 +20,15 @@ def test_ms_alignment_output_exists(clean_workspace_fixture):
         "snakemake",
         "-s", "tests/snakefiles/Snakefile_test_ms_fastq2alignment",
         "--cores", "all",
-        "--configfile", "tests/configs/ms_test_config.yaml",
-        "--notemp"
+        "--configfile", "tests/configs/test_ms_fastq2alignment_config.yaml",
+        "--notemp",
+        "--rerun-incomplete"
     ]
 
-    subprocess.run(snakemake_cmd, capture_output=False)
+    subprocess.run(snakemake_cmd)
 
     # Check for expected output
-    ms_samples = pd.read_csv("tests/configs/ms_samples_test.csv")["ms_sample"].to_list()
+    ms_samples = pd.read_csv("tests/configs/test_ms_fastq2alignment_samples.csv")["ms_sample"].to_list()
 
     for sample in ms_samples:
         bam_path = Path("tmp") / sample / f"{sample}_markdup.bam"
