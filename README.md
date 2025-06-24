@@ -11,6 +11,7 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 ## Contribution guidleines
 * [Contribution guidelines](docs/contrib.md)
+* [Integration testing guidelines](docs/testing.md)
 
 ## Library prep and sequencing
 * Prepare and sequence CODEC libraries as per `SOP0017 CODECseq library preparation`
