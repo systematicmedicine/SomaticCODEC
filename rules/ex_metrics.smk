@@ -1,20 +1,13 @@
 """
---- additional_metrics.smk ---
+--- ex_metrics.smk ---
 
-Rules for creating metrics files that are not related to the other rule groups and a component metrics report.
-
-Outputs: 
-    - Multiple metrics files
-    - Component metrics report csv
+Rules for creating metrics files that are not created during data processing steps.
+Specific to the ex section of the pipeline.
 
 Authors: 
     - James Phie
-    - Joshua Johnstone
 
 """
-
-#Lists ex_sample names that belong to each lane
-samples_by_lane = pd.read_csv(config["ex_samples_path"]).groupby("ex_lane")["ex_sample"].apply(list).to_dict()
 
 # Replace default index names with experiment specific sample names as defined in the input.tsv
 rule ex_correctproduct_metrics:

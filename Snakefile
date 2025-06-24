@@ -33,24 +33,25 @@ import pandas as pd
 # Set working directory
 os.chdir(workflow.basedir)
 
-# Load lane and sample names
-ex_lanes = pd.read_csv(config["ex_samples_path"])["ex_lane"].unique().tolist()
-ex_sample_names = pd.read_csv(config["ex_samples_path"])["ex_sample"].to_list()
-ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
-assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
+# Load additional config data
+ex_samples = pd.read_csv(config["ex_samples_path"])
+ex_adapters = pd.read_csv(config["ex_adapters_path"])
+ms_samples = pd.read_csv(config["ms_samples_path"])
+component_metrics = pd.read_csv(config["component_metrics_path"])
 
 # Include rules files
 
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
 include: "rules/ms_call_germ.smk"
+include: "rules/ms_metrics.smk"
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_dsc.smk"
 include: "rules/ex_call_somatic.smk"
+include: "rules/ex_metrics.smk"
 include: "rules/index_reference_genome.smk"
 include: "rules/masked_regions.smk"
-include: "rules/additional_metrics.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
