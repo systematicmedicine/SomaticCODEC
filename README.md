@@ -46,7 +46,7 @@ python3 utils/download_S3toEC2.py
 * Run pipeline
 ```
 # Dry-run
-snakemake --configfile config/config.yaml --dryrun
+snakemake --configfile config/config.yaml --cores all --dryrun
 
 # Run pipeline
 ./run_pipeline.sh
