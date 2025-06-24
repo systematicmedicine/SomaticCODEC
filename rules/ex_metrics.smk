@@ -9,29 +9,29 @@ Authors:
 
 """
 #Lists ex_sample names that belong to each lane
-samples_by_lane = pd.read_csv(config["ex_samples_path"]).groupby("ex_lane")["ex_sample"].apply(list).to_dict()
+samples_by_lane = ex_samples.groupby("ex_lane")["ex_sample"].apply(list).to_dict()
 
 # Replace default index names with experiment specific sample names as defined in the input.tsv
 rule ex_correctproduct_metrics:
     input:
-        demux_json = "metrics/{lane}/{lane}_demux_metrics.json",
-        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=samples_by_lane[wildcards.lane]),
-        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=samples_by_lane[wildcards.lane])
+        demux_json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
+        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=samples_by_lane[wildcards.ex_lane]),
+        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=samples_by_lane[wildcards.ex_lane])
     output:
-        "metrics/{lane}/{lane}_correctproduct_metrics.txt"
+        "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
     params:
-        samples = lambda wildcards: samples_by_lane[wildcards.lane]
+        samples = lambda wildcards: samples_by_lane[wildcards.ex_lane]
     script:
         "../scripts/correctproduct.py"
 
 # Custom python script to assess how many unused indices were detected from other experiments (similar metrics to rawreadcounts). This should always be 0. 
 rule ex_batchcontamination_metrics:
     input:
-        json = "metrics/{lane}/{lane}_demux_metrics.json"
+        json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
     output:
-        contamination = "metrics/{lane}/{lane}_batchcontamination_metrics.txt"
+        contamination = "metrics/{ex_lane}/{ex_lane}_batchcontamination_metrics.txt"
     params:
-        fasta = lambda wildcards: f"tmp/adapter_fastas/{wildcards.lane}_r1start.fasta",
+        fasta = lambda wildcards: f"tmp/adapter_fastas/{wildcards.ex_lane}_r1start.fasta",
         used = config['ex_samples_path']
     script:
         "../scripts/batchcontamination.py"

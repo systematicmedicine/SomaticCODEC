@@ -15,11 +15,11 @@ os.chdir(workflow.basedir)
 
 # Load lane and sample names
 ex_samples = pd.read_csv(config["ex_samples_path"])
+ex_adapters = pd.read_csv(config["ex_adapters_path"])
+ms_samples = pd.read_csv(config["ms_samples_path"])
+component_metrics = pd.read_csv(config["component_metrics_path"])
 
-ex_lanes = pd.read_csv(config["ex_samples_path"])["ex_lane"].unique().tolist()
-ex_sample_names = pd.read_csv(config["ex_samples_path"])["ex_sample"].to_list()
-ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
-assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
+#assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
 
 # Include rules files
 include: "rules/index_reference_genome.smk"
@@ -37,11 +37,11 @@ include: "rules/ex_metrics.smk"
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample=ex_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names),
+        expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist()),
         expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names),
         #expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample=ex_sample_names),
         #expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_names),
@@ -68,3 +68,17 @@ rule all:
         expand("metrics/{lane}/{lane}_correctproduct_metrics.txt", lane=ex_lanes),
         expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample=ex_sample_names),
         expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample=ex_sample_names)
+
+
+
+#TEMP
+
+# Load the DataFrame
+ex_samples = pd.read_csv("path/to/your/ex_samples.csv")
+
+# Create a unique identifier for each (R1, R2) pair
+unique_fastqs = ex_samples[["ex_fastqR1", "ex_fastqR2"]].drop_duplicates().reset_index(drop=True)
+unique_lanes["ex_lane"] = [f"ex_lane{i+1}" for i in range(len(unique_fastqs))]
+
+# Merge back into original DataFrame
+ex_samples = ex_samples.merge(unique_lanes, on=["ex_fastqR1", "ex_fastqR2"], how="left")
