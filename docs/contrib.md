@@ -29,8 +29,8 @@ Feature branches -> dev branch -> master branch
 
 ## Branch naming conventions
 Use the following naming conventions for feature branches:
-* feature/<description>
-* bugfix/<description>
-* tests/<description>
-* refactor/<description>
-* docs/<description>
+* `feature/description`
+* `bugfix/description`
+* `tests/description>`
+* `refactor/<description>`
+* `docs/<description>`
