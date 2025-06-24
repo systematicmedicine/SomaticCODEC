@@ -1,6 +1,8 @@
 # testing.md
 
-Guidelines for running tests on the CODECseq pipeline
+Guidelines for running <I>software</I> tests on the codec-opensource codebase.  
+
+This is distinct from testing the assays <I>scientific validity</I> (which is tested via component and system level performance metrics)
 
 ## Integration tests using pytest
 
