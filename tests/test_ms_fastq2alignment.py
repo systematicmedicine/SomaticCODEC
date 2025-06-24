@@ -11,7 +11,6 @@ Author: Joshua Johnstone
 import subprocess
 from pathlib import Path
 import pandas as pd
-import time
 
 # Tests if a non-empty BAM can be created from raw ms fastq files
 def test_ms_alignment_output_exists(clean_workspace_fixture):

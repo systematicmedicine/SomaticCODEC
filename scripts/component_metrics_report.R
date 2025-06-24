@@ -10,7 +10,14 @@ library(dplyr)
 
 # Load component metrics
 component_metrics <- read.csv("config/component_metrics.csv") %>% 
-  select(2:3, 5:9)
+  select(1:3, 5:9)
+
+# Get sample types from config
+ex_samples <- read.csv("config/ex_samples.csv") %>% 
+  pull(ex_sample)
+
+ms_samples <- read.csv("config/ms_samples.csv") %>% 
+  pull(ms_sample)
 
 # Load get_metrics.R functions
 source("scripts/get_metrics.R")
@@ -24,13 +31,18 @@ metric_dataframes <- lapply(all_functions, function(function_name){
   function_to_run()
 }) 
 
-
 # Combine metrics values into one data frame  
-combined_metrics_values <- do.call(rbind, metric_dataframes)
+combined_metrics_values <- do.call(rbind, metric_dataframes) %>% 
+  # Add sample_type column
+  mutate(sample_type = case_when(
+    sample %in% ex_samples ~ "Experimental",
+    sample %in% ms_samples ~ "Matched"))
+  # Add ms or ex to metric names based on sample type
 
 # Create metrics report data frame
 component_metrics_report <- combined_metrics_values %>% 
-  left_join(component_metrics, by = "metric") %>% 
+  # MODIFY JOIN TO INCLUDE ONLY RELEVANT METRICS
+  left_join(component_metrics, by = c("metric", "sample_type")) %>% 
   mutate(nn = ifelse(value >= nn_lower & value <= nn_upper, "PASS", "FAIL"),
          ideal = ifelse(value >= ideal_lower & value <= ideal_upper, "PASS", "FAIL")) %>% 
   arrange(metric, sample)
