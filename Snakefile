@@ -33,11 +33,11 @@ import pandas as pd
 # Set working directory
 os.chdir(workflow.basedir)
 
-# Load lane and sample names
-ex_lanes = pd.read_csv(config["ex_samples_path"])["ex_lane"].unique().tolist()
-ex_sample_names = pd.read_csv(config["ex_samples_path"])["ex_sample"].to_list()
-ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
-assert len(ex_sample_names + ms_sample_names) == len(set(ex_sample_names + ms_sample_names)), "Duplicate sample names found"
+# Load additional config data
+ex_samples = pd.read_csv(config["ex_samples_path"])
+ex_adapters = pd.read_csv(config["ex_adapters_path"])
+ms_samples = pd.read_csv(config["ms_samples_path"])
+component_metrics = pd.read_csv(config["component_metrics_path"])
 
 # Include rules files
 
