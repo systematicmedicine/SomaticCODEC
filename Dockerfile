@@ -78,7 +78,7 @@ RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A7564
     apt-get update && apt-get install -y sbt git default-jdk && \
     git clone https://github.com/fulcrumgenomics/fgbio.git && \
     cd fgbio && \
-    git checkout d93b8c3 && \
+    git checkout 61db498 && \
     sbt assembly && \
     mkdir -p /opt/fgbio && \
     cp target/scala-2.13/fgbio-*.jar /opt/fgbio/fgbio.jar && \

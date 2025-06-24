@@ -18,8 +18,8 @@ ex_to_ms = ex_samples.set_index("ex_sample")["ms_sample"].to_dict()
 #Call somatic mutations on duplex bases with a quality of >=Q70 (~<200 false positives per diploid genome)
 rule ex_call_somatic:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam", ##Add back filtered instead of mapQ
+        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam.bai",
         ref = config["GRCh38_path"],
         #Bed file
     output:
