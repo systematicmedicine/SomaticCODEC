@@ -26,3 +26,11 @@ Feature branches -> dev branch -> master branch
 * Use a testing framework (e.g. pytest)
 * Use toy files < 1MB (e.g. 100 line FASTQs). Where possible re-use files between tests (e.g. GCRh38-micro.fa)
 * When bugs in the pipeline are found, add integration tests that prevent this bug reccuring
+
+## Branch naming conventions
+Use the following naming conventions for feature branches:
+* feature/<description>
+* bugfix/<description>
+* tests/<description>
+* refactor/<description>
+* docs/<description>

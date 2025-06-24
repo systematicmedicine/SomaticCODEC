@@ -4,6 +4,7 @@
 Rules for creating metrics files that are not created during data processing steps.
 
 Authors: 
-    - James Phie
+    - Joshua Johnstone
+    - Ben Barry
 
 """
