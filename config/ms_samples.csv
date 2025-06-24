@@ -1,4 +1,4 @@
-ms_sample,fastq1,fastq2
+ms_sample_name,fastq1,fastq2
 S007,tmp/downloads/Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r1.fastq.gz,tmp/downloads/Buffy-young_232KFGLT3_TGATGTAAGA-GTGCGTCCTT_r2.fastq.gz
 S008,tmp/downloads/Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r1.fastq.gz,tmp/downloads/Buffy-old_232KFGLT3_TAGTTCGGTA-CCATGTGTAG_r2.fastq.gz
 S009,tmp/downloads/Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r1.fastq.gz,tmp/downloads/Sperm_232KFGLT3_CTATTACTAC-GAGTCTCTCC_r2.fastq.gz
