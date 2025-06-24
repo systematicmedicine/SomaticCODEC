@@ -38,6 +38,14 @@ ex_adapters = pd.read_csv(config["ex_adapters_path"])
 ms_samples = pd.read_csv(config["ms_samples_path"])
 component_metrics = pd.read_csv(config["component_metrics_path"])
 
+# Create lanes column from ex_samples fastq files
+    # Identify unique FASTQ pairs and assign lane labels
+unique_lanes = ex_samples[["ex_fastqR1", "ex_fastqR2"]].drop_duplicates().reset_index(drop=True)
+unique_lanes["ex_lane"] = [f"ex_lane{i+1}" for i in range(len(unique_lanes))]
+
+    # Merge back into the original dataframe
+ex_samples = ex_samples.merge(unique_lanes, on=["ex_fastqR1", "ex_fastqR2"], how="left")
+
 # Include rules files
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
@@ -47,9 +55,9 @@ include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_dsc.smk"
 include: "rules/ex_call_somatic.smk"
-include: "rules/ex_metrics.smk"
+#include: "rules/ex_metrics.smk"
 include: "rules/index_reference_genome.smk"
-include: "rules/masked_regions.smk"
+#include: "rules/masked_regions.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
