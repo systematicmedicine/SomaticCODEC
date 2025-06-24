@@ -44,13 +44,14 @@ component_metrics = pd.read_csv(config["component_metrics_path"])
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
 include: "rules/ms_call_germ.smk"
+include: "rules/ms_metrics.smk"
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_dsc.smk"
 include: "rules/ex_call_somatic.smk"
+include: "rules/ex_metrics.smk"
 include: "rules/index_reference_genome.smk"
 include: "rules/masked_regions.smk"
-include: "rules/additional_metrics.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
