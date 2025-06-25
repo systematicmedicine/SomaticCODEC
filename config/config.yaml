@@ -11,7 +11,7 @@ GRCh38_path: tmp/downloads/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
 difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions.bed
 common_variants_path: tmp/downloads/gnomad_common_af01_merged.bed
 ex_samples_path: config/ex_lanes.csv
-ex_lanes_path:  config/ex_lanes.csv
+ex_lanes_path: config/ex_lanes.csv
 ex_adapters_path: config/ex_adapters.csv
 ms_samples_path: config/ms_samples.csv
 component_metrics_path: config/component_metrics.csv
