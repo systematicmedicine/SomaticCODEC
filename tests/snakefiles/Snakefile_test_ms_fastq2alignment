@@ -28,10 +28,6 @@ include: "../../rules/ms_alignment.smk"
 
 rule all:
     input:
-        expand("tmp/{ms_sample_name}/{ms_sample_name}_markdup.bam", ms_sample_name = ms_samples["ms_sample_name"].tolist()),
-        expand("tmp/{ms_sample_name}/{ms_sample_name}_markdup.bai", ms_sample_name = ms_samples["ms_sample_name"].tolist()),
-        expand("metrics/{ms_sample_name}/{ms_sample_name}_markdup_metrics.txt", ms_sample_name = ms_samples["ms_sample_name"].tolist()),
-        expand("metrics/{ms_sample_name}/{ms_sample_name}_alignment_stats.txt", ms_sample_name = ms_samples["ms_sample_name"].tolist()),
-        expand("metrics/{ms_sample_name}/{ms_sample_name}_insert_size_metrics.txt", ms_sample_name = ms_samples["ms_sample_name"].tolist()),
-        expand("metrics/{ms_sample_name}/{ms_sample_name}_insert_size_histogram.pdf", ms_sample_name = ms_samples["ms_sample_name"].tolist())
+        expand("tmp/{ms_sample}/{ms_sample}_markdup.bam", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("tmp/{ms_sample}/{ms_sample}_markdup.bai", ms_sample = ms_samples["ms_sample"].tolist())
 
