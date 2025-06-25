@@ -96,8 +96,8 @@ rule ms_variant_call_filtered_metrics:
 # Generates metrics for each mask BED file
 rule masking_metrics:
     input:
-        gnomAD_bed = config['common_variants_path'],
-        GIAB_bed = config['difficult_regions_path'],
+        gnomAD_bed = lambda wc: config['common_variants_path'],
+        GIAB_bed = lambda wc: config['difficult_regions_path'],
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",

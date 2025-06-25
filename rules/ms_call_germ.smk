@@ -20,7 +20,7 @@ rule ms_call_germ_variants:
         bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam",
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
-        dictf = config["GRCh38_path"].replace(".fna", ".dict")
+        dictf = os.path.splitext(config["GRCh38_path"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz")
     threads:
@@ -32,17 +32,6 @@ rule ms_call_germ_variants:
             -I {input.bam} \
             -O {output.vcf} \
             --native-pair-hmm-threads {threads}
-        """
-
-# Create metrics for unfiltered germline variant calls
-rule ms_variant_call_unfiltered_metrics:
-    input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz"
-    output:
-        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt"
-    shell:
-        """
-        bcftools stats {input.vcf} > {output.stat}
         """
 
 # Convert MNVs to SNVs and complicated subsitutions into SNV + INDEL
@@ -59,59 +48,70 @@ rule ms_decompose_variants:
         tabix -p vcf {output.vcf}
         """
 
-# Flag SNVs to filter
-rule ms_hard_filter_SNV:
+# Select SNVs from decomposed vcf
+rule ms_select_SNV:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz",
-        ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai",
-        dictf = config["GRCh38_path"].replace(".fna", ".dict")
+        ref = config["GRCh38_path"]
+    output:
+        SNVs = temp("tmp/{ms_sample}/{ms_sample}_ms_SNVs.vcf.gz")
+    shell:
+        """
+        gatk SelectVariants \
+          -R {input.ref} \
+          -V {input.vcf} \
+          --select-type-to-include SNP \
+          -O {output.SNVs}
+        """
+# Flags SNVs for filtering
+rule ms_hard_filter_SNV:
+    input:
+        SNVs = "tmp/{ms_sample}/{ms_sample}_ms_SNVs.vcf.gz"
     output:
         SNV_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_SNV.vcf.gz")
     shell:
         """
-        gatk SelectVariants \
-        -R {input.ref} \
-        -V {input.vcf} \
-        --select-type-to-include SNP \
-        -O /dev/stdout \
-        | \
         gatk VariantFiltration \
-        -V /dev/stdin \
-        -filter "QD < 2.0" --filter-name "QD2" \
-        -filter "QUAL < 30.0" --filter-name "QUAL30" \
-        -filter "SOR > 3.0" --filter-name "SOR3" \
-        -filter "FS > 60.0" --filter-name "FS60" \
-        -filter "MQ < 40.0" --filter-name "MQ40" \
-        -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
-        -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
-        -O {output.SNV_filtered}
-        """    
-
-# Flag indels to filter
+          -V {input.SNVs} \
+          -filter "QD < 2.0" --filter-name "QD2" \
+          -filter "QUAL < 30.0" --filter-name "QUAL30" \
+          -filter "SOR > 3.0" --filter-name "SOR3" \
+          -filter "FS > 60.0" --filter-name "FS60" \
+          -filter "MQ < 40.0" --filter-name "MQ40" \
+          -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
+          -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
+          -O {output.SNV_filtered}
+        """
+# Selects INDELs from decomposed vcf
+rule ms_select_INDEL:
+    input:
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz",
+        ref = config["GRCh38_path"]
+    output:
+        INDELs = temp("tmp/{ms_sample}/{ms_sample}_ms_INDELs.vcf.gz")
+    shell:
+        """
+        gatk SelectVariants \
+          -R {input.ref} \
+          -V {input.vcf} \
+          --select-type-to-include INDEL \
+          -O {output.INDELs}
+        """
+# Flags INDELs for filtering
 rule ms_hard_filter_INDEL:
     input:
-        vcf= "tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz",
-        ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai",
-        dictf = config["GRCh38_path"].replace(".fna", ".dict")
+        INDELs = "tmp/{ms_sample}/{ms_sample}_ms_INDELs.vcf.gz"
     output:
         INDEL_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz")
     shell:
         """
-        gatk SelectVariants \
-        -R {input.ref} \
-        -V {input.vcf} \
-        --select-type-to-include INDEL \
-        -O /dev/stdout \
-        | \
         gatk VariantFiltration \
-        -V /dev/stdin \
-        -filter "QD < 2.0" --filter-name "QD2" \
-        -filter "QUAL < 30.0" --filter-name "QUAL30" \
-        -filter "FS > 200.0" --filter-name "FS200" \
-        -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20" \
-        -O {output.INDEL_filtered}
+          -V {input.INDELs} \
+          -filter "QD < 2.0" --filter-name "QD2" \
+          -filter "QUAL < 30.0" --filter-name "QUAL30" \
+          -filter "FS > 200.0" --filter-name "FS200" \
+          -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20" \
+          -O {output.INDEL_filtered}
         """
 
 # Merge flagged vcfs (SVNs and indels)
@@ -141,15 +141,4 @@ rule ms_filter_pass_variants:
         """
         bcftools view -f PASS -Oz -o {output.vcf} {input.vcf}
         tabix -p vcf {output.vcf}
-        """
-
-# Create metrics for filtered germline variants
-rule ms_variant_call_filtered_metrics:
-    input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
-    output:
-        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt"
-    shell:
-        """
-        bcftools stats {input.vcf} > {output.stat}
         """
