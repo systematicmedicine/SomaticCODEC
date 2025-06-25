@@ -2,7 +2,7 @@
 """
 --- test_ms_fastq_vcf.py ---
 
-Function for testing if non-empty filtered vcf files can be created from raw ms fastq files
+Function for testing if non-empty filter-flagged vcf files can be created from raw ms fastq files
 
 Author: Joshua Johnstone
 
@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 import pandas as pd
 
-# Tests if non-empty filtered vcf files can be created from raw ms fastq files
+# Tests if non-empty filter-flagged vcf files can be created from raw ms fastq files
 def test_ms_vcf_output_exists(clean_workspace_fixture):
 
     # Run snakemake
@@ -32,10 +32,10 @@ def test_ms_vcf_output_exists(clean_workspace_fixture):
     ms_sample = pd.read_csv("tests/configs/test_ms_fastq_vcf_samples.csv")["ms_sample"].to_list()
 
     for sample in ms_sample:
-        filtered_vcf_path = Path("tmp") / sample / f"{sample}_ms_filter_pass_variants.vcf.gz"
+        filter_flag_vcf_path = Path("tmp") / sample / f"{sample}_ms_merge_filtered.vcf.gz"
 
-        # Check if filtered vcf exists
-        assert filtered_vcf_path.exists(), f"ms_filter_pass_variants not found: {filtered_vcf_path}"
+        # Check if filter-flagged vcf exists
+        assert filter_flag_vcf_path.exists(), f"ms_merge_filtered.vcf.gz not found: {filter_flag_vcf_path}"
 
-        # Check that filtered vcf is not empty
-        assert filtered_vcf_path.stat().st_size > 0, f"ms_filter_pass_variants is empty: {filtered_vcf_path}"
+        # Check that filter-flagged vcf is not empty
+        assert filter_flag_vcf_path.stat().st_size > 0, f"_ms_merge_filtered.vcf.gz is empty: {filter_flag_vcf_path}"
