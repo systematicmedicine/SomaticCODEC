@@ -1,2 +1,2 @@
-ms_sample_name,fastq1,fastq2
+ms_sample,fastq1,fastq2
 S001,tests/data/ms_Chr1_100reads_r1.fastq,tests/data/ms_Chr1_100reads_r2.fastq
