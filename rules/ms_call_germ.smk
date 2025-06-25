@@ -17,12 +17,12 @@ Author: Ben Barry
 # Use Haplotypecaller to call germline variants (no filtering)
 rule ms_call_germ_variants:
     input:
-        bam = "tmp/{ms_sample_name}/{ms_sample_name}_markdup.bam",
+        bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam",
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
-        vcf = temp("tmp/{ms_sample_name}/{ms_sample_name}_ms_call_germ_variants.vcf.gz")
+        vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz")
     threads:
          max(1, os.cpu_count() // 8)
     shell:
@@ -37,9 +37,9 @@ rule ms_call_germ_variants:
 # Create metrics for unfiltered germline variant calls
 rule ms_variant_call_unfiltered_metrics:
     input: 
-        vcf = "tmp/{ms_sample_name}/{ms_sample_name}_ms_call_germ_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz"
     output:
-        stat = "metrics/{ms_sample_name}/{ms_sample_name}_variantCall_unfiltered_summary.txt"
+        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
@@ -48,11 +48,11 @@ rule ms_variant_call_unfiltered_metrics:
 # Convert MNVs to SNVs and complicated subsitutions into SNV + INDEL
 rule ms_decompose_variants:
     input:
-        vcf = "tmp/{ms_sample_name}/{ms_sample_name}_ms_call_germ_variants.vcf.gz",
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz",
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
     output:
-        vcf = temp("tmp/{ms_sample_name}/{ms_sample_name}_ms_decomposed.vcf.gz")
+        vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz")
     shell:
         """
         bcftools norm -m -both -f {input.ref} {input.vcf} -Oz -o {output.vcf}
@@ -62,12 +62,12 @@ rule ms_decompose_variants:
 # Flag SNVs to filter
 rule ms_hard_filter_SNV:
     input:
-        vcf = "tmp/{ms_sample_name}/{ms_sample_name}_ms_decomposed.vcf.gz",
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz",
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
-        SNV_filtered = temp("tmp/{ms_sample_name}/{ms_sample_name}_ms_hard_filtered_SNV.vcf.gz")
+        SNV_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_SNV.vcf.gz")
     shell:
         """
         gatk SelectVariants \
@@ -91,12 +91,12 @@ rule ms_hard_filter_SNV:
 # Flag indels to filter
 rule ms_hard_filter_INDEL:
     input:
-        vcf= "tmp/{ms_sample_name}/{ms_sample_name}_ms_decomposed.vcf.gz",
+        vcf= "tmp/{ms_sample}/{ms_sample}_ms_decomposed.vcf.gz",
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
-        INDEL_filtered = temp("tmp/{ms_sample_name}/{ms_sample_name}_ms_hard_filtered_INDEL.vcf.gz")
+        INDEL_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz")
     shell:
         """
         gatk SelectVariants \
@@ -117,10 +117,10 @@ rule ms_hard_filter_INDEL:
 # Merge flagged vcfs (SVNs and indels)
 rule ms_merge_filtered:
     input:
-        SNV = "tmp/{ms_sample_name}/{ms_sample_name}_ms_hard_filtered_SNV.vcf.gz",
-        INDEL = "tmp/{ms_sample_name}/{ms_sample_name}_ms_hard_filtered_INDEL.vcf.gz"
+        SNV = "tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_SNV.vcf.gz",
+        INDEL = "tmp/{ms_sample}/{ms_sample}_ms_hard_filtered_INDEL.vcf.gz"
     output:
-        vcf = temp("tmp/{ms_sample_name}/{ms_sample_name}_ms_merge_filtered.vcf.gz")
+        vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_merge_filtered.vcf.gz")
     shell:
         """
         gatk MergeVcfs \
@@ -132,10 +132,10 @@ rule ms_merge_filtered:
 # Filter germline variants (based on flagging in previous rules)
 rule ms_filter_pass_variants:
     input:
-        vcf = "tmp/{ms_sample_name}/{ms_sample_name}_ms_merge_filtered.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_merge_filtered.vcf.gz"
     output:
-        vcf = "tmp/{ms_sample_name}/{ms_sample_name}_ms_filter_pass_variants.vcf.gz", #Make temp once development is complete
-        vcf_index = "tmp/{ms_sample_name}/{ms_sample_name}_ms_filter_pass_variants.vcf.gz.tbi" #Make temp once development is complete
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz", #Make temp once development is complete
+        vcf_index = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz.tbi" #Make temp once development is complete
 
     shell:
         """
@@ -146,9 +146,9 @@ rule ms_filter_pass_variants:
 # Create metrics for filtered germline variants
 rule ms_variant_call_filtered_metrics:
     input: 
-        vcf = "tmp/{ms_sample_name}/{ms_sample_name}_ms_filter_pass_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
     output:
-        stat = "metrics/{ms_sample_name}/{ms_sample_name}_variantCall_filtered_summary.txt"
+        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
