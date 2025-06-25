@@ -17,3 +17,6 @@ metrics/*
 
 # Pycache generated when running pytest
 __pycache__/
+
+# vscode settings files
+.vscode/
