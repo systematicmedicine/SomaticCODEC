@@ -10,12 +10,11 @@ Author: James Phie
 
 """
 # Create lists of raw experimental FASTQ files and check that they are unique
-ex_raw_r1_list = ex_samples.drop_duplicates("ex_lane").set_index("ex_lane")["ex_fastqR1"].to_dict()
-ex_raw_r2_list = ex_samples.drop_duplicates("ex_lane").set_index("ex_lane")["ex_fastqR2"].to_dict()
-assert all(ex_samples.groupby("ex_lane")[col].nunique().eq(1).all() for col in ["ex_fastqR1", "ex_fastqR2"]), "Inconsistent FASTQ files per lane"
+ex_raw_r1_list = ex_lanes.set_index("ex_lane")["fastq1"].to_dict()
+ex_raw_r2_list = ex_lanes.set_index("ex_lane")["fastq2"].to_dict()
 
 #Creates mapping between ex_lane and ex_sample to determine which fasta file should be applied to each ex_sample during trimming
-ex_sample_to_lane = ex_samples.set_index("ex_sample")["ex_lane"].to_dict()
+ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
 
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
@@ -41,37 +40,38 @@ rule ex_fastqcraw_metrics:
 #Generate adapter fasta files for demultiplexing and trimming using adapter sequences in ex_adapters.csv
 rule ex_generate_adapter_fastas:
     input:
-        samples=ex_samples,
         adapters=config["ex_adapters_path"]
+    params:
+        samples = ex_samples
     output:
-        adapter_fasta_outputs = expand("tmp/adapter_fastas/{ex_lane}_{region}.fasta", ex_lane=ex_samples["ex_lane"].drop_duplicates().tolist(), region=["r1start", "r1end", "r2start", "r2end"])
+        adapter_fasta_outputs = expand("tmp/adapter_fastas/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1start", "r1end", "r2start", "r2end"])
     script:
         "../scripts/generatefastas.py"
 
-# For each lane, generate a separate ex_demux_{ex_lane} rule
+# For each lane, generate a separate ex_demux_{lane} rule
 # Removes first 3bp of R1 and R2 to read name as 6 base UMI. 
 # Demultiplexes using R1 and R2 5' sample indices (both must agree). 
 # Trims 5' sample indices used for demultiplexing. 
 for lane in ex_lanes:
     #Determine which samples are present in the lane
-    samples = ex_samples[ex_samples["ex_lane"] == lane]["ex_sample"].tolist()
+    samples = pd.read_csv(config["ex_samples_path"])[pd.read_csv(config["ex_samples_path"])["lane"] == lane]["ex_sample"].tolist()
     #Create list of file outputs based on samples present in the lane
     demuxed_r1 = [f"tmp/{s}_r1_trim5.fastq.gz" for s in samples]
     demuxed_r2 = [f"tmp/{s}_r2_trim5.fastq.gz" for s in samples]
     #Generate 1 rule per lane
-    rule_name = f"ex_demux_{ex_lane}"
+    rule_name = f"ex_demux_{lane}"
 
     rule:
         name: rule_name
         input:
             fastq1 = ex_raw_r1_list[lane],
             fastq2 = ex_raw_r2_list[lane],
-            r1_start = f"tmp/adapter_fastas/{ex_lane}_r1start.fasta",
-            r2_start = f"tmp/adapter_fastas/{ex_lane}_r2start.fasta"
+            r1_start = f"tmp/adapter_fastas/{lane}_r1start.fasta",
+            r2_start = f"tmp/adapter_fastas/{lane}_r2start.fasta"
         output:
             demuxed_r1 = temp(demuxed_r1),
             demuxed_r2 = temp(demuxed_r2),
-            json = f"metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
+            json = f"metrics/{lane}/{lane}_demux_metrics.json"
         threads:
             max(1, os.cpu_count() // 4)
         shell:

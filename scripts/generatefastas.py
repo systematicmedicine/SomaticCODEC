@@ -13,7 +13,7 @@ import pandas as pd
 from pathlib import Path
 import re
 
-samples = pd.read_csv(snakemake.input.samples)
+samples = snakemake.params.samples
 adapters = pd.read_csv(snakemake.input.adapters).set_index("adapter")
 
 # Map output paths back to (lane, region) using the filename
