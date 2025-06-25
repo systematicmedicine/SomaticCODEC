@@ -1,15 +1,15 @@
 """
---- Snakefile_test_ms_fastq_vcf ---
+--- Snakefile_test_ms_filtered_vcf_output ---
 
-Test Snakefile to be used with test_ms_fastq_vcf.py
+Test Snakefile to be used with function test_ms_filtered_vcf_output
 
-Runs matched sample pipeline from demuxed FASTQs to creating a filter-flagged vcf
+Runs matched sample pipeline from demuxed FASTQs to creating a filter-flagged VCF
 
 Inputs: 
     - 100 read pairs mapping to the middle of Chr1
     - Micro reference (1Mbp in the middle of Chr1)
 Output: 
-    - Merged and filter-flagged vcf
+    - Merged and filter-flagged VCF
 
 Author: Joshua Johnstone
 
