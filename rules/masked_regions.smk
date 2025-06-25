@@ -20,11 +20,11 @@ Authors:
 # Creates a mask for low depth (<30x) positions of ms raw alignment
 rule ms_low_depth_mask:
     input:
-        markdup_bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam",
-        markdup_bai = "tmp/{ms_sample}/{ms_sample}_markdup.bai"
+        markdup_bam = "tmp/{ms_sample_name}/{ms_sample_name}_markdup.bam",
+        markdup_bai = "tmp/{ms_sample_name}/{ms_sample_name}_markdup.bai"
     output:
-        depth_stats = "metrics/{ms_sample}/{ms_sample}_depth_stats.txt",
-        bed = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.bed")
+        depth_stats = "metrics/{ms_sample_name}/{ms_sample_name}_depth_stats.txt",
+        bed = temp("tmp/{ms_sample_name}/{ms_sample_name}_lowdepth.bed")
     params:
         threshold = 30
     shell:
@@ -40,11 +40,11 @@ rule ms_low_depth_mask:
     # For insertions and SNV's, the BED region is length 1
 rule ms_germline_variants_bed:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
+        vcf = "tmp/{ms_sample_name}/{ms_sample_name}_ms_filter_pass_variants.vcf.gz"
     output:
-        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed"),
-        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed"),
-        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed")
+        ms_germ_del_bed = temp("tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_del.bed"),
+        ms_germ_ins_bed = temp("tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_ins.bed"),
+        ms_germ_snv_bed = temp("tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_snv.bed")
     shell:
         """
         # Convert filtered VCF to BED format
@@ -58,12 +58,12 @@ rule ms_combine_masks:
     input:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
-        ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed"
+        ms_lowdepth_bed = "tmp/{ms_sample_name}/{ms_sample_name}_lowdepth.bed",
+        ms_germ_del_bed = "tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_del.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_ins.bed",
+        ms_germ_snv_bed = "tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_snv.bed"
     output:
-        combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed" # Make temporary once pipeline development is complete
+        combined_bed = "tmp/{ms_sample_name}/{ms_sample_name}_combined_mask.bed" # Make temporary once pipeline development is complete
     shell:
         """
         cat {input.gnomAD_bed} \
@@ -81,14 +81,14 @@ rule masking_metrics:
     input:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
-        ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed",
-        combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
+        ms_lowdepth_bed = "tmp/{ms_sample_name}/{ms_sample_name}_lowdepth.bed",
+        ms_germ_del_bed = "tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_del.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_ins.bed",
+        ms_germ_snv_bed = "tmp/{ms_sample_name}/{ms_sample_name}_GL_variants_snv.bed",
+        combined_bed = "tmp/{ms_sample_name}/{ms_sample_name}_combined_mask.bed",
         ref_index = config['GRCh38_path'] + ".fai"
     output:
-        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.txt"
+        mask_metrics = "metrics/{ms_sample_name}/{ms_sample_name}_mask_metrics.txt"
     shell:
         """
         total_genome_bp=$(awk '{{sum += $2}} END {{print sum}}' {input.ref_index})

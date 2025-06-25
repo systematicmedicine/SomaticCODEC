@@ -21,10 +21,10 @@ rule ms_raw_alignment:
         bwt = config["GRCh38_path"] + ".bwt.2bit.64",
         pac = config["GRCh38_path"] + ".pac",
         sa = config['GRCh38_path'] + ".0123",
-        r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
-        r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
+        r1_processed = "tmp/{ms_sample_name}/{ms_sample_name}_trimfilter_r1.fastq.gz",
+        r2_processed = "tmp/{ms_sample_name}/{ms_sample_name}_trimfilter_r2.fastq.gz"
     output:
-        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam" # Change to temp once pipeline development is complete
+        bam = "tmp/{ms_sample_name}/{ms_sample_name}_aligned.bam" # Change to temp once pipeline development is complete
     threads: 
         max(1, os.cpu_count() // 4)
     shell:
@@ -33,7 +33,7 @@ rule ms_raw_alignment:
         lane=$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4)
 
         # Define read groups (sample ID, sample name, library, platform, platform unit)
-        read_group="@RG\\tID:{wildcards.ms_sample}_${{lane}}\\tSM:{wildcards.ms_sample}\\tLB:{wildcards.ms_sample}_lib\\tPL:ILLUMINA\\tPU:{wildcards.ms_sample}.${{lane}}"
+        read_group="@RG\\tID:{wildcards.ms_sample_name}_${{lane}}\\tSM:{wildcards.ms_sample_name}\\tLB:{wildcards.ms_sample_name}_lib\\tPL:ILLUMINA\\tPU:{wildcards.ms_sample_name}.${{lane}}"
 
         # Add read groups and align
         bwa-mem2 mem \
@@ -48,9 +48,9 @@ rule ms_raw_alignment:
 # Sorts bam by coordinate
 rule ms_sort_bam:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam"
+        bam = "tmp/{ms_sample_name}/{ms_sample_name}_aligned.bam"
     output:
-        bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted.bam")
+        bam_sorted =  temp("tmp/{ms_sample_name}/{ms_sample_name}_sorted.bam")
     threads: 
         max(1, os.cpu_count() // 8)
     shell:
@@ -59,11 +59,11 @@ rule ms_sort_bam:
 # Marks duplicate reads in bam file
 rule ms_mark_duplicates:
     input:
-        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted.bam"
+        bam_sorted = "tmp/{ms_sample_name}/{ms_sample_name}_sorted.bam"
     output:
-        bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bam"),
-        bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bai"),
-        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
+        bam_markdup = temp("tmp/{ms_sample_name}/{ms_sample_name}_markdup.bam"),
+        bai_markdup = temp("tmp/{ms_sample_name}/{ms_sample_name}_markdup.bai"),
+        dup_metrics = "metrics/{ms_sample_name}/{ms_sample_name}_markdup_metrics.txt"
     shell:
         """
         picard MarkDuplicates \
@@ -76,11 +76,11 @@ rule ms_mark_duplicates:
 # Generates alignment metrics
 rule ms_alignment_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam"
+        bam = "tmp/{ms_sample_name}/{ms_sample_name}_markdup.bam"
     output:
-        stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt",
-        insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
-        insert_hist = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
+        stats = "metrics/{ms_sample_name}/{ms_sample_name}_alignment_stats.txt",
+        insert_metrics = "metrics/{ms_sample_name}/{ms_sample_name}_insert_size_metrics.txt",
+        insert_hist = "metrics/{ms_sample_name}/{ms_sample_name}_insert_size_histogram.pdf"
     shell:
         """
         # Generate alignment stats

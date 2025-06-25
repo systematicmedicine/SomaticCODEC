@@ -27,9 +27,9 @@ def test_ms_alignment_output_exists(clean_workspace_fixture):
     subprocess.run(snakemake_cmd)
 
     # Check for expected output
-    ms_samples = pd.read_csv("tests/configs/test_ms_fastq2alignment_samples.csv")["ms_sample"].to_list()
+    ms_sample_name = pd.read_csv("tests/configs/test_ms_fastq2alignment_samples.csv")["ms_sample_name"].to_list()
 
-    for sample in ms_samples:
+    for sample in ms_sample_name:
         bam_path = Path("tmp") / sample / f"{sample}_markdup.bam"
 
         # Check if markdup bam exists
