@@ -12,17 +12,20 @@ Author: Joshua Johnstone
 
 """
 
-# Create lists of matched sample raw FASTQ files
-ms_raw_fastq_dict = pd.read_csv(config["ms_samples_path"]).set_index("ms_sample").to_dict(orient="index")
+# Create dict of matched sample raw FASTQ files
+ms_raw_fastq_dict = (
+    ms_samples.set_index("ms_sample_name")[["fastq1", "fastq2"]]
+    .to_dict(orient="index")
+)
 
 # Generates a fastqc report for the demuxed FASTQs
 rule ms_fastqc_raw:
     input:
-        r1 = lambda wildcards: ms_raw_fastq_dict[wildcards.ms_sample]["fastq1"],
-        r2 = lambda wildcards: ms_raw_fastq_dict[wildcards.ms_sample]["fastq2"]
+        r1 = lambda wc: pd.read_csv(config["ms_samples_path"]).query(f"ms_sample_name == '{wc.ms_sample_name}'")["fastq1"].values[0],
+        r2 = lambda wc: pd.read_csv(config["ms_samples_path"]).query(f"ms_sample_name == '{wc.ms_sample_name}'")["fastq2"].values[0]
     output:
-        r1_report = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html"
+        r1_report = "metrics/{ms_sample_name}/{ms_sample_name}_r1_raw_fastqc.html",
+        r2_report = "metrics/{ms_sample_name}/{ms_sample_name}_r2_raw_fastqc.html"
     threads: 
         max(1, os.cpu_count() // 16)
     shell:
@@ -30,10 +33,10 @@ rule ms_fastqc_raw:
         r1_base=$(basename {input.r1} .fastq.gz)
         r2_base=$(basename {input.r2} .fastq.gz)
         
-        fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
+        fastqc -t {threads} -o metrics/{wildcards.ms_sample_name} {input.r1} {input.r2}
 
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
+        mv metrics/{wildcards.ms_sample_name}/${{r1_base}}_fastqc.html {output.r1_report}
+        mv metrics/{wildcards.ms_sample_name}/${{r2_base}}_fastqc.html {output.r2_report}
         """
 
 # Trims and filters reads
@@ -43,12 +46,12 @@ rule ms_fastqc_raw:
     # Removes reads less than 100bp after trimming
 rule ms_trim_filter:
     input:
-        r1 = lambda wildcards: ms_raw_fastq_dict[wildcards.ms_sample]["fastq1"],
-        r2 = lambda wildcards: ms_raw_fastq_dict[wildcards.ms_sample]["fastq2"]
+        r1 = lambda wc: pd.read_csv(config["ms_samples_path"]).query(f"ms_sample_name == '{wc.ms_sample_name}'")["fastq1"].values[0],
+        r2 = lambda wc: pd.read_csv(config["ms_samples_path"]).query(f"ms_sample_name == '{wc.ms_sample_name}'")["fastq2"].values[0]
     output:
-        r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
-        r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv"
+        r1 = temp("tmp/{ms_sample_name}/{ms_sample_name}_trimfilter_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample_name}/{ms_sample_name}_trimfilter_r2.fastq.gz"),
+        report = "metrics/{ms_sample_name}/{ms_sample_name}_trimfilter_metrics.tsv"
     threads: 
         max(1, os.cpu_count() // 4)
     shell: 
@@ -72,11 +75,11 @@ rule ms_trim_filter:
 # Generates a fastqc report for processed reads
 rule ms_fastqc_processed:
     input:
-        r1 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
+        r1 = "tmp/{ms_sample_name}/{ms_sample_name}_trimfilter_r1.fastq.gz",
+        r2 = "tmp/{ms_sample_name}/{ms_sample_name}_trimfilter_r2.fastq.gz"
     output:
-        r1_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html"
+        r1_report = "metrics/{ms_sample_name}/{ms_sample_name}_trimfilter_r1_fastqc.html",
+        r2_report = "metrics/{ms_sample_name}/{ms_sample_name}_trimfilter_r2_fastqc.html"
     threads:
         max(1, os.cpu_count() // 16)
     shell:
@@ -84,8 +87,8 @@ rule ms_fastqc_processed:
         r1_base=$(basename {input.r1} .fastq.gz)
         r2_base=$(basename {input.r2} .fastq.gz)
         
-        fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
+        fastqc -t {threads} -o metrics/{wildcards.ms_sample_name} {input.r1} {input.r2}
 
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
+        mv metrics/{wildcards.ms_sample_name}/${{r1_base}}_fastqc.html {output.r1_report}
+        mv metrics/{wildcards.ms_sample_name}/${{r2_base}}_fastqc.html {output.r2_report}
         """
