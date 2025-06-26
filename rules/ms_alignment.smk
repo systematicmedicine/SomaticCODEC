@@ -29,16 +29,14 @@ rule ms_raw_alignment:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        # Get lane information from headers
-        lane=$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4)
-
-        # Define read groups (sample ID, sample name, library, platform, platform unit)
-        read_group="@RG\\tID:{wildcards.ms_sample}_${{lane}}\\tSM:{wildcards.ms_sample}\\tLB:{wildcards.ms_sample}_lib\\tPL:ILLUMINA\\tPU:{wildcards.ms_sample}.${{lane}}"
-
         # Add read groups and align
         bwa-mem2 mem \
             -t {threads} \
-            -R "$read_group" \
+            -R "@RG\\tID:{wildcards.ms_sample}_$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4)"\\
+"\\tSM:{wildcards.ms_sample}"\\
+"\\tLB:{wildcards.ms_sample}_lib"\\
+"\\tPL:ILLUMINA"\\
+"\\tPU:{wildcards.ms_sample}.$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4)" \
             {input.ref} \
             {input.r1_processed} \
             {input.r2_processed} | \
