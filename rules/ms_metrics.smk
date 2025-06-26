@@ -127,3 +127,16 @@ rule masking_metrics:
             printf "%s\\t%s\\t%s%%\\n" "$name" "$masked_bp" "$pct" >> {output.mask_metrics}
         done
         """
+
+# calculate the het/hom ratio from ms vcf
+rule ms_het_hom_ratio:
+    input:
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
+    output:
+        txt = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
+    shell 
+    """
+    ../scripts/het_hom_ratio.sh
+
+    """
+
