@@ -40,12 +40,12 @@ combined_metrics_values <- do.call(rbind, metric_dataframes) %>%
   # Add ms or ex to metric names based on sample type
   mutate(metric = case_when(
     sample_type == "Experimental" ~ paste0("ex_", metric),
-    sample_type == "Matched" ~ paste0("ms_", metric))) %>% 
+    sample_type == "Matched" ~ paste0("ms_", metric)))
 
 # Create metrics report data frame
 component_metrics_report <- combined_metrics_values %>% 
-  # Join with component metrics, keeping only relevant rows
-  left_join(component_metrics, by = c("metric", "sample_type")) %>% 
+  # Join with component metrics, keeping only relevant metrics
+  inner_join(component_metrics, by = c("metric", "sample_type")) %>% 
   mutate(nn = ifelse(value >= nn_lower & value <= nn_upper, "PASS", "FAIL"),
          ideal = ifelse(value >= ideal_lower & value <= ideal_upper, "PASS", "FAIL")) %>% 
   arrange(metric, sample)
