@@ -3,13 +3,13 @@
 
 Rules for aligning umapped, non-deduplicated reads to reference genome, for experimental samples
 
-Input: Processed (trimmed and length filtered) FASTQ files
+Input: Processed (demuxed, trimmed and length filtered) FASTQ files
 Output: Reads aligned to a reference genome (BAM) 
 
 Author: James Phie
 
 """
-# Creates an aligned bam from trimmed and filtered fastq files. Softclipping allowed.
+# Align inserts (from demuxed, trimmed and length filtered fastqs) to reference genome
 rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
@@ -30,7 +30,11 @@ rule ex_map:
         samtools view -@ {threads} -bS -o {output.bam} -
         """
 
-# Filters reads that are not correctly paired (ie. on the same chromosome within ~500bp, in the correct directions - likely codecseq intermolecular byproducts)
+# Filters mapped bam files to remove intermolecular byproducts and retain correct products
+    # Included read pairs must be:
+        # Mapped on the same chromosome
+        # Mapped within 500bp
+        # Read in the correct directions
 rule ex_filter_correct:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
@@ -41,15 +45,4 @@ rule ex_filter_correct:
     shell:
         """
         samtools view -b -f 0x2 {input.bam} > {output.bam}
-        """
-
-# Collects alignment metrics from the aligned bam using samtools flagstat
-rule ex_map_metrics:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
-    output:
-        txt = "metrics/{ex_sample}/{ex_sample}_map_metrics.txt"
-    shell:
-        """
-        samtools flagstat {input.bam} > {output.txt}
         """

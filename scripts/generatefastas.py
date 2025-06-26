@@ -14,11 +14,11 @@ from pathlib import Path
 import re
 
 samples = snakemake.params.samples
-adapters = pd.read_csv(snakemake.input.adapters).set_index("adapter")
+adapters = pd.read_csv(snakemake.input.adapters).set_index("ex_adapter")
 
 # Map output paths back to (lane, region) using the filename
 output_map = {}
-pattern = re.compile(r"(?P<lane>[^_/]+)_(?P<region>r[12](start|end))\.fasta")
+pattern = re.compile(r"(?P<lane>[^_/]+)_(?P<region>r[12]_(start|end))\.fasta")
 
 for path in snakemake.output:
     match = pattern.search(Path(path).name)
@@ -29,7 +29,7 @@ for path in snakemake.output:
 
 # Write each output FASTA using snakemake.output
 for (lane, region), output_path in output_map.items():
-    lane_samples = samples[samples["ex_lane"] == lane]
+    lane_samples = samples[samples["lane"] == lane]
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, "w") as f:
