@@ -36,5 +36,6 @@ pytest
 ```
 -v # verbose output, shows which test function/s failed within each test_.py file
 -s # Shows all stdout/stderr output, useful when troubleshooting
+-k {test_function_name} # Runs only tests with names matching {test_function_name}
 
 ```
