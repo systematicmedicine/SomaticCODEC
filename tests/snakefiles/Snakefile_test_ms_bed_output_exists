@@ -1,7 +1,7 @@
 """
---- Snakefile_test_ms_bed_creation ---
+--- Snakefile_test_ms_bed_output_exists ---
 
-Test Snakefile to be used with test_ms_bed_creation.py
+Test Snakefile to be used with test function test_ms_bed_output_exists
 
 Runs matched sample pipeline from BAM and VCF files to creating bed files
 
@@ -27,4 +27,5 @@ include: "../../rules/masked_regions.smk"
 rule all:
     input:
         expand("tmp/{ms_sample}/{ms_sample}_lowdepth.bed", ms_sample = ms_samples["ms_sample"].tolist()),
-        expand("tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed", ms_sample = ms_samples["ms_sample"].tolist())
+        expand("tmp/{ms_sample}/{ms_sample}_GL_variants_snv_format.bed", ms_sample = ms_samples["ms_sample"].tolist())
+

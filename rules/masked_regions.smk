@@ -53,15 +53,31 @@ rule ms_germline_variants_bed:
         zcat {input.vcf} | vcf2bed --snvs > {output.ms_germ_snv_bed}
         """
 
+rule format_germline_variant_beds:
+    input:
+        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
+        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed"
+    output:
+        ms_germ_del_bed_format = temp("tmp/{ms_sample}/{ms_sample}_GL_variants_del_format.bed"),
+        ms_germ_ins_bed_format = temp("tmp/{ms_sample}/{ms_sample}_GL_variants_ins_format.bed"),
+        ms_germ_snv_bed_format = temp("tmp/{ms_sample}/{ms_sample}_GL_variants_snv_format.bed")
+    shell:
+        """
+        cut -f1-3 {input.ms_germ_del_bed} > {output.ms_germ_del_bed_format}
+        cut -f1-3 {input.ms_germ_ins_bed} > {output.ms_germ_ins_bed_format}
+        cut -f1-3 {input.ms_germ_snv_bed} > {output.ms_germ_snv_bed_format}        
+        """
+
 # Combines all masks into one BED file
 rule ms_combine_masks:
     input:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed"
+        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del_format.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins_format.bed",
+        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv_format.bed"
     output:
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed" # Make temporary once pipeline development is complete
     shell:
@@ -71,7 +87,7 @@ rule ms_combine_masks:
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \
         {input.ms_germ_ins_bed} \
-        {input.ms_germ_snv_bed} \
+        {input.ms_germ_snv_bed} | \
         sort -k1,1 -k2,2n | \
         bedtools merge -i - > {output.combined_bed}
         """
