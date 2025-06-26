@@ -1,7 +1,7 @@
 """
---- Snakefile_test_ms_bed_output ---
+--- Snakefile_test_bed_output ---
 
-Test Snakefile to be used with test function test_ms_bed_output
+Test Snakefile to be used with test function test_bed_output
 
 Runs matched sample pipeline from BAM and VCF files to creating bed files and combining them
 

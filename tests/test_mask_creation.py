@@ -1,6 +1,6 @@
 
 """
---- test_ms_masking.py ---
+--- test_mask_creation.py ---
 
 Function for testing if BED files can be:
     - Created from ms BAM and VCF files
@@ -16,10 +16,10 @@ import pandas as pd
 import shutil
 
 # Tests Tests if non-empty BED files can be created and combined with pre-made BEDs
-def test_ms_bed_output(clean_workspace_fixture):
+def test_bed_output(clean_workspace_fixture):
 
     # Copy BAM and VCF files into S001/tmp directory
-    ms_sample = pd.read_csv("tests/configs/test_ms_bed_output_samples.csv")["ms_sample"].to_list()
+    ms_sample = pd.read_csv("tests/configs/test_bed_output_samples.csv")["ms_sample"].to_list()
 
     for sample in ms_sample:
 
@@ -51,9 +51,9 @@ def test_ms_bed_output(clean_workspace_fixture):
     # Run snakemake
     snakemake_cmd = [
         "snakemake",
-        "-s", "tests/snakefiles/Snakefile_test_ms_bed_output",
+        "-s", "tests/snakefiles/Snakefile_test_bed_output",
         "--cores", "all",
-        "--configfile", "tests/configs/test_ms_bed_output_config.yaml",
+        "--configfile", "tests/configs/test_bed_output_config.yaml",
         "--notemp",
         "--forceall",
         "--rerun-incomplete"
