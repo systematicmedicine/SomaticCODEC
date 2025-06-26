@@ -99,9 +99,9 @@ rule masking_metrics:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv.bed",
+        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del_format.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins_format.bed",
+        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv_format.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
         ref_index = config['GRCh38_path'] + ".fai"
     output:

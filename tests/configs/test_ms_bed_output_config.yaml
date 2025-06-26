@@ -1,4 +1,4 @@
-ms_samples_path: tests/configs/test_ms_bed_output_exists_samples.csv
+ms_samples_path: tests/configs/test_ms_bed_output_samples.csv
 GRCh38_path: tests/data/micro_GRCh38_Chr1_1Mbp.fa
 difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions_10lines.bed
 common_variants_path: tmp/downloads/gnomad_common_af01_merged_10lines.bed

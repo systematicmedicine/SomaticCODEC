@@ -29,4 +29,4 @@ def clean_workspace_fixture():
 
     yield
 
-    #clean_workspace()   
+    clean_workspace()   
