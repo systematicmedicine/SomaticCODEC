@@ -12,7 +12,7 @@ import pytest
 
 # Deletes all files except for .gitkeep from metrics, results, and tmp folders
 def clean_workspace():
-    for folder in ["metrics", "results", "tmp"]:
+    for folder in ["metrics", "results", "tmp", ".snakemake"]:
         path = Path(folder)
         for item in path.iterdir():
             if item.name != ".gitkeep":
