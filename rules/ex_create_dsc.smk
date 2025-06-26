@@ -13,73 +13,68 @@ Output: Double stranded consensus
 Author: James Phie
 
 """
-
-#Move UMI from readname to RX:Z: tag and sort by name for UMI consensus steps
-rule ex_umitag:
+# Annotate the aligned bam with correct product to be umi aware for duplex sequencing
+    # Move umi from readname to RX:Z: tag
+    # Add mate information to read pairs 
+    # Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
+    # Assign general sample and read group related metadata for downstream tools
+rule ex_annotate_umi:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi1.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi.bam"),
+        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt"
     threads:
         max(1, os.cpu_count() // 16)
     resources:
         mem = 32
+    params:
+        ex_sample = lambda wc: wc.ex_sample
     shell:
         """
+        set -euo pipefail
+
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             CopyUmiFromReadName \
             -i {input.bam} \
             -o /dev/stdout \
             --remove-umi true | \
-        samtools sort -n -@ {threads} -o {output.bam}
-        """
-# Adds mate information to PE reads (e.g. read 1's information to read 2, read 2's information to read 1). Tags include MC:Z:, MQ:i, RNEXT, PNEXT, TLEN, FLAGs. These tags are required for groupbyUMI, SSC and DSC. 
-rule ex_addmate:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_umi1.bam"
-    output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi2.bam")
-    resources:
-        mem = 32
-    shell:
-        """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
-        SetMateInformation \
-        -i {input.bam} \
-        -o {output.bam}
-        """
 
-# Uses UMI tags (RX:Z:<UMI>) to assign identical MI tags to any reads within 1 edit distance of each other, for later SSC and DSC collapse.  
-rule ex_groupbyumi:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_umi2.bam"
-    output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi3.bam"),
-        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt"
-    threads:
-        max(1, os.cpu_count() // 16)
-    resources:
-        mem = 32
-    shell:
-        """
+        samtools sort -n -@ {threads} -o /dev/stdout | \
+
+        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+            SetMateInformation \
+            -i /dev/stdin \
+            -o /dev/stdout | \
+
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             --compression 1 --async-io \
             GroupReadsByUmi \
             --min-umi-length 6 \
-            -i {input.bam} \
-            -o {output.bam} \
+            -i /dev/stdin \
+            -o /dev/stdout \
             -f {output.histogram} \
             -@ {threads} \
             -m 0 \
-            --strategy=adjacency
+            --strategy=adjacency | \
+
+        picard AddOrReplaceReadGroups \
+            I=/dev/stdin \
+            O={output.bam} \
+            RGID={params.ex_sample} \
+            RGLB=lib1 \
+            RGPL=illumina \
+            RGPU=unit1 \
+            RGSM={params.ex_sample} \
+            VALIDATION_STRINGENCY=LENIENT
         """
 
-# Sort MI marked bam (before duplicate collapse) by coordinates for callcodecconsensusreads
-rule ex_sort_for_dsc:
+# Sort umi aware bam by coordinates for duplex consensus calling
+rule ex_sort_by_template:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_umi3.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map_umi.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi3_sorted.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi_sorted.bam")
     resources:
         mem = 16
     shell:
@@ -91,10 +86,14 @@ rule ex_sort_for_dsc:
             -s TemplateCoordinate
         """
 
-# Call codec consensus reads using MI marked bam (before duplicate collapse)
-rule ex_dsc:
+# Create duplex consensus bam using molecular identifiers
+    # All read 1's, and all read 2's belonging to a single molecular identifier are collapsed for single strand consensus (PCR duplicates)
+    # All read 1 consensus and read 2 consensus belonging to a single molecular identifier are collapsed for duplex strand consensus 
+    # Single stranded overhangs are retained for alignment purposes, but a Q of 2 is assigned to all single strand bases
+    # Reads with >4 disagreements between overlapping paired end reads are excluded
+rule ex_call_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_umi3_sorted.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map_umi_sorted.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam")
     resources:
@@ -108,42 +107,12 @@ rule ex_dsc:
             -M 1
         """
 
-# Add read group information to the dsc bam file (not particularly useful information, but required by downstream tools)
-rule ex_addrg:
+# Align the dsc to the reference genome as sequences have changed
+    # Single stranded overhangs are present in this bam to assist with alignment (filtered out during variant calling with base quality filter)
+    # Aligned bam is sorted by readname for downstream annotation
+rule ex_remap_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"
-    output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam")
-    params:
-        ex_sample = lambda wildcards: wildcards.ex_sample
-    shell:
-        """
-        picard AddOrReplaceReadGroups \
-            I={input.bam} \
-            O={output.bam} \
-            RGID={params.ex_sample} \
-            RGLB=lib1 \
-            RGPL=illumina \
-            RGPU=unit1 \
-            RGSM={params.ex_sample} \
-            VALIDATION_STRINGENCY=LENIENT
-        """
-
-# Convert the unmapped dsc bam to an unmapped fastq file for realignment 
-rule ex_dsc_bam_to_fastq:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam"
-    output:
-        fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.fastq")
-    shell:
-        """
-        samtools fastq {input.bam} > {output.fastq}
-        """
-
-# Align the dsc (with ss overhangs) to the reference genome as sequences have changed, and sort by readname (querynamesort)
-rule ex_map_dsc:
-    input:
-        fq = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.fastq",
+        bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
         ref = config["GRCh38_path"],
         amb = config["GRCh38_path"] + ".amb",
         ann = config["GRCh38_path"] + ".ann",
@@ -156,15 +125,16 @@ rule ex_map_dsc:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fq} | \
-        samtools sort -n -@ {threads} -o {output.bam} -
+        samtools fastq {input.bam} | \
+        bwa-mem2 mem -t {threads} -Y {input.ref} - | \
+        samtools sort -n -@ {threads} -o {output.bam}
         """
 
 # Add metadata from unmapped dsc bam back to the mapped dsc bam
-rule ex_zipdata: 
+rule ex_annotate_dsc: 
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
-        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc_rg.bam",
+        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
@@ -187,54 +157,16 @@ rule ex_zipdata:
         && samtools index {output.bam} -@ {threads}
         """
 
-
-# Filter the dsc bam for mapQ <= 60 (##Remove index step when filtered.bam is created)
-rule ex_filtermapQ_dsc:
+# Filter the dsc bam to prepare for variant calling 
+    # Remove reads with mapQ <= 60
+rule ex_filter_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam"),
-        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam.bai")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
+        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
     shell:
         """
         samtools view -b -q 60 {input.bam} > {output.bam}
         samtools index {output.bam}
-        """
-
-#Filter the dsc bam for any reads with alternative alignments of greater than 60% of main alignment
-
-###
-###
-###
-###
-
-# Add a rule to filter dsc for only duplex bases (ie. remove single strand overhangs and R1R2 disagreements) - functionality not yet built into CallCodecConsensusReads
-#rule ex_filterduplex_dsc:
-    #input:
-        #bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam"
-    #output:
-        #bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam")
-    #shell:
-        #CallCodecConsensusReads filter R1R2 disagree, filter ss overhangs
-
-# Depth and genome territory covered, applied to the dsc bam. Currently without filtering, so this includes single strand overhangs (ie. not true duplex depth)
-rule ex_dscdepth_metrics:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam", #Update to "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam" once fgbio is complete
-        ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai",
-        dictf = config["GRCh38_path"].replace(".fna", ".dict")
-    output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt",
-    resources:
-        mem = 30
-    shell:
-        """
-        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
-            CollectWgsMetrics \
-            I={input.bam} \
-            O={output.metrics} \
-            R={input.ref} \
-            INCLUDE_BQ_HISTOGRAM=true \
-            MINIMUM_BASE_QUALITY=30
         """

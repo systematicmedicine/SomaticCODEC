@@ -34,10 +34,9 @@ os.chdir(workflow.basedir)
 
 # Load additional config data
 ex_samples = pd.read_csv(config["ex_samples_path"])
-ex_adapters = pd.read_csv(config["ex_adapters_path"])
 ms_samples = pd.read_csv(config["ms_samples_path"])
-component_metrics = pd.read_csv(config["component_metrics_path"])
 ex_lanes = pd.read_csv(config["ex_lanes_path"])
+component_metrics = pd.read_csv(config["component_metrics_path"])
 
 # Include rules files
 include: "rules/ms_preprocess_fastq.smk"
