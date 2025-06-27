@@ -10,7 +10,7 @@ Authors:
 """
 
 # Generates a fastqc report for demuxed ms FASTQs
-rule ms_fastqc_raw:
+rule ms_raw_fastq_metrics:
     input:
         r1 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq1"].values[0],
         r2 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq2"].values[0]
@@ -31,7 +31,7 @@ rule ms_fastqc_raw:
         """
 
 # Generates a fastqc report for ms processed reads
-rule ms_fastqc_processed:
+rule ms_processed_fastq_metrics:
     input:
         r1 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
         r2 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
@@ -54,7 +54,7 @@ rule ms_fastqc_processed:
 # Generates ms alignment metrics
 rule ms_alignment_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_markdup.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_markdup_map.bam"
     output:
         stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt",
         insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
@@ -71,10 +71,10 @@ rule ms_alignment_metrics:
             H={output.insert_hist}  
         """ 
 
-# Create metrics for unfiltered ms germline variant calls
-rule ms_variant_call_unfiltered_metrics:
+# Generates metrics for candidate (unfiltered) ms germline variants
+rule ms_candidate_variant_metrics:
     input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
         stat = "metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt"
     shell:
@@ -82,10 +82,10 @@ rule ms_variant_call_unfiltered_metrics:
         bcftools stats {input.vcf} > {output.stat}
         """
 
-# Create metrics for filtered ms germline variants
-rule ms_variant_call_filtered_metrics:
+# Generates metrics for filtered ms germline variants
+rule ms_filtered_variant_metrics:
     input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filtered_variants.vcf.gz"
     output:
         stat = "metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt"
     shell:
@@ -99,9 +99,9 @@ rule masking_metrics:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_del_format.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_ins_format.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_GL_variants_snv_format.bed",
+        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
+        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
+        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
         ref_index = config['GRCh38_path'] + ".fai"
     output:

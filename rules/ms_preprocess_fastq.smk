@@ -3,10 +3,10 @@
 
 Rules for performing fastqc, adaptor trimming, and quality filtering on demuxed ms FASTQs.
 
-Input: Demuxed FASTQ files generated from Illumina sequencing of Illumina PCR-free libraries 
+Input: 
+    - Demuxed FASTQ files generated from Illumina sequencing of Illumina PCR-free libraries 
 Outputs: 
     - Processed ms FASTQ files
-    - Metrics files
 
 Author: Joshua Johnstone
 
@@ -17,7 +17,7 @@ Author: Joshua Johnstone
     # Trims poly-G artifacts (>10 Gs at 3' end)
     # Trims bases of quality <20 from read ends
     # Removes reads less than 100bp after trimming
-rule ms_trim_filter:
+rule ms_trim_filter_fastqs:
     input:
         r1 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq1"].values[0],
         r2 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq2"].values[0]
