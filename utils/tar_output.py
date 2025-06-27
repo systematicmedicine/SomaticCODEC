@@ -40,7 +40,8 @@ archive_structure = {
     "rules": "Methods/rules",
     "scripts": "Methods/scripts",
     "config": "Methods/config",
-    "Snakefile": "Methods/Snakefile"
+    "Snakefile": "Methods/Snakefile",
+    "run_pipeline.sh" : "Methods/run_pipeline.sh"
 }
 
 # Create the archive
