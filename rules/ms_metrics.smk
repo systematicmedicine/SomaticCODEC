@@ -71,7 +71,7 @@ rule ms_alignment_metrics:
             H={output.insert_hist}  
         """ 
 
-# Create metrics for candidate (unfiltered) ms germline variants
+# Generates metrics for candidate (unfiltered) ms germline variants
 rule ms_candidate_variant_metrics:
     input: 
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz"
@@ -82,7 +82,7 @@ rule ms_candidate_variant_metrics:
         bcftools stats {input.vcf} > {output.stat}
         """
 
-# Create metrics for filtered ms germline variants
+# Generates metrics for filtered ms germline variants
 rule ms_filtered_variant_metrics:
     input: 
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_filtered_variants.vcf.gz"
