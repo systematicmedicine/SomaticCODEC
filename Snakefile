@@ -39,6 +39,9 @@ ex_adapters = pd.read_csv(config["ex_adapters_path"])
 ms_samples = pd.read_csv(config["ms_samples_path"])
 component_metrics = pd.read_csv(config["component_metrics_path"])
 
+# Add sample adapter sequences to ex_samples dataframe
+ex_samples = ex_samples.merge(ex_adapters.rename(columns={"ex_adapter": "adapter"}),on="adapter",how="left")
+
 # Creates dictionaries to lookup between ex_lane and ex_sample
 ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
 ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict() #Currently broken in ex_preprocess_fastq, but used in ex_metrics
