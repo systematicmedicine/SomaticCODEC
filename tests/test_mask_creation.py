@@ -26,10 +26,10 @@ def test_bed_output(clean_workspace_fixture):
         target_dir = Path("tmp") / sample
         target_dir.mkdir(exist_ok=True)
 
-        files_to_copy = [f"{sample}_markdup.bam",
-                         f"{sample}_markdup.bai",
-                         f"{sample}_ms_filter_pass_variants.vcf.gz",
-                         f"{sample}_ms_filter_pass_variants.vcf.gz.tbi"]
+        files_to_copy = [f"{sample}_markdup_map.bam",
+                         f"{sample}_markdup_map.bai",
+                         f"{sample}_ms_filtered_variants.vcf.gz",
+                         f"{sample}_ms_filtered_variants.vcf.gz.tbi"]
 
         for filename in files_to_copy:
             source = Path("tests/data") / filename
@@ -62,8 +62,6 @@ def test_bed_output(clean_workspace_fixture):
     subprocess.run(snakemake_cmd)
 
     # Check for expected output
-    
-
     for sample in ms_sample:      
         # Define mask metrics path
         mask_metrics_path = Path("metrics") / sample / f"{sample}_mask_metrics.txt"
