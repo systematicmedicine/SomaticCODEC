@@ -47,32 +47,25 @@ rule ms_decompose_variants:
         tabix -p vcf {output.vcf}
         """
 
-# Select SNVs from decomposed VCF
-rule ms_select_snvs:
+# Flags SNVs for filtering
+rule ms_flag_snvs:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_decomposed_variants.vcf.gz",
         ref = config["GRCh38_path"]
     output:
-        SNVs = temp("tmp/{ms_sample}/{ms_sample}_ms_selected_snvs.vcf.gz")
+        SNV_flagged = temp("tmp/{ms_sample}/{ms_sample}_ms_flagged_snvs.vcf.gz")
+    params:
+        intermediate_vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_selected_snvs.vcf.gz")
     shell:
         """
         gatk SelectVariants \
           -R {input.ref} \
           -V {input.vcf} \
           --select-type-to-include SNP \
-          -O {output.SNVs}
-        """
+          -O {params.intermediate_vcf}
 
-# Flags SNVs for filtering
-rule ms_flag_snvs:
-    input:
-        SNVs = "tmp/{ms_sample}/{ms_sample}_ms_selected_snvs.vcf.gz"
-    output:
-        SNV_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_flagged_snvs.vcf.gz")
-    shell:
-        """
         gatk VariantFiltration \
-          -V {input.SNVs} \
+          -V {params.intermediate_vcf} \
           -filter "QD < 2.0" --filter-name "QD2" \
           -filter "QUAL < 30.0" --filter-name "QUAL30" \
           -filter "SOR > 3.0" --filter-name "SOR3" \
@@ -80,40 +73,33 @@ rule ms_flag_snvs:
           -filter "MQ < 40.0" --filter-name "MQ40" \
           -filter "MQRankSum < -12.5" --filter-name "MQRankSum-12.5" \
           -filter "ReadPosRankSum < -8.0" --filter-name "ReadPosRankSum-8" \
-          -O {output.SNV_filtered}
+          -O {output.SNV_flagged}
         """
 
-# Selects indels from decomposed vcf
-rule ms_select_indels:
+# Flags indels for filtering
+rule ms_flag_indels:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_decomposed_variants.vcf.gz",
         ref = config["GRCh38_path"]
     output:
-        INDELs = temp("tmp/{ms_sample}/{ms_sample}_ms_selected_indels.vcf.gz")
+        INDEL_flagged = temp("tmp/{ms_sample}/{ms_sample}_ms_flagged_indels.vcf.gz")
+    params:
+        intermediate_vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_selected_indels.vcf.gz")
     shell:
         """
         gatk SelectVariants \
           -R {input.ref} \
           -V {input.vcf} \
           --select-type-to-include INDEL \
-          -O {output.INDELs}
-        """
+          -O {params.intermediate_vcf}
 
-# Flags indels for filtering
-rule ms_flag_indels:
-    input:
-        INDELs = "tmp/{ms_sample}/{ms_sample}_ms_selected_indels.vcf.gz"
-    output:
-        INDEL_filtered = temp("tmp/{ms_sample}/{ms_sample}_ms_flagged_indels.vcf.gz")
-    shell:
-        """
         gatk VariantFiltration \
-          -V {input.INDELs} \
+          -V {params.intermediate_vcf} \
           -filter "QD < 2.0" --filter-name "QD2" \
           -filter "QUAL < 30.0" --filter-name "QUAL30" \
           -filter "FS > 200.0" --filter-name "FS200" \
           -filter "ReadPosRankSum < -20.0" --filter-name "ReadPosRankSum-20" \
-          -O {output.INDEL_filtered}
+          -O {output.INDEL_flagged}
         """
 
 # Merge flagged vcfs (SVNs and indels)
