@@ -128,10 +128,25 @@ rule masking_metrics:
         done
         """
 
-rule ms_component_metrics_report:
+# calculate the het/hom ratio from ms vcf
+rule ms_het_hom_ratio:
     input:
-        final_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist())
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
     output:
-        report = "metrics/component_metrics_report.csv"
-    script:
-        "scripts/component_metrics_report.R"
+        txt = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
+    shell: 
+        """
+        bcftools query -f '[%GT\\n]' {input.vcf} \\
+            | sort | uniq -c \\
+            | awk '
+                {{
+                    if ($2 == "0/1" || $2 == "1/0" || $2 == "1/2") het += $1;
+                    else if ($2 == "1/1") hom += $1;
+                }}
+                END {{
+                    print "Heterozygous_count", "Homozygous_count", "Het/Hom_Ratio";
+                    het += 0; hom += 0;
+                    print het, hom, (hom > 0 ? het / hom : "NA");
+                }}
+            ' OFS="\\t" > {output.txt}
+        """
