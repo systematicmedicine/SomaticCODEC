@@ -28,7 +28,7 @@ include: "rules/masked_regions.smk"
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("tmp/{ms_sample}/{ms_sample}_combined_mask.bed", ms_sample = ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("tmp/{ms_sample}/{ms_sample}_combined_mask.bed", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_samples["ms_sample"].tolist()),
