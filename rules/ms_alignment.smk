@@ -3,16 +3,16 @@
 
 Rules for performing a raw alignment with matched sample processed reads
 
-Input: Processed ms FASTQ files
+Input: 
+    - Processed ms FASTQ files
 Outputs: 
-    - ms raw alignment BAM
-    - Metrics files
+    - Reads aligned to GCRh38, sorted and marked duplicates
 
 Author: Joshua Johnstone
 
 """
 
-# Aligns reads to reference
+# Aligns reads to reference genome
 rule ms_raw_alignment:
     input: 
         ref = config['GRCh38_path'],
@@ -24,7 +24,7 @@ rule ms_raw_alignment:
         r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
-        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam" # Change to temp once pipeline development is complete
+        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam" # Change to temp once pipeline development is complete
     threads: 
         max(1, os.cpu_count() // 4)
     shell:
@@ -46,9 +46,9 @@ rule ms_raw_alignment:
 # Sorts bam by coordinate
 rule ms_sort_bam:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_aligned.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
     output:
-        bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted.bam")
+        bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam")
     threads: 
         max(1, os.cpu_count() // 8)
     shell:
@@ -57,11 +57,11 @@ rule ms_sort_bam:
 # Marks duplicate reads in bam file
 rule ms_mark_duplicates:
     input:
-        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted.bam"
+        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
     output:
-        bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bam"),
-        bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup.bai"),
-        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
+        bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
+        bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bai"),
+        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_map_metrics.txt"
     shell:
         """
         picard MarkDuplicates \
