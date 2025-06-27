@@ -134,7 +134,7 @@ rule ms_het_hom_ratio:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
     output:
         txt = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
-    shell 
+    shell: 
     """
     ../scripts/het_hom_ratio.sh
 
