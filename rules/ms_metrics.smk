@@ -135,8 +135,18 @@ rule ms_het_hom_ratio:
     output:
         txt = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
     shell: 
-    """
-    ../scripts/het_hom_ratio.sh
-
-    """
-
+        """
+        bcftools query -f '[%GT\\n]' {input.vcf} \\
+            | sort | uniq -c \\
+            | awk '
+                {{
+                    if ($2 == "0/1" || $2 == "1/0" || $2 == "1/2") het += $1;
+                    else if ($2 == "1/1") hom += $1;
+                }}
+                END {{
+                    print "Heterozygous_count", "Homozygous_count", "Het/Hom_Ratio";
+                    het += 0; hom += 0;
+                    print het, hom, (hom > 0 ? het / hom : "NA");
+                }}
+            ' OFS="\\t" > {output.txt}
+        """
