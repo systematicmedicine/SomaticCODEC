@@ -74,7 +74,7 @@ rule ms_alignment_metrics:
 # Generates metrics for candidate (unfiltered) ms germline variants
 rule ms_candidate_variant_metrics:
     input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_call_germ_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
         stat = "metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt"
     shell:
@@ -127,3 +127,11 @@ rule masking_metrics:
             printf "%s\\t%s\\t%s%%\\n" "$name" "$masked_bp" "$pct" >> {output.mask_metrics}
         done
         """
+
+rule ms_component_metrics_report:
+    input:
+        final_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist())
+    output:
+        report = "metrics/component_metrics_report.csv"
+    script:
+        "scripts/component_metrics_report.R"
