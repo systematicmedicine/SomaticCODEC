@@ -1,50 +1,33 @@
-
 """
---- Snakefile ---
+--- Snakefile_test_ex_fastq_dsc ---
 
-Top-level Snakefile that runs entire pipeline.
-All rules (except rule all) are defined in .smk files in /rules directory.
+Test Snakefile to be used with Snakefile_test_ex_fastq_dsc.py
 
+Runs experimental raw fastq files to generate a duplex strand consensus bam ready for variant calling
 
 Inputs: 
-    - Raw FASTQ files of Illumina sequenced CODEC libraries
-    - Raw FASTQ files of Illumina sequenced matched samples
-    - Reference files (e.g. GRCh38)
+    - 1000 read pairs mapping to Chr1:124500000-125500000
+    - Micro reference (Hg38 covering Chr1:124500000-125500000)
+Output: 
+    - Filtered duplex strand consensus bam ready for variant calling
 
-Outputs:
-    - Called somatic variants
-    - Metrics files
+Author: Joshua Johnstone
 
-Abbreviations:
-    - EX: Experimental samples (CODEC library prep, used to call somatic variants)
-    - MS: Matched samples (Standard Illumina library prep, used to determine germline variants for each person)
-
-Authors:
-    - James Phie
-    - Cameron Fraser
-    - Joshua Johnstone
-    - Benjamin Barry
 """
 
 # Load libraries
 import os
 import pandas as pd
 
-# Set working directory
-os.chdir(workflow.basedir)
-
 # Load additional config data
 ex_samples = pd.read_csv(config["ex_samples_path"])
-ms_samples = pd.read_csv(config["ms_samples_path"])
 ex_lanes = pd.read_csv(config["ex_lanes_path"])
-component_metrics = pd.read_csv(config["component_metrics_path"])
 
 # Include rules files
-include: "rules/ex_preprocess_fastq.smk"
-include: "rules/ex_alignment.smk"
-include: "rules/ex_create_dsc.smk"
-include: "rules/ex_call_somatic.smk"
-include: "rules/index_reference_genome.smk"
+include: "../../rules/ex_preprocess_fastq.smk"
+include: "../../rules/ex_alignment.smk"
+include: "../../rules/ex_create_dsc.smk"
+include: "../../rules/index_reference_genome.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:

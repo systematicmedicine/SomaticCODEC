@@ -57,31 +57,22 @@ rule ex_extract_umis:
     # Use the 18bp sample indices to match to indicated samples, with an allowed error of 2 edit distance
 rule ex_demux:
     input:
-        fastq1 = "tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz",
-        fastq2 = "tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz",
-        r1_start = "tmp/adapter_fastas/{ex_lane}_r1_start.fasta",
-        r2_start = "tmp/adapter_fastas/{ex_lane}_r2_start.fasta"
+        fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
+        fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
+        r1_start = expand("tmp/adapter_fastas/{ex_lane}_r1_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist()),
+        r2_start = expand("tmp/adapter_fastas/{ex_lane}_r2_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist())
     output:
-        json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
-        #demuxed_r1 = lambda wc: expand("tmp/{lane_sample}_r1_demux.fastq.gz", lane_sample=ex_lane_to_sample[wc.ex_lane]),
-        #demuxed_r2 = lambda wc: expand("tmp/{lane_sample}_r2_demux.fastq.gz", lane_sample=ex_lane_to_sample[wc.ex_lane])
+        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist()),
+        demuxed_r1 = expand("tmp/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
+        demuxed_r2 = expand("tmp/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())
+    params:
+        samples = ex_samples,
+        lanes = ex_lanes
     threads:
         max(1, os.cpu_count() // 4)
-    shell:
-        """
-        cutadapt \
-          -j {threads} \
-          --no-indels \
-          -e 2 \
-          -g ^file:{input.r1_start} \
-          -G ^file:{input.r2_start} \
-          --pair-adapters \
-          -o tmp/{{name}}_r1_demux.fastq.gz \
-          -p tmp/{{name}}_r2_demux.fastq.gz \
-          {input.fastq1} {input.fastq2} \
-          --json={output.json} \
-          --action=none \
-        """
+    script:
+        "../scripts/ex_demultiplex_all_lanes.py"
+
 
 # Trim all demultiplexed reads so that only inserts are remaining
     # Trim 5' adapter sequences
@@ -91,7 +82,8 @@ rule ex_demux:
     # Remove any bases with a Q score of <20 from the 3' end
 rule ex_trim:
     input:
-        json = lambda wildcards: f"metrics/{ex_sample_to_lane[wildcards.ex_sample]}/{ex_sample_to_lane[wildcards.ex_sample]}_demux_metrics.json",
+        r1 = "tmp/{ex_sample}_r1_demux.fastq.gz",
+        r2 = "tmp/{ex_sample}_r2_demux.fastq.gz",
         r1_start = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r1_start.fasta",
         r2_start = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r2_start.fasta",
         r1_end = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r1_end.fasta",
@@ -101,8 +93,6 @@ rule ex_trim:
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
         json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     params:
-        r1 = "tmp/{ex_sample}_r1_demux.fastq.gz", # Moved to params as snakemake is not tracking demux inputs
-        r2 = "tmp/{ex_sample}_r2_demux.fastq.gz", # Moved to params as snakemake is not tracking demux inputs
         intermediate_r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters.fastq.gz"),
         intermediate_r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters.fastq.gz")
     threads:
@@ -119,7 +109,7 @@ rule ex_trim:
           -A file:{input.r2_end} \
           -o {params.intermediate_r1} \
           -p {params.intermediate_r2} \
-          {params.r1} {params.r2} \
+          {input.r1} {input.r2} \
           --json={output.json}
 
         cutadapt \
