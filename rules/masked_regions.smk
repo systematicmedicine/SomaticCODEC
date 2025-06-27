@@ -60,14 +60,14 @@ rule format_germline_variant_mask:
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"
     output:
-        ms_germ_del_bed_format = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
-        ms_germ_ins_bed_format = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-        ms_germ_snv_bed_format = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
+        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
+        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
+        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
     shell:
         """
-        cut -f1-3 {input.ms_germ_del_bed} > {output.ms_germ_del_bed_format}
-        cut -f1-3 {input.ms_germ_ins_bed} > {output.ms_germ_ins_bed_format}
-        cut -f1-3 {input.ms_germ_snv_bed} > {output.ms_germ_snv_bed_format}        
+        cut -f1-3 {input.ms_germ_del_bed} > {output.ms_germ_del_bed}
+        cut -f1-3 {input.ms_germ_ins_bed} > {output.ms_germ_ins_bed}
+        cut -f1-3 {input.ms_germ_snv_bed} > {output.ms_germ_snv_bed}        
         """
 
 # Combines all masks into a single BED file

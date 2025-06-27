@@ -26,4 +26,4 @@ include: "../../rules/ms_call_germ.smk"
 
 rule all:
     input:
-        expand("tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz", ms_sample = ms_samples["ms_sample"].tolist())
+        expand("tmp/{ms_sample}/{ms_sample}_ms_filtered_variants.vcf.gz", ms_sample = ms_samples["ms_sample"].tolist())
