@@ -6,7 +6,7 @@ Rules for performing a raw alignment with matched sample processed reads
 Input: 
     - Processed ms FASTQ files
 Outputs: 
-    - Reads aligned to GCRh38, sorted and marked duplicates
+    - BAM with reads aligned to GCRh38, sorted and duplicates marked
 
 Author: Joshua Johnstone
 
@@ -24,7 +24,7 @@ rule ms_raw_alignment:
         r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
-        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam" # Change to temp once pipeline development is complete
+        bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam")
     threads: 
         max(1, os.cpu_count() // 4)
     shell:
@@ -32,21 +32,35 @@ rule ms_raw_alignment:
         # Add read groups and align
         bwa-mem2 mem \
             -t {threads} \
-            -R "@RG\\tID:{wildcards.ms_sample}_$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4)"\\
-"\\tSM:{wildcards.ms_sample}"\\
-"\\tLB:{wildcards.ms_sample}_lib"\\
-"\\tPL:ILLUMINA"\\
-"\\tPU:{wildcards.ms_sample}.$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4)" \
             {input.ref} \
             {input.r1_processed} \
             {input.r2_processed} | \
         samtools view -bS - > {output.bam}
         """
 
+# Adds read group information to aligned reads
+rule ms_add_read_groups:
+    input:
+        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam",
+        r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"
+    output:
+        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
+    shell:
+        """
+        picard AddOrReplaceReadGroups \
+            I={input.bam} \
+            O={output.bam} \
+            RGID={wildcards.ms_sample} \
+            RGLB={wildcards.ms_sample}_lib \
+            RGPL=ILLUMINA \
+            RGPU={wildcards.ms_sample}.$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4) \
+            RGSM={wildcards.ms_sample}
+        """
+
 # Sorts bam by coordinate
 rule ms_sort_bam:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
         bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam")
     threads: 

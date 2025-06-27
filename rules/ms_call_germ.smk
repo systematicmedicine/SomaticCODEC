@@ -13,7 +13,7 @@ Author: Ben Barry
 
 """
 
-# Call candiated germline variants (no filtering)
+# Call candidate germline variants (no filtering)
 rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_markdup_map.bam",

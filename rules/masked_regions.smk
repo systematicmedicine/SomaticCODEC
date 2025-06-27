@@ -53,7 +53,7 @@ rule ms_germline_variants_mask:
         zcat {input.vcf} | vcf2bed --snvs > {output.ms_germ_snv_bed}
         """
 
-# Align germline variants mask with standard BED format, by removing additional columns
+# Removes additional columns from germline variants mask to align with standard BED format
 rule format_germline_variant_mask:
     input:
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed",
