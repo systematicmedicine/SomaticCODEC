@@ -12,22 +12,21 @@ Author: James Phie
 # Generate adapter fasta files for demultiplexing and trimming using adapter sequences in ex_adapters.csv
 rule ex_generate_adapter_fastas:
     params:
-        samples = ex_samples
+        samples = ex_samples,
         adapters = ex_adapters
     output:
-        adapter_fasta_outputs = expand("tmp/adapter_fastas/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1_start", "r1_end", "r2_start", "r2_end"])
+        adapter_fasta_outputs = expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1_start", "r1_end", "r2_start", "r2_end"])
     script:
         "../scripts/generatefastas.py"
 
-# TODO - Draw inputs directly from top-level dataframes
 # Moves the read pair umi to readname
     # Cut 3bp from the start of the read 1 and read 2 sequence
     # Append read 1 3bp umi sequence to the readname of read 1 and read 2
     # Append read 2 3bp umi sequence after read 1 umi in read 1 and read 2
 rule ex_extract_umis:
     input:
-        fastq1 = lambda wildcards: ex_raw_r1_list[wildcards.ex_lane],
-        fastq2 = lambda wildcards: ex_raw_r2_list[wildcards.ex_lane]
+        fastq1 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq1"].values[0],
+        fastq2 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq2"].values[0],
     output:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
@@ -51,11 +50,11 @@ rule ex_demux:
     input:
         fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
         fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
-        r1_start = expand("tmp/adapter_fastas/{ex_lane}_r1_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist()),
-        r2_start = expand("tmp/adapter_fastas/{ex_lane}_r2_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist())
+        r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist()),
+        r2_start = expand("tmp/{ex_lane}/{ex_lane}_r2_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist())
     output:
-        demuxed_r1 = expand("tmp/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
-        demuxed_r2 = expand("tmp/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
+        demuxed_r1 = expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
+        demuxed_r2 = expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
         json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist())
     params:
         samples = ex_samples,
@@ -74,17 +73,17 @@ rule ex_demux:
     # Remove any bases with a Q score of <20 from the 3' end
 rule ex_trim:
     input:
-        r1 = "tmp/{ex_sample}_r1_demux.fastq.gz",
-        r2 = "tmp/{ex_sample}_r2_demux.fastq.gz",
-        r1_start = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r1_start.fasta",
-        r2_start = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r2_start.fasta",
-        r1_end = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r1_end.fasta",
-        r2_end = lambda wildcards: f"tmp/adapter_fastas/{ex_sample_to_lane[wildcards.ex_sample]}_r2_end.fasta"
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
         json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
     params:
+        r1_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_start"].values[0],
+        r2_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_start"].values[0],
+        r1_end   = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_end"].values[0],
+        r2_end   = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_end"].values[0],
         intermediate_r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters.fastq.gz"),
         intermediate_r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters.fastq.gz")
     threads:
@@ -95,10 +94,10 @@ rule ex_trim:
           -j {threads} \
           -e 1 \
           -O 7 \
-          -g ^file:{input.r1_start} \
-          -G ^file:{input.r2_start} \
-          -a file:{input.r1_end} \
-          -A file:{input.r2_end} \
+          -g ^{params.r1_start} \
+          -G ^{params.r2_start} \
+          -a {params.r1_end} \
+          -A {params.r2_end} \
           -o {params.intermediate_r1} \
           -p {params.intermediate_r2} \
           {input.r1} {input.r2} \

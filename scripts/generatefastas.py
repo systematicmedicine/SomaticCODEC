@@ -19,7 +19,9 @@ import re
 
 # Load sample metadata and adapter sequences
 samples = snakemake.params.samples
-adapters = snakemake.params.adapters
+adapters_df = snakemake.params.adapters
+adapters = adapters_df.set_index("ex_adapter")
+
 
 # Map output paths back to (lane, region) using the filename
 output_map = {}

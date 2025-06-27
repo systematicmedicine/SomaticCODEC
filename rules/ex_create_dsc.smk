@@ -16,7 +16,7 @@ Author: James Phie
 # Annotate the filtered (for correct product) BAM for downstream rules
     # Move UMI from read name to RX:Z tag
     # Add mate information to read pairs
-    # Assign molecular identifiers (MI). Based on RX:Z UMI tags and other complex stuff...
+    # Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
     # Assign generic sample and read group metadata for downstream tool compatibility
 rule ex_annotate_bam:
     input:
