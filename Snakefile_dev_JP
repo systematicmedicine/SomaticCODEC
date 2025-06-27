@@ -87,3 +87,85 @@ rule all:
         #expand("metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt", ms_sample = ms_sample_names),
         #expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_sample_names),
         #"metrics/component_metrics_report.csv"
+
+
+# Demultiplex each lane (fastq pair) into samples
+    # Use the 18bp sample indices to match to indicated samples, with an allowed error of 2 edit distance
+rule ex_demux:
+    input:
+        fastq1 = "tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz",
+        fastq2 = "tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz",
+        r1_start = "tmp/adapter_fastas/{ex_lane}_r1_start.fasta",
+        r2_start = "tmp/adapter_fastas/{ex_lane}_r2_start.fasta"
+    output:
+        json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
+        #demuxed_r1 = lambda wc: expand("tmp/{lane_sample}_r1_demux.fastq.gz", lane_sample=ex_lane_to_sample[wc.ex_lane]),
+        #demuxed_r2 = lambda wc: expand("tmp/{lane_sample}_r2_demux.fastq.gz", lane_sample=ex_lane_to_sample[wc.ex_lane])
+    threads:
+        max(1, os.cpu_count() // 4)
+    shell:
+        """
+        cutadapt \
+          -j {threads} \
+          --no-indels \
+          -e 2 \
+          -g ^file:{input.r1_start} \
+          -G ^file:{input.r2_start} \
+          --pair-adapters \
+          -o tmp/{{name}}_r1_demux.fastq.gz \
+          -p tmp/{{name}}_r2_demux.fastq.gz \
+          {input.fastq1} {input.fastq2} \
+          --json={output.json} \
+          --action=none \
+        """
+
+rule ex_demux:
+    input:
+        fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
+        fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
+        r1_start = expand("tmp/adapter_fastas/{ex_lane}_r1_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist()),
+        r2_start = expand("tmp/adapter_fastas/{ex_lane}_r2_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist())
+    output:
+        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist()),
+        demuxed_r1 = expand("tmp/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
+        demuxed_r2 = expand("tmp/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())
+    params:
+        samples = ex_samples,
+        lanes = ex_lanes
+    threads:
+        max(1, os.cpu_count() // 4)
+    run:
+        """
+        
+        ex_demultiplex_all_lanes.py
+        
+        <insert python.py script that takes all raw fastq's and turns them into all json{lane} outputs and {ex_sample} outputs.
+        Data frames that can be used to link lane and samples within the python script:
+
+        ex_samples
+        ex_sample,lane,adapter,ms_sample
+        S001,lane1,Quadruplex001,S007
+        S002,lane1,Quadruplex002,S008
+        S003,lane1,Quadruplex003,S009
+
+        ex_lanes
+        ex_lane,fastq1,fastq2
+        lane1,tmp/downloads/200k_test_R1.fastq.gz,tmp/downloads/200k_test_R2.fastq.gz
+
+        All fasta files are pre-made in correct format
+
+        Previous shell code (ie. what i actually need the script to do per lane's fastq1 and fastq2), note this will repeat for each lane 
+
+        cutadapt \
+          -j {threads} \
+          --no-indels \
+          -e 2 \
+          -g ^file:{input.r1_start} \
+          -G ^file:{input.r2_start} \
+          --pair-adapters \
+          -o tmp/{{name}}_r1_demux.fastq.gz \
+          -p tmp/{{name}}_r2_demux.fastq.gz \
+          {input.fastq1} {input.fastq2} \
+          --json={output.json} \
+          --action=none \
+        """

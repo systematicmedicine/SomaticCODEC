@@ -1,5 +1,5 @@
 ---
 GRCh38_path: tests/data/micro_GRCh38_Chr1_1Mbp.fa
-ex_samples_path: test/configs/test_ex_fastq_dsc_exsamples.csv
-ex_adapters_path: test/configs/test_ex_fastq_dsc_exadapters.csv
-ex_lanes_path: test/configs/test_ex_fastq_dsc_exlanes.csv
+ex_samples_path: tests/configs/test_ex_fastq_dsc_exsamples.csv
+ex_adapters_path: tests/configs/test_ex_fastq_dsc_exadapters.csv
+ex_lanes_path: tests/configs/test_ex_fastq_dsc_exlanes.csv
