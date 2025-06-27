@@ -22,7 +22,13 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 ## Running the pipeline
 * Navigate to the codec-opensource directory
-* Upload [config files](docs/configs.md) for this run
+* Upload [config files](docs/configs.md) for this run:
+    * `config.yaml`
+    * `ex_samples.csv`
+    * `ex_lanes.csv`
+    * `ex_adapters.csv`
+    * `ms_samples.csv`
+    * `download_list.csv` (optional)
 * Create tmux session
 ```
 tmux new -s bioinf
@@ -33,6 +39,7 @@ sudo docker run -it --name pipeline -v "$PWD":/work -w /work codec
 ```
 * Download FASTQ and reference files
 ```
+# If your files are stored elswhere, a different method may be used
 python3 utils/download_S3toEC2.py
 ```
 
@@ -42,14 +49,7 @@ python3 utils/download_S3toEC2.py
 snakemake --configfile config/config.yaml --dryrun
 
 # Run pipeline
-snakemake \
-    --configfile config/config.yaml \
-    --cores all \
-    --keep-going \
-    --verbose \
-    --reason \
-    --stats metrics/pipeline_stats.json \
-    2>&1 | tee metrics/snakemake_log.log
+./run_pipeline.sh
 
 # Generate report
 snakemake --configfile config/config.yaml --report report.html

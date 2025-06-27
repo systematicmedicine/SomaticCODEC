@@ -13,38 +13,36 @@ import pandas as pd
 # Set working directory
 os.chdir(workflow.basedir)
 
-# Load lane and sample names
-ex_lanes = None
-ex_sample_names = None
-ms_sample_names = pd.read_csv(config["ms_samples_path"])["ms_sample"].to_list()
+# Load additional config data
+ms_samples = pd.read_csv(config["ms_samples_path"])
+component_metrics = pd.read_csv(config["component_metrics_path"])
 
 # Include rules files
-include: "rules/index_reference_genome.smk"
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
 include: "rules/ms_call_germ.smk"
+include: "rules/ms_metrics.smk"
+include: "rules/index_reference_genome.smk"
 include: "rules/masked_regions.smk"
-include: "rules/additional_metrics.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_depth_stats.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_sample_names),
-        expand("tmp/{ms_sample}/{ms_sample}_combined_mask.bed", ms_sample = ms_sample_names),
+        expand("tmp/{ms_sample}/{ms_sample}_combined_mask.bed", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_markdup_map_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_depth_stats.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         "metrics/component_metrics_report.csv"
-
 
 
 
