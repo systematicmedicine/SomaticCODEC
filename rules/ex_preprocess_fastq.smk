@@ -9,25 +9,17 @@ Output: Fully processed FASTQ files ready for alignment
 Author: James Phie
 
 """
-# Create lists of raw experimental FASTQ files and check that they are unique
-ex_raw_r1_list = ex_lanes.set_index("ex_lane")["fastq1"].to_dict()
-ex_raw_r2_list = ex_lanes.set_index("ex_lane")["fastq2"].to_dict()
-
-# Creates dictionaries to lookup between ex_lane and ex_sample
-ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
-ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict() #Currently broken in ex_preprocess_fastq, but used in ex_metrics
-
 # Generate adapter fasta files for demultiplexing and trimming using adapter sequences in ex_adapters.csv
 rule ex_generate_adapter_fastas:
-    input:
-        adapters=config["ex_adapters_path"]
     params:
         samples = ex_samples
+        adapters = ex_adapters
     output:
         adapter_fasta_outputs = expand("tmp/adapter_fastas/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1_start", "r1_end", "r2_start", "r2_end"])
     script:
         "../scripts/generatefastas.py"
 
+# TODO - Draw inputs directly from top-level dataframes
 # Moves the read pair umi to readname
     # Cut 3bp from the start of the read 1 and read 2 sequence
     # Append read 1 3bp umi sequence to the readname of read 1 and read 2
@@ -62,9 +54,9 @@ rule ex_demux:
         r1_start = expand("tmp/adapter_fastas/{ex_lane}_r1_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist()),
         r2_start = expand("tmp/adapter_fastas/{ex_lane}_r2_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist())
     output:
-        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist()),
         demuxed_r1 = expand("tmp/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
-        demuxed_r2 = expand("tmp/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())
+        demuxed_r2 = expand("tmp/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist()),
+        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist())
     params:
         samples = ex_samples,
         lanes = ex_lanes

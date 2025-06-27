@@ -31,11 +31,9 @@ rule ex_map:
         """
 
 # Filters mapped bam files to remove intermolecular byproducts and retain correct products
-    # Included read pairs must be:
-        # Mapped on the same chromosome
-        # Mapped within 500bp
-        # Read in the correct directions
-rule ex_filter_correct:
+    # Must be mapped within ~500bp on the same chromosome (exact value determiend in previous step by bwa-mem2)
+    # Must be read in the correct directions
+rule ex_filter_correct_product:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
     output:

@@ -19,7 +19,7 @@ import re
 
 # Load sample metadata and adapter sequences
 samples = snakemake.params.samples
-adapters = pd.read_csv(snakemake.input.adapters).set_index("ex_adapter")
+adapters = snakemake.params.adapters
 
 # Map output paths back to (lane, region) using the filename
 output_map = {}
