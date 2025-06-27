@@ -34,7 +34,7 @@ rule all:
         expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
-        expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_markdup_map_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_samples["ms_sample"].tolist()),
