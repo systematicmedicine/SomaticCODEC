@@ -34,9 +34,14 @@ os.chdir(workflow.basedir)
 
 # Load additional config data
 ex_samples = pd.read_csv(config["ex_samples_path"])
-ms_samples = pd.read_csv(config["ms_samples_path"])
 ex_lanes = pd.read_csv(config["ex_lanes_path"])
+ex_adapters = pd.read_csv(config["ex_adapters_path"])
+ms_samples = pd.read_csv(config["ms_samples_path"])
 component_metrics = pd.read_csv(config["component_metrics_path"])
+
+# Creates dictionaries to lookup between ex_lane and ex_sample
+ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
+ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict() #Currently broken in ex_preprocess_fastq, but used in ex_metrics
 
 # Include rules files
 include: "rules/ms_preprocess_fastq.smk"

@@ -13,16 +13,16 @@ Output: Double stranded consensus
 Author: James Phie
 
 """
-# Annotate the aligned bam with correct product to be umi aware for duplex sequencing
-    # Move umi from readname to RX:Z: tag
-    # Add mate information to read pairs 
-    # Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
-    # Assign general sample and read group related metadata for downstream tools
-rule ex_annotate_umi:
+# Annotate the filtered (for correct product) BAM for downstream rules
+    # Move UMI from read name to RX:Z tag
+    # Add mate information to read pairs
+    # Assign molecular identifiers (MI). Based on RX:Z UMI tags and other complex stuff...
+    # Assign generic sample and read group metadata for downstream tool compatibility
+rule ex_annotate_bam:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi.bam"),
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
         histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt"
     threads:
         max(1, os.cpu_count() // 16)
@@ -69,12 +69,12 @@ rule ex_annotate_umi:
             VALIDATION_STRINGENCY=LENIENT
         """
 
-# Sort umi aware bam by coordinates for duplex consensus calling
+# Sort the annotated BAM by coordinates for duplex consensus calling
 rule ex_sort_by_template:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_umi.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi_sorted.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam")
     resources:
         mem = 16
     shell:
@@ -86,14 +86,14 @@ rule ex_sort_by_template:
             -s TemplateCoordinate
         """
 
-# Create duplex consensus bam using molecular identifiers
+# Create duplex consensus BAM
     # All read 1's, and all read 2's belonging to a single molecular identifier are collapsed for single strand consensus (PCR duplicates)
     # All read 1 consensus and read 2 consensus belonging to a single molecular identifier are collapsed for duplex strand consensus 
     # Single stranded overhangs are retained for alignment purposes, but a Q of 2 is assigned to all single strand bases
     # Reads with >4 disagreements between overlapping paired end reads are excluded
 rule ex_call_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_umi_sorted.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam")
     resources:
@@ -107,7 +107,7 @@ rule ex_call_dsc:
             -M 1
         """
 
-# Align the dsc to the reference genome as sequences have changed
+# Realign the double strand consensus (DSC) to the reference genome, as sequences have changed
     # Single stranded overhangs are present in this bam to assist with alignment (filtered out during variant calling with base quality filter)
     # Aligned bam is sorted by readname for downstream annotation
 rule ex_remap_dsc:
@@ -157,7 +157,7 @@ rule ex_annotate_dsc:
         && samtools index {output.bam} -@ {threads}
         """
 
-# Filter the dsc bam to prepare for variant calling 
+# Filter the DSC bam to prepare for variant calling 
     # Remove reads with mapQ <= 60
 rule ex_filter_dsc:
     input:
