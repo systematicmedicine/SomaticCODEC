@@ -14,6 +14,7 @@ snakemake \
     --snakefile Snakefile_dev_CF \
     --configfile config/config.yaml \
     --cores all \
+    --notemp \
     --keep-going \
     --verbose \
     --reason \
