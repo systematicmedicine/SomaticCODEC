@@ -42,14 +42,7 @@ python3 utils/download_S3toEC2.py
 snakemake --configfile config/config.yaml --dryrun
 
 # Run pipeline
-snakemake \
-    --configfile config/config.yaml \
-    --cores all \
-    --keep-going \
-    --verbose \
-    --reason \
-    --stats metrics/pipeline_stats.json \
-    2>&1 | tee metrics/snakemake_log.log
+./run_pipeline.sh
 
 # Generate report
 snakemake --configfile config/config.yaml --report report.html
