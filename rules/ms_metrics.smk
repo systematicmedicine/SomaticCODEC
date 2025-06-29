@@ -131,9 +131,9 @@ rule masking_metrics:
 # calculate the het/hom ratio from ms vcf
 rule ms_het_hom_ratio:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filter_pass_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filtered_variants.vcf.gz"
     output:
-        txt = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
+        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
     shell: 
         """
         bcftools query -f '[%GT\\n]' {input.vcf} \\
@@ -148,5 +148,5 @@ rule ms_het_hom_ratio:
                     het += 0; hom += 0;
                     print het, hom, (hom > 0 ? het / hom : "NA");
                 }}
-            ' OFS="\\t" > {output.txt}
+            ' OFS="\\t" > {output.ms_het_hom_ratio}
         """
