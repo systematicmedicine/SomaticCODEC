@@ -9,13 +9,11 @@ Authors:
 
 """
 
-# ex_lane_to_sample has been moved to ex_preprocess_fastq (and was renamed from samples_by_lane)
-
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
-        fastq1 = lambda wildcards: ex_raw_r1_list[wildcards.ex_lane],
-        fastq2 = lambda wildcards: ex_raw_r2_list[wildcards.ex_lane]
+        fastq1 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq1"].values[0],
+        fastq2 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq2"].values[0],
     output:
         fastqc_report1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html",
         fastqc_report2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html",
@@ -69,26 +67,14 @@ rule ex_map_metrics:
 rule ex_correctproduct_metrics:
     input:
         demux_json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
-        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=samples_by_lane[wildcards.ex_lane]),
-        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=samples_by_lane[wildcards.ex_lane])
+        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
+        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_lane_to_sample[wildcards.ex_lane])
     output:
         "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
     params:
-        samples = lambda wildcards: samples_by_lane[wildcards.ex_lane]
+        samples = lambda wildcards: ex_lane_to_sample[wildcards.ex_lane]
     script:
         "../scripts/correctproduct.py"
-
-# Custom python script to assess how many unused indices were detected from other experiments (similar metrics to rawreadcounts). This should always be 0. 
-rule ex_batchcontamination_metrics:
-    input:
-        json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
-    output:
-        contamination = "metrics/{ex_lane}/{ex_lane}_batchcontamination_metrics.txt"
-    params:
-        fasta = lambda wildcards: f"tmp/adapter_fastas/{wildcards.ex_lane}_r1start.fasta",
-        used = config['ex_samples_path']
-    script:
-        "../scripts/batchcontamination.py"
 
 # Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
 rule ex_insert_metrics:
@@ -114,7 +100,7 @@ rule ex_insert_metrics:
 # Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
 rule ex_duplication_metrics:
     input:
-        expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample=ex_sample_names)
+        expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist())
     output:
         "metrics/ex_duplication_metrics.txt"
     script:
@@ -127,39 +113,17 @@ rule ex_rawreadcounts_metrics:
     output:
         readcounts = "metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt"
     params:
-        fasta = lambda wildcards: f"tmp/adapter_fastas/{wildcards.ex_lane}_r1start.fasta",
-        used = config['ex_samples_path']
+        fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta",
+        used = ex_samples
     script:
         "../scripts/rawreadcounts.py"
 
-# Depth and genome territory covered, applied to the dsc bam
-rule ex_dscdepth_metrics:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam", #Update to "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam" once fgbio is complete
-        ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai",
-        dictf = config["GRCh38_path"].replace(".fna", ".dict")
-    output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt",
-    resources:
-        mem = 30
-    shell:
-        """
-        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
-            CollectWgsMetrics \
-            I={input.bam} \
-            O={output.metrics} \
-            R={input.ref} \
-            INCLUDE_BQ_HISTOGRAM=true \
-            MINIMUM_BASE_QUALITY=30
-        """
-
 # Generates a pass/fail report for all component level metrics
-rule component_metrics_report:
-    input:
-        expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names),
-        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_sample_names)
-    output:
-        report = "metrics/component_metrics_report.csv"
-    script:
-        "scripts/component_metrics_report.R"
+#rule component_metrics_report:
+#    input:
+#        expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_names),
+#        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist())
+#    output:
+#        report = "metrics/component_metrics_report.csv"
+#    script:
+#        "scripts/component_metrics_report.R"
