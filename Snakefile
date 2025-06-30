@@ -44,7 +44,7 @@ ex_samples = ex_samples.merge(ex_adapters.rename(columns={"ex_adapter": "adapter
 
 # Creates dictionaries to lookup between ex_lane and ex_sample
 ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
-ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict() #Currently broken in ex_preprocess_fastq, but used in ex_metrics
+ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
 # Include rules files
 include: "rules/ms_preprocess_fastq.smk"
@@ -55,7 +55,7 @@ include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_dsc.smk"
 include: "rules/ex_call_somatic.smk"
-#include: "rules/ex_metrics.smk"
+include: "rules/ex_metrics.smk"
 include: "rules/index_reference_genome.smk"
 #include: "rules/masked_regions.smk"
 

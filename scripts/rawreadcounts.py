@@ -4,21 +4,24 @@
 Calculates the number and percentage of raw read pairs that demultiplexed to each sample. 
 
 Author: James Phie
-Date: 
-
 """
 
 import json
-from Bio import SeqIO
 import pandas as pd
 
 # Inputs from Snakemake
 json_path = snakemake.input.json
 output_path = snakemake.output.readcounts
-fasta_path = snakemake.params.fasta
-lane = snakemake.wildcards.lane
-df = pd.read_csv(snakemake.params.used)
-used_samples = set(df[df["ex_lane"] == lane]["ex_sample"])
+fasta_path = snakemake.params.fasta  # Not used currently, but preserved for future use
+lane = snakemake.wildcards.ex_lane
+df = snakemake.params.used
+
+# Validate lane exists
+if lane not in df["lane"].unique():
+    raise ValueError(f"Lane '{lane}' not found in ex_samples.csv.")
+
+# Extract expected samples from this lane
+used_samples = sorted(df[df["lane"] == lane]["ex_sample"])
 
 # Load demux JSON
 with open(json_path) as f:
@@ -27,28 +30,27 @@ with open(json_path) as f:
 # Total read pairs (before processing)
 total_reads = report["read_counts"]["input"]
 
-# Demuxed read pairs = those with adapters in both read1 and read2
-demuxed_read_pairs = min(report["read_counts"]["read1_with_adapter"],
-                         report["read_counts"]["read2_with_adapter"])
+# Read pairs with both adapters present
+demuxed_read_pairs = min(
+    report["read_counts"].get("read1_with_adapter", 0),
+    report["read_counts"].get("read2_with_adapter", 0)
+)
 
-# Count read pairs per sample
+# Tally matches from adapters_read1 and adapters_read2
 match_counts = {}
-
-# Sum up matches from R1 and R2
-for entry in report["adapters_read1"] + report["adapters_read2"]:
+for entry in report.get("adapters_read1", []) + report.get("adapters_read2", []):
     name = entry["name"]
     if name in used_samples:
-        matches = entry["total_matches"]
-        match_counts[name] = match_counts.get(name, 0) + matches
+        match_counts[name] = match_counts.get(name, 0) + entry["total_matches"]
 
-# Convert raw matches (read count) to read pairs by dividing by 2
-for name in match_counts:
-    match_counts[name] = match_counts[name] // 2
+# Convert to read pairs (each match is one read, not a pair)
+read_pair_counts = {name: count // 2 for name, count in match_counts.items()}
 
-# Write output
+# Ensure all expected samples appear in output
 with open(output_path, "w") as out:
     out.write("Sample\tRead pairs per sample\tPercentage of demuxed\tPercentage of raw reads\n")
-    for name, count in sorted(match_counts.items(), key=lambda x: -x[1]):
+    for sample in used_samples:
+        count = read_pair_counts.get(sample, 0)
         pct_demuxed = 100 * count / demuxed_read_pairs if demuxed_read_pairs > 0 else 0
         pct_total = 100 * count / total_reads if total_reads > 0 else 0
-        out.write(f"{name}\t{count}\t{pct_demuxed:.4f}%\t{pct_total:.4f}%\n")
+        out.write(f"{sample}\t{count}\t{pct_demuxed:.4f}%\t{pct_total:.4f}%\n")

@@ -1,5 +1,5 @@
 """
---- generatefastas.py ---
+--- ex_demultiplex_all_lanes.py ---
 
 Demultiplex each lane specific fastq read pairs into sample specific fastq read pairs
 
@@ -25,8 +25,8 @@ lanes_df = pd.DataFrame(snakemake.params.lanes)
 
 # Loop over each lane
 for lane in lanes_df["ex_lane"].unique():
-    fastq1 = lanes_df.loc[lanes_df["ex_lane"] == lane, "fastq1"].values[0]
-    fastq2 = lanes_df.loc[lanes_df["ex_lane"] == lane, "fastq2"].values[0]
+    fastq1 = f"tmp/{lane}/{lane}_r1_umi_extracted.fastq.gz"
+    fastq2 = f"tmp/{lane}/{lane}_r2_umi_extracted.fastq.gz"
 
     r1_fasta = f"tmp/{lane}/{lane}_r1_start.fasta"
     r2_fasta = f"tmp/{lane}/{lane}_r2_start.fasta"
@@ -36,7 +36,7 @@ for lane in lanes_df["ex_lane"].unique():
         "cutadapt",
         "-j", str(snakemake.threads),
         "--no-indels",
-        "-e", "2",
+        "-e", "1",
         f"-g", f"^file:{r1_fasta}",
         f"-G", f"^file:{r2_fasta}",
         "--pair-adapters",

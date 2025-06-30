@@ -108,8 +108,7 @@ rule ex_call_dsc:
         """
 
 # Realign the double strand consensus (DSC) to the reference genome, as sequences have changed
-    # Single stranded overhangs are present in this bam to assist with alignment (filtered out during variant calling with base quality filter)
-    # Aligned bam is sorted by readname for downstream annotation
+    # Single stranded overhangs are present in this BAM to assist with alignment (filtered out during variant calling with base quality filter)
 rule ex_remap_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
@@ -120,17 +119,30 @@ rule ex_remap_dsc:
         pac = config["GRCh38_path"] + ".pac",
         sa = config["GRCh38_path"] + ".0123"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam")
     threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
         samtools fastq {input.bam} | \
         bwa-mem2 mem -t {threads} -Y {input.ref} - | \
-        samtools sort -n -@ {threads} -o {output.bam}
+        samtools view -bS -@ {threads} - > {output.bam}
+        """
+        
+# Sort realigned DSC bam by readname for downstream annotation
+rule ex_sort_dsc:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
+    threads:
+        max(1, os.cpu_count() // 4)
+    shell:
+        """
+        samtools sort -n -@ {threads} -o {output.bam} {input.bam}
         """
 
-# Add metadata from unmapped dsc bam back to the mapped dsc bam
+# Add metadata from unmapped DSC BAM back to the mapped DSC BAM
 rule ex_annotate_dsc: 
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
@@ -139,8 +151,8 @@ rule ex_annotate_dsc:
         fai = config["GRCh38_path"] + ".fai",
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
-        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
+        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
     resources:
         mem = 32
     threads:

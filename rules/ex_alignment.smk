@@ -21,7 +21,7 @@ rule ex_map:
         pac = config["GRCh38_path"] + ".pac",
         sa = config["GRCh38_path"] + ".0123"
     output:
-        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam")
     threads:
         max(1, os.cpu_count() // 4)
     shell:
@@ -30,7 +30,7 @@ rule ex_map:
         samtools view -@ {threads} -bS -o {output.bam} -
         """
 
-# Filters mapped bam files to remove intermolecular byproducts and retain correct products
+# Filters mapped BAM files to remove intermolecular byproducts and retain correct products
     # Must be mapped within ~500bp on the same chromosome (exact value determiend in previous step by bwa-mem2)
     # Must be read in the correct directions
 rule ex_filter_correct_product:
