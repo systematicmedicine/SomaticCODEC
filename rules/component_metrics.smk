@@ -14,4 +14,4 @@ rule component_metrics_report:
     output:
         report = "metrics/component_metrics_report.csv"
     script:
-        "scripts/component_metrics_report.R"
+        "../scripts/component_metrics_report.R"
