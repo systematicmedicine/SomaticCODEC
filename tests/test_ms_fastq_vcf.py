@@ -34,10 +34,10 @@ def test_ms_flagged_vcf_output(clean_workspace_fixture):
     ms_sample = pd.read_csv("tests/configs/test_ms_flagged_vcf_output_samples.csv")["ms_sample"].to_list()
 
     for sample in ms_sample:
-        flagged_vcf_path = Path("tmp") / sample / f"{sample}_ms_merged_flagged.vcf.gz"
+        flagged_vcf_path = Path("tmp") / sample / f"{sample}_ms_candidate_variants.vcf.gz"
 
         # Check if flagged VCF exists
-        assert flagged_vcf_path.exists(), f"ms_merged_flagged.vcf.gz not found: {flagged_vcf_path}"
+        assert flagged_vcf_path.exists(), f"ms_candidate_variants.vcf.gz not found: {flagged_vcf_path}"
 
         # Check that flagged VCF is not empty
-        assert flagged_vcf_path.stat().st_size > 0, f"ms_merged_flagged.vcf.gz is empty: {flagged_vcf_path}"
+        assert flagged_vcf_path.stat().st_size > 0, f"ms_candidate_variants.vcf.gz is empty: {flagged_vcf_path}"
