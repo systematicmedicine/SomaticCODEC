@@ -11,7 +11,7 @@ Inputs:
 Output: 
     - Filtered duplex strand consensus bam ready for variant calling
 
-Author: Joshua Johnstone
+Author: James Phie
 
 """
 
