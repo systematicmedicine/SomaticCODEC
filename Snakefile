@@ -34,9 +34,17 @@ os.chdir(workflow.basedir)
 
 # Load additional config data
 ex_samples = pd.read_csv(config["ex_samples_path"])
+ex_lanes = pd.read_csv(config["ex_lanes_path"])
 ex_adapters = pd.read_csv(config["ex_adapters_path"])
 ms_samples = pd.read_csv(config["ms_samples_path"])
 component_metrics = pd.read_csv(config["component_metrics_path"])
+
+# Add sample adapter sequences to ex_samples dataframe
+ex_samples = ex_samples.merge(ex_adapters.rename(columns={"ex_adapter": "adapter"}),on="adapter",how="left")
+
+# Creates dictionaries to lookup between ex_lane and ex_sample
+ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
+ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
 # Include rules files
 include: "rules/ms_preprocess_fastq.smk"
@@ -50,21 +58,28 @@ include: "rules/ex_call_somatic.smk"
 include: "rules/ex_metrics.smk"
 include: "rules/index_reference_genome.smk"
 include: "rules/masked_regions.smk"
+include: "rules/component_metrics.smk"
 
 # Rule all defines all the output that the pipeline will create
 rule all:
     input:
-        expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = ex_samples[ex_sample_name]),
-        expand("results/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_trim_metrics.json", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_map_umi3_metrics.txt", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample = ex_samples[ex_sample_name]),
-        expand("metrics/{ex_sample}/{ex_sample}_dsc_depth_metrics.txt", ex_sample = ex_samples[ex_sample_name]),
+        expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("results/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html",ex_lane=ex_lanes["ex_lane"].tolist()),
+        expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html",ex_lane=ex_lanes["ex_lane"].tolist()),
+        expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane=ex_lanes["ex_lane"].tolist()),
+        expand("metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt", ex_lane=ex_lanes["ex_lane"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample=ex_samples["ex_sample"].tolist()),
         "metrics/ex_duplication_metrics.txt",
         expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
