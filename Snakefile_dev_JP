@@ -58,7 +58,7 @@ include: "rules/ex_create_dsc.smk"
 include: "rules/ex_call_somatic.smk"
 include: "rules/ex_metrics.smk"
 include: "rules/index_reference_genome.smk"
-include: "rules/component_metrics.smk"
+#include: "rules/component_metrics.smk"
 #include: "rules/masked_regions.smk"
 
 # Rule all defines all the output that the pipeline will create

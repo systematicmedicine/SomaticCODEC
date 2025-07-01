@@ -1,5 +1,5 @@
 """
---- test_ex_demux_trim.py ---
+--- test_ex_demux_to_trim.py ---
 
 Test demultiplexing and trimming steps for CODECseq experimental pipeline.
 
@@ -16,9 +16,9 @@ import gzip
 def run_pipeline():
     snakemake_cmd = [
         "snakemake",
-        "-s", "tests/snakefiles/Snakefile_test_ex_demux_trim",
+        "-s", "tests/snakefiles/Snakefile_test_ex_demux_to_trim",
         "--cores", "all",
-        "--configfile", "tests/configs/test_ex_demux_trim_config.yaml",
+        "--configfile", "tests/configs/test_ex_demux_to_trim_config.yaml",
         "--notemp",
         "--forceall",
         "--rerun-incomplete"

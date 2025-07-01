@@ -1,4 +1,0 @@
----
-ex_samples_path: tests/configs/test_ex_demux_trim_exsamples.csv
-ex_adapters_path: tests/configs/test_ex_demux_trim_exadapters.csv
-ex_lanes_path: tests/configs/test_ex_demux_trim_exlanes.csv
