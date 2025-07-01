@@ -78,43 +78,60 @@ rule ex_trim:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
-        json = "metrics/{ex_sample}/{ex_sample}_trim_metrics.json"
+        trim5primejson = "metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json",
+        r1_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json",
+        r2_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json"
     params:
-        r1_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_start"].values[0],
-        r2_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_start"].values[0],
-        r1_end   = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_end"].values[0],
-        r2_end   = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_end"].values[0],
-        intermediate_r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters.fastq.gz"),
-        intermediate_r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters.fastq.gz")
+        r1_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_start"].values[0].strip(),
+        r2_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_start"].values[0].strip(),
+        r1_end   = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_end"].values[0].strip(),
+        r2_end   = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_end"].values[0].strip(),
+        intermediate_r1_1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters.fastq.gz"),
+        intermediate_r2_1 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters.fastq.gz"),
+        intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
+        intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
         cutadapt \
           -j {threads} \
-          --no-indels \
-          -e 1 \
-          -O 7 \
+          -e 2 \
           -g ^{params.r1_start} \
           -G ^{params.r2_start} \
-          -a {params.r1_end} \
-          -A {params.r2_end} \
-          -o {params.intermediate_r1} \
-          -p {params.intermediate_r2} \
+          -o {params.intermediate_r1_1} \
+          -p {params.intermediate_r2_1} \
           {input.r1} {input.r2} \
-          --json={output.json}
+          --json={output.trim5primejson}
+
+        cutadapt \
+          -j {threads} \
+          -e 2 \
+          --overlap 8 \
+          -b {params.r1_end} \
+          -o {params.intermediate_r1_2} \
+          {params.intermediate_r1_1} \
+          --json={output.r1_trim3primejson}
+
+        cutadapt \
+          -j {threads} \
+          -e 2 \
+          --overlap 8 \
+          -b {params.r2_end} \
+          -o {params.intermediate_r2_2} \
+          {params.intermediate_r2_1} \
+          --json={output.r2_trim3primejson}
 
         cutadapt \
           -j {threads} \
           -u 3 \
           -U 3 \
-          -u -8 \
-          -U -8 \
+          -u -9 \
+          -U -9 \
           --quality-cutoff 20 \
           -o {output.r1} \
           -p {output.r2} \
-          {params.intermediate_r1} \
-          {params.intermediate_r2} \
+          {params.intermediate_r1_2} {params.intermediate_r2_2} \
         """
 
 # Filter inserts (trimmed sequences)

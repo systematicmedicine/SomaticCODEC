@@ -82,7 +82,7 @@ rule ex_insert_metrics:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam",
     output:
         txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
-        hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf",
+        hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", 
     resources:
         mem = 32
     shell:

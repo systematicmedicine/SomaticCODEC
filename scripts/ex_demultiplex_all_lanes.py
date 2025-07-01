@@ -35,8 +35,7 @@ for lane in lanes_df["ex_lane"].unique():
     cmd = [
         "cutadapt",
         "-j", str(snakemake.threads),
-        "--no-indels",
-        "-e", "1",
+        "-e", "2",
         f"-g", f"^file:{r1_fasta}",
         f"-G", f"^file:{r2_fasta}",
         "--pair-adapters",
