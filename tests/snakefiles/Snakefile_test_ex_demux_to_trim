@@ -1,5 +1,5 @@
 """
---- Snakefile_test_ex_demux_trim.py ---
+--- Snakefile_test_ex_demux_to_trim.py ---
 
 Integration test for verifying correct demultiplexing, adapter trimming, and length filtering in the CODECseq pipeline.
 
