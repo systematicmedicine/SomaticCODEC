@@ -77,6 +77,5 @@ rule all:
         expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_depth_stats.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-        expand("metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-        expand("metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt", ms_sample = ms_samples["ms_sample"].tolist())
         "metrics/component_metrics_report.csv"
