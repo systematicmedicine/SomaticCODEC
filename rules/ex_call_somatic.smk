@@ -6,21 +6,20 @@ Rules for calling somatic mutations
 Input: Filtered double stranded consensus (.bam)
 Output: Somatic mutation calls (.vcf)
 
-Somatic mutations are directly called against the filtered double stranded consensus bam (single stranded overhangs and read 1 read 2 disagreements removed).
+Somatic mutations are directly called against the filtered double stranded consensus BAM (single stranded overhangs and read 1 read 2 disagreements removed).
 Some areas are masked using bed files (illumina difficlut regions, areas where germline depth is insufficient)
 
 Author: James Phie
 """
 
 #Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
-ex_to_ms = pd.read_csv(config["ex_samples_path"]).set_index("ex_sample")["ms_sample"].to_dict()
-
+ex_to_ms = ex_samples.set_index("ex_sample")["ms_sample"].to_dict()
 
 #Call somatic mutations on duplex bases with a quality of >=Q70 (~<200 false positives per diploid genome)
 rule ex_call_somatic:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam", #Change to bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam.bai",
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
         ref = config["GRCh38_path"],
         #Bed file
     output:

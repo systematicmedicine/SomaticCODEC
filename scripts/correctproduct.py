@@ -3,12 +3,17 @@
 
 To be considered a CODECseq correct product, the following criteria must be met:
 1. Read 1 and read 2 both present at >minimum insert size (typically 70bp, set in ex_preprocess_fastq.smk, rule ex_filter)
-2. Read 1 and read 2 align to the same chromosome, with the start of read 1 being within ~500 base pairs of the end of read 2 (determined in rule ex_map, 'properly paired')
+2. Read 1 and read 2 align to the same chromosome, with the start of read 1 being within ~500 base pairs of the end of read 2
+    * The ~500bp acceptable distance is determined by bwa-mem2 during alignment in rule ex_map, 'properly paired' 0x2 flag)
 3. Read 1 and read 2 are read in the expected direction
 
 A large proportion (>20%) of CODECseq byproducts are expected to be intermolecular byproducts, where a different dsDNA molecule binds to each end of the adapter quadruplex.
 These byproducts should mainly be filtered in step 2 above. 
 
+The correct product is calculated as number of properly paired read pairs in the aligned bam for all samples in the lane divided by total reads in the lane
+
+Number filtered as singleton reads (filtered_missingread), and filtered for small insert size (filtered_smallinsertsize) are already factored into the above calculation.
+ 
 Author: James Phie
 """
 import json
@@ -19,8 +24,8 @@ demux_json = snakemake.input.demux_json
 trim_reports = snakemake.input.trim_reports
 flagstats = snakemake.input.flagstats
 samples = snakemake.params.samples
-output_file = snakemake.output[0]
-lane = snakemake.wildcards.lane
+output_file = snakemake.output[0] 
+lane = snakemake.wildcards.ex_lane
 
 # Load global adapter match stats from demux_report
 with open(demux_json) as f:

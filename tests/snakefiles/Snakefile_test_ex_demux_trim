@@ -1,0 +1,56 @@
+"""
+--- Snakefile_test_ex_demux_trim.py ---
+
+Integration test for verifying correct demultiplexing, adapter trimming, and length filtering in the CODECseq pipeline.
+
+This test uses 3 hand-crafted paired-end FASTQ reads with predictable sequences to validate:
+
+1. **UMI Tagging**:
+   - The first 3 bases of each R1 and R2 read are extracted and concatenated.
+   - The resulting 6 bp UMI is expected to appear at the end of the read names in both demultiplexed R1 and R2 FASTQs.
+
+2. **Demultiplexing**:
+   - The reads contain known adapter sequences for 3 samples (S001, S003, S004).
+   - Each should produce exactly 1 demultiplexed R1 and R2 read.
+   - One sample (S002) lacks matching adapters and should have 0 demultiplexed reads.
+
+3. **Adapter Trimming**:
+   - For sample S003, the read in the R2 file contains a known 3' adapter sequence.
+   - Cutadapt should trim this adapter and any remaining sequence beyond it in the 5'-3' direction ->, leaving exactly 2 bp of insert sequence remaining.
+
+4. **Filtering**:
+   - A length filter of ≥70 bp is applied to trimmed reads.
+   - The S003 R2 read (only 2 bp after trimming) should be removed by this filter.
+
+This test ensures that UMI tagging, demux, trimming, and filtering behave exactly as expected on controlled input.
+
+Author: James Phie
+"""
+
+# Load libraries
+import os
+import pandas as pd
+
+# Load additional config data
+ex_samples = pd.read_csv(config["ex_samples_path"])
+ex_lanes = pd.read_csv(config["ex_lanes_path"])
+ex_adapters = pd.read_csv(config["ex_adapters_path"])
+
+# Add sample adapter sequences to ex_samples dataframe
+ex_samples = ex_samples.merge(ex_adapters.rename(columns={"ex_adapter": "adapter"}),on="adapter",how="left")
+
+# Creates dictionaries to lookup between ex_lane and ex_sample
+ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
+ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
+
+# Include rules files
+include: "../../rules/ex_preprocess_fastq.smk"
+
+# Rule all defines all the output that the pipeline will create
+rule all:
+    input:
+        expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_samples["ex_sample"].tolist())

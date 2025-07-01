@@ -1,12 +1,14 @@
 """
 --- duplication.py ---
 
-Duplication rate calculated from umihistogram data, an output from ex_groupbyumi. 
+Duplication rate calculated from umihistogram data, an output from ex_annotate_bam from ex_create_dsc.smk. 
 
 Duplicates are caused by:
 1. Library preparation PCR duplication
 2. Flow cell 'PCR' duplication (when both the p5 and p7 strands of the original double stranded molecule bind to different regions of the flow cell)
 3. Optical duplicates (optical cross-talk/signal bleed from adjacent spots on the flow cell)
+
+The bam used for this calculation is the aligned bam with byproducts removed (correct product only).
 
 The calculation is 1 - (unique reads/total reads). Unique reads are the number of reads with a unique UMI. 
 
@@ -20,7 +22,7 @@ output_file = snakemake.output[0]
 
 rows = []
 for path in hist_files:
-    sample = path.split("/")[-1].split(".")[0]  # extracts {sample} from filename
+    sample = path.split("/")[-1].replace("_map_umi_metrics.txt", "")
     df = pd.read_csv(path, sep="\t")
     
     unique_reads = (df["count"] * 2).sum()

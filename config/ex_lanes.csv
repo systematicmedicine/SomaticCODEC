@@ -1,0 +1,2 @@
+ex_lane,fastq1,fastq2
+lane1,tmp/downloads/200k_test_R1.fastq.gz,tmp/downloads/200k_test_R2.fastq.gz
