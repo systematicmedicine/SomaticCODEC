@@ -1,2 +1,0 @@
-ms_samples_path: tests/configs/test_ms_flagged_vcf_output_samples.csv
-GRCh38_path: tests/data/micro_GRCh38_Chr1_1Mbp.fa

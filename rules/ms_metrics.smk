@@ -71,27 +71,17 @@ rule ms_alignment_metrics:
             H={output.insert_hist}  
         """ 
 
-# Generates metrics for candidate (unfiltered) ms germline variants
+# Generates metrics for candidate ms germline variants
 rule ms_candidate_variant_metrics:
     input: 
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
-        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_unfiltered_summary.txt"
+        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt"
     shell:
         """
         bcftools stats {input.vcf} > {output.stat}
         """
 
-# Generates metrics for filtered ms germline variants
-rule ms_filtered_variant_metrics:
-    input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filtered_variants.vcf.gz"
-    output:
-        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_filtered_summary.txt"
-    shell:
-        """
-        bcftools stats {input.vcf} > {output.stat}
-        """
 
 # Generates metrics for each mask BED file
 rule masking_metrics:
@@ -131,7 +121,7 @@ rule masking_metrics:
 # calculate the het/hom ratio from ms vcf
 rule ms_het_hom_ratio:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filtered_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
         ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
     shell: 

@@ -40,7 +40,7 @@ rule ms_low_depth_mask:
     # For insertions and SNV's, the BED region is length 1
 rule ms_germline_variants_mask:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_filtered_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
         ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
         ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
