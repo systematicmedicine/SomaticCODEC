@@ -11,8 +11,6 @@ Author: Joshua Johnstone
 import subprocess
 from pathlib import Path
 import pandas as pd
-import shutil
-import pysam
 
 # Tests if non-empty candidate variant VCF files can be created from raw ms FASTQ files
 def test_ms_candidate_vcf_output(clean_workspace_fixture):
