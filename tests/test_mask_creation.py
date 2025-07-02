@@ -28,8 +28,8 @@ def test_bed_output(clean_workspace_fixture):
 
         files_to_copy = [f"{sample}_markdup_map.bam",
                          f"{sample}_markdup_map.bai",
-                         f"{sample}_ms_filtered_variants.vcf.gz",
-                         f"{sample}_ms_filtered_variants.vcf.gz.tbi"]
+                         f"{sample}_ms_candidate_variants.vcf.gz",
+                         f"{sample}_ms_candidate_variants.vcf.gz.tbi"]
 
         for filename in files_to_copy:
             source = Path("tests/data") / filename
