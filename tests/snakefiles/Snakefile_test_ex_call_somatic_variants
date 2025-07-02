@@ -1,0 +1,28 @@
+
+"""
+--- Snakefile_test_ex_call_somatic_variants.py ---
+
+?????????????????
+
+Authors:
+    - James Phie
+
+"""
+
+# Load libraries
+import os
+import pandas as pd
+
+# Load additional config data
+ex_samples = pd.read_csv(config["ex_samples_path"])
+
+# Include rules files
+include: "../../rules/ex_call_somatic.smk"
+include: "../../rules/index_reference_genome.smk"
+
+# Rule all defines all the output that the pipeline will create
+rule all:
+    input:
+        expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("results/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("results/{ex_sample}/{ex_sample}_all_positions.vcf", ex_sample=ex_samples["ex_sample"].tolist())

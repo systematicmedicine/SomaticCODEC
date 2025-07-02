@@ -195,6 +195,6 @@ rule ex_filter_dsc:
     shell:
         """
         samtools view -b -q 60 {input.bam} | \
-        fgbio SortBam -i /dev/stdin -o {output.bam} -s TemplateCoordinate
+        samtools sort -o {output.bam}
         samtools index {output.bam}
         """
