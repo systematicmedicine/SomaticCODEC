@@ -12,16 +12,31 @@ Some areas are masked using bed files (illumina difficlut regions, areas where g
 Author: James Phie
 """
 
-#Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
+# Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
 ex_to_ms = ex_samples.set_index("ex_sample")["ms_sample"].to_dict()
 
-#Call somatic mutations on duplex bases with a quality of >=Q70 (~<200 false positives per diploid genome)
-rule ex_call_somatic:
+# Use the combined bed for masking germline mutations and difficult regions to create an include regions bed file for variant calling
+rule generate_include_bed:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam", ##Add back filtered instead of mapQ
-        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_mapQ.bam.bai",
+        mask_bed = lambda wildcards: f"tmp/{ex_to_ms[wildcards.ex_sample]}/{ex_to_ms[wildcards.ex_sample]}_combined_mask.bed",
+        fai = config["GRCh38_path"] + ".fai"
+    output:
+        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+    shell:
+        """
+        bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed}
+        """
+
+# Call somatic mutations using the filtered duplex bam
+    # Bases with quality of >=Q70 (ie. individual R1 and R2 bases were ~Q35) are filtered (~<200 false positives per diploid genome)
+    # Indels are excluded from variant calling (SNVs only)
+    # Multiallelic calls (all alt alleles called, e.g. If position X has AGCTTTTTTTTTT, an A mutation, G mutation and C mutation will be called)
+rule ex_call_somatic_variants:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
         ref = config["GRCh38_path"],
-        #Bed file
+        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
         vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf",
         vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf"
@@ -30,10 +45,11 @@ rule ex_call_somatic:
         bcftools mpileup \
             --fasta-ref {input.ref} \
             --output-type u \
-            --min-BQ 70 \
-            --min-MQ 60 \
+            --min-BQ 32 \
+            --min-MQ 0 \
+            --no-BAQ \
             --annotate AD,DP \
-            --regions chr1:1000000-3000000 \
+            --regions-file {input.include_bed} \
             {input.bam} \
         | bcftools call \
             --multiallelic-caller \
@@ -53,4 +69,4 @@ rule ex_somatic_variant_rate:
     output:
         results = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.txt"
     script:
-        "../scripts/somaticvariants.py"
+        "../scripts/ex_somatic_variant_rate.py"

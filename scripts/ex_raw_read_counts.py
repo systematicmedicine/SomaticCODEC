@@ -1,5 +1,5 @@
 """
---- rawreadcounts.py ---
+--- ex_raw_read_counts.py ---
 
 Calculates the number and percentage of raw read pairs that demultiplexed to each sample. 
 
