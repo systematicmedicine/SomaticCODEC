@@ -45,7 +45,7 @@ rule ex_call_somatic_variants:
         bcftools mpileup \
             --fasta-ref {input.ref} \
             --output-type u \
-            --min-BQ 32 \
+            --min-BQ 70 \
             --min-MQ 0 \
             --no-BAQ \
             --annotate AD,DP \
