@@ -9,7 +9,7 @@
 # ---
 
 # Gets the path to the relevant metrics file
-metric_file_path <- function(sample_dir, function_metric, component_metrics) {
+find_metric_file_path <- function(sample_dir, function_metric, component_metrics) {
   pattern <- paste(
     component_metrics$metrics_file[grepl(paste0(function_metric, "$"), component_metrics$metric)],
     collapse = "|")
@@ -23,7 +23,7 @@ get_per_sequence_quality_score_r1 <- function() {
   function_metric = "per_sequence_quality_score_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -36,7 +36,7 @@ get_per_sequence_quality_score_r1 <- function() {
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -101,7 +101,7 @@ get_per_sequence_quality_score_r2 <- function() {
     function_metric = "per_sequence_quality_score_r2"
     
     # Print progress indicator
-    print(paste("Getting", function_metric, "for:"))
+    print(paste("Getting", function_metric))
     
     # Get list of sample directories within metrics directory
     sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -179,7 +179,7 @@ get_percent_reads_filtered <- function() {
   function_metric = "percent_reads_filtered"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -236,7 +236,7 @@ get_read_alignment_rate <- function() {
   function_metric = "read_alignment_rate"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -296,7 +296,7 @@ get_mask_coverage <- function(){
   function_metric = "mask_coverage"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -349,7 +349,7 @@ get_percent_read_contribution <- function(){
   function_metric = "percent_read_contribution"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -414,7 +414,7 @@ get_percent_adaptor_contamination <- function(){
   function_metric = "percent_adaptor_contamination"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -464,7 +464,7 @@ get_correct_product_ratio <- function(){
   function_metric = "correct_product_ratio"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -514,7 +514,7 @@ get_duplex_coverage <- function(){
   function_metric = "duplex_coverage"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -564,7 +564,7 @@ get_germline_variants <- function(){
   function_metric = "germline_variants"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -630,7 +630,7 @@ get_SNV_indel_ratio <- function(){
   function_metric = "SNV_indel_ratio"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -696,7 +696,7 @@ get_insertion_deletion_ratio <- function(){
   function_metric = "insertion_deletion_ratio"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -775,7 +775,7 @@ get_MNP_other_variants <- function(){
   function_metric = "MNP_other_variants"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -839,7 +839,7 @@ get_transition_transversion_ratio <- function(){
   function_metric = "transition_transversion_ratio"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -900,7 +900,7 @@ get_het_hom_ratio <- function(){
   function_metric = "het_hom_ratio"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -947,7 +947,7 @@ get_multimapping_rate <- function() {
   function_metric = "multimapping_rate"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1019,7 +1019,7 @@ get_duplication_rate <- function(){
   function_metric = "duplication_rate"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1077,7 +1077,7 @@ get_total_reads_r1 <- function() {
   function_metric = "total_reads_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1145,7 +1145,7 @@ get_total_reads_r2 <- function() {
   function_metric = "total_reads_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1213,7 +1213,7 @@ get_insert_size <- function(){
   function_metric = "insert_size"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1271,7 +1271,7 @@ get_overrepresented_sequences_r1 <- function(){
   function_metric = "overrepresented_sequences_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1358,7 +1358,7 @@ get_overrepresented_sequences_r2 <- function(){
   function_metric = "overrepresented_sequences_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1445,7 +1445,7 @@ get_gc_deviation_r1 <- function(){
   function_metric = "gc_deviation_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1533,7 +1533,7 @@ get_gc_deviation_r2 <- function(){
   function_metric = "gc_deviation_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1621,7 +1621,7 @@ get_per_base_content_diff_r1 <- function(){
   function_metric = "per_base_content_diff_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1705,7 +1705,7 @@ get_per_base_content_diff_r2 <- function(){
   function_metric = "per_base_content_diff_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1789,7 +1789,7 @@ get_per_base_sequencing_quality_r1 <- function(){
   function_metric = "per_base_sequencing_quality_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1867,7 +1867,7 @@ get_per_base_sequencing_quality_r2 <- function(){
   function_metric = "per_base_sequencing_quality_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -1945,7 +1945,7 @@ get_per_tile_sequencing_quality_r1 <- function(){
   function_metric = "per_tile_sequencing_quality_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -2045,7 +2045,7 @@ get_per_tile_sequencing_quality_r2 <- function(){
   function_metric = "per_tile_sequencing_quality_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -2145,7 +2145,7 @@ get_sequence_length_r1 <- function(){
   function_metric = "sequence_length_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -2224,7 +2224,7 @@ get_sequence_length_r2 <- function(){
   function_metric = "sequence_length_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -2303,7 +2303,7 @@ get_per_base_N_content_r1 <- function(){
   function_metric = "per_base_N_content_r1"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
@@ -2386,7 +2386,7 @@ get_per_base_N_content_r2 <- function(){
   function_metric = "per_base_N_content_r2"
   
   # Print progress indicator
-  print(paste("Getting", function_metric, "for:"))
+  print(paste("Getting", function_metric))
   
   # Get list of sample directories within metrics directory
   sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)

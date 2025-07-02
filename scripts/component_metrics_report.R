@@ -26,10 +26,24 @@ source("scripts/get_metrics.R")
 get_metric_functions <- Filter(function(x) is.function(get(x)) && startsWith(x, "get"), ls())
 
 # Run get_metrics.R functions and store results in list
-metric_dataframes <- lapply(get_metric_functions, function(function_name){
+metric_dataframes <- lapply(get_metric_functions, function(function_name) {
   function_to_run <- get(function_name)
-  function_to_run()
-}) 
+  
+  tryCatch({
+    message("Running ", function_name, "...")
+    result <- function_to_run()
+    result  # Return result if successful
+  }, error = function(e) {
+    warning("Function ", function_name, " failed: ", conditionMessage(e))
+    
+    # Insert placeholder row with cleaned metric name
+    data.frame(
+      metric = sub("^get", "", function_name),
+      sample = NA_character_,
+      value = NA_real_
+    )
+  })
+})
 
 # Combine metrics values into one data frame  
 combined_metrics_values <- do.call(rbind, metric_dataframes) %>% 
