@@ -84,7 +84,7 @@ rule ex_insert_metrics:
         txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
         hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", 
     resources:
-        mem = 32
+        mem = 128
     shell:
         """
         picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
