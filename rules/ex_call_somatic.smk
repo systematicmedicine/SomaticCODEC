@@ -27,10 +27,6 @@ rule generate_include_bed:
         bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed}
         """
 
-# Call somatic mutations using the filtered duplex bam
-    # Bases with quality of >=Q70 (ie. individual R1 and R2 bases were ~Q35) are filtered (~<200 false positives per diploid genome)
-    # Indels are excluded from variant calling (SNVs only)
-    # Multiallelic calls (all alt alleles called, e.g. If position X has AGCTTTTTTTTTT, an A mutation, G mutation and C mutation will be called)
 rule ex_call_somatic_variants:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
@@ -39,28 +35,48 @@ rule ex_call_somatic_variants:
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
         vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf",
-        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf"
+        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        intermediate_mpileup = temp("tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf"),
+        intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
+        intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
     shell:
         """
         bcftools mpileup \
             --fasta-ref {input.ref} \
-            --output-type u \
-            --min-BQ 70 \
+            --output-type b \
+            --count-orphans \
+            --max-BQ 150 \
+            --min-BQ 61 \
             --min-MQ 0 \
             --no-BAQ \
             --annotate AD,DP \
             --regions-file {input.include_bed} \
             {input.bam} \
-        | bcftools call \
+            -o {output.intermediate_mpileup}
+
+        bcftools call \
             --multiallelic-caller \
             --keep-alts \
-            --output-type u \
-        | tee >(bcftools view \
-                    -e 'TYPE="indel" || TYPE="ref"' \
-                | bcftools norm -m -both -Ov -o {output.vcf_snvs}) \
-        | bcftools view \
-              -e 'TYPE="indel"' \
-              -Ov -o {output.vcf_all}
+            --output-type b \
+            -o {output.intermediate_called} \
+            {output.intermediate_mpileup}
+
+        bcftools view \
+            -e 'TYPE="indel" || TYPE="ref"' \
+            -Ob \
+            -o {output.intermediate_biallelic} \
+            {output.intermediate_called}
+
+        bcftools norm \
+            -m -both \
+            -Ov \
+            -o {output.vcf_snvs} \
+            {output.intermediate_biallelic}
+
+        bcftools view \
+            -e 'TYPE="indel"' \
+            {output.intermediate_called} \
+            -Ov -o {output.vcf_all}
         """
 
 rule ex_somatic_variant_rate:
