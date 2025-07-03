@@ -43,11 +43,11 @@ def get_adapter_counts(metrics, sample):
     return r1_count, r2_count
 
 
-def test_ex_demux_trim_output(clean_workspace_fixture):
+def test_ex_demux_to_trim_output(clean_workspace_fixture):
     run_pipeline()
 
-    ex_samples_df = pd.read_csv("tests/configs/test_ex_demux_trim_exsamples.csv")
-    ex_lanes_df = pd.read_csv("tests/configs/test_ex_demux_trim_exlanes.csv")
+    ex_samples_df = pd.read_csv("tests/configs/test_ex_demux_to_trim_exsamples.csv")
+    ex_lanes_df = pd.read_csv("tests/configs/test_ex_demux_to_trim_exlanes.csv")
     ex_lane_to_sample = ex_samples_df.groupby("lane")["ex_sample"].apply(list).to_dict()
 
     for lane, samples in ex_lane_to_sample.items():
@@ -65,8 +65,8 @@ def test_ex_demux_trim_output(clean_workspace_fixture):
         assert r1_count == 0, f"S002 should have 0 R1 reads, got {r1_count}"
         assert r2_count == 0, f"S002 should have 0 R2 reads, got {r2_count}"
 
-        raw_r1_path = "tests/data/ex_demux_trim_r1.fastq.gz"
-        raw_r2_path = "tests/data/ex_demux_trim_r2.fastq.gz"
+        raw_r1_path = "tests/data/ex_demux_to_trim_r1.fastq.gz"
+        raw_r2_path = "tests/data/ex_demux_to_trim_r2.fastq.gz"
         umi_r1_list = extract_first_3_bases_from_fastq(raw_r1_path)
         umi_r2_list = extract_first_3_bases_from_fastq(raw_r2_path)
         umi_expected_list = [r1 + r2 for r1, r2 in zip(umi_r1_list, umi_r2_list)]
