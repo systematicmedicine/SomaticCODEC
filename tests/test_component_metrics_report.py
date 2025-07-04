@@ -24,6 +24,9 @@ def test_component_metrics_report_output(clean_workspace_fixture):
     metrics_dir_lane1 = Path("metrics/lane1")
     metrics_dir_lane1.mkdir(exist_ok=True)
 
+    # Copy mask metrics file
+    shutil.copy(Path("tests/data/S001_mask_metrics.txt"), Path("metrics/S001/S001_mask_metrics.txt"))
+
     # Run snakemake
     snakemake_cmd = [
         "snakemake",
