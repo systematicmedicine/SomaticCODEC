@@ -1,5 +1,5 @@
 """
---- duplication.py ---
+--- ex_duplication.py ---
 
 Duplication rate calculated from umihistogram data, an output from ex_annotate_bam from ex_create_dsc.smk. 
 

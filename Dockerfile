@@ -70,14 +70,16 @@ RUN VARSCAN_JAR=$(find /opt/conda/envs/codec-env -name 'VarScan.jar') && \
 RUN Rscript -e 'install.packages(c("dplyr", "jsonlite"), repos="https://mirror.aarnet.edu.au/pub/CRAN/")' \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install feature branch of fgbio (replace with conda install when CallCodecConsensusReads is added to main branch)
+# Install feature branch of fgbio at commit d93b8c3 (supports duplex agreement and ssc filters)
 RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | \
     gpg --dearmor > /usr/share/keyrings/sbt-keyring.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/sbt-keyring.gpg] https://repo.scala-sbt.org/scalasbt/debian all main" \
     > /etc/apt/sources.list.d/sbt.list && \
     apt-get update && apt-get install -y sbt git default-jdk && \
-    git clone --single-branch --branch feature/codec https://github.com/fulcrumgenomics/fgbio.git && \
-    cd fgbio && sbt assembly && \
+    git clone https://github.com/fulcrumgenomics/fgbio.git && \
+    cd fgbio && \
+    git checkout 61db498 && \
+    sbt assembly && \
     mkdir -p /opt/fgbio && \
     cp target/scala-2.13/fgbio-*.jar /opt/fgbio/fgbio.jar && \
     echo -e '#!/bin/bash\nexec java ${JAVA_OPTS} -jar /opt/fgbio/fgbio.jar "$@"' > /usr/local/bin/fgbio && \

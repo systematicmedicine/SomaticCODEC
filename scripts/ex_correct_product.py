@@ -1,5 +1,5 @@
 """
---- correctproduct.py ---
+--- ex_correct_product.py ---
 
 To be considered a CODECseq correct product, the following criteria must be met:
 1. Read 1 and read 2 both present at >minimum insert size (typically 70bp, set in ex_preprocess_fastq.smk, rule ex_filter)

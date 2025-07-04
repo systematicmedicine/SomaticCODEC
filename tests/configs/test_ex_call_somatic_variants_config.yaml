@@ -1,0 +1,3 @@
+---
+GRCh38_path: tests/data/micro_GRCh38_Chr1_somatic.fa
+ex_samples_path: tests/configs/test_ex_call_somatic_variants_exsamples.csv

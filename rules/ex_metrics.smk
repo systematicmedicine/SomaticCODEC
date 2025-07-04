@@ -74,7 +74,7 @@ rule ex_correctproduct_metrics:
     params:
         samples = lambda wildcards: ex_lane_to_sample[wildcards.ex_lane]
     script:
-        "../scripts/correctproduct.py"
+        "../scripts/ex_correct_product.py"
 
 # Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
 rule ex_insert_metrics:
@@ -104,10 +104,10 @@ rule ex_duplication_metrics:
     output:
         "metrics/ex_duplication_metrics.txt"
     script:
-        "../scripts/duplication.py"
+        "../scripts/ex_duplication.py"
 
 # Custom python script to assess demultiplexing. 
-rule ex_rawreadcounts_metrics:
+rule ex_raw_read_counts_metrics:
     input:
         json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
     output:
@@ -116,4 +116,4 @@ rule ex_rawreadcounts_metrics:
         fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta",
         used = ex_samples
     script:
-        "../scripts/rawreadcounts.py"
+        "../scripts/ex_raw_read_counts.py"
