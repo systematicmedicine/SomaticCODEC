@@ -26,8 +26,8 @@ rule ms_raw_fastq_metrics:
         
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
 
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
+        mv metrics/{wildcards.ms_sample}/${{r1_base}}_raw_fastqc.html {output.r1_report}
+        mv metrics/{wildcards.ms_sample}/${{r2_base}}_raw_fastqc.html {output.r2_report}
         """
 
 # Generates a fastqc report for ms processed reads

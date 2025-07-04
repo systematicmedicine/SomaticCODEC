@@ -56,4 +56,4 @@ Matched,ms_per_base_N_content_r1,Percentage of bases at each read position recor
 Experimental,ex_per_base_N_content_r1,Percentage of bases at each read position recorded as N,Preprocess experimental sample fastq,r1_filter_metrics.zip,0,10,0,5,Stricter than fastqc warnings due to requirement for increased accuracy
 Matched,ms_per_base_N_content_r2,Percentage of bases at each read position recorded as N,Preprocess matched sample fastq,trimfilter_r2_fastqc.zip,0,10,0,5,Stricter than fastqc warnings due to requirement for increased accuracy
 Experimental,ex_per_base_N_content_r2,Percentage of bases at each read position recorded as N,Preprocess experimental sample fastq,r2_filter_metrics.zip,0,10,0,5,Stricter than fastqc warnings due to requirement for increased accuracy
-Experimental,ex_duplex_base_disagreement,Rate at which Watson and Crick complementary bases disagree,Create double strand consensus,TBD,TBD,TBD,TBD,TBD,TBD
+Experimental,ex_duplex_base_disagreement,Rate at which Watson and Crick complementary bases disagree,Create double strand consensus,TBD,0,0,0,0,TBD
