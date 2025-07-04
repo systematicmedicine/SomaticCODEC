@@ -61,10 +61,8 @@ rule ms_alignment_metrics:
         insert_hist = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
     shell:
         """
-        # Generate alignment stats
         samtools stats {input.bam} > {output.stats}
 
-        # Collect insert size metrics
         picard CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.insert_metrics} \
