@@ -1,0 +1,36 @@
+
+"""
+--- Snakefile_test_ex_call_somatic_variants.py ---
+
+Tests the somatic variant calling part of the pipeline.
+
+Inputs:
+    - Somatic variant toy bam file (7 reads) with mutations and low and high quality bases
+        - ex_somatic_variant_dsc.bam
+        - ex_somatic_variant_dsc.bam.bai
+    - Bed file indicating which regions should be included for variant calling
+        - ex_include_chr1_30k_1M.bed
+        - Will be generated from the ms_samples pipeline masked_bed using rule generate_include_bed in ex_call_somatic.smk
+
+Authors:
+    - James Phie
+
+"""
+
+# Load libraries
+import os
+import pandas as pd
+
+# Load additional config data
+ex_samples = pd.read_csv(config["ex_samples_path"])
+
+# Include rules files
+include: "../../rules/ex_call_somatic.smk"
+include: "../../rules/index_reference_genome.smk"
+
+# Rule all defines all the output that the pipeline will create
+rule all:
+    input:
+        expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("results/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("results/{ex_sample}/{ex_sample}_all_positions.vcf", ex_sample=ex_samples["ex_sample"].tolist())

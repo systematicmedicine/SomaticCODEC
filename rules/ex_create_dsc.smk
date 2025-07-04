@@ -92,7 +92,7 @@ rule ex_sort_by_template:
     # All read 1's, and all read 2's belonging to a single molecular identifier are collapsed for single strand consensus (PCR duplicates)
     # All read 1 consensus and read 2 consensus belonging to a single molecular identifier are collapsed for duplex strand consensus 
     # Single stranded overhangs are retained for alignment purposes, but a Q of 2 is assigned to all single strand bases
-    # Reads with >4 disagreements between overlapping paired end reads are excluded
+    # Reads with >3 disagreements between overlapping paired end reads are excluded
 rule ex_call_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
@@ -106,7 +106,9 @@ rule ex_call_dsc:
          CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
-            -M 1
+            --max-duplex-disagreements 3 \
+            --single-strand-qual 2 \
+            -M 1 
         """
 
 # Realign the double strand consensus (DSC) to the reference genome, as sequences have changed
@@ -192,6 +194,7 @@ rule ex_filter_dsc:
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
     shell:
         """
-        samtools view -b -q 60 {input.bam} > {output.bam}
+        samtools view -b -q 60 {input.bam} | \
+        samtools sort -o {output.bam}
         samtools index {output.bam}
         """

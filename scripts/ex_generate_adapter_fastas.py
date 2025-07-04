@@ -1,5 +1,5 @@
 """
---- generatefastas.py ---
+--- ex_generate_adapter_fastas.py ---
 
 Generate per-lane codec index adapter FASTA files for demultiplexing and trimming from the sequences provided in ex_adapters.csv
 

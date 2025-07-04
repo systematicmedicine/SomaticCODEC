@@ -17,7 +17,7 @@ rule ex_generate_adapter_fastas:
     output:
         adapter_fasta_outputs = expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1_start", "r1_end", "r2_start", "r2_end"])
     script:
-        "../scripts/generatefastas.py"
+        "../scripts/ex_generate_adapter_fastas.py"
 
 # Moves the read pair umi to readname
     # Cut 3bp from the start of the read 1 and read 2 sequence
