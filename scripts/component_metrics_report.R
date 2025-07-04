@@ -16,6 +16,9 @@ component_metrics <- read.csv("config/component_metrics.csv") %>%
 ex_samples <- read.csv("config/ex_samples.csv") %>% 
   pull(ex_sample)
 
+ex_lanes <- read.csv("config/ex_lanes.csv") %>% 
+  pull(ex_lane)
+
 ms_samples <- read.csv("config/ms_samples.csv") %>% 
   pull(ms_sample)
 
@@ -53,10 +56,12 @@ combined_metrics_values <- do.call(rbind, metric_dataframes) %>%
   # Add sample_type column
   mutate(sample_type = case_when(
     sample %in% ex_samples ~ "Experimental",
+    sample %in% ex_lanes ~ "Experimental_lane",
     sample %in% ms_samples ~ "Matched")) %>% 
   # Add ms or ex to metric names based on sample type
   mutate(metric = case_when(
     sample_type == "Experimental" ~ paste0("ex_", metric),
+    sample_type == "Experimental_lane" ~ paste0("ex_lane_", metric),
     sample_type == "Matched" ~ paste0("ms_", metric)))
 
 # Create metrics report data frame

@@ -25,17 +25,19 @@ rule ms_raw_alignment:
         r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam")
+    params:
+        intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_intermediate.sam")
     threads: 
         max(1, os.cpu_count() // 4)
     shell:
         """
-        # Add read groups and align
         bwa-mem2 mem \
             -t {threads} \
             {input.ref} \
             {input.r1_processed} \
-            {input.r2_processed} | \
-        samtools view -bS - > {output.bam}
+            {input.r2_processed} > {params.intermediate_sam}
+
+        samtools view -bS {params.intermediate_sam} > {output.bam}
         """
 
 # Adds read group information to aligned reads
@@ -53,7 +55,7 @@ rule ms_add_read_groups:
             RGID={wildcards.ms_sample} \
             RGLB={wildcards.ms_sample}_lib \
             RGPL=ILLUMINA \
-            RGPU={wildcards.ms_sample}.$(zcat {input.r1_processed} | head -n1 | cut -d ':' -f4) \
+            RGPU={wildcards.ms_sample} \
             RGSM={wildcards.ms_sample}
         """
 
