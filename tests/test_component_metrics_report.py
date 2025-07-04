@@ -17,6 +17,13 @@ import pysam
 # Tests if non-empty component metrics report can be created
 def test_component_metrics_report_output(clean_workspace_fixture):
 
+    # Create empty metrics directories
+    metrics_dir_S001 = Path("metrics/S001")
+    metrics_dir_S001.mkdir(exist_ok=True)
+
+    metrics_dir_lane1 = Path("metrics/lane1")
+    metrics_dir_lane1.mkdir(exist_ok=True)
+
     # Run snakemake
     snakemake_cmd = [
         "snakemake",
