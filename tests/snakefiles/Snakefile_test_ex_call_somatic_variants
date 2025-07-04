@@ -2,7 +2,15 @@
 """
 --- Snakefile_test_ex_call_somatic_variants.py ---
 
-?????????????????
+Tests the somatic variant calling part of the pipeline.
+
+Inputs:
+    - Somatic variant toy bam file (7 reads) with mutations and low and high quality bases
+        - ex_somatic_variant_dsc.bam
+        - ex_somatic_variant_dsc.bam.bai
+    - Bed file indicating which regions should be included for variant calling
+        - ex_include_chr1_30k_1M.bed
+        - Will be generated from the ms_samples pipeline masked_bed using rule generate_include_bed in ex_call_somatic.smk
 
 Authors:
     - James Phie
