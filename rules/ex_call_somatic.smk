@@ -46,7 +46,7 @@ rule ex_call_somatic_variants:
             --output-type b \
             --count-orphans \
             --max-BQ 150 \
-            --min-BQ 61 \
+            --min-BQ 70 \
             --min-MQ 0 \
             --no-BAQ \
             --annotate AD,DP \

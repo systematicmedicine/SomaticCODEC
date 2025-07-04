@@ -3,7 +3,10 @@
 
 Tests the somatic variant calling module using a known input BAM and BED file.
 
-Checks that the expected number of bases and SNVs are reported.
+Checks that the expected number of bases, filtered bases and SNVs are reported.
+
+Note that if the quality score filter changes drastically, this test will fail. 
+Any decreases in Q score filtering cut-off should be carefully considered as false positive somatic SNVs will increase. 
 
 Author: James Phie
 """
@@ -57,10 +60,30 @@ def test_ex_call_somatic_variants_output(clean_workspace_fixture):
     metrics = pd.read_csv(metrics_path, sep="\t", index_col="metric")["value"]
 
     expected = {
-        "starting_bases": 331,
-        "filtered_bases": 142,
-        "num_snv_bases": 4,
+        "starting_bases": 719,
+        "filtered_bases": 279,
+        "num_snv_bases": 226,
     }
 
     for metric, expected_value in expected.items():
         assert int(metrics[metric]) == expected_value, f"{metric} was {metrics[metric]}, expected {expected_value}"
+
+
+# ex_somatic_variant_dsc.bam
+    # Read 1
+        # 123 bases total
+            # 122 Q score below 70 (or reduced to below 70 due to adjacent base penalty)
+    # Read 2
+        # 111 bases total
+            # 12 Q score below 70 (or reduced to below 70 due to adjacent base penalty)
+            # 2 mutations
+    # Read 3 
+        # 97 bases total
+            # 12 Q score below 70 (or reduced to below 70 due to adjacent base penalty) 
+            # 56 mutations
+    # Read 4, 5 and 6
+        # Same as Read 3
+    # Read 7:
+        # 97 bases total
+            # 97 Q score below 70
+            # Many are mutations, but will not be detected as all bases are filtered
