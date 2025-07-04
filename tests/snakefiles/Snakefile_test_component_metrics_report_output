@@ -1,0 +1,29 @@
+"""
+--- Snakefile_test_component_metrics_report_output ---
+
+Test Snakefile to be used with function test_component_metrics_report_output
+
+Runs component_metrics_report rule in component_metrics.smk
+
+Inputs: 
+    - None
+Output: 
+    - Component metrics report csv
+
+Author: Joshua Johnstone
+
+"""
+
+# Load libraries
+import os
+import pandas as pd
+
+# Load additional config data
+ms_samples = pd.read_csv(config["ms_samples_path"])
+
+# Include rules files
+include: "../../rules/component_metrics.smk"
+
+rule all:
+    input:
+        expand("metrics/component_metrics_report.csv")

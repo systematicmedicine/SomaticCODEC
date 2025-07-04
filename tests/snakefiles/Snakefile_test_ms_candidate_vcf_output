@@ -1,15 +1,15 @@
 """
---- Snakefile_test_ms_filtered_vcf_output ---
+--- Snakefile_test_ms_candidate_vcf_output ---
 
-Test Snakefile to be used with function test_ms_filtered_vcf_output
+Test Snakefile to be used with function test_ms_candidate_vcf_output
 
-Runs matched sample pipeline from demuxed FASTQs to creating a filter-flagged VCF
+Runs matched sample pipeline from demuxed FASTQs to creating a candidate variant VCF
 
 Inputs: 
     - 100 read pairs mapping to the middle of Chr1
     - Micro reference (1Mbp in the middle of Chr1)
 Output: 
-    - Merged and filter-flagged VCF
+    - Candidate variants VCF
 
 Author: Joshua Johnstone
 
