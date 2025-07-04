@@ -23,6 +23,9 @@ def test_bed_output(clean_workspace_fixture):
 
     for sample in ms_sample:
 
+        metrics_dir = Path("metrics") / sample
+        metrics_dir.mkdir(exist_ok=True)
+
         target_dir = Path("tmp") / sample
         target_dir.mkdir(exist_ok=True)
 
