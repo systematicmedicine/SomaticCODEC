@@ -75,7 +75,7 @@ rule ms_mark_duplicates:
     output:
         bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
         bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bai"),
-        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_map_metrics.txt"
+        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
     shell:
         """
         picard MarkDuplicates \

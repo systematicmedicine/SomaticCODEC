@@ -114,7 +114,7 @@ get_per_sequence_quality_score_r2 <- function() {
       print(sample_name)
       
       # Get path to metrics file
-      metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+      metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
       
       # If missing metrics file enter NA value, then skip sample
       if(length(metric_file_path) == 0) {
@@ -192,7 +192,7 @@ get_percent_reads_filtered <- function() {
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -204,16 +204,14 @@ get_percent_reads_filtered <- function() {
       next
     }
     
-    # Read report lines
-    cutadapt_lines <- readLines(metric_file_path)
+    # Read report into dataframe
+    cutadapt <- read.delim(metric_file_path)
     
     # Get total read pairs processed
-    total_line <- grep("^Total read pairs processed:", cutadapt_lines, value = TRUE)
-    total_reads <- as.numeric(gsub(",", "", sub("Total read pairs processed:\\s*", "", total_line)))
+    total_reads <- as.numeric(cutadapt$in_reads)
     
-    # Extract "Reads written (passing filters)"
-    written_line <- grep("^Reads written \\(passing filters\\):", cutadapt_lines, value = TRUE)
-    written_reads <- as.numeric(gsub(",", "", sub(" .*", "", sub("Reads written \\(passing filters\\):\\s*", "", written_line))))
+    # Get reads written (passing filters)
+    written_reads <- as.numeric(cutadapt$out_reads)
     
     # Calculate percent remaining
     percent_remaining <- round((written_reads / total_reads) * 100, digits = 1)
@@ -249,7 +247,7 @@ get_read_alignment_rate <- function() {
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -309,7 +307,7 @@ get_mask_coverage <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -325,8 +323,8 @@ get_mask_coverage <- function(){
     mask_metrics_lines <- readLines(metric_file_path)
     
     # Get percent coverage of combined mask
-    combined_mask_line <- grep("^combined_mask\\.bed", mask_metrics_lines, value = TRUE)
-    percent_coverage <- round(as.numeric(sub("%", "", 
+    combined_mask_line <- grep("combined_mask\\.bed", mask_metrics_lines, value = TRUE)
+    percent_coverage <- round(as.numeric(sub("%", "",
                                              strsplit(combined_mask_line, "\t")[[1]][3])), digits = 1)
     
     # Add to results
@@ -362,7 +360,7 @@ get_percent_read_contribution <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -427,7 +425,7 @@ get_percent_adaptor_contamination <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -477,7 +475,7 @@ get_correct_product_ratio <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -527,7 +525,7 @@ get_duplex_coverage <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -577,7 +575,7 @@ get_germline_variants <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -615,7 +613,7 @@ get_germline_variants <- function(){
     results <- rbind(results, data.frame(
       sample = sample_name,
       metric = function_metric,
-      value = total_variants,
+      value = total_variants / 1000000,
       stringsAsFactors = FALSE
     )
     )
@@ -643,7 +641,7 @@ get_SNV_indel_ratio <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -709,7 +707,7 @@ get_insertion_deletion_ratio <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -788,7 +786,7 @@ get_MNP_other_variants <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -852,7 +850,7 @@ get_transition_transversion_ratio <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -913,7 +911,7 @@ get_het_hom_ratio <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -925,9 +923,13 @@ get_het_hom_ratio <- function(){
       next
     }
     
-    #read file to df
-    df <- read.delim(metric_file_path, sep = "\t")
-    ratio <- round(df$ratio, digits = 1)
+    # Read lines from metrics file
+    lines <- readLines(metric_file_path)
+    psc_line <- grep("^PSC", lines, value = TRUE)
+    fields <- strsplit(psc_line, "\t")[[1]]
+    het <- as.numeric(fields[4])
+    hom <- as.numeric(fields[5])
+    het_hom_ratio <- round(het / hom, digits = 1)
     
     #add key metrics to results format  
     results <- rbind(results, data.frame(
@@ -960,7 +962,7 @@ get_multimapping_rate <- function() {
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -986,9 +988,7 @@ get_multimapping_rate <- function() {
       reads_multimapped <- grep("^SN\tnon-primary alignments:", alignment_stats_lines, value = TRUE) %>%
         sub(pattern = "SN\tnon-primary alignments:\t", replacement = "") %>%
         as.numeric()
-    } 
-    
-    else {
+    } else {
       
       raw_total_sequences <- grep("in total", alignment_stats_lines, value = TRUE) %>%
         sub(pattern = " .*", replacement = "") %>%
@@ -1032,7 +1032,7 @@ get_duplication_rate <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1090,7 +1090,7 @@ get_total_reads_r1 <- function() {
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # Give if missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1158,7 +1158,7 @@ get_total_reads_r2 <- function() {
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # Give if missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1226,7 +1226,7 @@ get_insert_size <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1284,7 +1284,7 @@ get_overrepresented_sequences_r1 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1371,7 +1371,7 @@ get_overrepresented_sequences_r2 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1458,7 +1458,7 @@ get_gc_deviation_r1 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1546,7 +1546,7 @@ get_gc_deviation_r2 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1634,7 +1634,7 @@ get_per_base_content_diff_r1 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1718,7 +1718,7 @@ get_per_base_content_diff_r2 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1802,7 +1802,7 @@ get_per_base_sequencing_quality_r1 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1880,7 +1880,7 @@ get_per_base_sequencing_quality_r2 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -1958,7 +1958,7 @@ get_per_tile_sequencing_quality_r1 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -2058,7 +2058,7 @@ get_per_tile_sequencing_quality_r2 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -2158,7 +2158,7 @@ get_sequence_length_r1 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -2237,7 +2237,7 @@ get_sequence_length_r2 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -2316,7 +2316,7 @@ get_per_base_N_content_r1 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
@@ -2399,7 +2399,7 @@ get_per_base_N_content_r2 <- function(){
     print(sample_name)
     
     # Get path to metrics file
-    metric_file_path <- metric_file_path(sample_dir, function_metric, component_metrics)
+    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
     # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {

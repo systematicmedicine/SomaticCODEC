@@ -28,21 +28,25 @@ get_metric_functions <- Filter(function(x) is.function(get(x)) && startsWith(x, 
 # Run get_metrics.R functions and store results in list
 metric_dataframes <- lapply(get_metric_functions, function(function_name) {
   function_to_run <- get(function_name)
-  
-  tryCatch({
-    message("Running ", function_name, "...")
-    result <- function_to_run()
-    result  # Return result if successful
-  }, error = function(e) {
-    warning("Function ", function_name, " failed: ", conditionMessage(e))
-    
-    # Insert placeholder row with cleaned metric name
-    data.frame(
-      metric = sub("^get", "", function_name),
-      sample = NA_character_,
-      value = NA_real_
-    )
-  })
+  tryCatch(
+    {
+      function_to_run()
+    },
+    error = function(e) {
+      message(paste0("Error: ", function_name, " failed: ", e$message))
+      # Graceful NA dataframe return:
+      # Determine metric name from function name
+      function_metric <- sub("^get_", "", function_name)
+      # Return data frame with NA for all samples found
+      sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+      sample_names <- basename(sample_dirs)
+      if (length(sample_names) == 0) sample_names <- NA_character_
+      data.frame(
+        metric = function_metric,
+        sample = sample_names,
+        value = NA_real_)
+    }
+  )
 })
 
 # Combine metrics values into one data frame  
@@ -62,7 +66,8 @@ component_metrics_report <- combined_metrics_values %>%
   inner_join(component_metrics, by = c("metric", "sample_type")) %>% 
   mutate(nn = ifelse(value >= nn_lower & value <= nn_upper, "PASS", "FAIL"),
          ideal = ifelse(value >= ideal_lower & value <= ideal_upper, "PASS", "FAIL")) %>% 
-  arrange(metric, sample)
+  arrange(metric, sample) %>% 
+  select(1:2, 4:6, 3, 7:12)
 
 # Export metrics report as csv
 write.csv(component_metrics_report, "metrics/component_metrics_report.csv", row.names = FALSE)
