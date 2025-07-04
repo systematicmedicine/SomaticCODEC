@@ -61,10 +61,8 @@ rule ms_alignment_metrics:
         insert_hist = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
     shell:
         """
-        # Generate alignment stats
         samtools stats {input.bam} > {output.stats}
 
-        # Collect insert size metrics
         picard CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.insert_metrics} \
@@ -96,23 +94,28 @@ rule masking_metrics:
         ref_index = config['GRCh38_path'] + ".fai"
     output:
         mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.txt"
+    params:
+        intermediate_sorted = temp("metrics/{ms_sample}/{ms_sample}_masks_sorted.txt"),
+        intermediate_merged = temp("metrics/{ms_sample}/{ms_sample}_masks_merged.txt")
     shell:
         """
         total_genome_bp=$(awk '{{sum += $2}} END {{print sum}}' {input.ref_index})
 
         printf "Mask File\\tMasked bases\\t%% of ref genome\\n" > {output.mask_metrics}
 
-        for bed in \\
-            {input.gnomAD_bed} \\
-            {input.GIAB_bed} \\
-            {input.ms_lowdepth_bed} \\
-            {input.ms_germ_del_bed} \\
-            {input.ms_germ_ins_bed} \\
-            {input.ms_germ_snv_bed} \\
+        for bed in \
+            {input.gnomAD_bed} \
+            {input.GIAB_bed} \
+            {input.ms_lowdepth_bed} \
+            {input.ms_germ_del_bed} \
+            {input.ms_germ_ins_bed} \
+            {input.ms_germ_snv_bed} \
             {input.combined_bed}
         do
             name=$(basename "$bed")
-            masked_bp=$(bedtools sort -i "$bed" | bedtools merge -i - | awk '{{sum += $3 - $2}} END {{print sum}}')
+            bedtools sort -i "$bed" > {params.intermediate_sorted}
+            bedtools merge -i {params.intermediate_sorted} > {params.intermediate_merged}
+            masked_bp=$(awk '{{sum += $3 - $2}} END {{print sum}}' {params.intermediate_merged})
             pct=$(awk -v masked="$masked_bp" -v total="$total_genome_bp" 'BEGIN {{printf "%.2f", (masked / total) * 100}}')
             printf "%s\\t%s\\t%s%%\\n" "$name" "$masked_bp" "$pct" >> {output.mask_metrics}
         done
@@ -124,19 +127,25 @@ rule ms_het_hom_ratio:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
         ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
-    shell: 
+    params:
+        intermediate_txt = temp("tmp/{ms_sample}/{ms_sample}_ms_genotypes.txt"),
+        intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_ms_genotypes_sorted.txt"),
+        intermediate_counts = temp("tmp/{ms_sample}/{ms_sample}_ms_genotype_counts.txt")
+    shell:
         """
-        bcftools query -f '[%GT\\n]' {input.vcf} \\
-            | sort | uniq -c \\
-            | awk '
-                {{
-                    if ($2 == "0/1" || $2 == "1/0" || $2 == "1/2") het += $1;
-                    else if ($2 == "1/1") hom += $1;
-                }}
-                END {{
-                    print "Heterozygous_count", "Homozygous_count", "Het/Hom_Ratio";
-                    het += 0; hom += 0;
-                    print het, hom, (hom > 0 ? het / hom : "NA");
-                }}
-            ' OFS="\\t" > {output.ms_het_hom_ratio}
+        bcftools query -f '[%GT\\n]' {input.vcf} > {params.intermediate_txt}
+        sort {params.intermediate_txt} > {params.intermediate_sorted}
+        uniq -c {params.intermediate_sorted} > {params.intermediate_counts}
+
+        awk '
+            {{
+                if ($2 == "0/1" || $2 == "1/0" || $2 == "1/2") het += $1;
+                else if ($2 == "1/1") hom += $1;
+            }}
+            END {{
+                print "Heterozygous_count", "Homozygous_count", "Het/Hom_Ratio";
+                het += 0; hom += 0;
+                print het, hom, (hom > 0 ? het / hom : "NA");
+            }}
+        ' OFS="\\t" {params.intermediate_counts} > {output.ms_het_hom_ratio}
         """
