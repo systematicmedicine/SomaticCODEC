@@ -34,7 +34,6 @@ metric_dataframes <- lapply(get_metric_functions, function(function_name) {
     },
     error = function(e) {
       message(paste0("Error: ", function_name, " failed: ", e$message))
-      # Graceful NA dataframe return:
       # Determine metric name from function name
       function_metric <- sub("^get_", "", function_name)
       # Return data frame with NA for all samples found
