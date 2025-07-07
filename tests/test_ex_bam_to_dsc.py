@@ -12,6 +12,7 @@ import subprocess
 from pathlib import Path
 import pandas as pd
 import os
+import shutil
 
 def symlink_test_bams():
     for sample in ["S001", "S002", "S003"]:
@@ -27,6 +28,20 @@ def test_ex_bam_to_dsc_output(clean_workspace_fixture):
 
     # Create symlink for intermediate input bams before running snakemake
     symlink_test_bams()
+
+    # Copy files into tmp/downloads
+    target_dir = Path("tmp/downloads")
+    target_dir.mkdir(exist_ok=True)
+
+    files_to_copy = [f"micro_GRCh38_Chr1_1Mbp.fna",
+                     f"ex_Chr1_1kreads_r1.fastq.gz",
+                     f"ex_Chr1_1kreads_r2.fastq.gz"
+                     ]
+
+    for filename in files_to_copy:
+            source = Path("tests/data") / filename
+            dest = target_dir / filename
+            shutil.copy(source, dest)
 
     # Run snakemake
     snakemake_cmd = [
