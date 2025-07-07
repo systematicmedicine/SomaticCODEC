@@ -23,45 +23,45 @@ rule ex_annotate_bam:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
-        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt"
+        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
+        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map__moveumi_tmp.bam"),
+        intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
+        intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
+        intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam")
     threads:
         max(1, os.cpu_count() // 16)
     resources:
         mem = 64
     params:
-        ex_sample = lambda wc: wc.ex_sample,
-        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map__moveumi_tmp.bam"),
-        intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
-        intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
-        intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam")
+        ex_sample = lambda wc: wc.ex_sample
     shell:
         """
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             CopyUmiFromReadName \
             -i {input.bam} \
-            -o {params.intermediate_moveumi} \
+            -o {output.intermediate_moveumi} \
             --remove-umi true \
 
-        samtools sort -n -@ {threads} -o {params.intermediate_sorted} {params.intermediate_moveumi} \
+        samtools sort -n -@ {threads} -o {output.intermediate_sorted} {output.intermediate_moveumi} \
 
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             SetMateInformation \
-            -i {params.intermediate_sorted} \
-            -o {params.intermediate_mateinfo} \
+            -i {output.intermediate_sorted} \
+            -o {output.intermediate_mateinfo} \
 
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             --compression 1 --async-io \
             GroupReadsByUmi \
             --min-umi-length 6 \
-            -i {params.intermediate_mateinfo} \
-            -o {params.intermediate_groupbyumi} \
+            -i {output.intermediate_mateinfo} \
+            -o {output.intermediate_groupbyumi} \
             -f {output.histogram} \
             -@ {threads} \
             -m 0 \
             --strategy=adjacency \
 
         picard AddOrReplaceReadGroups \
-            I={params.intermediate_groupbyumi} \
+            I={output.intermediate_groupbyumi} \
             O={output.bam} \
             RGID={params.ex_sample} \
             RGLB=lib1 \
@@ -123,19 +123,18 @@ rule ex_remap_dsc:
         pac = config["GRCh38_path"] + ".pac",
         sa = config["GRCh38_path"] + ".0123"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam")
-    params:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam")
     threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        samtools fastq -o {params.intermediate_fastq} {input.bam}
+        samtools fastq -o {output.intermediate_fastq} {input.bam}
 
-        bwa-mem2 mem -t {threads} -Y {input.ref} {params.intermediate_fastq} > {params.intermediate_sam}
+        bwa-mem2 mem -t {threads} -Y {input.ref} {output.intermediate_fastq} > {output.intermediate_sam}
 
-        samtools view -@ {threads} -bS {params.intermediate_sam} > {output.bam}
+        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam}
         """
         
 # Sort realigned DSC bam by readname for downstream annotation
@@ -161,10 +160,8 @@ rule ex_annotate_dsc:
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
-        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai")
-    params:
-        intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam"),
-        intermediate_sort = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_sort_tmp.bam")
+        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
+        intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
     resources:
         mem = 64
     threads:
@@ -177,9 +174,9 @@ rule ex_annotate_dsc:
             --unmapped {input.unmapped} \
             --ref {input.ref} \
             --tags-to-revcomp Consensus \
-            -o {params.intermediate_anno}
+            -o {output.intermediate_anno}
 
-        samtools sort -@ {threads} -o {output.bam} {params.intermediate_anno}
+        samtools sort -@ {threads} -o {output.bam} {output.intermediate_anno}
 
         samtools index -@ {threads} {output.bam}
         """

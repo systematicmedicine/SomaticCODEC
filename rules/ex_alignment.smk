@@ -21,16 +21,15 @@ rule ex_map:
         pac = config["GRCh38_path"] + ".pac",
         sa = config["GRCh38_path"] + ".0123"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam")
-    params:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
     threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fastq1} {input.fastq2} > {params.intermediate_sam}
+        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fastq1} {input.fastq2} > {output.intermediate_sam}
         
-        samtools view -@ {threads} -bS {params.intermediate_sam} > {output.bam}
+        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam}
         """
 
 # Filters mapped BAM files to remove intermolecular byproducts and retain correct products
