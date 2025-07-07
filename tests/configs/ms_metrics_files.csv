@@ -1,0 +1,16 @@
+file_path
+tmp/{sample}/{sample}_combined_mask.bed
+metrics/{sample}/{sample}_r1_raw_fastqc.html
+metrics/{sample}/{sample}_r2_raw_fastqc.html
+metrics/{sample}/{sample}_trimfilter_metrics.tsv
+metrics/{sample}/{sample}_trimfilter_r1_fastqc.html
+metrics/{sample}/{sample}_trimfilter_r2_fastqc.html
+metrics/{sample}/{sample}_markdup_metrics.txt
+metrics/{sample}/{sample}_alignment_stats.txt
+metrics/{sample}/{sample}_insert_size_metrics.txt
+metrics/{sample}/{sample}_insert_size_histogram.pdf
+metrics/{sample}/{sample}_variantCall_summary.txt
+metrics/{sample}/{sample}_ms_het_hom_ratio.txt
+metrics/{sample}/{sample}_depth_histogram.txt
+metrics/{sample}/{sample}_mask_metrics.txt
+metrics/component_metrics_report.csv
