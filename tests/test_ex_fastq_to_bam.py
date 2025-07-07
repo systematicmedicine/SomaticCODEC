@@ -11,9 +11,25 @@ import subprocess
 import json
 from pathlib import Path
 import pandas as pd
+import shutil
 
 # Tests if raw codecseq fastq files can be converted to an aligned bam
 def test_ex_fastq_to_bam_output(clean_workspace_fixture):
+
+    # Copy files into tmp/downloads
+    target_dir = Path("tmp/downloads")
+    target_dir.mkdir(exist_ok=True)
+
+    files_to_copy = [f"micro_GRCh38_Chr1_1Mbp.fna",
+                     f"ex_Chr1_1kreads_r1.fastq.gz",
+                     f"ex_Chr1_1kreads_r2.fastq.gz"
+                     ]
+
+    for filename in files_to_copy:
+            source = Path("tests/data") / filename
+            dest = target_dir / filename
+            shutil.copy(source, dest)
+
     # Run snakemake
     snakemake_cmd = [
         "snakemake",
