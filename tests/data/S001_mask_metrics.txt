@@ -1,8 +1,0 @@
-Mask File	Masked bases	% of ref genome
-gnomad_common_af01_merged_10lines.bed	238	0.02%
-GRCh38_alldifficultregions_10lines.bed	739096	73.91%
-S001_lowdepth.bed	1000001	100.00%
-S001_germ_deletions.bed	2	0.00%
-S001_germ_insertions.bed	1	0.00%
-S001_germ_snvs.bed	2	0.00%
-S001_combined_mask.bed	1739097	173.91%
