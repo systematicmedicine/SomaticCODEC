@@ -72,4 +72,14 @@ def test_ms_outputs(clean_workspace_fixture):
         assert path.exists(), f"File not found ({desc}, sample {sample}): {path}"
         # Check that file is not empty
         assert path.stat().st_size > 0, f"File is empty ({desc}, sample {sample}): {path}"
+
+        # Check that files have rows below header
+        if path.suffix in [".csv", ".tsv", ".txt"]:
+            # Determine separator
+            sep = "\t" if path.suffix == ".tsv" or desc.endswith("metrics.txt") else ","
+            try:
+                df = pd.read_csv(path, sep=sep, comment="#")
+                assert len(df) > 0, f"File has header but no data rows ({desc}, sample {sample}): {path}"
+            except pd.errors.EmptyDataError:
+                assert False, f"File has header but no data rows ({desc}, sample {sample}): {path}"
         
