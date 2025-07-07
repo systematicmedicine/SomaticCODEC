@@ -10,7 +10,8 @@ Output: Double stranded consensus
 2. Duplicate reads are then collapsed into consensus sequences for read 1 and read 2
 3. Read 1 and read 2 are collapsed to create a double stranded consensus, which includes single strand overhangs and read 1 read 2 disagreements marked as N
 
-Author: James Phie
+Authors: 
+    - James Phie
 
 """
 # Annotate the filtered (for correct product) BAM for downstream rules
@@ -32,8 +33,6 @@ rule ex_annotate_bam:
         max(1, os.cpu_count() // 16)
     resources:
         mem = 64
-    params:
-        ex_sample = lambda wc: wc.ex_sample
     shell:
         """
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
@@ -63,11 +62,11 @@ rule ex_annotate_bam:
         picard AddOrReplaceReadGroups \
             I={output.intermediate_groupbyumi} \
             O={output.bam} \
-            RGID={params.ex_sample} \
+            RGID={wildcards.ex_sample} \
             RGLB=lib1 \
             RGPL=illumina \
             RGPU=unit1 \
-            RGSM={params.ex_sample} \
+            RGSM={wildcards.ex_sample} \
             VALIDATION_STRINGENCY=LENIENT
         """
 
