@@ -1,0 +1,2 @@
+ms_sample,fastq1,fastq2
+S001,tmp/downloads/ms_Chr1_100reads_r1.fastq.gz,tmp/downloads/ms_Chr1_100reads_r2.fastq.gz

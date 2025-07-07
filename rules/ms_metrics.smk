@@ -26,8 +26,8 @@ rule ms_raw_fastq_metrics:
         
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
 
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_raw_fastqc.html {output.r1_report}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_raw_fastqc.html {output.r2_report}
+        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
+        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
         """
 
 # Generates a fastqc report for ms processed reads
@@ -46,9 +46,7 @@ rule ms_processed_fastq_metrics:
         r2_base=$(basename {input.r2} .fastq.gz)
         
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
-
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
+        
         """
 
 # Generates ms alignment metrics
@@ -95,8 +93,8 @@ rule masking_metrics:
     output:
         mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.txt"
     params:
-        intermediate_sorted = temp("metrics/{ms_sample}/{ms_sample}_masks_sorted.txt"),
-        intermediate_merged = temp("metrics/{ms_sample}/{ms_sample}_masks_merged.txt")
+        intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),
+        intermediate_merged = temp("tmp/{ms_sample}/{ms_sample}_masks_merged.txt")
     shell:
         """
         total_genome_bp=$(awk '{{sum += $2}} END {{print sum}}' {input.ref_index})
