@@ -1,14 +1,15 @@
-
 """
---- Snakefile_dev_JJ ---
+--- Snakefile_test_ms_outputs ---
 
-Temporary Snakefile for use during pipeline development
+Test Snakefile to be used with function test_ms_outputs
 
-Runs matched sample pipeline from demuxed FASTQs to raw alignment
+Runs matched sample pipeline from demuxed FASTQs to creating a combined mask BED and metrics files
 
-Input: Demuxed FASTQ files generated from Illumina sequencing of Illumina PCR-free libraries 
+Inputs: 
+    - 100 read pairs mapping to the middle of Chr1
+    - Micro reference (1Mbp in the middle of Chr1)
 Output: 
-    - Combined mask
+    - Combined mask BED
     - Metrics files
 
 Author: Joshua Johnstone
@@ -19,24 +20,18 @@ Author: Joshua Johnstone
 import os
 import pandas as pd
 
-# Set working directory
-os.chdir(workflow.basedir)
-
-# Load lane and sample names
+# Load additional config data
 ms_samples = pd.read_csv(config["ms_samples_path"])
 
 # Include rules files
+include: "../../rules/index_reference_genome.smk"
+include: "../../rules/ms_preprocess_fastq.smk"
+include: "../../rules/ms_alignment.smk"
+include: "../../rules/ms_call_germ.smk"
+include: "../../rules/masked_regions.smk"
+include: "../../rules/ms_metrics.smk"
+include: "../../rules/component_metrics.smk"
 
-include: "rules/ms_preprocess_fastq.smk"
-include: "rules/ms_alignment.smk"
-include: "rules/ms_call_germ.smk"
-include: "rules/ms_metrics.smk"
-include: "rules/masked_regions.smk"
-include: "rules/component_metrics.smk"
-include: "rules/index_reference_genome.smk"
-
-
-# Rule all defines all the output that the pipeline will create
 rule all:
     input:
         expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
@@ -53,5 +48,3 @@ rule all:
         expand("metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         "metrics/component_metrics_report.csv"
-
-
