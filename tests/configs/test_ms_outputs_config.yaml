@@ -1,5 +1,5 @@
 ms_samples_path: tests/configs/test_ms_outputs_samples.csv
-GRCh38_path: tmp/downloads/micro_GRCh38_Chr1_1Mbp.fna
+GRCh38_path: tmp/downloads/GRCh38_Chr21.fna
 ms_adaptor_1: CTGTCTCTTATACACATCT
 ms_adaptor_2: ATGTGTATAAGAGACA
 difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions_10lines.bed
