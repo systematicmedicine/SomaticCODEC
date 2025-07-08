@@ -48,45 +48,56 @@ def test_pipeline_outputs(clean_workspace_fixture):
 
     subprocess.run(snakemake_cmd)
 
-    # Load sample names
-    ms_samples = pd.read_csv("tests/configs/test_pipeline_outputs_samples.csv")["ms_sample"].to_list()
-    ex_lanes = pd.read_csv("tests/configs/test_pipeline_outputs_samples.csv")["ex_lane"].to_list()
-    ex_samples = pd.read_csv("tests/configs/test_pipeline_outputs_samples.csv")["ex_sample"].to_list()
+    # Load sample and region names for file name wildcards
+    ms_samples = pd.read_csv("tests/configs/test_pipeline_outputs_ms_samples.csv")["ms_sample"].to_list()
+    ex_lanes = pd.read_csv("tests/configs/test_pipeline_outputs_ex_lanes.csv")["ex_lane"].to_list()
+    ex_samples = pd.read_csv("tests/configs/test_pipeline_outputs_ex_samples.csv")["ex_sample"].to_list()
 
     # Load files to check
     outputs_to_check = pd.read_csv("tests/configs/test_pipeline_outputs_file_list.csv")
     checked_files = set()
 
-    for sample in ms_samples + ex_lanes + ex_samples:
-        # Check output files
-        for _, row in outputs_to_check.iterrows():
-            path_str = (
-                row["file_path"].format(ms_sample=sample)
-                if "{ms_sample}" in row["file_path"] else
-                row["file_path"].format(ex_lane=sample)
-                if "{ex_lane}" in row["file_path"] else
-                row["file_path"].format(ex_sample=sample)
-                if "{ex_sample}" in row["file_path"] else
-                row["file_path"]
-                )
-            
-            checked_files.add(path_str)
-            path = Path(path_str)
+    file_counts = []
 
-            # Check that file exists
-            assert path.exists(), f"Missing file: {path}"
+    for _, row in outputs_to_check.iterrows():
+        if "{ms_sample}" in row["file_path"]:
+            for ms_sample in ms_samples:
+                checked_files.add(row["file_path"].format(ms_sample=ms_sample))
+        elif "{ex_lane}" in row["file_path"]:
+            for ex_lane in ex_lanes:
+                checked_files.add(row["file_path"].format(ex_lane=ex_lane))
+        elif "{ex_sample}" in row["file_path"]:
+            for ex_sample in ex_samples:
+                checked_files.add(row["file_path"].format(ex_sample=ex_sample))
+        else:
+            checked_files.add(row["file_path"])
 
-            # Check that non-data files are not empty
-            if path.suffix in [".amb", ".ann", ".bwt.2bit.64", ".pac", ".0123", 
-                               ".fai", ".dict", ".html", ".pdf", ".json", ".zip",
-                               ".bai"]:
-                assert path.stat().st_size > 0, f"File is empty: {path}"
-            else:
-                # Check that data files have data points
-                data_row_count = count_data_points.count_data_points(path)
-                assert data_row_count > 1, f"File has no data points ({data_row_count}): {path_str}"
+    missing_files = [filepath for filepath in checked_files if not Path(filepath).exists()]
+    assert not missing_files, f"Missing files: {missing_files}"
 
-    # Check that all files in the file list have been checked
-    all_files = count_data_points.get_all_file_paths(outputs_to_check, ms_samples, ex_lanes, ex_samples)
-    missing_files = all_files - checked_files
-    assert not missing_files, f"Files from file list not checked: {missing_files}"
+    for path in checked_files:
+        path = Path(path)
+    
+        # Check that file exists
+        assert path.exists(), f"Missing file: {path}"
+
+    # Check that non-data files are not empty
+    if path.suffix in [".amb", ".ann", ".pac", ".0123", ".64", 
+                    ".fai", ".dict", ".html", ".pdf", ".json", 
+                    ".zip", ".bai"]:
+        assert path.stat().st_size > 0, f"File is empty: {path}"
+        data_row_count = None
+    else:
+        # Check data files have data points
+        data_row_count = count_data_points.count_data_points(path)
+        assert data_row_count > 1, f"File has no data points: {path}"
+
+        # Store data point count
+        file_counts.append({
+        "file_path": str(path),
+        "data_row_count": data_row_count
+        })
+
+    # Print all data point counts clearly
+    df_counts = pd.DataFrame(file_counts)
+    print(df_counts)
