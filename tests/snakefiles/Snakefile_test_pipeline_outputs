@@ -1,15 +1,17 @@
 """
 --- Snakefile_test_ms_outputs ---
 
-Test Snakefile to be used with function test_ms_outputs
+Test Snakefile to be used with function test_pipeline_outputs
 
-Runs matched sample pipeline from demuxed FASTQs to creating a combined mask BED and metrics files
+Runs entire pipeline from raw FASTQs to a filtered duplex strand consensus BAM
 
 Inputs: 
-    - 100 read pairs mapping to the middle of Chr1
-    - Micro reference (1Mbp in the middle of Chr1)
-Output: 
-    - Combined mask BED
+    - 10000 ms read pairs mapping to Chr21
+    - 10000 ex read pairs mapping to Chr21
+    - Chr21 of GRCh38 (reference)
+Outputs: 
+    - Filtered duplex strand consensus bam
+    - All intermediate files
     - Metrics files
 
 Author: Joshua Johnstone

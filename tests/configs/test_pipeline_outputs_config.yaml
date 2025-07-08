@@ -1,4 +1,4 @@
-ms_samples_path: tests/configs/test_ms_outputs_samples.csv
+ms_samples_path: tests/configs/test_pipeline_outputs_samples.csv
 GRCh38_path: tmp/downloads/GRCh38_Chr21.fna
 ms_adaptor_1: CTGTCTCTTATACACATCT
 ms_adaptor_2: ATGTGTATAAGAGACA
