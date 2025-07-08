@@ -24,6 +24,16 @@ import pandas as pd
 
 # Load additional config data
 ms_samples = pd.read_csv(config["ms_samples_path"])
+ex_samples = pd.read_csv(config["ex_samples_path"])
+ex_lanes = pd.read_csv(config["ex_lanes_path"])
+ex_adapters = pd.read_csv(config["ex_adapters_path"])
+
+# Add sample adapter sequences to ex_samples dataframe
+ex_samples = ex_samples.merge(ex_adapters.rename(columns={"ex_adapter": "adapter"}),on="adapter",how="left")
+
+# Creates dictionaries to lookup between ex_lane and ex_sample
+ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
+ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
 # Include rules files
 include: "../../rules/index_reference_genome.smk"
@@ -32,6 +42,9 @@ include: "../../rules/ms_alignment.smk"
 include: "../../rules/ms_call_germ.smk"
 include: "../../rules/masked_regions.smk"
 include: "../../rules/ms_metrics.smk"
+include: "../../rules/ex_preprocess_fastq.smk"
+include: "../../rules/ex_alignment.smk"
+include: "../../rules/ex_create_dsc.smk"
 include: "../../rules/component_metrics.smk"
 
 rule all:
@@ -49,4 +62,11 @@ rule all:
         expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt", ms_sample = ms_samples["ms_sample"].tolist()),
         expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_samples["ms_sample"].tolist()),
+        expand("tmp/{ex_sample}/{ex_sample}_map_correct.bam", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
+        expand("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam", ex_sample=ex_samples["ex_sample"].tolist()),
         "metrics/component_metrics_report.csv"
