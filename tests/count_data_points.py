@@ -14,14 +14,19 @@ import pysam
 def get_all_file_paths(outputs_to_check, ms_samples, ex_lanes, ex_samples):
     all_files = set()
     for _, row in outputs_to_check.iterrows():
+
         for sample in ms_samples + ex_lanes + ex_samples:
             path_template = row["file_path"]
+
             if "{ms_sample}" in path_template:
                 path_str = path_template.format(ms_sample=sample)
+
             elif "{ex_lane}" in path_template:
                 path_str = path_template.format(ex_lane=sample)
+
             elif "{ex_sample}" in path_template:
                 path_str = path_template.format(ex_sample=sample)
+                
             else:
                 path_str = path_template
             all_files.add(path_str)
@@ -30,26 +35,20 @@ def get_all_file_paths(outputs_to_check, ms_samples, ex_lanes, ex_samples):
 # Determines which data counting function to call based on file suffix
 def count_data_points(path):
     path = Path(path)
-    suffixes = "".join(path.suffixes[-2:])
+    suffixes = "".join(path.suffixes)
     suffix = path.suffix
 
-    if suffixes == ".vcf.gz":
+    if suffixes == ".vcf.gz" or suffix == ".vcf":
         return count_vcf_data_points(path)
     
-    if suffixes == ".fastq.gz":
+    if suffixes == ".fastq.gz" or suffix == ".fastq":
         return count_fastq_data_points(path)
     
     if suffix == ".bed":
         return count_bed_data_points(path)
     
-    elif suffix == ".vcf":
-        return count_vcf_data_points(path)
-    
     elif suffix in [".csv", ".tsv", ".txt"]:
         return count_tabular_data_points(path)
-    
-    elif suffix == ".fastq" or suffix == ".fq":
-        return count_fastq_data_points(path)
     
     elif suffix == ".bam":
         return count_bam_data_points(path)
@@ -59,6 +58,9 @@ def count_data_points(path):
     
     elif suffix == ".bcf":
         return count_bcf_data_points(path)
+    
+    elif suffixes == ".fasta.gz" or suffix == ".fasta":
+        return count_fasta_data_points(path)
     
     else:
         raise ValueError(f"Unsupported file type for data point counting: {path.suffix}")
