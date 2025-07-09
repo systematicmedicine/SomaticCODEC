@@ -9,6 +9,7 @@ Author: Joshua Johnstone
 import gzip
 from pathlib import Path
 import pysam
+import subprocess
 
 # Gets list of all files to be checked
 def get_all_file_paths(outputs_to_check, ms_samples, ex_lanes, ex_samples):
@@ -115,8 +116,17 @@ def count_sam_data_points(path):
 
 # Counts the number of reads in a BAM file
 def count_bam_data_points(path):
-    with pysam.AlignmentFile(path, "rb") as bam:
-        return sum(1 for _ in bam)
+    path = str(path)
+    try:
+        result = subprocess.run(
+            ["samtools", "view", "-c", path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return int(result.stdout.strip())
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"samtools failed on {path} with error:\n{e.stderr}")
     
 # Counts the number of variant records in a BCF file
 def count_bcf_data_points(path):
