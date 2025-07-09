@@ -55,22 +55,21 @@ def test_pipeline_outputs(clean_workspace_fixture):
 
     # Load files to check
     outputs_to_check = pd.read_csv("tests/configs/test_pipeline_outputs_file_list.csv")
-    checked_files = set()
-
+    checked_files = []
     file_counts = []
 
     for _, row in outputs_to_check.iterrows():
         if "{ms_sample}" in row["file_path"]:
             for ms_sample in ms_samples:
-                checked_files.add(row["file_path"].format(ms_sample=ms_sample))
+                checked_files.append(row["file_path"].format(ms_sample=ms_sample))
         elif "{ex_lane}" in row["file_path"]:
             for ex_lane in ex_lanes:
-                checked_files.add(row["file_path"].format(ex_lane=ex_lane))
+                checked_files.append(row["file_path"].format(ex_lane=ex_lane))
         elif "{ex_sample}" in row["file_path"]:
             for ex_sample in ex_samples:
-                checked_files.add(row["file_path"].format(ex_sample=ex_sample))
+                checked_files.append(row["file_path"].format(ex_sample=ex_sample))
         else:
-            checked_files.add(row["file_path"])
+            checked_files.append(row["file_path"])
 
     missing_files = [filepath for filepath in checked_files if not Path(filepath).exists()]
     assert not missing_files, f"Missing files: {missing_files}"
@@ -81,22 +80,22 @@ def test_pipeline_outputs(clean_workspace_fixture):
         # Check that file exists
         assert path.exists(), f"Missing file: {path}"
 
-    # Check that non-data files are not empty
-    if path.suffix in [".amb", ".ann", ".pac", ".0123", ".64", 
+        # Check that non-data files are not empty
+        if path.suffix in [".amb", ".ann", ".pac", ".0123", ".64", 
                     ".fai", ".dict", ".html", ".pdf", ".json", 
                     ".zip", ".bai"]:
-        assert path.stat().st_size > 0, f"File is empty: {path}"
-        data_row_count = None
-    else:
-        # Check data files have data points
-        data_row_count = count_data_points.count_data_points(path)
-        assert data_row_count > 1, f"File has no data points: {path}"
+            assert path.stat().st_size > 0, f"File is empty: {path}"
+            data_row_count = None
+        else:
+            # Check data files have data points
+            data_row_count = count_data_points.count_data_points(path)
+            assert data_row_count >= 1, f"File has no data points: {path}"
 
-        # Store data point count
-        file_counts.append({
-        "file_path": str(path),
-        "data_row_count": data_row_count
-        })
+            # Store data point count
+            file_counts.append({
+            "file_path": str(path),
+            "data_row_count": data_row_count
+            })
 
     # Print all data point counts clearly
     df_counts = pd.DataFrame(file_counts)
