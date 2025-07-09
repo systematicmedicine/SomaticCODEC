@@ -26,7 +26,7 @@ rule ms_low_depth_mask:
         bed = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.bed"),
         depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram.txt"
     params:
-        threshold = 30,
+        threshold = config['lowdepth_mask_threshold'],
         intermediate_depth_per_base = temp("tmp/{ms_sample}/{ms_sample}_depth_per_base.txt"),
         intermediate_30x_depth = temp("tmp/{ms_sample}/{ms_sample}_30x_depth.txt"),
         intermediate_30x_sorted = temp("tmp/{ms_sample}/{ms_sample}_30x_sorted.txt"),
