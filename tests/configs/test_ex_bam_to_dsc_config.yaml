@@ -1,5 +1,0 @@
----
-GRCh38_path: tmp/downloads/micro_GRCh38_Chr1_1Mbp.fna
-ex_samples_path: tests/configs/test_ex_bam_to_dsc_exsamples.csv
-ex_adapters_path: tests/configs/test_ex_bam_to_dsc_exadapters.csv
-ex_lanes_path: tests/configs/test_ex_bam_to_dsc_exlanes.csv
