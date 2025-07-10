@@ -17,7 +17,6 @@ snakemake \
     --resources mem=370 \
     --notemp \
     --keep-going \
-    --verbose \
     --reason \
     --stats metrics/pipeline_stats.json \
-    2>&1 | tee metrics/snakemake.log
+    2>&1 | tee logs/pipeline_run_$(date +%Y%m%d).log
