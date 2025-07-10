@@ -4,16 +4,18 @@
 *.snakemake-tmp*
 *.snakemake-tmp/
 
-# Intermediate files generated while running pipeline
+# Omit the contents of the following directories
 tmp/*
 !tmp/.gitkeep
 
-# During development, dont push results and metrics files to remote repo
 results/*
 !results/.gitkeep
 
 metrics/*
 !metrics/.gitkeep
+
+logs/*
+!logs/.gitkeep
 
 # Pycache generated when running pytest
 __pycache__/
