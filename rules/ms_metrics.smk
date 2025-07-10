@@ -91,8 +91,7 @@ rule masking_metrics:
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
         ref_index = config['GRCh38_path'] + ".fai"
     output:
-        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.txt"
-    params:
+        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.txt",
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),
         intermediate_merged = temp("tmp/{ms_sample}/{ms_sample}_masks_merged.txt")
     shell:
@@ -111,9 +110,9 @@ rule masking_metrics:
             {input.combined_bed}
         do
             name=$(basename "$bed")
-            bedtools sort -i "$bed" > {params.intermediate_sorted}
-            bedtools merge -i {params.intermediate_sorted} > {params.intermediate_merged}
-            masked_bp=$(awk '{{sum += $3 - $2}} END {{print sum}}' {params.intermediate_merged})
+            bedtools sort -i "$bed" > {output.intermediate_sorted}
+            bedtools merge -i {output.intermediate_sorted} > {output.intermediate_merged}
+            masked_bp=$(awk '{{sum += $3 - $2}} END {{print sum}}' {output.intermediate_merged})
             pct=$(awk -v masked="$masked_bp" -v total="$total_genome_bp" 'BEGIN {{printf "%.2f", (masked / total) * 100}}')
             printf "%s\\t%s\\t%s%%\\n" "$name" "$masked_bp" "$pct" >> {output.mask_metrics}
         done
@@ -124,16 +123,15 @@ rule ms_het_hom_ratio:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
-        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt"
-    params:
+        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt",
         intermediate_txt = temp("tmp/{ms_sample}/{ms_sample}_ms_genotypes.txt"),
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_ms_genotypes_sorted.txt"),
         intermediate_counts = temp("tmp/{ms_sample}/{ms_sample}_ms_genotype_counts.txt")
     shell:
         """
-        bcftools query -f '[%GT\\n]' {input.vcf} > {params.intermediate_txt}
-        sort {params.intermediate_txt} > {params.intermediate_sorted}
-        uniq -c {params.intermediate_sorted} > {params.intermediate_counts}
+        bcftools query -f '[%GT\\n]' {input.vcf} > {output.intermediate_txt}
+        sort {output.intermediate_txt} > {output.intermediate_sorted}
+        uniq -c {output.intermediate_sorted} > {output.intermediate_counts}
 
         awk '
             {{
@@ -145,5 +143,5 @@ rule ms_het_hom_ratio:
                 het += 0; hom += 0;
                 print het, hom, (hom > 0 ? het / hom : "NA");
             }}
-        ' OFS="\\t" {params.intermediate_counts} > {output.ms_het_hom_ratio}
+        ' OFS="\\t" {output.intermediate_counts} > {output.ms_het_hom_ratio}
         """
