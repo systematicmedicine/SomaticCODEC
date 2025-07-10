@@ -14,10 +14,10 @@ tmp/{ms_sample}/{ms_sample}_sorted_map.bam
 tmp/{ms_sample}/{ms_sample}_markdup_map.bam
 tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz
 tmp/{ms_sample}/{ms_sample}_depth_per_base.txt
-tmp/{ms_sample}/{ms_sample}_30x_depth.txt
-tmp/{ms_sample}/{ms_sample}_30x_sorted.txt
-tmp/{ms_sample}/{ms_sample}_depth.txt
-tmp/{ms_sample}/{ms_sample}_depth_sorted.txt
+tmp/{ms_sample}/{ms_sample}_lowdepth.txt
+tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt
+tmp/{ms_sample}/{ms_sample}_depth_values.txt
+tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth.bed
 tmp/{ms_sample}/{ms_sample}_ms_candidate_variants_uncompressed.vcf
 tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed
