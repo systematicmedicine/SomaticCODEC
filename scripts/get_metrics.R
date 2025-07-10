@@ -1023,26 +1023,13 @@ get_multimapping_rate <- function() {
 # Extract the duplication rate
 get_duplication_rate <- function(){
   
-  # Store metric name
   function_metric = "duplication_rate"
-  
-  # Print progress indicator
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
+  # Find metrics file
+  metric_file_path <- find_metric_file_path("metrics", function_metric, component_metrics)
   
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
+  # If missing metrics file enter NA value, then skip sample
     if(length(metric_file_path) == 0) {
       results <- rbind(results, data.frame(
         metric = function_metric,
@@ -1051,31 +1038,21 @@ get_duplication_rate <- function(){
       ))
       next
     }
-    
-    # Get duplication values
-    if(any(grepl("_alignment_stats\\.txt$", metric_file_path))){
-      
-      # Put all lines of txt file into character vector
-      alignment_stats_lines <- readLines(metric_file_path)
-      
-      total_reads <- as.numeric(sub("SN	sequences:\t", "", 
-                                    grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
-      reads_duplicated <- as.numeric(strsplit(grep("^SN\treads duplicated:", alignment_stats_lines, 
-                                                   value = TRUE), "\t")[[1]][3])
-      duplication_rate <- round((reads_duplicated / total_reads) * 100, digits = 1) 
-        
-    } else {
-      df <- read.delim(metric_file_path)
-      duplication_rate <- round(df$Duplication.rate[df$Sample == sample_name] * 100, digits = 1)
-    }
-    
-    #add key metrics to results format  
-    results <- rbind(results, data.frame(
-      sample = sample_name,
-      metric = function_metric,
-      value = duplication_rate)
-    ) 
-  }
+  
+  # Read metrics file
+  df <- read.delim(metric_file_path, stringsAsFactors = FALSE)
+  
+  # Convert duplication rate to percentage
+  df$dup_rate_percent <- round(df$Duplication.rate * 100, digits = 2)
+  
+  # Prepare results
+  results <- data.frame(
+    metric = function_metric,
+    sample = df$Sample,
+    value = df$dup_rate_percent,
+    stringsAsFactors = FALSE
+  )
+  
   return(results)
 }
 
