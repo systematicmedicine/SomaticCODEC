@@ -28,21 +28,21 @@ rule ms_low_depth_mask:
     params:
         threshold = config['lowdepth_mask_threshold'],
         intermediate_depth_per_base = temp("tmp/{ms_sample}/{ms_sample}_depth_per_base.txt"),
-        intermediate_30x_depth = temp("tmp/{ms_sample}/{ms_sample}_30x_depth.txt"),
-        intermediate_30x_sorted = temp("tmp/{ms_sample}/{ms_sample}_30x_sorted.txt"),
-        intermediate_depth = temp("tmp/{ms_sample}/{ms_sample}_depth.txt"),
-        intermediate_depth_sorted = temp("tmp/{ms_sample}/{ms_sample}_depth_sorted.txt")
+        intermediate_lowdepth = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.txt"),
+        intermediate_lowdepth_sorted = temp("tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt"),
+        intermediate_depth_values = temp("tmp/{ms_sample}/{ms_sample}_depth_values.txt"),
+        intermediate_depth_values_sorted = temp("tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt")
     shell:
         """
         samtools depth -aa {input.markdup_bam} > {params.intermediate_depth_per_base}
         awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
-        {params.intermediate_depth_per_base} > {params.intermediate_30x_depth}
-        sort {params.intermediate_30x_depth} -k1,1 -k2,2n > {params.intermediate_30x_sorted}
-        bedtools merge -i {params.intermediate_30x_sorted} > {output.bed}
+        {params.intermediate_depth_per_base} > {params.intermediate_lowdepth}
+        sort {params.intermediate_lowdepth} -k1,1 -k2,2n > {params.intermediate_lowdepth_sorted}
+        bedtools merge -i {params.intermediate_lowdepth_sorted} > {output.bed}
 
-        awk '{{print $3}}' {params.intermediate_depth_per_base} > {params.intermediate_depth}
-        sort -n {params.intermediate_depth} > {params.intermediate_depth_sorted}
-        uniq -c {params.intermediate_depth_sorted} > {output.depth_histogram}
+        awk '{{print $3}}' {params.intermediate_depth_per_base} > {params.intermediate_depth_values}
+        sort -n {params.intermediate_depth_values} > {params.intermediate_depth_values_sorted}
+        uniq -c {params.intermediate_depth_values_sorted} > {output.depth_histogram}
         """
 
 # Creates a mask genomic positions where germline variants have been called in ms sample
