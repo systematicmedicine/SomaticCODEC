@@ -129,7 +129,7 @@ rule ex_remap_dsc:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        samtools fastq -o {output.intermediate_fastq} {input.bam}
+        samtools fastq -0 {output.intermediate_fastq} {input.bam}
 
         bwa-mem2 mem -t {threads} -Y {input.ref} {output.intermediate_fastq} > {output.intermediate_sam}
 
