@@ -16,7 +16,9 @@ rule ms_raw_fastq_metrics:
         r2 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq2"].values[0]
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html"
+        r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html",
+        r1_zip = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip",
+        r2_zip = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip"
     threads: 
         max(1, os.cpu_count() // 16)
     shell:
@@ -28,6 +30,8 @@ rule ms_raw_fastq_metrics:
 
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report}
         mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report}
+        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.zip {output.r1_zip}
+        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.zip {output.r2_zip}
         """
 
 # Generates a fastqc report for ms processed reads
@@ -37,16 +41,14 @@ rule ms_processed_fastq_metrics:
         r2 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html"
+        r2_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html",
+        r1_zip = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.zip",
+        r2_zip = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.zip"
     threads:
         max(1, os.cpu_count() // 16)
     shell:
-        """
-        r1_base=$(basename {input.r1} .fastq.gz)
-        r2_base=$(basename {input.r2} .fastq.gz)
-        
+        """        
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2}
-        
         """
 
 # Generates ms alignment metrics
@@ -75,7 +77,7 @@ rule ms_candidate_variant_metrics:
         stat = "metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt"
     shell:
         """
-        bcftools stats {input.vcf} > {output.stat}
+        bcftools stats -s - {input.vcf} > {output.stat}
         """
 
 

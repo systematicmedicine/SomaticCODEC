@@ -48,19 +48,21 @@ get_per_sequence_quality_score_r1 <- function() {
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -126,46 +128,48 @@ get_per_sequence_quality_score_r2 <- function() {
         next
       }
     
-    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
+      # Create tmp directory for unzipped file
+      tmp_dir <- file.path(sample_dir, "tmp")
+      if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+      
+      # List contents inside the zip to find the correct path to fastqc_data.txt
+      zip_contents <- unzip(metric_file_path, list = TRUE)$Name
+      
+      # Identify the path to fastqc_data.txt inside the zip
+      fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+      
+      # Unzip only the fastqc_data.txt file
+      unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+      
+      # Get path for the unzipped data file
+      fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path(sample_dir, "tmp")
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
+      # Put all lines of txt file into character vector
+      fastqc_data_lines <- readLines(fastqc_data_path)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+      # Find start and end of the per sequence quality scores section
+      start_line <- grep("^>>Per sequence quality scores", fastqc_data_lines)
+      end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+      end_line <- end_lines[which(end_lines > start_line)[1]]
     
-    # Get path for unzipped metrics file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+      # Extract per sequence quality scores section lines (skip headers and end module lines)
+      section_lines <- fastqc_data_lines[(start_line + 2):(end_line - 1)]
     
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
+      # Parse to dataframe
+      quality_df <- read.table(text = section_lines, header = FALSE)
+      colnames(quality_df) <- c("Quality", "Count")
     
-    # Find start and end of the per sequence quality scores section
-    start_line <- grep("^>>Per sequence quality scores", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
+      # Get peak quality score
+      peak_quality <- round(quality_df$Quality[which.max(quality_df$Count)], digits = 1)
     
-    # Extract per sequence quality scores section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line + 2):(end_line - 1)]
-    
-    # Parse to dataframe
-    quality_df <- read.table(text = section_lines, header = FALSE)
-    colnames(quality_df) <- c("Quality", "Count")
-    
-    # Get peak quality score
-    peak_quality <- round(quality_df$Quality[which.max(quality_df$Count)], digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(metric = function_metric,
+      # Add to results
+      results <- rbind(results, data.frame(metric = function_metric,
                                          sample = sample_name,
                                          value = peak_quality))
     
-    # Remove tmp directory
-    Sys.sleep(1) # Pause needed to allow files to be deleted
-    unlink(tmp_dir, recursive = TRUE)
+      # Remove tmp directory
+      Sys.sleep(1) # Pause needed to allow files to be deleted
+      unlink(tmp_dir, recursive = TRUE)
     
   }
   
@@ -391,15 +395,19 @@ get_percent_read_contribution <- function(){
     adaptor_counts <- aggregate(total_matches ~ name, data = combined, sum)
     
     total_adaptors <- sum(adaptor_counts$total_matches)
-    sample_adaptors <- adaptor_counts$total_matches[adaptor_counts$name == sample_name]
-    
-    percent_contribution <- round((sample_adaptors / total_adaptors) * 100, digits = 1)
-    
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = percent_contribution
+
+    # Calculate percent contribution by each sample and add row
+    for (sample in 1:nrow(adaptor_counts)) {
+      sample_name <- adaptor_counts$name[sample]
+      sample_adaptors <- adaptor_counts$total_matches[sample]
+      percent_contribution <- round((sample_adaptors / total_adaptors) * 100, digits = 1)
+      
+      results <- rbind(results, data.frame(
+        metric = function_metric,
+        sample = sample_name,
+        value = percent_contribution
       ))
+    }
   }
   
   return(results)
@@ -733,7 +741,7 @@ get_insertion_deletion_ratio <- function(){
                      unlist(strsplit(gsub("# ", "", lines[IDD_info_index]), "\t")))
     
     #parse into a DF
-    df <- read.delim(textConnection(IDD_data), header = FALSE, skip = 1, col.names = IDD_info) %>%
+    df <- read.delim(textConnection(IDD_data), header = FALSE, col.names = IDD_info) %>%
       rename(indel_len = `length..deletions.negative.`)
     
     #select the total variants
@@ -758,7 +766,7 @@ get_insertion_deletion_ratio <- function(){
     results <- rbind(results, data.frame(
       sample = sample_name,
       metric = function_metric,
-      value = ins_count/del_count,
+      value = ratio,
       stringsAsFactors = FALSE
     )
     )
@@ -935,7 +943,7 @@ get_het_hom_ratio <- function(){
     results <- rbind(results, data.frame(
       sample = sample_name,
       metric = function_metric,
-      value = ratio)
+      value = het_hom_ratio)
     ) 
     
   }
@@ -1102,19 +1110,21 @@ get_total_reads_r1 <- function() {
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -1170,19 +1180,21 @@ get_total_reads_r2 <- function() {
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -1296,19 +1308,21 @@ get_overrepresented_sequences_r1 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-    
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1383,19 +1397,21 @@ get_overrepresented_sequences_r2 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-    
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1470,19 +1486,21 @@ get_gc_deviation_r1 <- function(){
       next
     }
 
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
-
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
-
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
+    
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
 
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1558,19 +1576,21 @@ get_gc_deviation_r2 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-    
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1646,19 +1666,21 @@ get_per_base_content_diff_r1 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-    
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1730,19 +1752,21 @@ get_per_base_content_diff_r2 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-    
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1814,19 +1838,21 @@ get_per_base_sequencing_quality_r1 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-    
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1892,19 +1918,21 @@ get_per_base_sequencing_quality_r2 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file
-    proc_zip_base <- basename(metric_file_path)
-    proc_zip_name <- sub("\\.zip$", "", proc_zip_base)
-    
-    # Create tmp directory for unzipped files
+    # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(proc_zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped metrics file
-    proc_fastqc_data_path <- file.path(tmp_dir, proc_zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     proc_fastqc_lines <- readLines(proc_fastqc_data_path)
@@ -1970,19 +1998,21 @@ get_per_tile_sequencing_quality_r1 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -2070,19 +2100,21 @@ get_per_tile_sequencing_quality_r2 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -2170,19 +2202,21 @@ get_sequence_length_r1 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -2249,19 +2283,21 @@ get_sequence_length_r2 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -2328,19 +2364,21 @@ get_per_base_N_content_r1 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
@@ -2411,19 +2449,21 @@ get_per_base_N_content_r2 <- function(){
       next
     }
     
-    # Unzip fastqc_data.txt from zip file (could standardise file names to simplify)
-    zip_base <- basename(metric_file_path)
-    zip_name <- sub("\\.zip$", "", zip_base)
-    
     # Create tmp directory for unzipped file
     tmp_dir <- file.path(sample_dir, "tmp")
     if (!dir.exists(tmp_dir)) dir.create(tmp_dir)
     
-    # Unzip metrics txt file
-    unzip(metric_file_path, files = paste0(zip_name, "/fastqc_data.txt"), exdir = tmp_dir)
+    # List contents inside the zip to find the correct path to fastqc_data.txt
+    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
     
-    # Get path for unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, zip_name, "fastqc_data.txt")
+    # Identify the path to fastqc_data.txt inside the zip
+    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+    
+    # Unzip only the fastqc_data.txt file
+    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+    
+    # Get path for the unzipped data file
+    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
     
     # Put all lines of txt file into character vector
     fastqc_data_lines <- readLines(fastqc_data_path)
