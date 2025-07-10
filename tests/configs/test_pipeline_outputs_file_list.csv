@@ -31,9 +31,13 @@ tmp/{ms_sample}/{ms_sample}_masks_sorted.bed
 tmp/{ms_sample}/{ms_sample}_combined_mask.bed
 metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html
 metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html
+metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip
+metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip
 metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv
 metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html
 metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html
+metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.zip
+metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.zip
 metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt
 metrics/{ms_sample}/{ms_sample}_alignment_stats.txt
 metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt
@@ -80,6 +84,7 @@ tmp/{ex_sample}/{ex_sample}_map_dsc.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam
+tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered_unsorted.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai
 metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html
