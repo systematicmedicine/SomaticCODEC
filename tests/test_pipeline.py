@@ -93,12 +93,13 @@ def test_pipeline_outputs(clean_workspace_fixture):
             data_row_count = count_data_points.count_data_points(path)
             assert data_row_count >= 1, f"File has no data points: {path}"
 
-            # Store data point count
+            # Store data point counts
             file_counts.append({
             "file_path": str(path),
             "data_row_count": data_row_count
             })
 
-    # Print all data point counts clearly
+    # Print all data point counts (when using pytest -s flag)
     df_counts = pd.DataFrame(file_counts)
-    print(df_counts)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(df_counts)
