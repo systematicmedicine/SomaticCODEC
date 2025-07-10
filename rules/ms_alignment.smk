@@ -24,8 +24,7 @@ rule ms_raw_alignment:
         r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam")
-    params:
+        bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
         intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_intermediate.sam")
     threads: 
         max(1, os.cpu_count() // 4)
@@ -35,9 +34,9 @@ rule ms_raw_alignment:
             -t {threads} \
             {input.ref} \
             {input.r1_processed} \
-            {input.r2_processed} > {params.intermediate_sam}
+            {input.r2_processed} > {output.intermediate_sam}
 
-        samtools view -bS {params.intermediate_sam} > {output.bam}
+        samtools view -bS {output.intermediate_sam} > {output.bam}
         """
 
 # Adds read group information to aligned reads
