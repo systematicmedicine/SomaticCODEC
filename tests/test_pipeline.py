@@ -3,6 +3,8 @@
 --- test_pipeline.py ---
 
 Function for testing all outputs of the full pipeline.
+    - Tests that all expected files are created
+    - Tests that all expected files have atleast one datapoint
 
 Author: Joshua Johnstone
 
