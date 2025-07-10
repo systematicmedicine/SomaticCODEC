@@ -39,8 +39,13 @@ rule ex_call_somatic_variants:
         intermediate_mpileup = temp("tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf"),
         intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
         intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
+    log:
+        "logs/{ex_sample}/ex_call_somatic_variants.log"
+    benchmark:
+        "logs/{ex_sample}/ex_call_somatic_variants.benchmark.txt"
     shell:
         """
+        (
         bcftools mpileup \
             --fasta-ref {input.ref} \
             --output-type b \
@@ -77,6 +82,7 @@ rule ex_call_somatic_variants:
             -e 'TYPE="indel"' \
             {output.intermediate_called} \
             -Ov -o {output.vcf_all}
+        ) {log} 2>&1
         """
 
 rule ex_somatic_variant_rate:

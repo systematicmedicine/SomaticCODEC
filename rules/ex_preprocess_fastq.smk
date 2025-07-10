@@ -90,11 +90,15 @@ rule ex_trim:
         r2_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_start"].values[0].strip(),
         r1_end = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_end"].values[0].strip(),
         r2_end = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_end"].values[0].strip()
-
+    log:
+        "logs/{ex_sample}/ex_trim.log"
+    benchmark:
+        "logs/{ex_sample}/ex_trim.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
+        (
         cutadapt \
           -j {threads} \
           -e 2 \
@@ -132,8 +136,9 @@ rule ex_trim:
           --quality-cutoff 20 \
           -o {output.r1} \
           -p {output.r2} \
-          {output.intermediate_r1_2} {output.intermediate_r2_2} \
-        """
+          {output.intermediate_r1_2} {output.intermediate_r2_2}   
+          ) > {log} 2>&1
+        """ 
 
 # Filter inserts (trimmed sequences)
     # Insert size >70bp
@@ -144,7 +149,11 @@ rule ex_filter:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
-        json = "metrics/{ex_sample}/{ex_sample}_filter_metrics.json",
+        json = "metrics/{ex_sample}/{ex_sample}_filter_metrics.json"
+    log:
+        "logs/{ex_sample}/ex_filter.log"
+    benchmark:
+        "logs/{ex_sample}/ex_filter.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 4)
     shell:  
@@ -155,6 +164,7 @@ rule ex_filter:
         -o {output.r1} \
         -p {output.r2} \
         {input.r1} {input.r2} \
-        --json={output.json}
+        --json={output.json} \
+        > {log} 2>&1
         """
 

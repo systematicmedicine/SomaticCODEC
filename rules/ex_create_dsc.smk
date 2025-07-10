@@ -29,12 +29,17 @@ rule ex_annotate_bam:
         intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
         intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam")
+    log:
+        "logs/{ex_sample}/annotate_bam.log"
+    benchmark:
+        "logs/{ex_sample}/annotate_bam.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 16)
     resources:
         mem = 64
     shell:
         """
+        (
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             CopyUmiFromReadName \
             -i {input.bam} \
@@ -68,6 +73,7 @@ rule ex_annotate_bam:
             RGPU=unit1 \
             RGSM={wildcards.ex_sample} \
             VALIDATION_STRINGENCY=LENIENT
+        ) > {log} 2>&1
         """
 
 # Sort the annotated BAM by coordinates for duplex consensus calling
@@ -76,6 +82,10 @@ rule ex_sort_by_template:
         bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam")
+    log:
+        "logs/{ex_sample}/ex_sort_by_template.log"
+    benchmark:
+        "logs/{ex_sample}/ex_sort_by_template.benchmark.txt"
     resources:
         mem = 64
     shell:
@@ -84,7 +94,8 @@ rule ex_sort_by_template:
             SortBam \
             -i {input.bam} \
             -o {output.bam} \
-            -s TemplateCoordinate
+            -s TemplateCoordinate \
+        > {log} 2>&1
         """
 
 # Create duplex consensus BAM
@@ -97,6 +108,10 @@ rule ex_call_dsc:
         bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam")
+    log:
+        "logs/{ex_sample}/ex_call_dsc.log"
+    benchmark:
+        "logs/{ex_sample}/ex_call_dsc.benchmark.txt"
     resources:
         mem = 64
     shell:
@@ -107,7 +122,8 @@ rule ex_call_dsc:
             -o {output.bam} \
             --max-duplex-disagreements 3 \
             --single-strand-qual 2 \
-            -M 1 
+            -M 1 \
+        > {log} 2>&1
         """
 
 # Realign the double strand consensus (DSC) to the reference genome, as sequences have changed
@@ -142,11 +158,15 @@ rule ex_sort_dsc:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
+    log:
+        "logs/{ex_sample}/ex_sort_dsc.log"
+    benchmark:
+        "logs/{ex_sample}/ex_sort_dsc.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        samtools sort -n -@ {threads} -o {output.bam} {input.bam}
+        samtools sort -n -@ {threads} -o {output.bam} {input.bam} 2> {log}
         """
 
 # Add metadata from unmapped DSC BAM back to the mapped DSC BAM
