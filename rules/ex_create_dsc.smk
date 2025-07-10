@@ -206,11 +206,12 @@ rule ex_filter_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"
     output:
+        intermediate_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered_unsorted.bam"),
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
     shell:
         """
-        samtools view -b -q 60 {input.bam} | \
-        samtools sort -o {output.bam}
+        samtools view -b -q 60 {input.bam} > {output.intermediate_bam}
+        samtools sort -o {output.bam} {output.intermediate_bam}
         samtools index {output.bam}
         """

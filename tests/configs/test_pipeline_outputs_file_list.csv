@@ -84,6 +84,7 @@ tmp/{ex_sample}/{ex_sample}_map_dsc.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam
+tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered_unsorted.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam
 tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai
 metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html
