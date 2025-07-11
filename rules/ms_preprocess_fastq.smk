@@ -25,6 +25,10 @@ rule ms_trim_filter_fastqs:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv"
+    log:
+        "logs/{ms_sample}/ms_trim_filter_fastqs.log"
+    benchmark:
+        "logs/{ms_sample}/ms_trim_filter_fastqs.benchmark.txt"
     threads: 
         max(1, os.cpu_count() // 4)
     shell: 
@@ -42,5 +46,5 @@ rule ms_trim_filter_fastqs:
             -o {output.r1} \
             -p {output.r2} \
             {input.r1} {input.r2} \
-            --report=minimal > {output.report}
+            --report=minimal > {output.report} 2>> {log}
         """

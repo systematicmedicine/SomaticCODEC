@@ -31,11 +31,9 @@ rule ex_map:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        (
-        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fastq1} {input.fastq2} > {output.intermediate_sam}
+        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fastq1} {input.fastq2} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam}
-        ) > {log} 2>&1
+        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
 
 # Filters mapped BAM files to remove intermolecular byproducts and retain correct products
@@ -54,5 +52,5 @@ rule ex_filter_correct_product:
         max(1, os.cpu_count() // 16)
     shell:
         """
-        samtools view -b -f 0x2 {input.bam} > {output.bam} 2> {log}
+        samtools view -b -f 0x2 {input.bam} > {output.bam} 2>> {log}
         """

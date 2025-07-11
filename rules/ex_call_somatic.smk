@@ -22,9 +22,13 @@ rule generate_include_bed:
         fai = config["GRCh38_path"] + ".fai"
     output:
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+    log:
+        "logs/{ex_sample}/generate_include_bed.log"
+    benchmark:
+        "logs/{ex_sample}/generate_include_bed.benchmark.txt"
     shell:
         """
-        bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed}
+        bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed} 2>> {log}
         """
 
 rule ex_call_somatic_variants:
@@ -45,7 +49,6 @@ rule ex_call_somatic_variants:
         "logs/{ex_sample}/ex_call_somatic_variants.benchmark.txt"
     shell:
         """
-        (
         bcftools mpileup \
             --fasta-ref {input.ref} \
             --output-type b \
@@ -57,32 +60,31 @@ rule ex_call_somatic_variants:
             --annotate AD,DP \
             --regions-file {input.include_bed} \
             {input.bam} \
-            -o {output.intermediate_mpileup}
+            -o {output.intermediate_mpileup} 2>> {log}
 
         bcftools call \
             --multiallelic-caller \
             --keep-alts \
             --output-type b \
             -o {output.intermediate_called} \
-            {output.intermediate_mpileup}
+            {output.intermediate_mpileup} 2>> {log}
 
         bcftools view \
             -e 'TYPE="indel" || TYPE="ref"' \
             -Ob \
             -o {output.intermediate_biallelic} \
-            {output.intermediate_called}
+            {output.intermediate_called} 2>> {log}
 
         bcftools norm \
             -m -both \
             -Ov \
             -o {output.vcf_snvs} \
-            {output.intermediate_biallelic}
+            {output.intermediate_biallelic} 2>> {log}
 
         bcftools view \
             -e 'TYPE="indel"' \
             {output.intermediate_called} \
-            -Ov -o {output.vcf_all}
-        ) {log} 2>&1
+            -Ov -o {output.vcf_all} 2>> {log}
         """
 
 rule ex_somatic_variant_rate:

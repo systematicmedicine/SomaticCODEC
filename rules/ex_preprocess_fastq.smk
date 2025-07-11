@@ -30,6 +30,10 @@ rule ex_extract_umis:
     output:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
+    log:
+        "logs/{ex_lane}/ex_extract_umis.log"
+    benchmark:
+        "logs/{ex_lane}/ex_extract_umis.txt"
     threads:
         max(1, os.cpu_count() // 4)
     shell:
@@ -41,7 +45,7 @@ rule ex_extract_umis:
           --rename='{{id}}:{{r1.cut_prefix}}{{r2.cut_prefix}}' \
           -o {output.fastq1} \
           -p {output.fastq2} \
-          {input.fastq1} {input.fastq2} \
+          {input.fastq1} {input.fastq2} 2>> {log}
         """
 
 # Demultiplex each lane (fastq pair) into samples
@@ -98,7 +102,6 @@ rule ex_trim:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        (
         cutadapt \
           -j {threads} \
           -e 2 \
@@ -107,7 +110,7 @@ rule ex_trim:
           -o {output.intermediate_r1_1} \
           -p {output.intermediate_r2_1} \
           {input.r1} {input.r2} \
-          --json={output.trim5primejson}
+          --json={output.trim5primejson} 2>> {log}
 
         cutadapt \
           -j {threads} \
@@ -116,7 +119,7 @@ rule ex_trim:
           -b {params.r1_end} \
           -o {output.intermediate_r1_2} \
           {output.intermediate_r1_1} \
-          --json={output.r1_trim3primejson}
+          --json={output.r1_trim3primejson} 2>> {log}
 
         cutadapt \
           -j {threads} \
@@ -125,7 +128,7 @@ rule ex_trim:
           -b {params.r2_end} \
           -o {output.intermediate_r2_2} \
           {output.intermediate_r2_1} \
-          --json={output.r2_trim3primejson}
+          --json={output.r2_trim3primejson} 2>> {log}
 
         cutadapt \
           -j {threads} \
@@ -136,8 +139,7 @@ rule ex_trim:
           --quality-cutoff 20 \
           -o {output.r1} \
           -p {output.r2} \
-          {output.intermediate_r1_2} {output.intermediate_r2_2}   
-          ) > {log} 2>&1
+          {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
         """ 
 
 # Filter inserts (trimmed sequences)
@@ -164,7 +166,6 @@ rule ex_filter:
         -o {output.r1} \
         -p {output.r2} \
         {input.r1} {input.r2} \
-        --json={output.json} \
-        > {log} 2>&1
+        --json={output.json} 2>> {log}
         """
 
