@@ -16,6 +16,10 @@ rule ex_generate_adapter_fastas:
         adapters = ex_adapters
     output:
         adapter_fasta_outputs = expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1_start", "r1_end", "r2_start", "r2_end"])
+    log:
+        "logs/ex_generate_adapter_fastas.log"
+    benchmark:
+        "logs/ex_generate_adapter_fastas.benchmark.txt"
     script:
         "../scripts/ex_generate_adapter_fastas.py"
 
@@ -33,7 +37,7 @@ rule ex_extract_umis:
     log:
         "logs/{ex_lane}/ex_extract_umis.log"
     benchmark:
-        "logs/{ex_lane}/ex_extract_umis.txt"
+        "logs/{ex_lane}/ex_extract_umis.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 4)
     shell:
@@ -60,14 +64,17 @@ rule ex_demux:
         demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())),
         demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())),
         json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist())
+    log:
+        "logs/ex_demux.log"
+    benchmark:
+        "logs/ex_demux.benchmark.txt"
     params:
         samples = ex_samples,
         lanes = ex_lanes
     threads:
         max(1, os.cpu_count() // 4)
     script:
-        "../scripts/ex_demultiplex_all_lanes.py"
-
+        "../scripts/ex_demux.py"
 
 # Trim all demultiplexed reads so that only inserts are remaining
     # Trim 5' adapter sequences

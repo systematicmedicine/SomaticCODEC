@@ -1,6 +1,6 @@
-# contrib.md
+# branches.md
 
-Guidleines for contributing to this repository
+Guidleines for branches & pull requests
 
 ## Branch structure
 

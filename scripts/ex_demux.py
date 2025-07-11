@@ -1,15 +1,15 @@
 """
 --- ex_demultiplex_all_lanes.py ---
 
-Demultiplex each lane specific fastq read pairs into sample specific fastq read pairs
+Demultiplex each lane specific FASTQ pair into sample specific FASTQ pairs
+
+To be used exclusively with rule ex demux
 
 Inputs:
-  - All fastq pairs (for all lanes)
-  - Codec quadruplex adapter sequences
-  - ex_lanes and ex_samples data frames
+  - Parameter inection from rule ex demux
 
 Outputs:
-  - Per sample fastq pairs (for all samples)
+  - Per sample FASTQ pairs (for all samples)
   - Metrics file showing number of reads demuxed for each sample
 
 Author: James Phie
@@ -19,7 +19,13 @@ import subprocess
 import pandas as pd
 from pathlib import Path
 import shutil
+import sys
 
+# Redirect stdout and stderr to the Snakemake log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
+
+# For some reason re declare these dataframes?
 samples_df = pd.DataFrame(snakemake.params.samples)
 lanes_df = pd.DataFrame(snakemake.params.lanes)
 
@@ -47,7 +53,8 @@ for lane in lanes_df["ex_lane"].unique():
         fastq2
     ]
 
-    subprocess.run(cmd, check=True)
+    with open(snakemake.log[0], "a") as log_file:
+        subprocess.run(cmd, check=True, stdout=log_file, stderr=log_file)
 
     # Move output files into per-sample folders
     for sample in samples_df.loc[samples_df["lane"] == lane, "ex_sample"]:
