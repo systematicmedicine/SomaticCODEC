@@ -26,6 +26,10 @@ rule ms_raw_alignment:
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
         intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_intermediate.sam")
+    log:
+        "logs/{ms_sample}/ms_raw_alignment.log"
+    benchmark:
+        "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 
         max(1, os.cpu_count() // 4)
     shell:
@@ -34,9 +38,9 @@ rule ms_raw_alignment:
             -t {threads} \
             {input.ref} \
             {input.r1_processed} \
-            {input.r2_processed} > {output.intermediate_sam}
+            {input.r2_processed} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -bS {output.intermediate_sam} > {output.bam}
+        samtools view -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
 
 # Adds read group information to aligned reads
@@ -46,6 +50,10 @@ rule ms_add_read_groups:
         r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
+    log:
+        "logs/{ms_sample}/ms_add_read_groups.log"
+    benchmark:
+        "logs/{ms_sample}/ms_add_read_groups.benchmark.txt"
     shell:
         """
         picard AddOrReplaceReadGroups \
@@ -55,7 +63,7 @@ rule ms_add_read_groups:
             RGLB={wildcards.ms_sample}_lib \
             RGPL=ILLUMINA \
             RGPU={wildcards.ms_sample} \
-            RGSM={wildcards.ms_sample}
+            RGSM={wildcards.ms_sample} 2>> {log}
         """
 
 # Sorts bam by coordinate
@@ -64,10 +72,16 @@ rule ms_sort_bam:
         bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
         bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam")
+    log:
+        "logs/{ms_sample}/ms_sort_bam.log"
+    benchmark:
+        "logs/{ms_sample}/ms_sort_bam.benchmark.txt"
     threads: 
         max(1, os.cpu_count() // 8)
     shell:
-        "samtools sort -@ {threads} -o {output.bam_sorted} {input.bam}"
+        """
+        samtools sort -@ {threads} -o {output.bam_sorted} {input.bam} 2>> {log}
+        """
 
 # Marks duplicate reads in bam file
 rule ms_mark_duplicates:
@@ -77,11 +91,15 @@ rule ms_mark_duplicates:
         bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
         bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bai"),
         dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
+    log:
+        "logs/{ms_sample}/ms_mark_duplicates.log"
+    benchmark:
+        "logs/{ms_sample}/ms_mark_duplicates.benchmark.txt"
     shell:
         """
         picard MarkDuplicates \
         I={input.bam_sorted} \
         O={output.bam_markdup} \
         M={output.dup_metrics} \
-        CREATE_INDEX=true
+        CREATE_INDEX=true 2>> {log}
         """

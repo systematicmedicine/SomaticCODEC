@@ -39,19 +39,18 @@ rule ex_annotate_bam:
         mem = 64
     shell:
         """
-        (
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             CopyUmiFromReadName \
             -i {input.bam} \
             -o {output.intermediate_moveumi} \
-            --remove-umi true \
+            --remove-umi true 2>> {log}
 
-        samtools sort -n -@ {threads} -o {output.intermediate_sorted} {output.intermediate_moveumi} \
+        samtools sort -n -@ {threads} -o {output.intermediate_sorted} {output.intermediate_moveumi} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             SetMateInformation \
             -i {output.intermediate_sorted} \
-            -o {output.intermediate_mateinfo} \
+            -o {output.intermediate_mateinfo} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             --compression 1 --async-io \
@@ -62,7 +61,7 @@ rule ex_annotate_bam:
             -f {output.histogram} \
             -@ {threads} \
             -m 0 \
-            --strategy=adjacency \
+            --strategy=adjacency 2>> {log}
 
         picard AddOrReplaceReadGroups \
             I={output.intermediate_groupbyumi} \
@@ -72,8 +71,7 @@ rule ex_annotate_bam:
             RGPL=illumina \
             RGPU=unit1 \
             RGSM={wildcards.ex_sample} \
-            VALIDATION_STRINGENCY=LENIENT
-        ) > {log} 2>&1
+            VALIDATION_STRINGENCY=LENIENT 2>> {log}
         """
 
 # Sort the annotated BAM by coordinates for duplex consensus calling
@@ -94,8 +92,7 @@ rule ex_sort_by_template:
             SortBam \
             -i {input.bam} \
             -o {output.bam} \
-            -s TemplateCoordinate \
-        > {log} 2>&1
+            -s TemplateCoordinate 2>> {log}
         """
 
 # Create duplex consensus BAM
@@ -122,8 +119,7 @@ rule ex_call_dsc:
             -o {output.bam} \
             --max-duplex-disagreements 3 \
             --single-strand-qual 2 \
-            -M 1 \
-        > {log} 2>&1
+            -M 1 2>> {log}
         """
 
 # Realign the double strand consensus (DSC) to the reference genome, as sequences have changed
@@ -141,15 +137,19 @@ rule ex_remap_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam")
+    log:
+        "logs/{ex_sample}/ex_remap_dsc.log"
+    benchmark:
+        "logs/{ex_sample}/ex_remap_dsc.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        samtools fastq -0 {output.intermediate_fastq} {input.bam}
+        samtools fastq -0 {output.intermediate_fastq} {input.bam} 2>> {log}
 
-        bwa-mem2 mem -t {threads} -Y {input.ref} {output.intermediate_fastq} > {output.intermediate_sam}
+        bwa-mem2 mem -t {threads} -Y {input.ref} {output.intermediate_fastq} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam}
+        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
         
 # Sort realigned DSC bam by readname for downstream annotation
@@ -166,7 +166,7 @@ rule ex_sort_dsc:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        samtools sort -n -@ {threads} -o {output.bam} {input.bam} 2> {log}
+        samtools sort -n -@ {threads} -o {output.bam} {input.bam} 2>> {log}
         """
 
 # Add metadata from unmapped DSC BAM back to the mapped DSC BAM
@@ -181,6 +181,10 @@ rule ex_annotate_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
         intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
+    log:
+        "logs/{ex_sample}/ex_annotate_dsc.log"
+    benchmark:
+        "logs/{ex_sample}/ex_annotate_dsc.benchmark.txt"
     resources:
         mem = 64
     threads:
@@ -193,11 +197,11 @@ rule ex_annotate_dsc:
             --unmapped {input.unmapped} \
             --ref {input.ref} \
             --tags-to-revcomp Consensus \
-            -o {output.intermediate_anno}
+            -o {output.intermediate_anno} 2>> {log}
 
-        samtools sort -@ {threads} -o {output.bam} {output.intermediate_anno}
+        samtools sort -@ {threads} -o {output.bam} {output.intermediate_anno} 2>> {log}
 
-        samtools index -@ {threads} {output.bam}
+        samtools index -@ {threads} {output.bam} 2>> {log}
         """
 
 # Filter the DSC bam to prepare for variant calling 
@@ -209,9 +213,13 @@ rule ex_filter_dsc:
         intermediate_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered_unsorted.bam"),
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
+    log:
+        "logs/{ex_sample}/ex_filter_dsc.log"
+    benchmark:
+        "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
     shell:
         """
-        samtools view -b -q 60 {input.bam} > {output.intermediate_bam}
-        samtools sort -o {output.bam} {output.intermediate_bam}
-        samtools index {output.bam}
+        samtools view -b -q 60 {input.bam} > {output.intermediate_bam} 2>> {log}
+        samtools sort -o {output.bam} {output.intermediate_bam} 2>> {log}
+        samtools index {output.bam} 2>> {log}
         """
