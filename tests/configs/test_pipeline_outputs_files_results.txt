@@ -1,0 +1,2 @@
+results/{ex_sample}/{ex_sample}_variants.vcf
+results/{ex_sample}/{ex_sample}_all_positions.vcf
