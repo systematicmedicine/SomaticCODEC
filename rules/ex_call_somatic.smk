@@ -13,6 +13,8 @@ Author: James Phie
 """
 
 # Call somatic variants using CODED DSC, GCRh38 and include BED
+    # Only calls SNVS
+    # Indels will be added in the future
 rule ex_call_somatic_variants:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
@@ -20,8 +22,8 @@ rule ex_call_somatic_variants:
         ref = config["GRCh38_path"],
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
-        vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf",
-        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf", # Pileup of every unmasked position (except positions where indels present)
+        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf", # Subset of vcf_all, where SNVs have been called
         intermediate_mpileup = temp("tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf"),
         intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
         intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
