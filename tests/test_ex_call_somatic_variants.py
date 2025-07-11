@@ -56,7 +56,7 @@ def test_ex_call_somatic_variants_output(clean_workspace_fixture):
     ]
     subprocess.run(snakemake_cmd, check=True)
 
-    metrics_path = "results/testvariants/testvariants_somatic_variant_rate.txt"
+    metrics_path = "metrics/testvariants/testvariants_somatic_variant_rate.txt"
     metrics = pd.read_csv(metrics_path, sep="\t", index_col="metric")["value"]
 
     expected = {
