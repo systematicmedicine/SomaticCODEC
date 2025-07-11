@@ -30,19 +30,28 @@ rule ms_low_depth_mask:
         intermediate_lowdepth_sorted = temp("tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt"),
         intermediate_depth_values = temp("tmp/{ms_sample}/{ms_sample}_depth_values.txt"),
         intermediate_depth_values_sorted = temp("tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt")
+    log:
+        "logs/{ms_sample}/ms_low_depth_mask.log"
+    benchmark:
+        "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
         threshold = config['lowdepth_mask_threshold']
     shell:
         """
-        samtools depth -aa {input.markdup_bam} > {output.intermediate_depth_per_base}
-        awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
-        {output.intermediate_depth_per_base} > {output.intermediate_lowdepth}
-        sort {output.intermediate_lowdepth} -k1,1 -k2,2n > {output.intermediate_lowdepth_sorted}
-        bedtools merge -i {output.intermediate_lowdepth_sorted} > {output.bed}
+        samtools depth -aa {input.markdup_bam} > {output.intermediate_depth_per_base} 2>> {log}
 
-        awk '{{print $3}}' {output.intermediate_depth_per_base} > {output.intermediate_depth_values}
-        sort -n {output.intermediate_depth_values} > {output.intermediate_depth_values_sorted}
-        uniq -c {output.intermediate_depth_values_sorted} > {output.depth_histogram}
+        awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
+        {output.intermediate_depth_per_base} > {output.intermediate_lowdepth} 2>> {log}
+
+        sort {output.intermediate_lowdepth} -k1,1 -k2,2n > {output.intermediate_lowdepth_sorted} 2>> {log}
+
+        bedtools merge -i {output.intermediate_lowdepth_sorted} > {output.bed} 2>> {log}
+
+        awk '{{print $3}}' {output.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
+
+        sort -n {output.intermediate_depth_values} > {output.intermediate_depth_values_sorted} 2>> {log}
+
+        uniq -c {output.intermediate_depth_values_sorted} > {output.depth_histogram} 2>> {log}
         """
 
 # Creates a mask genomic positions where germline variants have been called in ms sample
@@ -56,17 +65,23 @@ rule ms_germline_variants_mask:
         ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
         ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"),
         intermediate_uncompressed = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants_uncompressed.vcf")
+    log:
+        "logs/{ms_sample}/ms_germline_variants_mask.log"
+    benchmark:
+        "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
     shell:
         """
-        zcat {input.vcf} > {output.intermediate_uncompressed}
+        zcat {input.vcf} > {output.intermediate_uncompressed} 2>> {log}
         
-        vcf2bed --deletions < {output.intermediate_uncompressed} > {output.ms_germ_del_bed}
-        vcf2bed --insertions < {output.intermediate_uncompressed} > {output.ms_germ_ins_bed}
-        vcf2bed --snvs < {output.intermediate_uncompressed} > {output.ms_germ_snv_bed}
+        vcf2bed --deletions < {output.intermediate_uncompressed} > {output.ms_germ_del_bed} 2>> {log}
+
+        vcf2bed --insertions < {output.intermediate_uncompressed} > {output.ms_germ_ins_bed} 2>> {log}
+
+        vcf2bed --snvs < {output.intermediate_uncompressed} > {output.ms_germ_snv_bed} 2>> {log}
         """
 
 # Removes additional columns from germline variants mask to align with standard BED format
-rule format_germline_variant_mask:
+rule ms_format_germline_variant_mask:
     input:
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed",
@@ -75,15 +90,21 @@ rule format_germline_variant_mask:
         ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
         ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
         ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
+    log:
+        "logs/{ms_sample}/ms_format_germline_variant_mask.log"
+    benchmark:
+        "logs/{ms_sample}/ms_format_germline_variant_mask.benchmark.txt"
     shell:
         """
-        cut -f1-3 {input.ms_germ_del_bed} > {output.ms_germ_del_bed}
-        cut -f1-3 {input.ms_germ_ins_bed} > {output.ms_germ_ins_bed}
-        cut -f1-3 {input.ms_germ_snv_bed} > {output.ms_germ_snv_bed}        
+        cut -f1-3 {input.ms_germ_del_bed} > {output.ms_germ_del_bed} 2>> {log}
+
+        cut -f1-3 {input.ms_germ_ins_bed} > {output.ms_germ_ins_bed} 2>> {log}
+
+        cut -f1-3 {input.ms_germ_snv_bed} > {output.ms_germ_snv_bed} 2>> {log}      
         """
 
 # Combines all masks into a single BED file
-rule ms_combine_masks:
+rule combine_masks:
     input:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
@@ -95,6 +116,10 @@ rule ms_combine_masks:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
         intermediate_cat = temp("tmp/{ms_sample}/{ms_sample}_masks_cat.bed"),
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.bed")
+    log:
+        "logs/{ms_sample}/combine_masks.log"
+    benchmark:
+        "logs/{ms_sample}/combine_masks.benchmark.txt"
     shell:
         """
         cat {input.gnomAD_bed} \
@@ -102,9 +127,9 @@ rule ms_combine_masks:
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \
         {input.ms_germ_ins_bed} \
-        {input.ms_germ_snv_bed} > {output.intermediate_cat}
+        {input.ms_germ_snv_bed} > {output.intermediate_cat} 2>> {log}
         
-        sort {output.intermediate_cat} -k1,1 -k2,2n > {output.intermediate_sorted}
+        sort {output.intermediate_cat} -k1,1 -k2,2n > {output.intermediate_sorted} 2>> {log}
 
-        bedtools merge -i {output.intermediate_sorted} > {output.combined_bed}
+        bedtools merge -i {output.intermediate_sorted} > {output.combined_bed} 2>> {log}
         """

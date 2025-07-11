@@ -22,6 +22,10 @@ rule ms_candidate_germ_variants:
         dictf = os.path.splitext(config["GRCh38_path"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
+    log:
+        "logs/{ms_sample}/ms_candidate_germ_variants.log"
+    benchmark:
+        "logs/{ms_sample}/ms_candidate_germ_variants.benchmark.txt"
     threads:
          max(1, os.cpu_count() // 8)
     shell:
@@ -31,5 +35,5 @@ rule ms_candidate_germ_variants:
             -I {input.bam} \
             -O {output.vcf} \
             --native-pair-hmm-threads {threads} \
-            --standard-min-confidence-threshold-for-calling 20
+            --standard-min-confidence-threshold-for-calling 20 2>> {log}
         """
