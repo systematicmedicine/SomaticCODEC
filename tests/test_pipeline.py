@@ -56,36 +56,37 @@ def test_pipeline_outputs(clean_workspace_fixture):
     ex_samples = pd.read_csv("tests/configs/test_pipeline_outputs_ex_samples.csv")["ex_sample"].to_list()
 
     # Load files to check
-    outputs_to_check = pd.read_csv("tests/configs/test_pipeline_outputs_file_list.csv")
+    file_lists = ["tests/configs/test_pipeline_outputs_files_tmp.txt",
+                  "tests/configs/test_pipeline_outputs_files_metrics.txt",
+                  "tests/configs/test_pipeline_outputs_files_results.txt"]
+    
+    outputs_to_check = sum([Path(f).read_text().splitlines() for f in file_lists],[])
     checked_files = []
     file_counts = []
 
-    for _, row in outputs_to_check.iterrows():
-        if "{ms_sample}" in row["file_path"]:
+    for path_str in outputs_to_check:
+        if "{ms_sample}" in path_str:
             for ms_sample in ms_samples:
-                checked_files.append(row["file_path"].format(ms_sample=ms_sample))
-        elif "{ex_lane}" in row["file_path"]:
+                checked_files.append(path_str.format(ms_sample=ms_sample))
+        elif "{ex_lane}" in path_str:
             for ex_lane in ex_lanes:
-                checked_files.append(row["file_path"].format(ex_lane=ex_lane))
-        elif "{ex_sample}" in row["file_path"]:
+                checked_files.append(path_str.format(ex_lane=ex_lane))
+        elif "{ex_sample}" in path_str:
             for ex_sample in ex_samples:
-                checked_files.append(row["file_path"].format(ex_sample=ex_sample))
+                checked_files.append(path_str.format(ex_sample=ex_sample))
         else:
-            checked_files.append(row["file_path"])
+            checked_files.append(path_str)
 
     missing_files = [filepath for filepath in checked_files if not Path(filepath).exists()]
     assert not missing_files, f"Missing files: {missing_files}"
 
     for path in checked_files:
         path = Path(path)
-    
-        # Check that file exists
-        assert path.exists(), f"Missing file: {path}"
 
         # Check that non-data files are not empty
         if path.suffix in [".amb", ".ann", ".pac", ".0123", ".64", 
                     ".fai", ".dict", ".html", ".pdf", ".json", 
-                    ".zip", ".bai"]:
+                    ".zip", ".bai", ".tbi"]:
             assert path.stat().st_size > 0, f"File is empty: {path}"
             data_row_count = None
         else:
@@ -103,3 +104,20 @@ def test_pipeline_outputs(clean_workspace_fixture):
     df_counts = pd.DataFrame(file_counts)
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
         print(df_counts)
+
+    # Check that all files in metrics, tmp and results are being checked
+    folders_to_check = ["metrics", "tmp", "results"]
+    untracked_files = []
+
+    for folder in folders_to_check:
+        for path in Path(folder).rglob("*"):
+            if path.is_file():
+                path_str = str(path)
+                if path.name.startswith("."):
+                    continue
+                if "tmp/downloads" in path_str:
+                    continue
+                if path_str not in checked_files:
+                    untracked_files.append(path_str)
+
+    assert not untracked_files, f"The following files are not being checked: {untracked_files}"
