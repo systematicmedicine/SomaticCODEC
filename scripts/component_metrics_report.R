@@ -3,7 +3,12 @@
 # 
 # Calls on get_metrics.R functions and generates a pass/fail report for all metrics.
 # 
-# Author: Joshua Johnstone
+# Authors: Joshua Johnstone & Cameron Fraser
+
+# Redirect stdout and stderr to Snakemake log
+log_con <- file(snakemake@log[[1]], open = "wt")
+sink(log_con)
+sink(log_con, type = "message")
 
 # Load packages
 library(dplyr)
@@ -76,3 +81,7 @@ component_metrics_report <- combined_metrics_values %>%
 # Export metrics report as csv
 write.csv(component_metrics_report, "metrics/component_metrics_report.csv", row.names = FALSE)
 
+# Clean up logging
+sink(type = "message")
+sink()
+close(log_con)

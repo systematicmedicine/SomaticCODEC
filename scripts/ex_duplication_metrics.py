@@ -1,5 +1,5 @@
 """
---- ex_duplication.py ---
+--- ex_duplication_metrics.py ---
 
 Duplication rate calculated from umihistogram data, an output from ex_annotate_bam from ex_create_dsc.smk. 
 
@@ -16,7 +16,14 @@ Author: James Phie
 """
 
 import pandas as pd
+import sys
 
+# Redirect stdout and stderr to the Snakemake log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
+print("[INFO] Starting ex_duplication_metrics.py")
+
+# Begin script
 hist_files = snakemake.input
 output_file = snakemake.output[0]
 
@@ -34,3 +41,6 @@ for path in hist_files:
 # Save output table
 result_df = pd.DataFrame(rows, columns=["Sample", "Unique reads", "Total reads", "Duplication rate"])
 result_df.to_csv(output_file, sep="\t", index=False)
+
+# Print script completion message to log
+print("[INFO] Completed ex_duplication_metrics.py")
