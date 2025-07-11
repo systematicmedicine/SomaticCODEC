@@ -208,23 +208,25 @@ get_percent_reads_filtered <- function() {
       next
     }
     
-    # Read report into dataframe
-    cutadapt <- read.delim(metric_file_path)
+    # If JSON file, read JSON and extract read counts, else read as TSV
+    if (grepl("\\.json$", metric_file_path)) {
+      cutadapt <- fromJSON(metric_file_path)
+      total_reads <- as.numeric(cutadapt$read_counts$input)
+      written_reads <- as.numeric(cutadapt$read_counts$output)
+    } else {
+      cutadapt <- read.delim(metric_file_path)
+      total_reads <- as.numeric(cutadapt$in_reads)
+      written_reads <- as.numeric(cutadapt$out_reads)
+    }
     
-    # Get total read pairs processed
-    total_reads <- as.numeric(cutadapt$in_reads)
-    
-    # Get reads written (passing filters)
-    written_reads <- as.numeric(cutadapt$out_reads)
-    
-    # Calculate percent remaining
-    percent_remaining <- round((written_reads / total_reads) * 100, digits = 1)
+    # Calculate percent filtered
+    percent_filtered <- round((1 - written_reads / total_reads) * 100, digits = 1)
     
     # Add to results
     results <- rbind(results, data.frame(
       metric = function_metric,
       sample = sample_name,
-      value = percent_remaining
+      value = percent_filtered
     ))
   }
   
@@ -1107,10 +1109,9 @@ get_total_reads_r1 <- function() {
     fastqc_data_lines <- readLines(fastqc_data_path)
     
     # Get total reads
-    total_reads = round(as.numeric(sub("Total Sequences\t", "",
-                                 grep("^Total Sequences", 
-                                      fastqc_data_lines, 
-                                      value = TRUE))) / 1000000, digits = 1)
+    line <- grep("^Total Sequences", fastqc_data_lines, value = TRUE)
+    total_reads_value <- as.numeric(strsplit(line, "\t")[[1]][2])
+    total_reads <- round(total_reads_value / 1e6, 1)
     
     # Add to results
     results <- rbind(results, data.frame(metric = function_metric,
@@ -1177,10 +1178,9 @@ get_total_reads_r2 <- function() {
     fastqc_data_lines <- readLines(fastqc_data_path)
     
     # Get total reads
-    total_reads = round(as.numeric(sub("Total Sequences\t", "",
-                                       grep("^Total Sequences", 
-                                            fastqc_data_lines, 
-                                            value = TRUE))) / 1000000, digits = 1)
+    line <- grep("^Total Sequences", fastqc_data_lines, value = TRUE)
+    total_reads_value <- as.numeric(strsplit(line, "\t")[[1]][2])
+    total_reads <- round(total_reads_value / 1e6, 1)
     
     # Add to results
     results <- rbind(results, data.frame(metric = function_metric,
