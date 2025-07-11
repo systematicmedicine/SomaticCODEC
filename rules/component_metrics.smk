@@ -15,5 +15,9 @@ rule component_metrics_report:
         final_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist())
     output:
         report = "metrics/component_metrics_report.csv"
+    log:
+        "logs/component_metrics_report.log"
+    benchmark:
+        "logs/component_metrics_report.txt"
     script:
         "../scripts/component_metrics_report.R"

@@ -3,11 +3,21 @@
 
 Calculates the somatic variant rate and bases filtered during variant calling from vcf's produced by bcftools pileup and bcftools call. 
 
+This script is to be used exclusively with its parent rule
+
 Author: James Phie
 """
 
+# Load libraries
 import re
+import sys
 
+# Redirect stdout and stderr to the Snakemake log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
+print("[INFO] Starting ex_somatic_variant_rate.py")
+
+# Setup
 vcf_path = snakemake.input.vcf_all
 output_path = snakemake.output.results
 
@@ -76,3 +86,6 @@ with open(output_path, "w") as out:
     out.write(f"num_snv_bases\t{num_snv_bases}\n")
     out.write(f"snv_rate\t{snv_rate:.6e}\n")
     out.write(f"snv_per_diploid\t{snv_per_diploid:.2f}\n")
+
+# Print script completion message to log
+print("[INFO] Completed ex_somatic_variant_rate.py")

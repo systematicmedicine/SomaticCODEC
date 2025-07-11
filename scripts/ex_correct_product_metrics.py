@@ -1,5 +1,7 @@
 """
---- ex_correct_product.py ---
+--- ex_correct_product_metrics.py ---
+
+Caluclates correct product ratio. To be used exclusively with parent rule.
 
 To be considered a CODECseq correct product, the following criteria must be met:
 1. Read 1 and read 2 both present at >minimum insert size (typically 70bp, set in ex_preprocess_fastq.smk, rule ex_filter)
@@ -15,9 +17,17 @@ The correct product is calculated as number of properly paired read pairs in the
 Number filtered as singleton reads (filtered_missingread), and filtered for small insert size (filtered_smallinsertsize) are already factored into the above calculation.
  
 Author: James Phie
+
 """
+
 import json
 import pandas as pd
+import sys
+
+# Redirect stdout and stderr to the Snakemake log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
+print("[INFO] Starting ex_correct_product.py")
 
 # Inputs from Snakemake
 demux_json = snakemake.input.demux_json
@@ -90,3 +100,5 @@ df = pd.DataFrame([[
 ])
 
 df.to_csv(output_file, sep="\t", index=False)
+
+print("[INFO] Completed ex_correct_product.py")
