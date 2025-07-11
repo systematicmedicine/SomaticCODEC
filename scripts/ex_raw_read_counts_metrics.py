@@ -1,13 +1,22 @@
 """
---- ex_raw_read_counts.py ---
+--- ex_raw_read_counts_metrics ---
 
 Calculates the number and percentage of raw read pairs that demultiplexed to each sample. 
+
+This script is to be used exclusively with its parent rule
 
 Author: James Phie
 """
 
+# Load libraries
 import json
 import pandas as pd
+import sys
+
+# Redirect stdout and stderr to the Snakemake log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
+print("[INFO] Starting ex_raw_read_counts_metrics.py")
 
 # Inputs from Snakemake
 json_path = snakemake.input.json
@@ -54,3 +63,6 @@ with open(output_path, "w") as out:
         pct_demuxed = 100 * count / demuxed_read_pairs if demuxed_read_pairs > 0 else 0
         pct_total = 100 * count / total_reads if total_reads > 0 else 0
         out.write(f"{sample}\t{count}\t{pct_demuxed:.4f}%\t{pct_total:.4f}%\n")
+
+# Print script completion message to log
+print("[INFO] Completed ex_raw_read_counts_metrics.py")
