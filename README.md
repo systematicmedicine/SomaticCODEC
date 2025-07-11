@@ -10,8 +10,9 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 * Fully containerized docker workflow
 
 ## Contribution guidleines
-* [Contribution guidelines](docs/contrib.md)
+* [Branch structure](docs/branches.md)
 * [Integration testing guidelines](docs/testing.md)
+* [Logging](docs/logging.md)
 
 ## Library prep and sequencing
 * Prepare and sequence CODEC libraries as per `SOP0017 CODECseq library preparation`
