@@ -12,25 +12,7 @@ Some areas are masked using bed files (illumina difficlut regions, areas where g
 Author: James Phie
 """
 
-# Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
-ex_to_ms = ex_samples.set_index("ex_sample")["ms_sample"].to_dict()
-
-# Use the combined bed for masking germline mutations and difficult regions to create an include regions bed file for variant calling
-rule generate_include_bed:
-    input:
-        mask_bed = lambda wildcards: f"tmp/{ex_to_ms[wildcards.ex_sample]}/{ex_to_ms[wildcards.ex_sample]}_combined_mask.bed",
-        fai = config["GRCh38_path"] + ".fai"
-    output:
-        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
-    log:
-        "logs/{ex_sample}/generate_include_bed.log"
-    benchmark:
-        "logs/{ex_sample}/generate_include_bed.benchmark.txt"
-    shell:
-        """
-        bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed} 2>> {log}
-        """
-
+# Call somatic variants using CODED DSC, GCRh38 and include BED
 rule ex_call_somatic_variants:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
@@ -86,11 +68,3 @@ rule ex_call_somatic_variants:
             {output.intermediate_called} \
             -Ov -o {output.vcf_all} 2>> {log}
         """
-
-rule ex_somatic_variant_rate:
-    input:
-        vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf"
-    output:
-        results = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.txt"
-    script:
-        "../scripts/ex_somatic_variant_rate.py"
