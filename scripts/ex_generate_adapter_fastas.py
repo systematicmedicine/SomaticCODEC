@@ -1,11 +1,12 @@
 """
 --- ex_generate_adapter_fastas.py ---
 
-Generate per-lane codec index adapter FASTA files for demultiplexing and trimming from the sequences provided in ex_adapters.csv
+Generate per-lane codec index adapter FASTA files for demultiplexing and trimming
+
+To be used exclusively with rule ex_generate_adapter_fastas
 
 Inputs:
-  - ex_adapters.csv
-  - ex_samples (as snakemake.params.samples)
+  - Parameter injection from rule ex_generate_adapter_fastas
 
 Outputs:
   - FASTA files with only adapters used in the ex_sample column (no generic Quadruplex labels)
@@ -16,6 +17,11 @@ Author: James Phie
 import pandas as pd
 from pathlib import Path
 import re
+import sys
+
+# Redirect stdout and stderr to the Snakemake log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
 
 # Load sample metadata and adapter sequences
 samples = snakemake.params.samples
