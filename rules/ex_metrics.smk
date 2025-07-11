@@ -117,3 +117,12 @@ rule ex_raw_read_counts_metrics:
         used = ex_samples
     script:
         "../scripts/ex_raw_read_counts.py"
+
+# Calculate the somatic variant rate
+rule ex_somatic_variant_rate:
+    input:
+        vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf"
+    output:
+        results = "metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt"
+    script:
+        "../scripts/ex_somatic_variant_rate.py"
