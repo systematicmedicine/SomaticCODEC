@@ -22,8 +22,8 @@ rule ex_call_somatic_variants:
         ref = config["GRCh38_path"],
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
-        vcf_all = "results/{ex_sample}/{ex_sample}_all_positions.vcf", # Pileup of every unmasked position (except positions where indels present)
-        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf", # Subset of vcf_all, where SNVs have been called
+        vcf_all = temp("tmp/{ex_sample}/{ex_sample}_all_positions.vcf"), # Pileup of every unmasked position (except positions where indels present)
+        vcf_snvs = protected("results/{ex_sample}/{ex_sample}_variants.vcf"), # Subset of vcf_all, where SNVs have been called
         intermediate_mpileup = temp("tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf"),
         intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
         intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
