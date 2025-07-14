@@ -1,2 +1,0 @@
-ex_lane,fastq1,fastq2
-lane1,tests/data/ex_demux_to_trim_r1.fastq.gz,tests/data/ex_demux_to_trim_r2.fastq.gz
