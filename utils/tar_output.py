@@ -37,6 +37,7 @@ archive_path = os.path.join(root_dir, f"{experiment_name}.tar.gz")
 archive_structure = {
     "results": "Data/results",
     "metrics": "Data/metrics",
+    "logs": "Data/logs",
     "rules": "Methods/rules",
     "scripts": "Methods/scripts",
     "config": "Methods/config",
