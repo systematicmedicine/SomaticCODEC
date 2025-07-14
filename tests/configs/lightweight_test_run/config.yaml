@@ -1,0 +1,17 @@
+# Experiment name
+experiment_name: lightweight_test_run
+
+# Configurable parameters
+ms_adaptor_1: CTGTCTCTTATACACATCT
+ms_adaptor_2: ATGTGTATAAGAGACA
+lowdepth_mask_threshold: 1
+
+# File paths
+GRCh38_path: tmp/downloads/GRCh38_Chr21.fna
+difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions_10lines.bed
+common_variants_path: tmp/downloads/gnomad_common_af01_merged_10lines.bed
+ex_samples_path: tests/configs/lightweight_test_run/ex_samples.csv
+ex_lanes_path: tests/configs/lightweight_test_run/ex_lanes.csv
+ex_adapters_path: tests/configs/lightweight_test_run/ex_adapters.csv
+ms_samples_path: tests/configs/lightweight_test_run/ms_samples.csv
+component_metrics_path: config/component_metrics.csv
