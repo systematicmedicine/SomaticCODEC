@@ -3,7 +3,9 @@
 
 Functions and fixtures for pytest to use across test functions.
 
-Author: Joshua Johnstone
+Authors: 
+    - Joshua Johnstone
+    - Cameron Fraser
 
 """
 import pytest
@@ -11,7 +13,7 @@ from pathlib import Path
 import shutil
 import subprocess
 
-# Deletes all files except for .gitkeep from metrics, results, tmp and .snakemake folders
+# Deletes all files from metrics, results, logs, tmp and .snakemake directories
 def clean_workspace():
     for folder in ["metrics", "results", "tmp", "logs", ".snakemake"]:
         path = Path(folder)
@@ -35,7 +37,7 @@ def clean_workspace():
     if pytest_cache.exists():
         shutil.rmtree(pytest_cache)
 
-# Run a small dataset through the snakemake pipeline to generate all intermediate files
+# Runs a small dataset through the snakemake pipeline to generate files for testing
 @pytest.fixture(scope = "session")
 def lightweight_test_run():
     
