@@ -6,9 +6,10 @@ Functions and fixtures for pytest to use across test functions.
 Author: Joshua Johnstone
 
 """
+import pytest
 from pathlib import Path
 import shutil
-import pytest
+import subprocess
 
 # Deletes all files except for .gitkeep from metrics, results, tmp and .snakemake folders
 def clean_workspace():
@@ -34,12 +35,42 @@ def clean_workspace():
     if pytest_cache.exists():
         shutil.rmtree(pytest_cache)
 
-# Runs clean_workspace function before and after test
-@pytest.fixture
-def clean_workspace_fixture():
-
+# Run a small dataset through the snakemake pipeline to generate all intermediate files
+@pytest.fixture(scope = "session")
+def lightweight_test_run():
+    
+    # Setup test environment
     clean_workspace()
+    
+    src_dir = Path("tests/data/lightweight_test_run")
+    dst_dir = Path("tmp/downloads")
+    dst_dir.mkdir(exist_ok=True)
 
-    yield
+    files_to_copy = [
+        "GRCh38_Chr21.fna",
+        "ms_Chr21_10000reads_r1.fastq.gz",
+        "ms_Chr21_10000reads_r2.fastq.gz",
+        "GRCh38_alldifficultregions_10lines.bed",
+        "gnomad_common_af01_merged_10lines.bed",
+        "ex_Chr21_10000reads_r1.fastq.gz",
+        "ex_Chr21_10000reads_r2.fastq.gz"
+        ]
 
-    clean_workspace()
+    for filename in files_to_copy:
+        shutil.copy2(src_dir / filename, dst_dir / filename)
+
+    # Run snakemake
+    snakemake_cmd = [
+        "snakemake",
+        "--snakefile", "Snakefile",
+        "--configfile", "tests/configs/lightweight_test_run/config.yaml",
+        "--cores", "all",
+        "--notemp",
+    ]
+
+    result = subprocess.run(snakemake_cmd, capture_output = True)
+    if result.returncode != 0:
+        raise RuntimeError("Pipeline failed:\n" + result.stderr.decode())
+
+    # Cleanup test environmnt
+    #clean_workspace()
