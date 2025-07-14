@@ -33,5 +33,4 @@ include: "../../rules/index_reference_genome.smk"
 rule all:
     input:
         expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample=ex_samples["ex_sample"].tolist()),
-        expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample=ex_samples["ex_sample"].tolist()),
-        expand("results/{ex_sample}/{ex_sample}_all_positions.vcf", ex_sample=ex_samples["ex_sample"].tolist())
+        expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample=ex_samples["ex_sample"].tolist())
