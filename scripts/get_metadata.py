@@ -11,23 +11,35 @@ Authors:
 import pandas as pd
 import yaml
 
-""" Get ex sample ids"""
+
+""" 
+Returns a list of ex sample ids 
+"""
 def get_ex_sample_ids(config):
     metadata = load_metadata(config)
     return metadata["ex_samples"]["ex_sample"].dropna().unique().tolist()
 
-""" Get ex lane ids"""
+
+""" 
+Reuturns a list of ex lane ids
+"""
 def get_ex_lane_ids(config):
     metadata = load_metadata(config)
     return metadata["ex_lanes"]["ex_lane"].dropna().unique().tolist()
 
-""" Get ms sample ids"""
+
+""" 
+Returns a list of ms sample ids
+"""
 def get_ms_sample_ids(config):
     metadata = load_metadata(config)
     return metadata["ms_samples"]["ms_sample"].dropna().unique().tolist()
 
-""" Create adapter dictionary"""
-# Format: ["ex_lane"]["ex_sample"]["region"] -> sequence
+
+""" 
+Returns a nested dictionary of ex adapter sequences
+    dict[ex_lane][ex_sample][region] -> adapter sequence (str)
+"""
 def get_ex_adapter_dict(config):
     metadata = load_metadata(config)
     ex_samples = metadata["ex_samples"]
@@ -50,7 +62,9 @@ def get_ex_adapter_dict(config):
 
     return nested_dict
 
-""" Load sample metadata into dictionary """
+""" 
+Load sample metadata from CSV files into dictionary 
+"""
 def load_metadata(config):
 
     metadata = {}
@@ -62,8 +76,9 @@ def load_metadata(config):
 
     return metadata
 
-"""Load the Snakemake config.yaml file.""" 
+"""
+Load the Snakemake config.yaml file
+""" 
 def load_config(path="config/config.yaml"):
-       
     with open(path, "r") as f:
         return yaml.safe_load(f)
