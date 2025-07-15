@@ -27,6 +27,6 @@ rule collate_benchmarks:
     input:
         final_rule_output = "metrics/component_metrics_report.csv"
     output:
-        file_path = "logs/combined_benchmarks.log"
+        file_path = "logs/combined_benchmarks.csv"
     script:
         "../scripts/collate_benchmarks.py"
