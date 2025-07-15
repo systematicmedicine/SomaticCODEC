@@ -13,7 +13,7 @@ Authors:
 """
 import scripts.get_metadata as md
 
-# Generate adapter fasta files for demultiplexing and trimming
+# Generate adapter FASTA files for demultiplexing and trimming
 rule ex_generate_adapter_fastas:
     output:
         adapter_fasta_outputs = expand(
