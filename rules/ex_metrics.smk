@@ -86,7 +86,8 @@ rule ex_map_metrics:
 rule ex_correctproduct_metrics:
     input:
         demux_json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
-        trim_reports = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
+        filter_length = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
+        filter_meanquality = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
         flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_lane_to_sample[wildcards.ex_lane])
     output:
         "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
