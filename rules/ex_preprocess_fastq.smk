@@ -11,10 +11,18 @@ Authors:
     - Cameron Fraser
 
 """
+
 import scripts.get_metadata as md
 
-# Generate adapter FASTA files for demultiplexing and trimming
+
+"""
+Generate adapter FASTA files for demultiplexing and trimming
+""" 
 rule ex_generate_adapter_fastas:
+    input:
+        ex_lanes = config["ex_lanes_path"],
+        ex_samples = config["ex_samples_path"],
+        ex_adapters = config["ex_adapters_path"]
     output:
         adapter_fasta_outputs = expand(
             "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
@@ -28,10 +36,13 @@ rule ex_generate_adapter_fastas:
     script:
         "../scripts/ex_generate_adapter_fastas.py"
 
-# Moves the read pair umi to readname
-    # Cut 3bp from the start of the read 1 and read 2 sequence
-    # Append read 1 3bp umi sequence to the readname of read 1 and read 2
-    # Append read 2 3bp umi sequence after read 1 umi in read 1 and read 2
+
+"""
+Moves the read pair UMI to readname
+    - Cut 3bp from the start of the read 1 and read 2 sequence
+    - Append read 1 3bp UMI sequence to the readname of read 1 and read 2
+    - Append read 2 3bp UMI sequence after read 1 UMI in read 1 and read 2
+""" 
 rule ex_extract_umis:
     input:
         fastq1 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq1"].values[0],
@@ -56,6 +67,7 @@ rule ex_extract_umis:
           -p {output.fastq2} \
           {input.fastq1} {input.fastq2} 2>> {log}
         """
+
 
 # Demultiplex each lane (fastq pair) into samples
     # Use the 18bp sample indices to match to indicated samples, with an allowed error of 2 edit distance
