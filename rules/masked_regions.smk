@@ -38,7 +38,7 @@ rule ms_low_depth_mask:
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
-        threshold = config['lowdepth_mask_threshold']
+        threshold = config["ms_low_depth_mask"]["threshold"]
     shell:
         """
         samtools depth -aa {input.markdup_bam} > {output.intermediate_depth_per_base} 2>> {log}

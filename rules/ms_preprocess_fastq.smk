@@ -25,6 +25,9 @@ rule ms_trim_filter_fastqs:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv"
+    params:
+        adaptor_1 = config["ms_trim_filter_fastqs"]["adaptor_1"],
+        adaptor_2 = config["ms_trim_filter_fastqs"]["adaptor_2"]
     log:
         "logs/{ms_sample}/ms_trim_filter_fastqs.log"
     benchmark:
@@ -35,10 +38,10 @@ rule ms_trim_filter_fastqs:
         """
         cutadapt \
             -j {threads} \
-            -a {config[ms_adaptor_1]} \
-            -A {config[ms_adaptor_1]} \
-            -a {config[ms_adaptor_2]} \
-            -A {config[ms_adaptor_2]} \
+            -a {params.adaptor_1} \
+            -A {params.adaptor_1} \
+            -a {params.adaptor_2} \
+            -A {params.adaptor_2} \
             -a "G{{10}}" \
             -A "G{{10}}" \
             --quality-cutoff 20 \
