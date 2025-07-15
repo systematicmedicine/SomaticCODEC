@@ -74,5 +74,8 @@ def lightweight_test_run():
     if result.returncode != 0:
         raise RuntimeError("Pipeline failed:\n" + result.stderr.decode())
 
+    # Yield control to the test
+    yield
+
     # Cleanup test environmnt
-    #clean_workspace()
+    clean_workspace()
