@@ -6,16 +6,21 @@ Rules for preprocssessing FASTQ files for experimental samples
 Input: Raw FASTQ files, generated from Illumina sequencing of CODEC libraries, prepared from experimental samples
 Output: Fully processed FASTQ files ready for alignment 
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Cameron Fraser
 
 """
-# Generate adapter fasta files for demultiplexing and trimming using adapter sequences in ex_adapters.csv
+import scripts.get_metadata as md
+
+# Generate adapter fasta files for demultiplexing and trimming
 rule ex_generate_adapter_fastas:
-    params:
-        samples = ex_samples,
-        adapters = ex_adapters
     output:
-        adapter_fasta_outputs = expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1_start", "r1_end", "r2_start", "r2_end"])
+        adapter_fasta_outputs = expand(
+            "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
+            ex_lane = md.get_ex_lane_ids(config),
+            region = ["r1_start", "r1_end", "r2_start", "r2_end"]
+        )
     log:
         "logs/ex_generate_adapter_fastas.log"
     benchmark:
