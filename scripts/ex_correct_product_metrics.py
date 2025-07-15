@@ -17,7 +17,6 @@ The correct product is calculated as number of properly paired read pairs in the
 Number filtered as singleton reads (filtered_missingread), and filtered for small insert size (filtered_smallinsertsize) are already factored into the above calculation.
  
 Author: James Phie
-
 """
 
 import json
@@ -31,7 +30,8 @@ print("[INFO] Starting ex_correct_product.py")
 
 # Inputs from Snakemake
 demux_json = snakemake.input.demux_json
-trim_reports = snakemake.input.trim_reports
+filter_insertlengths = snakemake.input.filter_length
+filter_meanquality = snakemake.input.filter_meanquality
 flagstats = snakemake.input.flagstats
 samples = snakemake.params.samples
 output_file = snakemake.output[0] 
@@ -56,20 +56,36 @@ for r1_entry, r2_entry in zip(demux_data["adapters_read1"], demux_data["adapters
 # Initialize totals
 total_missing_adapter = total_read_pairs - matched_adapter_pairs
 total_too_short = 0
+total_low_quality = 0
 total_filtered_mapping = 0
 total_correct = 0
 
 # Iterate using explicit sample order
-for sample, trim_path, flagstat_path in zip(samples, trim_reports, flagstats):
-    sample_matched_pairs = sample_pair_counts.get(sample, 0)
-
+for sample, insert_path, meanqual_path, flagstat_path in zip(samples, filter_insertlengths, filter_meanquality, flagstats):
     # Too short filter
-    with open(trim_path) as f:
-        trim_data = json.load(f)
-    too_short = trim_data["read_counts"]["filtered"]["too_short"] or 0
+    with open(insert_path) as f:
+        insertlength_data = json.load(f)
+    reads_before = insertlength_data["summary"]["before_filtering"]["total_reads"]
+    reads_after = insertlength_data["summary"]["after_filtering"]["total_reads"]
+    paired_before = reads_before // 2
+    paired_after = reads_after // 2
+
+    too_short = paired_before - paired_after
     total_too_short += too_short
 
+    # Mean quality filter
+    with open(meanqual_path) as f:
+        meanquality_data = json.load(f)
+    reads_before_q = meanquality_data["summary"]["before_filtering"]["total_reads"]
+    reads_after_q = meanquality_data["summary"]["after_filtering"]["total_reads"]
+    paired_before_q = reads_before_q // 2
+    paired_after_q = reads_after_q // 2
+
+    too_low_quality = paired_before_q - paired_after_q
+    total_low_quality += too_low_quality
+
     # Properly paired reads
+    sample_matched_pairs = sample_pair_counts.get(sample, 0)
     with open(flagstat_path) as f:
         lines = f.readlines()
     properly_paired_line = next(line for line in lines if "properly paired" in line)
@@ -90,12 +106,13 @@ df = pd.DataFrame([[
     total_missing_adapter,
     global_match_pct,
     total_too_short,
+    total_low_quality,
     total_filtered_mapping,
     total_correct,
     round(correct_product_pct, 4)
 ]], columns=[
     "raw_reads_total", "filtered_missingread", "R1R2_present_%",
-    "filtered_smallinsertsize", "filtered_mapping",
+    "filtered_smallinsertsize", "filtered_lowquality", "filtered_mapping",
     "correct_aligned_total", "correct_aligned_%"
 ])
 

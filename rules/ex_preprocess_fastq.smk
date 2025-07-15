@@ -151,6 +151,8 @@ rule ex_trim:
 
 # Filter inserts (trimmed sequences)
     # Insert size >70bp
+    # Mean per read base quality >=Q36
+    # Number of N bases <=3
 rule ex_filter:
     input: 
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
@@ -158,7 +160,10 @@ rule ex_filter:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
-        json = "metrics/{ex_sample}/{ex_sample}_filter_metrics.json"
+        intermediate_r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter_tmp.fastq.gz"),
+        intermediate_r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter_tmp.fastq.gz"),
+        json_length = "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
+        json_meanquality = "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json",
     log:
         "logs/{ex_sample}/ex_filter.log"
     benchmark:
@@ -167,12 +172,29 @@ rule ex_filter:
         max(1, os.cpu_count() // 4)
     shell:  
         """
-        cutadapt \
-        -j {threads} \
-        --minimum-length 70 \
-        -o {output.r1} \
-        -p {output.r2} \
-        {input.r1} {input.r2} \
-        --json={output.json} 2>> {log}
+        fastp \
+          -i {input.r1} \
+          -I {input.r2} \
+          -o {output.intermediate_r1} \
+          -O {output.intermediate_r2} \
+          --length_required 70 \
+          --disable_quality_filtering \
+          --n_base_limit 49 \
+          --disable_adapter_trimming \
+          --thread {threads} \
+          --html /dev/null \
+          --json {output.json_length} 2>> {log}
+
+        fastp \
+          -i {output.intermediate_r1} \
+          -I {output.intermediate_r2} \
+          -o {output.r1} \
+          -O {output.r2} \
+          --average_qual 36 \
+          --n_base_limit 3 \
+          --disable_adapter_trimming \
+          --thread {threads} \
+          --html /dev/null \
+          --json {output.json_meanquality} 2>> {log}
         """
 
