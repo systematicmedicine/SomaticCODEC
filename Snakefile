@@ -58,7 +58,7 @@ include: "rules/ex_call_somatic.smk"
 include: "rules/ex_metrics.smk"
 include: "rules/index_reference_genome.smk"
 include: "rules/masked_regions.smk"
-include: "rules/component_metrics.smk"
+include: "rules/other_metrics.smk"
 
 # Define outputs
 
@@ -108,7 +108,8 @@ ms_metrics = [
 
 # Other metrics (e.g. component metrics report)
 other_metrics = [
-    "metrics/component_metrics_report.csv"
+    "metrics/component_metrics_report.csv",
+    "logs/combined_benchmarks.csv"
 ]
 
 # Call rule all
