@@ -1,10 +1,14 @@
+---
 # Experiment name
 experiment_name: lightweight_test_run
 
-# Configurable parameters
-ms_adaptor_1: CTGTCTCTTATACACATCT
-ms_adaptor_2: ATGTGTATAAGAGACA
-lowdepth_mask_threshold: 1
+# Rule parameters
+ms_trim_filter_fastqs:
+  adaptor_1: CTGTCTCTTATACACATCT
+  adaptor_2: ATGTGTATAAGAGACA
+
+ms_low_depth_mask:
+  threshold: 1
 
 # File paths
 GRCh38_path: tmp/downloads/GRCh38_Chr21.fna
