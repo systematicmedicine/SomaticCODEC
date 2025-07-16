@@ -126,6 +126,29 @@ def get_ex_lane_samples(config):
     )
 
 
+"""
+Returns a dictionary mapping ex_sample to its corresponding ms_sample
+    dict[ex_sample] -> ms_sample
+"""
+def get_ex_to_ms_sample_map(config):
+    df = load_metadata(config)["ex_samples"]
+    return dict(zip(df["ex_sample"], df["ms_sample"]))
+
+
+"""
+Returns a dictionary mapping ms_sample to its FASTQ file paths
+    dict[ms_sample] -> (fastq1_path, fastq2_path)
+"""
+def get_ms_sample_fastqs(config):
+    metadata = load_metadata(config)
+    df = metadata["ms_samples"]
+
+    return {
+        row["ms_sample"]: (row["fastq1"], row["fastq2"])
+        for _, row in df.iterrows()
+    }
+
+
 """ 
 Load sample metadata from CSV files into dictionary 
 """
