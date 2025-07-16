@@ -13,7 +13,6 @@ Output: Double stranded consensus
 Authors: 
     - James Phie
     - Cameron Fraser
-
 """
 
 

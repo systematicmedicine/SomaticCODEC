@@ -8,8 +8,9 @@ Input:
 Outputs: 
     - Processed ms FASTQ files
 
-Author: Joshua Johnstone
-
+Authors:
+    - Joshua Johnstone
+    - Cameron Fraser
 """
 
 # Trims and filters reads
