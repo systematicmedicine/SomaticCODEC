@@ -13,6 +13,8 @@ Authors:
     - Cameron Fraser
 """
 
+import scripts.get_metadata as md
+
 # TODO - spilt into two rules (trim and filter)
 # Trims and filters reads
     # Trims adaptors
