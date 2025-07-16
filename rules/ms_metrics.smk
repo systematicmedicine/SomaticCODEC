@@ -10,6 +10,8 @@ Authors:
 
 """
 
+import scripts.get_metadata as md
+
 # Generates a fastqc report for demuxed ms FASTQs
 rule ms_raw_fastq_metrics:
     input:

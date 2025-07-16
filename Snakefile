@@ -25,9 +25,13 @@ Authors:
     - Benjamin Barry
 """
 
+"""
+Setup
+"""
 # Load libraries
 import os
 import pandas as pd
+import scripts.get_metadata as md
 
 # Set working directory
 os.chdir(workflow.basedir)
@@ -46,7 +50,7 @@ ex_samples = ex_samples.merge(ex_adapters.rename(columns={"ex_adapter": "adapter
 ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
 ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
-# Include rules files
+# Include required rules files
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
 include: "rules/ms_call_germ.smk"
@@ -60,53 +64,61 @@ include: "rules/index_reference_genome.smk"
 include: "rules/masked_regions.smk"
 include: "rules/other_metrics.smk"
 
-# Define outputs
+"""
+Define outputs
+"""
 
-# Final results VCF
+# Get lists of sample ids
+ex_lane_ids = md.get_ex_lane_ids(config)
+ex_sample_ids = md.get_ex_sample_ids(config)
+ms_sample_ids = md.get_ms_sample_ids(config)
+
+
+# Define results
 results = [
-    expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample=ex_samples["ex_sample"].tolist())
+    expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = ex_sample_ids)
 ]
 
-# Metrics for experimental (CODEC) samples
+# Define metrics for ex samples
 ex_metrics = [
-    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html",ex_lane=ex_lanes["ex_lane"].tolist()),
-    expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html",ex_lane=ex_lanes["ex_lane"].tolist()),
-    expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane=ex_lanes["ex_lane"].tolist()),
-    expand("metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt", ex_lane=ex_lanes["ex_lane"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample=ex_samples["ex_sample"].tolist()),
-    expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample=ex_samples["ex_sample"].tolist()),
+    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = ex_sample_ids),
     "metrics/ex_duplication_metrics.txt"
 ]
 
-# Metrics for matched samples
+# Define metrics for matched samples
 ms_metrics = [
-    expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_depth_histogram.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-    expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_samples["ms_sample"].tolist())
+    expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_depth_histogram.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_sample_ids)
 ]
 
-# Other metrics (e.g. component metrics report)
+# Define other metrics
 other_metrics = [
     "metrics/component_metrics_report.csv",
     "logs/combined_benchmarks.csv"
