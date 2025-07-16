@@ -64,7 +64,7 @@ def get_ex_adapter_dict(config):
 
 
 """
-Returns a dictionary of lane FASTQ file paths
+Returns a dictionary mapping ex_lane to FASTQ file paths
     dict[ex_lane] -> (fastq1_path, fastq2_path)
 """
 def get_ex_lane_fastqs(config):
@@ -74,6 +74,24 @@ def get_ex_lane_fastqs(config):
         row["ex_lane"]: (row["fastq1"], row["fastq2"])
         for _, row in df.iterrows()
     }
+
+
+"""
+Returns a dictionary mapping ex_lane to ex_sample
+    dict[ex_lane] -> list(ex_samples)
+"""
+def get_ex_lane_samples(config):
+    metadata = load_metadata(config)
+    df = metadata["ex_samples"]
+
+    # Rename 'lane' to 'ex_lane' for consistency
+    df = df.rename(columns={"lane": "ex_lane"})
+
+    return (
+        df.groupby("ex_lane")["ex_sample"]
+        .apply(list)
+        .to_dict()
+    )
 
 
 """ 
@@ -89,6 +107,7 @@ def load_metadata(config):
     metadata["ex_adapters"] = pd.read_csv(config["ex_adapters_path"])
 
     return metadata
+
 
 """
 Load the Snakemake config.yaml file
