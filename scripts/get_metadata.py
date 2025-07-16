@@ -37,7 +37,7 @@ def get_ms_sample_ids(config):
 
 
 """ 
-Returns a nested dictionary of ex adapter sequences
+Returns a nested dictionary mapping ex_lane, ex_sample and region to an adapter sequence
     dict[ex_lane][ex_sample][region] -> adapter sequence
 """
 def get_ex_adapter_dict(config):
@@ -61,6 +61,38 @@ def get_ex_adapter_dict(config):
         }
 
     return nested_dict
+
+
+"""
+Returns a nested dictionary mapping each ex_sample and region to an adapter sequence
+    dict[ex_sample][region] -> sequence
+"""
+def get_ex_sample_adapter_dict(config):
+    metadata = load_metadata(config)
+
+    ex_samples = metadata["ex_samples"]
+    ex_adapters = metadata["ex_adapters"]
+
+    # Merge ex_samples with adapter sequences using the adapter name
+    merged = ex_samples[["ex_sample", "adapter"]].merge(
+        ex_adapters,
+        how="left",
+        left_on="adapter",
+        right_on="ex_adapter"
+    )
+
+    # Build the nested dictionary
+    sample_adapter_dict = {}
+    for _, row in merged.iterrows():
+        sample = row["ex_sample"]
+        sample_adapter_dict[sample] = {
+            "r1_start": row["r1_start"],
+            "r1_end": row["r1_end"],
+            "r2_start": row["r2_start"],
+            "r2_end": row["r2_end"]
+        }
+
+    return sample_adapter_dict
 
 
 """
