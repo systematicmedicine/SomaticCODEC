@@ -6,7 +6,9 @@ Rules for aligning umapped, non-deduplicated reads to reference genome, for expe
 Input: Processed (demuxed, trimmed and length filtered) FASTQ files
 Output: Reads aligned to a reference genome (BAM) 
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Cameron Fraser
 
 """
 
