@@ -95,12 +95,15 @@ rule ex_demux:
     script:
         "../scripts/ex_demux.py"
 
-# Trim all demultiplexed reads so that only inserts are remaining
-    # Trim 5' adapter sequences
-    # Trim 3' adapter sequences
-    # Trim 3 additional bases from the 5' end (to account for short adapter sequences/A-tailing remnants)
-    # Trim 8 additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
-    # Remove any bases with a Q score of <20 from the 3' end
+
+"""
+Trim reads so that only inserts are remaining
+    1. Trim 5' adapter sequences
+    2. Trim 3' adapter sequences
+    3. Trim 3 additional bases from the 5' end (to account for short adapter sequences/A-tailing remnants)
+    4. Trim 8 additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
+    5. Remove any bases with a Q score of <20 from the 3' end
+"""
 rule ex_trim:
     input:
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
@@ -116,10 +119,10 @@ rule ex_trim:
         intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
         intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     params:
-        r1_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_start"].values[0].strip(),
-        r2_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_start"].values[0].strip(),
-        r1_end = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_end"].values[0].strip(),
-        r2_end = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_end"].values[0].strip()
+        r1_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_start"],
+        r1_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_end"],
+        r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
+        r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"]
     log:
         "logs/{ex_sample}/ex_trim.log"
     benchmark:
