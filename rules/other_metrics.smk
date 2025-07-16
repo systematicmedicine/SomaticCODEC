@@ -9,11 +9,15 @@ Authors:
 
 """
 
+import scripts.get_metadata as md
+
 # Generates a pass/fail report for all component level metrics
 rule component_metrics_report:
     input:
-        final_ms_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_samples["ms_sample"].tolist()),
-        final_ex_metrics_file = expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = ex_samples["ex_sample"].tolist())
+        ms_samples = config["ms_samples_path"],
+        ex_samples = config["ex_samples_path"],
+        final_ms_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = md.get_ms_sample_ids(config)),
+        final_ex_metrics_file = expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = md.get_ex_sample_ids(config))
     output:
         report = "metrics/component_metrics_report.csv"
     log:

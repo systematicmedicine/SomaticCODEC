@@ -9,11 +9,17 @@ Authors:
     - Cameron Fraser
 """
 
+# Import modules
 import scripts.get_metadata as md
+
+# Legacy use of global variables yet to be refactored out
+ex_samples = pd.read_csv(config["ex_samples_path"])
+ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
+        ex_lanes = config["ex_lanes_path"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
