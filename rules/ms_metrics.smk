@@ -10,11 +10,14 @@ Authors:
 
 """
 
+import scripts.get_metadata as md
+
 # Generates a fastqc report for demuxed ms FASTQs
 rule ms_raw_fastq_metrics:
     input:
-        r1 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq1"].values[0],
-        r2 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq2"].values[0]
+        ms_samples = config["ms_samples_path"],
+        r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
+        r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html",
         r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html",
