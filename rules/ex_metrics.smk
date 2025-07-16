@@ -14,6 +14,7 @@ import scripts.get_metadata as md
 # FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
+        ex_lanes = config["ex_lanes_path"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
