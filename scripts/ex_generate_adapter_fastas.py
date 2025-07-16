@@ -31,7 +31,7 @@ sys.stderr = open(snakemake.log[0], "a")
 
 # Load nested dictionary of ex adapter sequences
   # Assumes format: dict[ex_lane][ex_sample][region] -> adapter sequence (str)
-adapter_dict = md.get_ex_adapter_dict(snakemake.config)
+adapter_dict = md.get_ex_lane_adapter_dict(snakemake.config)
 
 # Generate adapta FASTAS
 for output_path in snakemake.output:
