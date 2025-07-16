@@ -17,8 +17,8 @@ Authors:
     - James Phie
     - Cameron Fraser
 """
-# Creates mapping between experimental (codec) and matched sample (standard illumina sequencing) sample names
-ex_to_ms = ex_samples.set_index("ex_sample")["ms_sample"].to_dict()
+
+import scripts.get_metadata as md
 
 # Creates a mask for genomic positions with low ms read depth
 rule ms_low_depth_mask:
@@ -140,7 +140,11 @@ rule combine_masks:
 # Generate an include regions bed file for variant calling (opposite of combined bed)
 rule generate_include_bed:
     input:
-        mask_bed = lambda wildcards: f"tmp/{ex_to_ms[wildcards.ex_sample]}/{ex_to_ms[wildcards.ex_sample]}_combined_mask.bed",
+        ms_samples = config["ms_samples_path"],
+        mask_bed = lambda wc: (
+            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
+            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_combined_mask.bed"
+        ),
         fai = config["GRCh38_path"] + ".fai"
     output:
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
