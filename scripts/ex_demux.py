@@ -15,22 +15,23 @@ Outputs:
 Author: James Phie
 """
 
+# Import libraries
 import subprocess
 import pandas as pd
 from pathlib import Path
 import shutil
 import sys
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
+sys.path.insert(0, str(PROJECT_ROOT))
+import scripts.get_metadata as md
+
 # Redirect stdout and stderr to the Snakemake log file
 sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
 
-# For some reason re declare these dataframes?
-samples_df = pd.DataFrame(snakemake.params.samples)
-lanes_df = pd.DataFrame(snakemake.params.lanes)
-
 # Loop over each lane
-for lane in lanes_df["ex_lane"].unique():
+for lane in md.get_ex_lane_ids(snakemake.config):
     fastq1 = f"tmp/{lane}/{lane}_r1_umi_extracted.fastq.gz"
     fastq2 = f"tmp/{lane}/{lane}_r2_umi_extracted.fastq.gz"
 
@@ -57,7 +58,7 @@ for lane in lanes_df["ex_lane"].unique():
         subprocess.run(cmd, check=True, stdout=log_file, stderr=log_file)
 
     # Move output files into per-sample folders
-    for sample in samples_df.loc[samples_df["lane"] == lane, "ex_sample"]:
+    for sample in md.get_ex_lane_samples(snakemake.config)[lane]:
         r1_src = f"tmp/{sample}_r1_demux.fastq.gz"
         r2_src = f"tmp/{sample}_r2_demux.fastq.gz"
         r1_dst = f"tmp/{sample}/{sample}_r1_demux.fastq.gz"

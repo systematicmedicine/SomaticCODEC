@@ -6,16 +6,27 @@ Rules for preprocssessing FASTQ files for experimental samples
 Input: Raw FASTQ files, generated from Illumina sequencing of CODEC libraries, prepared from experimental samples
 Output: Fully processed FASTQ files ready for alignment 
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Cameron Fraser
+"""
+
+import scripts.get_metadata as md
 
 """
-# Generate adapter fasta files for demultiplexing and trimming using adapter sequences in ex_adapters.csv
+Generate adapter FASTA files for demultiplexing and trimming
+""" 
 rule ex_generate_adapter_fastas:
-    params:
-        samples = ex_samples,
-        adapters = ex_adapters
+    input:
+        ex_lanes = config["ex_lanes_path"],
+        ex_samples = config["ex_samples_path"],
+        ex_adapters = config["ex_adapters_path"]
     output:
-        adapter_fasta_outputs = expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", ex_lane=ex_lanes["ex_lane"].tolist(), region=["r1_start", "r1_end", "r2_start", "r2_end"])
+        adapter_fasta_outputs = expand(
+            "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
+            ex_lane = md.get_ex_lane_ids(config),
+            region = ["r1_start", "r1_end", "r2_start", "r2_end"]
+        )
     log:
         "logs/ex_generate_adapter_fastas.log"
     benchmark:
@@ -23,14 +34,18 @@ rule ex_generate_adapter_fastas:
     script:
         "../scripts/ex_generate_adapter_fastas.py"
 
-# Moves the read pair umi to readname
-    # Cut 3bp from the start of the read 1 and read 2 sequence
-    # Append read 1 3bp umi sequence to the readname of read 1 and read 2
-    # Append read 2 3bp umi sequence after read 1 umi in read 1 and read 2
-rule ex_extract_umis:
+
+"""
+Moves the read pair UMI to readname
+    - Cut 3bp from the start of the read 1 and read 2 sequence
+    - Append read 1 3bp UMI sequence to the readname of read 1 and read 2
+    - Append read 2 3bp UMI sequence after read 1 UMI in read 1 and read 2
+""" 
+rule ex_extract_fastq_umis:
     input:
-        fastq1 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq1"].values[0],
-        fastq2 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq2"].values[0],
+        ex_lanes = config["ex_lanes_path"],
+        fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
+        fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]
     output:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
@@ -52,37 +67,43 @@ rule ex_extract_umis:
           {input.fastq1} {input.fastq2} 2>> {log}
         """
 
-# Demultiplex each lane (fastq pair) into samples
-    # Use the 18bp sample indices to match to indicated samples, with an allowed error of 2 edit distance
-rule ex_demux:
+
+"""
+Demultiplex each lane FASTQ into sample FASTQs
+    - Use the 18bp sample indices to match reads to samples
+    - Allowed error of 2 edit distance
+""" 
+rule ex_demux_fastq:
     input:
-        fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
-        fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
-        r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist()),
-        r2_start = expand("tmp/{ex_lane}/{ex_lane}_r2_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist())
+        ex_lanes = config["ex_lanes_path"],
+        ex_samples = config["ex_samples_path"],
+        fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
+        fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
+        r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane = md.get_ex_lane_ids(config)),
+        r2_start = expand("tmp/{ex_lane}/{ex_lane}_r2_start.fasta", ex_lane = md.get_ex_lane_ids(config))
     output:
-        demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())),
-        demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())),
-        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist())
+        demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
+        demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
+        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane = md.get_ex_lane_ids(config))
     log:
         "logs/ex_demux.log"
     benchmark:
         "logs/ex_demux.benchmark.txt"
-    params:
-        samples = ex_samples,
-        lanes = ex_lanes
     threads:
         max(1, os.cpu_count() // 4)
     script:
         "../scripts/ex_demux.py"
 
-# Trim all demultiplexed reads so that only inserts are remaining
-    # Trim 5' adapter sequences
-    # Trim 3' adapter sequences
-    # Trim 3 additional bases from the 5' end (to account for short adapter sequences/A-tailing remnants)
-    # Trim 8 additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
-    # Remove any bases with a Q score of <20 from the 3' end
-rule ex_trim:
+
+"""
+Trim reads so that only inserts are remaining
+    1. Trim 5' adapter sequences
+    2. Trim 3' adapter sequences
+    3. Trim 3 additional bases from the 5' end (to account for short adapter sequences/A-tailing remnants)
+    4. Trim 8 additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
+    5. Remove any bases with a Q score of <20 from the 3' end
+"""
+rule ex_trim_fastq:
     input:
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
@@ -97,10 +118,10 @@ rule ex_trim:
         intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
         intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     params:
-        r1_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_start"].values[0].strip(),
-        r2_start = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_start"].values[0].strip(),
-        r1_end = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r1_end"].values[0].strip(),
-        r2_end = lambda wildcards: ex_samples.loc[ex_samples["ex_sample"] == wildcards.ex_sample, "r2_end"].values[0].strip()
+        r1_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_start"],
+        r1_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_end"],
+        r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
+        r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"]
     log:
         "logs/{ex_sample}/ex_trim.log"
     benchmark:
@@ -149,11 +170,14 @@ rule ex_trim:
           {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
         """ 
 
-# Filter inserts (trimmed sequences)
-    # Insert size >70bp
-    # Mean per read base quality >=Q36
-    # Number of N bases <=3
-rule ex_filter:
+
+"""
+Filter reads
+    - Remove reads that are < 70bp
+    - Remove reads with mean quality <Q36
+    - Remove reads with >3 N bases
+""" 
+rule ex_filter_fastq:
     input: 
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",  
