@@ -2,8 +2,7 @@
 """
 --- Snakefile ---
 
-Top-level Snakefile that runs entire pipeline.
-All rules (except rule all) are defined in .smk files in /rules directory.
+Top-level snakefile that runs codec-opensource pipeline
 
 Inputs: 
     - Raw FASTQ files of Illumina sequenced CODEC libraries
@@ -15,8 +14,8 @@ Outputs:
     - Metrics files
 
 Abbreviations:
-    - EX: Experimental samples (CODEC library prep, used to call somatic variants)
-    - MS: Matched samples (Standard Illumina library prep, used to determine germline variants for each person)
+    - ex: experimental samples (CODEC library prep, used to call somatic variants)
+    - ms: matched samples (Standard Illumina library prep, used to determine germline variants for each donor)
 
 Authors:
     - James Phie
@@ -25,9 +24,11 @@ Authors:
     - Benjamin Barry
 """
 
+
 """
 Setup
 """
+
 # Load libraries
 import os
 import pandas as pd
@@ -35,20 +36,6 @@ import scripts.get_metadata as md
 
 # Set working directory
 os.chdir(workflow.basedir)
-
-# Load additional config data
-ex_samples = pd.read_csv(config["ex_samples_path"])
-ex_lanes = pd.read_csv(config["ex_lanes_path"])
-ex_adapters = pd.read_csv(config["ex_adapters_path"])
-ms_samples = pd.read_csv(config["ms_samples_path"])
-component_metrics = pd.read_csv(config["component_metrics_path"])
-
-# Add sample adapter sequences to ex_samples dataframe
-ex_samples = ex_samples.merge(ex_adapters.rename(columns={"ex_adapter": "adapter"}),on="adapter",how="left")
-
-# Creates dictionaries to lookup between ex_lane and ex_sample
-ex_sample_to_lane = ex_samples.set_index("ex_sample")["lane"].to_dict()
-ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
 # Include required rules files
 include: "rules/ms_preprocess_fastq.smk"
@@ -72,7 +59,6 @@ Define outputs
 ex_lane_ids = md.get_ex_lane_ids(config)
 ex_sample_ids = md.get_ex_sample_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
-
 
 # Define results
 results = [
@@ -101,7 +87,7 @@ ex_metrics = [
     "metrics/ex_duplication_metrics.txt"
 ]
 
-# Define metrics for matched samples
+# Define metrics for ms samples
 ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_ids),
