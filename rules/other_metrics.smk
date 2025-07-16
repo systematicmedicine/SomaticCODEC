@@ -9,6 +9,8 @@ Authors:
 
 """
 
+import scripts.get_metadata as md
+
 # Generates a pass/fail report for all component level metrics
 rule component_metrics_report:
     input:
