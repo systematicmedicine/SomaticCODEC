@@ -9,7 +9,6 @@ Output: Reads aligned to a reference genome (BAM)
 Authors: 
     - James Phie
     - Cameron Fraser
-
 """
 
 """

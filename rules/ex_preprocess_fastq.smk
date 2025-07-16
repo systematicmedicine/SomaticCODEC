@@ -9,7 +9,6 @@ Output: Fully processed FASTQ files ready for alignment
 Authors: 
     - James Phie
     - Cameron Fraser
-
 """
 
 import scripts.get_metadata as md

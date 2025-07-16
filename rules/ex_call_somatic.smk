@@ -9,7 +9,8 @@ Output: Somatic mutation calls (.vcf)
 Somatic mutations are directly called against the filtered double stranded consensus BAM (single stranded overhangs and read 1 read 2 disagreements removed).
 Some areas are masked using bed files (illumina difficlut regions, areas where germline depth is insufficient)
 
-Author: James Phie
+Authors: 
+    - James Phie
 """
 
 
