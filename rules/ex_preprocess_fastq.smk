@@ -45,8 +45,9 @@ Moves the read pair UMI to readname
 """ 
 rule ex_extract_umis:
     input:
-        fastq1 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq1"].values[0],
-        fastq2 = lambda wildcards: ex_lanes.loc[ex_lanes["ex_lane"] == wildcards.ex_lane, "fastq2"].values[0],
+        ex_lanes = config["ex_lanes_path"],
+        fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
+        fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]
     output:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
