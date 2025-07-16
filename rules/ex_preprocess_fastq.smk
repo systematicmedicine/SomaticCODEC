@@ -171,10 +171,13 @@ rule ex_trim:
           {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
         """ 
 
-# Filter inserts (trimmed sequences)
-    # Insert size >70bp
-    # Mean per read base quality >=Q36
-    # Number of N bases <=3
+"""
+Filter inserts
+    - Insert size >70bp
+    - Mean per read base quality >=Q36
+    - Number of N bases <=3
+""" 
+
 rule ex_filter:
     input: 
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
