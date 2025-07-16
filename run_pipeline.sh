@@ -11,7 +11,7 @@
 #
 
 snakemake \
-    --snakefile Snakefile_dev_CF \
+    --snakefile Snakefile \
     --configfile config/config.yaml \
     --cores all \
     --resources mem=370 \
