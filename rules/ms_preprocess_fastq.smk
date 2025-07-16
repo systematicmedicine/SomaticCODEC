@@ -13,6 +13,9 @@ Authors:
     - Cameron Fraser
 """
 
+import scripts.get_metadata as md
+
+# TODO - spilt into two rules (trim and filter)
 # Trims and filters reads
     # Trims adaptors
     # Trims poly-G artifacts (>10 Gs at 3' end)
@@ -20,8 +23,9 @@ Authors:
     # Removes reads less than 100bp after trimming
 rule ms_trim_filter_fastqs:
     input:
-        r1 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq1"].values[0],
-        r2 = lambda wc: ms_samples.query(f"ms_sample == '{wc.ms_sample}'")["fastq2"].values[0]
+        ms_samples = config["ms_samples_path"],
+        r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
+        r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
