@@ -21,7 +21,7 @@ def get_ex_sample_ids(config):
 
 
 """ 
-Reuturns a list of ex lane ids
+Returns a list of ex lane ids
 """
 def get_ex_lane_ids(config):
     metadata = load_metadata(config)
@@ -38,7 +38,7 @@ def get_ms_sample_ids(config):
 
 """ 
 Returns a nested dictionary of ex adapter sequences
-    dict[ex_lane][ex_sample][region] -> adapter sequence (str)
+    dict[ex_lane][ex_sample][region] -> adapter sequence
 """
 def get_ex_adapter_dict(config):
     metadata = load_metadata(config)
@@ -61,6 +61,20 @@ def get_ex_adapter_dict(config):
         }
 
     return nested_dict
+
+
+"""
+Returns a dictionary of lane FASTQ file paths
+    dict[ex_lane] -> (fastq1_path, fastq2_path)
+"""
+def get_ex_lane_fastqs(config):
+    metadata = load_metadata(config)
+    df = metadata["ex_lanes"]
+    return {
+        row["ex_lane"]: (row["fastq1"], row["fastq2"])
+        for _, row in df.iterrows()
+    }
+
 
 """ 
 Load sample metadata from CSV files into dictionary 
