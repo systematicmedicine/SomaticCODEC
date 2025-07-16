@@ -42,7 +42,7 @@ Moves the read pair UMI to readname
     - Append read 1 3bp UMI sequence to the readname of read 1 and read 2
     - Append read 2 3bp UMI sequence after read 1 UMI in read 1 and read 2
 """ 
-rule ex_extract_umis:
+rule ex_extract_fastq_umis:
     input:
         ex_lanes = config["ex_lanes_path"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
@@ -74,7 +74,7 @@ Demultiplex each lane FASTQ into sample FASTQs
     - Use the 18bp sample indices to match reads to samples
     - Allowed error of 2 edit distance
 """ 
-rule ex_demux:
+rule ex_demux_fastq:
     input:
         ex_lanes = config["ex_lanes_path"],
         ex_samples = config["ex_samples_path"],
@@ -104,7 +104,7 @@ Trim reads so that only inserts are remaining
     4. Trim 8 additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
     5. Remove any bases with a Q score of <20 from the 3' end
 """
-rule ex_trim:
+rule ex_trim_fastq:
     input:
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
@@ -171,14 +171,14 @@ rule ex_trim:
           {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
         """ 
 
-"""
-Filter inserts
-    - Insert size >70bp
-    - Mean per read base quality >=Q36
-    - Number of N bases <=3
-""" 
 
-rule ex_filter:
+"""
+Filter reads
+    - Remove reads that are < 70bp
+    - Remove reads with mean quality <Q36
+    - Remove reads with >3 N bases
+""" 
+rule ex_filter_fastq:
     input: 
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",  
