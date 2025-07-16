@@ -14,7 +14,6 @@ Authors:
 
 import scripts.get_metadata as md
 
-
 """
 Generate adapter FASTA files for demultiplexing and trimming
 """ 
@@ -70,25 +69,27 @@ rule ex_extract_umis:
         """
 
 
-# Demultiplex each lane (fastq pair) into samples
-    # Use the 18bp sample indices to match to indicated samples, with an allowed error of 2 edit distance
+"""
+Demultiplex each lane FASTQ into sample FASTQs
+    - Use the 18bp sample indices to match reads to samples
+    - Allowed error of 2 edit distance
+""" 
 rule ex_demux:
     input:
-        fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
-        fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane=ex_lanes["ex_lane"].tolist()),
-        r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist()),
-        r2_start = expand("tmp/{ex_lane}/{ex_lane}_r2_start.fasta", ex_lane=ex_lanes["ex_lane"].tolist())
+        ex_lanes = config["ex_lanes_path"],
+        ex_samples = config["ex_samples_path"],
+        fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
+        fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
+        r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane = md.get_ex_lane_ids(config)),
+        r2_start = expand("tmp/{ex_lane}/{ex_lane}_r2_start.fasta", ex_lane = md.get_ex_lane_ids(config))
     output:
-        demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())),
-        demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample=ex_samples["ex_sample"].tolist())),
-        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane=ex_lanes["ex_lane"].tolist())
+        demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
+        demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
+        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane = md.get_ex_lane_ids(config))
     log:
         "logs/ex_demux.log"
     benchmark:
         "logs/ex_demux.benchmark.txt"
-    params:
-        samples = ex_samples,
-        lanes = ex_lanes
     threads:
         max(1, os.cpu_count() // 4)
     script:
