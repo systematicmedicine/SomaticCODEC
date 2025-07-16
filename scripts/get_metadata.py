@@ -40,7 +40,7 @@ def get_ms_sample_ids(config):
 Returns a nested dictionary mapping ex_lane, ex_sample and region to an adapter sequence
     dict[ex_lane][ex_sample][region] -> adapter sequence
 """
-def get_ex_adapter_dict(config):
+def get_ex_lane_adapter_dict(config):
     metadata = load_metadata(config)
     ex_samples = metadata["ex_samples"]
     ex_adapters = metadata["ex_adapters"].set_index("ex_adapter")
@@ -64,8 +64,8 @@ def get_ex_adapter_dict(config):
 
 
 """
-Returns a nested dictionary mapping each ex_sample and region to an adapter sequence
-    dict[ex_sample][region] -> sequence
+Returns a nested dictionary mapping ex_sample and region to an adapter sequence
+    dict[ex_sample][region] -> adapter sequence
 """
 def get_ex_sample_adapter_dict(config):
     metadata = load_metadata(config)
