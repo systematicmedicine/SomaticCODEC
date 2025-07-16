@@ -9,12 +9,15 @@ Output: Somatic mutation calls (.vcf)
 Somatic mutations are directly called against the filtered double stranded consensus BAM (single stranded overhangs and read 1 read 2 disagreements removed).
 Some areas are masked using bed files (illumina difficlut regions, areas where germline depth is insufficient)
 
-Author: James Phie
+Authors: 
+    - James Phie
 """
 
-# Call somatic variants using CODED DSC, GCRh38 and include BED
-    # Only calls SNVS
-    # Indels will be added in the future
+
+"""
+Call somatic variants
+    - Current version only calls SNVs
+"""
 rule ex_call_somatic_variants:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",

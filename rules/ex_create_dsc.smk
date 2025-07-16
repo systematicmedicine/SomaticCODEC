@@ -12,14 +12,18 @@ Output: Double stranded consensus
 
 Authors: 
     - James Phie
+    - Cameron Fraser
+"""
+
 
 """
-# Annotate the filtered (for correct product) BAM for downstream rules
-    # Move UMI from read name to RX:Z tag
-    # Add mate information to read pairs
-    # Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
-    # Assign generic sample and read group metadata for downstream tool compatibility
-rule ex_annotate_bam:
+ Annotate the mapped reads for downstream rules
+    - Move UMI from read name to RX:Z tag
+    - Add mate information to read pairs
+    - Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
+    - Assign generic sample and read group metadata for tool compatibility
+"""
+rule ex_annotate_map:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
@@ -74,8 +78,12 @@ rule ex_annotate_bam:
             VALIDATION_STRINGENCY=LENIENT 2>> {log}
         """
 
-# Sort the annotated BAM by coordinates for duplex consensus calling
-rule ex_sort_by_template:
+
+"""
+Sort the mapped reads by coordinates
+    - Required for duplex consensus calling
+"""
+rule ex_sort_map:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
     output:
@@ -95,11 +103,14 @@ rule ex_sort_by_template:
             -s TemplateCoordinate 2>> {log}
         """
 
-# Create duplex consensus BAM
-    # All read 1's, and all read 2's belonging to a single molecular identifier are collapsed for single strand consensus (PCR duplicates)
-    # All read 1 consensus and read 2 consensus belonging to a single molecular identifier are collapsed for duplex strand consensus 
-    # Single stranded overhangs are retained for alignment purposes, but a Q of 2 is assigned to all single strand bases
-    # Reads with >3 disagreements between overlapping paired end reads are excluded
+
+"""
+Create duplex consensus (DSC)
+    - All read 1's, and all read 2's belonging to a single molecular identifier are collapsed for single strand consensus (PCR duplicates)
+    - All read 1 consensus and read 2 consensus belonging to a single molecular identifier are collapsed for duplex strand consensus 
+    - Single stranded overhangs are retained for alignment purposes, but a Q of 2 is assigned to all single strand bases
+    - Reads with >3 disagreements between overlapping paired end reads are excluded
+"""
 rule ex_call_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
@@ -122,8 +133,12 @@ rule ex_call_dsc:
             -M 1 2>> {log}
         """
 
-# Realign the double strand consensus (DSC) to the reference genome, as sequences have changed
-    # Single stranded overhangs are present in this BAM to assist with alignment (filtered out during variant calling with base quality filter)
+
+"""
+Realign the DSC to the reference genome
+    - This is required because the conensus sequence may differe from the sequences previously used for alignment
+    - Single stranded overhangs are present in this BAM to assist with alignment (ideally filtered later)
+"""
 rule ex_remap_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
@@ -151,8 +166,12 @@ rule ex_remap_dsc:
 
         samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
-        
-# Sort realigned DSC bam by readname for downstream annotation
+
+
+"""
+Sort realigned DSC by read name
+    - Required for downstream rules
+"""
 rule ex_sort_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"
@@ -169,7 +188,11 @@ rule ex_sort_dsc:
         samtools sort -n -@ {threads} -o {output.bam} {input.bam} 2>> {log}
         """
 
-# Add metadata from unmapped DSC BAM back to the mapped DSC BAM
+
+"""
+Add metadata to the DSC
+    - Replace metadata lost during alignment
+"""
 rule ex_annotate_dsc: 
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
@@ -204,8 +227,11 @@ rule ex_annotate_dsc:
         samtools index -@ {threads} {output.bam} 2>> {log}
         """
 
-# Filter the DSC bam to prepare for variant calling 
-    # Remove reads with mapQ <= 60
+
+"""
+Filter reads from DSC
+    - Remove reads with mapQ <= 60
+"""
 rule ex_filter_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"

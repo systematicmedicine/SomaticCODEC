@@ -1,53 +1,48 @@
 """
---- ex_generate_adapter_fastas.py ---
+--- ex_generate_adapter_fastas.py
 
 Generate per-lane codec index adapter FASTA files for demultiplexing and trimming
 
 To be used exclusively with rule ex_generate_adapter_fastas
 
 Inputs:
-  - Parameter injection from rule ex_generate_adapter_fastas
+  - Sample metadata (loaded via get_metadata.py)
 
 Outputs:
   - FASTA files with only adapters used in the ex_sample column (no generic Quadruplex labels)
 
-Author: James Phie
+Author:
+    - Chat GPT
+    - Cameron Fraser
 """
 
-import pandas as pd
-from pathlib import Path
-import re
+# Import libraries
 import sys
+import json
+from pathlib import Path
 
-# Redirect stdout and stderr to the Snakemake log file
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
+sys.path.insert(0, str(PROJECT_ROOT))
+import scripts.get_metadata as md
+
+# Redirect stderr and stdout to Snakemake log
 sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
 
-# Load sample metadata and adapter sequences
-samples = snakemake.params.samples
-adapters_df = snakemake.params.adapters
-adapters = adapters_df.set_index("ex_adapter")
+# Load nested dictionary of ex adapter sequences
+  # Assumes format: dict[ex_lane][ex_sample][region] -> adapter sequence (str)
+adapter_dict = md.get_ex_lane_adapter_dict(snakemake.config)
 
-
-# Map output paths back to (lane, region) using the filename
-output_map = {}
-pattern = re.compile(r"(?P<lane>[^_/]+)_(?P<region>r[12]_(start|end))\.fasta")
-
-for path in snakemake.output:
-    match = pattern.search(Path(path).name)
-    if match:
-        lane = match.group("lane")
-        region = match.group("region")
-        output_map[(lane, region)] = path
-
-# Write each output FASTA
-for (lane, region), output_path in output_map.items():
-    lane_samples = samples[samples["lane"] == lane]
-    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-
+# Generate adapta FASTAS
+for output_path in snakemake.output:
+    output_path = Path(output_path)
+    filename = output_path.name
+    lane, region_with_ext = filename.split("_", 1)
+    region = region_with_ext.replace(".fasta", "")
+    sample_dict = adapter_dict.get(lane, {})
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
-        for _, row in lane_samples.iterrows():
-            adapter_seq = adapters.loc[row["adapter"], region]
-            f.write(f">{row['ex_sample']}\n{adapter_seq}\n")
-
+        for sample_id, region_dict in sample_dict.items():
+            sequence = region_dict[region]
+            f.write(f">{sample_id}\n{sequence}\n")
     print(f"[INFO] Wrote: {output_path}")

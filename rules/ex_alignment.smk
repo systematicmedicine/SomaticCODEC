@@ -6,10 +6,14 @@ Rules for aligning umapped, non-deduplicated reads to reference genome, for expe
 Input: Processed (demuxed, trimmed and length filtered) FASTQ files
 Output: Reads aligned to a reference genome (BAM) 
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Cameron Fraser
+"""
 
 """
-# Align inserts (from demuxed, trimmed and length filtered fastqs) to reference genome
+Map reads to reference genome
+"""
 rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
@@ -36,10 +40,14 @@ rule ex_map:
         samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
 
-# Filters mapped BAM files to remove intermolecular byproducts and retain correct products
-    # Must be mapped within ~500bp on the same chromosome (exact value determiend in previous step by bwa-mem2)
-    # Must be read in the correct directions
-rule ex_filter_correct_product:
+
+"""
+Filter mapped reads
+    - Remove read pairs that are on different chromosomes
+    - Remove reads pairs that are too far apart (~500bp, determined by aligner)
+    - Remove read pairs that are not read in the correct directions
+"""
+rule ex_filter_map:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
     output:
