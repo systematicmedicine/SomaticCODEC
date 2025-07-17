@@ -16,7 +16,9 @@ import scripts.get_metadata as md
 ex_samples = pd.read_csv(config["ex_samples_path"])
 ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
-# FastQC on raw fastq files (before demultiplexing or any processing)
+"""
+FastQC on raw fastq files (before demultiplexing or any processing)
+"""
 rule ex_fastqcraw_metrics:
     input:
         ex_lanes = config["ex_lanes_path"],
@@ -46,7 +48,10 @@ rule ex_fastqcraw_metrics:
         mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2} 2>> {log}
         """
 
-# FastQC on demultiplexed, trimmed, filtered FASTQs 
+
+"""
+FastQC on demultiplexed, trimmed, filtered FASTQs 
+"""
 rule ex_fastqctrim_metrics:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
@@ -75,7 +80,10 @@ rule ex_fastqctrim_metrics:
         mv metrics/{wildcards.ex_sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2} 2>> {log}
         """
 
-# Collects alignment metrics from the experimental bam mapped to the reference genome
+
+"""
+Collects alignment metrics from the experimental bam mapped to the reference genome
+"""
 rule ex_map_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
@@ -90,7 +98,10 @@ rule ex_map_metrics:
         samtools flagstat {input.bam} > {output.txt} 2>> {log}
         """
 
-# Replace default index names with experiment specific sample names as defined in the input.tsv
+
+"""
+Replace default index names with experiment specific sample names as defined in the input.tsv
+"""
 rule ex_correctproduct_metrics:
     input:
         demux_json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
@@ -108,7 +119,10 @@ rule ex_correctproduct_metrics:
     script:
         "../scripts/ex_correct_product_metrics.py"
 
-# Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
+
+"""
+Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
+"""
 rule ex_insert_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam",
@@ -133,7 +147,10 @@ rule ex_insert_metrics:
             DEVIATIONS=100 2>> {log}
         """
 
-# Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
+
+"""
+Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
+"""
 rule ex_duplication_metrics:
     input:
         expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist())
@@ -146,7 +163,10 @@ rule ex_duplication_metrics:
     script:
         "../scripts/ex_duplication_metrics.py"
 
-# Custom python script to assess demultiplexing
+
+"""
+Custom python script to assess demultiplexing
+"""
 rule ex_raw_read_counts_metrics:
     input:
         json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
@@ -162,7 +182,10 @@ rule ex_raw_read_counts_metrics:
     script:
         "../scripts/ex_raw_read_counts_metrics.py"
 
-# Calculate the somatic variant rate
+
+"""
+Calculate the somatic variant rate
+"""
 rule ex_somatic_variant_rate:
     input:
         vcf_all = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf"
@@ -192,6 +215,7 @@ rule ex_dsc_remap_metrics:
         "logs/{ex_sample}/ex_dsc_remap_metrics.benchmark.txt"
     script:
         "../scripts/ex_dsc_remap_metrics.py"
+
 
 """
 Calculate DSC coverage metrics
