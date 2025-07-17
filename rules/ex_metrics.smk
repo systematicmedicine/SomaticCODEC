@@ -174,3 +174,20 @@ rule ex_somatic_variant_rate:
         "logs/{ex_sample}/ex_somatic_variant_rate.benchmark.txt"
     script:
         "../scripts/ex_somatic_variant_rate.py"
+
+
+
+"""
+<<Annotate>>
+"""
+rule ex_dsc_remap_metrics:
+    input:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"),
+    output:
+        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt"
+    log:
+        "logs/{ex_sample}/ex_dsc_remap_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_dsc_remap_metrics.txt"
+    script:
+        "../scripts/ex_dsc_remap_metrics.py"
