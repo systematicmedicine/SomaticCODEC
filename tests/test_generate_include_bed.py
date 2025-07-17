@@ -18,42 +18,59 @@ import pytest
 import pandas as pd
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # adds PROJECT_ROOT to path
+
+# Add PROJECT_ROOT to sys.path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from scripts.get_metadata import load_config, get_ex_to_ms_sample_map
 
 
 # Read BED file as sorted DataFrame with columns: chrom, start, end
 def read_bed(path):
-    
     df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 1, 2], names=["chrom", "start", "end"])
     return df.sort_values(["chrom", "start"]).reset_index(drop=True)
 
 
 # Read .fai file and return as a DataFrame with chrom, length
 def read_fai(path):
-    
     df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 1], names=["chrom", "length"])
     return df
 
 
-# Assert that the union of mask and include BED intervals exactly covers the reference genome
-def merge_and_check_coverage(mask_df, include_df, fai_df):
-    genome_intervals = []
-    for _, row in fai_df.iterrows():
-        genome_intervals.append((row["chrom"], 0, row["length"]))
-    genome_df = pd.DataFrame(genome_intervals, columns=["chrom", "start", "end"])
+# Load input and output BEDs for a sample
+def get_mask_and_include_beds(ex_sample, ms_sample):
+    mask_path = Path(f"tmp/{ms_sample}/{ms_sample}_combined_mask.bed")
+    include_path = Path(f"tmp/{ex_sample}/{ex_sample}_include.bed")
 
-    # Concatenate and sort
+    assert mask_path.exists(), f"Missing input mask BED: {mask_path}"
+    assert include_path.exists(), f"Missing output include BED: {include_path}"
+
+    return read_bed(mask_path), read_bed(include_path)
+
+
+# Assert that the mask and include regions are disjoint
+def assert_no_overlap(mask_df, include_df, ex_sample):
+    combined = pd.concat([mask_df.assign(set="mask"), include_df.assign(set="include")])
+    combined = combined.sort_values(["chrom", "start"]).reset_index(drop=True)
+
+    overlap_found = (
+        (combined["start"].shift(-1) < combined["end"]) &
+        (combined["chrom"].shift(-1) == combined["chrom"]) &
+        (combined["set"] != combined["set"].shift(-1))
+    ).any()
+    assert not overlap_found, f"Overlap found between mask and include for {ex_sample}"
+
+
+# Assert that the union of mask and include exactly spans the genome
+def assert_spans_reference(mask_df, include_df, fai_df):
+    genome_df = fai_df.copy()
+    genome_df["start"] = 0
+    genome_df["end"] = genome_df["length"]
+    genome_df = genome_df[["chrom", "start", "end"]]
+
     combined = pd.concat([mask_df, include_df]).sort_values(["chrom", "start"]).reset_index(drop=True)
 
-    # Check for overlapping intervals
-    overlaps = (
-        (combined["start"].shift(-1) < combined["end"]) &
-        (combined["chrom"].shift(-1) == combined["chrom"])
-    )
-    assert not overlaps.any(), "Mask + include BEDs contain overlapping intervals"
-
-    # Collapse combined intervals
+    # Collapse adjacent/overlapping intervals
     collapsed = []
     current_chr, current_start, current_end = combined.iloc[0]
 
@@ -68,39 +85,28 @@ def merge_and_check_coverage(mask_df, include_df, fai_df):
     collapsed.append((current_chr, current_start, current_end))
     collapsed_df = pd.DataFrame(collapsed, columns=["chrom", "start", "end"])
 
-    # Now check that the collapsed set equals the full genome regions
     pd.testing.assert_frame_equal(collapsed_df.reset_index(drop=True), genome_df.reset_index(drop=True),
                                   check_dtype=False, obj="Collapsed union of mask + include")
 
 
-# Test that the BED files do not overlap, and overlaps the entire reference genome
-def test_include_bed_complement_and_coverage(lightweight_test_run):
-    # Load config and metadata
+# Test that the input (mask) and output (include) BEDs do not overlap
+def test_beds_dont_overlap(lightweight_test_run):
+    
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ex_to_ms = get_ex_to_ms_sample_map(config)
+
+    for ex_sample, ms_sample in ex_to_ms.items():
+        mask_df, include_df = get_mask_and_include_beds(ex_sample, ms_sample)
+        assert_no_overlap(mask_df, include_df, ex_sample)
+
+# Test that mask + include BEDs span the entire reference
+def test_beds_span_reference(lightweight_test_run):
+
     config = load_config("tests/configs/lightweight_test_run/config.yaml")
     ex_to_ms = get_ex_to_ms_sample_map(config)
     fai_path = config["GRCh38_path"] + ".fai"
     fai_df = read_fai(fai_path)
 
     for ex_sample, ms_sample in ex_to_ms.items():
-        mask_path = Path(f"tmp/{ms_sample}/{ms_sample}_combined_mask.bed")
-        include_path = Path(f"tmp/{ex_sample}/{ex_sample}_include.bed")
-
-        assert mask_path.exists(), f"Missing input mask BED: {mask_path}"
-        assert include_path.exists(), f"Missing output include BED: {include_path}"
-
-        mask_df = read_bed(mask_path)
-        include_df = read_bed(include_path)
-
-        # Test 1: No overlap between mask and include
-        combined = pd.concat([mask_df.assign(set="mask"), include_df.assign(set="include")])
-        combined = combined.sort_values(["chrom", "start"]).reset_index(drop=True)
-
-        overlap_found = (
-            (combined["start"].shift(-1) < combined["end"]) &
-            (combined["chrom"].shift(-1) == combined["chrom"]) &
-            (combined["set"] != combined["set"].shift(-1))
-        ).any()
-        assert not overlap_found, f"Overlap found between mask and include for {ex_sample}"
-
-        # Test 2: Together they fully cover the genome
-        merge_and_check_coverage(mask_df, include_df, fai_df)
+        mask_df, include_df = get_mask_and_include_beds(ex_sample, ms_sample)
+        assert_spans_reference(mask_df, include_df, fai_df)

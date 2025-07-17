@@ -15,7 +15,7 @@ import glob
 from pathlib import Path
 from helper_functions import count_reads_fastq, sum_len_fastq
 
-def test_trimmed_read_counts_preserved(lightweight_test_run):
+def test_read_counts_preserved(lightweight_test_run):
     input_files = sorted(glob.glob("tmp/*/*_r1_demux.fastq.gz"))
     output_files = sorted(glob.glob("tmp/*/*_r1_trim.fastq.gz"))
 
@@ -34,7 +34,7 @@ def test_trimmed_read_counts_preserved(lightweight_test_run):
 
         assert in_reads == out_reads, f"Read count mismatch for {key}: {in_reads} in vs {out_reads} out"
 
-def test_trimmed_sequences_are_shorter(lightweight_test_run):
+def test_sequences_are_shorter(lightweight_test_run):
     input_files = sorted(glob.glob("tmp/*/*_r1_demux.fastq.gz"))
     output_files = sorted(glob.glob("tmp/*/*_r1_trim.fastq.gz"))
 
