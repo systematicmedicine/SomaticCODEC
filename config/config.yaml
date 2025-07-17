@@ -3,7 +3,7 @@
 experiment_name: experiment_1
 
 # Rule parameters
-ms_trim_filter_fastqs:
+ms_trim_fastq:
   adaptor_1: CTGTCTCTTATACACATCT
   adaptor_2: ATGTGTATAAGAGACA
 

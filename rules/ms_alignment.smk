@@ -21,8 +21,8 @@ rule ms_raw_alignment:
         bwt = config["GRCh38_path"] + ".bwt.2bit.64",
         pac = config["GRCh38_path"] + ".pac",
         sa = config['GRCh38_path'] + ".0123",
-        r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
-        r2_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
+        r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
+        r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
         intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_intermediate.sam")
@@ -47,7 +47,7 @@ rule ms_raw_alignment:
 rule ms_add_read_groups:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam",
-        r1_processed = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"
+        r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
     log:
