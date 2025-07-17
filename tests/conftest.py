@@ -80,14 +80,3 @@ def lightweight_test_run():
     # Cleanup test environmnt
     clean_workspace()
 
-# Counts the number of reads in a FASTQ file
-def count_reads_seqkit(fastq_path):
-    result = subprocess.run(
-        ["seqkit", "stats", fastq_path],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        check=True
-    )
-    lines = result.stdout.strip().split('\n')
-    return int(lines[1].split()[3])
