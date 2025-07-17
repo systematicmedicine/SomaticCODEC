@@ -13,6 +13,7 @@ import glob
 from pathlib import Path
 from helper_functions import count_reads_fastq
 
+# Test that filtering decreases the number of reads
 def test_filtering_decreases_reads(lightweight_test_run):
     # Find input and output FASTQ files
     input_files = sorted(glob.glob("tmp/*/*_r1_trim.fastq.gz"))
