@@ -1,0 +1,2 @@
+ex_lane,fastq1,fastq2
+lane1,tests/data/dryrun/ex_Chr21_10000reads_r1.fastq.gz,tests/data/dryrun/ex_Chr21_10000reads_r2.fastq.gz

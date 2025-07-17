@@ -1,0 +1,2 @@
+ms_sample,fastq1,fastq2
+S007,tests/data/dryrun/ms_Chr21_10000reads_r1.fastq.gz,tests/data/dryrun/ms_Chr21_10000reads_r2.fastq.gz
