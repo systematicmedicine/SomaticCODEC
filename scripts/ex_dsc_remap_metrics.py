@@ -12,13 +12,13 @@ Author: James Phie
 import subprocess
 import sys
 
-# Define input and outputs (from snakemake rule ex_dsc_remap_metrics in ex_metrics.smk)
-dsc_bam = snakemake.input.bam
-metrics_file = snakemake.output.metrics
-
 # Redirect stdout and stderr to the Snakemake log file
 sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
+
+# Inputs from Snakemake
+dsc_bam = snakemake.input.bam
+metrics_file = snakemake.output.metrics
 
 def count_reads(cmd):
     """Run a samtools view command and return the count as int"""
