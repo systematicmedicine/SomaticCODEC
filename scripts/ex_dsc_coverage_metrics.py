@@ -14,7 +14,7 @@ Inputs:
 - Include BED file which excludes difficult to call regions (GIAB difficult regions), low depth germline regions, and germline mutations
 
 """
-
+# Import libraries
 import sys
 import pysam
 
@@ -22,6 +22,7 @@ import pysam
 sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
 
+# Inputs from Snakemake
 bam = snakemake.input.bam
 bed = snakemake.input.bed
 metrics = snakemake.output.metrics
