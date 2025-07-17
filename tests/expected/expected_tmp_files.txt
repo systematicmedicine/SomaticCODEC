@@ -5,8 +5,10 @@ tmp/downloads/GRCh38_Chr21.fna.pac
 tmp/downloads/GRCh38_Chr21.fna.0123
 tmp/downloads/GRCh38_Chr21.fna.fai
 tmp/downloads/GRCh38_Chr21.dict
-tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz
-tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz
+tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz
+tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz
+tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz
+tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_raw_intermediate.sam
 tmp/{ms_sample}/{ms_sample}_raw_map.bam
 tmp/{ms_sample}/{ms_sample}_read_group_map.bam
