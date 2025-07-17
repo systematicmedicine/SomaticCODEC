@@ -45,13 +45,13 @@ rule ms_raw_fastq_metrics:
 # Generates a fastqc report for ms processed reads
 rule ms_processed_fastq_metrics:
     input:
-        r1 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"
+        r1 = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
+        r2 = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:
-        r1_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html",
-        r1_zip = "metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.zip",
-        r2_zip = "metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.zip"
+        r1_report = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html",
+        r2_report = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html",
+        r1_zip = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip",
+        r2_zip = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip"
     log:
         "logs/{ms_sample}/ms_processed_fastq_metrics.log"
     benchmark:
