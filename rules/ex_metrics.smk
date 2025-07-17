@@ -176,9 +176,10 @@ rule ex_somatic_variant_rate:
         "../scripts/ex_somatic_variant_rate.py"
 
 
-
 """
-<<Annotate>>
+Calculate DSC remapping metrics
+    - ex_duplex_realignment: Percentage of reads which successfully aligned during DSC realignment
+    - ex_duplex_mapQ: Percentage of reads with a mapQ score of at least 60
 """
 rule ex_dsc_remap_metrics:
     input:
@@ -188,6 +189,26 @@ rule ex_dsc_remap_metrics:
     log:
         "logs/{ex_sample}/ex_dsc_remap_metrics.log"
     benchmark:
-        "logs/{ex_sample}/ex_dsc_remap_metrics.txt"
+        "logs/{ex_sample}/ex_dsc_remap_metrics.benchmark.txt"
     script:
         "../scripts/ex_dsc_remap_metrics.py"
+
+"""
+Calculate DSC coverage metrics
+    - ex_mean_analyzable_duplex_depth: Total duplex bases in include_beg region divided by total positions in include_bed region
+    - ex_duplex_coverage_bedregions: Percentage of positions in include_bed region that have >0x duplex depth
+    - ex_duplex_coverage_wholegenome: Positions with >0x duplex depth in the include_bed region as a percentage of the whole genome
+"""
+rule ex_dsc_coverage_metrics:
+    input:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
+        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai"),
+        bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+    output:
+        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.txt"
+    log:
+        "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_dsc_coverage_metrics.py"
