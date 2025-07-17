@@ -15,31 +15,31 @@ Authors:
 
 import scripts.get_metadata as md
 
-# TODO - spilt into two rules (trim and filter)
-# Trims and filters reads
-    # Trims adaptors
-    # Trims poly-G artifacts (>10 Gs at 3' end)
-    # Trims bases of quality <20 from read ends
-    # Removes reads less than 100bp after trimming
-rule ms_trim_filter_fastqs:
+"""
+Trims FASTQ files
+    - Adaptors
+    - Poly-G artifacts (>10 Gs at 3' end)
+    - Trims bases of quality <20 from read ends
+"""
+rule ms_trim_fastq:
     input:
         ms_samples = config["ms_samples_path"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
-        r1 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r1.fastq.gz"),
-        r2 = temp("tmp/{ms_sample}/{ms_sample}_trimfilter_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv"
+        r1 = temp("tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
+        report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv"
     params:
-        adaptor_1 = config["ms_trim_filter_fastqs"]["adaptor_1"],
-        adaptor_2 = config["ms_trim_filter_fastqs"]["adaptor_2"]
+        adaptor_1 = config["ms_trim_fastq"]["adaptor_1"],
+        adaptor_2 = config["ms_trim_fastq"]["adaptor_2"]
     log:
-        "logs/{ms_sample}/ms_trim_filter_fastqs.log"
+        "logs/{ms_sample}/ms_trim_fastq.log"
     benchmark:
-        "logs/{ms_sample}/ms_trim_filter_fastqs.benchmark.txt"
+        "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
     threads: 
         max(1, os.cpu_count() // 4)
-    shell: 
+    shell:
         """
         cutadapt \
             -j {threads} \
@@ -50,6 +50,35 @@ rule ms_trim_filter_fastqs:
             -a "G{{10}}" \
             -A "G{{10}}" \
             --quality-cutoff 20 \
+            -o {output.r1} \
+            -p {output.r2} \
+            {input.r1} {input.r2} \
+            --report=minimal > {output.report} 2>> {log}
+        """
+
+
+"""
+Filters FASTQ files
+    - Reads < 100 base pairs
+"""
+rule ms_filter_fastq:
+    input:
+        r1 = "tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz",
+        r2 = "tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz",    
+    output:
+        r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
+        report = "metrics/{ms_sample}/{ms_sample}_filter_metrics.tsv"
+    log:
+        "logs/{ms_sample}/ms_filter_fastq.log"
+    benchmark:
+        "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
+    threads:
+        max(1, os.cpu_count() // 4)
+    shell:
+        """
+        cutadapt \
+            -j {threads} \
             --minimum-length 100 \
             -o {output.r1} \
             -p {output.r2} \

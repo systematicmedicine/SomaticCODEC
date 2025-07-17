@@ -2,11 +2,12 @@ metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html
 metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html
 metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip
 metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip
-metrics/{ms_sample}/{ms_sample}_trimfilter_metrics.tsv
-metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.html
-metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.html
-metrics/{ms_sample}/{ms_sample}_trimfilter_r1_fastqc.zip
-metrics/{ms_sample}/{ms_sample}_trimfilter_r2_fastqc.zip
+metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv
+metrics/{ms_sample}/{ms_sample}_filter_metrics.tsv
+metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html
+metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html
+metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip
+metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip
 metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt
 metrics/{ms_sample}/{ms_sample}_alignment_stats.txt
 metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt
