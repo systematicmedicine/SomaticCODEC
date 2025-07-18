@@ -50,12 +50,16 @@ def lightweight_test_run():
 
     files_to_copy = [
         "GRCh38_Chr21.fna",
-        "ms_Chr21_10000reads_r1.fastq.gz",
-        "ms_Chr21_10000reads_r2.fastq.gz",
+        "ms_S004_Chr21_5000reads_r1.fastq.gz",
+        "ms_S004_Chr21_5000reads_r2.fastq.gz",
+        "ms_S005_Chr21_5000reads_r1.fastq.gz",
+        "ms_S005_Chr21_5000reads_r2.fastq.gz",
         "GRCh38_alldifficultregions_10lines.bed",
         "gnomad_common_af01_merged_10lines.bed",
-        "ex_Chr21_10000reads_r1.fastq.gz",
-        "ex_Chr21_10000reads_r2.fastq.gz"
+        "ex_lane1_Chr21_10000reads_r1.fastq.gz",
+        "ex_lane1_Chr21_10000reads_r2.fastq.gz",
+        "ex_lane2_Chr21_5000reads_r1.fastq.gz",
+        "ex_lane2_Chr21_5000reads_r2.fastq.gz"
         ]
 
     for filename in files_to_copy:
