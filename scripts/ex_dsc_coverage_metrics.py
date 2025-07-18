@@ -7,7 +7,7 @@ Calculate duplex sequencing coverage metrics:
 2. Percent of variant calling positions with >0x coverage (selected per sample with include_bed)
 3. Percent of whole genome positions with >0x coverage
 
-Only bases with >=Q70 are considered for depth and coverage calculations (e.g. duplex bases made from 2 Q35 bases).
+Only bases with high base quality scores (>= QUALITY_THRESHOLD, typically >=Q70) are considered for depth and coverage calculations (e.g. duplex bases made from 2 Q35 bases).
 
 Inputs:
 - Filtered DSC BAM file
@@ -21,6 +21,9 @@ import pysam
 # Redirect stdout/stderr to Snakemake log
 sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
+
+# Define hard coded variables
+QUALITY_THRESHOLD = 70
 
 # Inputs from Snakemake
 bam = snakemake.input.bam
@@ -49,13 +52,17 @@ bed_covered_positions = 0
 
 for chrom, start, end in regions:
     for pileupcolumn in bamfile.pileup(chrom, start, end, stepper="all", min_base_quality=0, truncate=True):
-        q70_depth = sum(
+        q_depth = sum(
             1 for pileupread in pileupcolumn.pileups
-            if not pileupread.is_del and not pileupread.is_refskip and
-            pileupread.alignment.query_qualities[pileupread.query_position] >= 70
+            if (
+                not pileupread.is_del and
+                not pileupread.is_refskip and
+                pileupread.query_position is not None and
+                pileupread.alignment.query_qualities[pileupread.query_position] >= QUALITY_THRESHOLD
+            )
         )
-        bed_total_depth += q70_depth
-        if q70_depth > 0:
+        bed_total_depth += q_depth
+        if q_depth > 0:
             bed_covered_positions += 1
 
 # Total duplex depth in BED-covered regions of the genome
@@ -70,7 +77,7 @@ ex_dsc_coverage_wholegenome = 100 * bed_covered_positions / total_genome_positio
 # BED region as % of genome
 include_bed_coverage = 100 * bed_total_positions / total_genome_positions if total_genome_positions else 0
 
-# Total duplex bases with Q≥70 in BED regions
+# Total duplex bases with Q≥ required Q score (typically 70) in BED regions
 duplex_bases_in_bed_positions = bed_total_depth
 
 bamfile.close()
