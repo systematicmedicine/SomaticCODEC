@@ -206,7 +206,7 @@ Calculate DSC remapping metrics
 """
 rule ex_dsc_remap_metrics:
     input:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"),
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam",
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt"
     log:
@@ -225,8 +225,8 @@ Calculate DSC coverage metrics
 """
 rule ex_dsc_coverage_metrics:
     input:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
-        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai"),
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
         bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.txt"
