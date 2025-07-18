@@ -29,7 +29,7 @@ rule ex_annotate_map:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
         histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
-        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map__moveumi_tmp.bam"),
+        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
         intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
         intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam")
