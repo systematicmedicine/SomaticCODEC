@@ -32,5 +32,7 @@ rule collate_benchmarks:
         final_rule_output = "metrics/component_metrics_report.csv"
     output:
         file_path = "logs/combined_benchmarks.csv"
+    log:
+        "logs/collate_benchmarks.log"
     script:
         "../scripts/collate_benchmarks.py"
