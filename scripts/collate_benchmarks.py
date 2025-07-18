@@ -14,6 +14,10 @@ Authors:
 import pandas as pd
 from pathlib import Path
 
+# Redirect stdout and stderr to the Snakemake log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
+
 # Resolve the script's directory and logs directory
 script_dir = Path(__file__).resolve().parent
 logs_dir = script_dir.parent / "logs"
