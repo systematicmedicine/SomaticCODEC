@@ -18,21 +18,35 @@ from pathlib import Path
 ALLOWED_EXTS = {".py", ".sh", ".R"}
 EXEMPT_FILES = {".gitkeep"}
 
-scripts_dir = Path(__file__).resolve().parent.parent / "scripts"
+# Directories to check
+project_root = Path(__file__).resolve().parent.parent
+check_dirs = [
+    project_root / "scripts",
+    project_root / "utils",
+    project_root / "tests"
+]
 
-# Test for scripts with invalid exetnsions
+# Helper to collect files with optional extension filter
+def collect_files(ext=None):
+    files = []
+    for base_dir in check_dirs:
+        if base_dir.name == "tests":
+            # Only top-level files in /tests
+            contents = base_dir.glob(f"*{ext}" if ext else "*")
+        else:
+            contents = base_dir.rglob(f"*{ext}" if ext else "*")
+        files.extend([f for f in contents if f.is_file() and "__pycache__" not in f.parts])
+    return files
+
+# Check for unexpected extensions
 def test_scripts_have_valid_extensions():
-    for script_path in scripts_dir.rglob("*"):
-        if script_path.is_file():
-            if "__pycache__" in script_path.parts:
-                continue  # skip all __pycache__ contents
-            ext = script_path.suffix
-            name = script_path.name
-            if ext not in ALLOWED_EXTS and name not in EXEMPT_FILES:
-                pytest.fail(f"Unexpected file in scripts/: {script_path}")
+    for path in collect_files():
+        ext = path.suffix
+        name = path.name
+        if ext not in ALLOWED_EXTS and name not in EXEMPT_FILES:
+            pytest.fail(f"Unexpected file type: {path}")
 
-# Test Python scipts
-@pytest.mark.parametrize("script_path", list(scripts_dir.rglob("*.py")))
+@pytest.mark.parametrize("script_path", collect_files(".py"))
 def test_python_syntax(script_path):
     result = subprocess.run(
         ["python3", "-m", "py_compile", str(script_path)],
@@ -40,8 +54,7 @@ def test_python_syntax(script_path):
     )
     assert result.returncode == 0, f"Python syntax error in {script_path}:\n{result.stderr}"
 
-# Test bash scripts
-@pytest.mark.parametrize("script_path", list(scripts_dir.rglob("*.sh")))
+@pytest.mark.parametrize("script_path", collect_files(".sh"))
 def test_bash_syntax(script_path):
     result = subprocess.run(
         ["bash", "-n", str(script_path)],
@@ -49,8 +62,7 @@ def test_bash_syntax(script_path):
     )
     assert result.returncode == 0, f"Bash syntax error in {script_path}:\n{result.stderr}"
 
-# Test R scripts
-@pytest.mark.parametrize("script_path", list(scripts_dir.rglob("*.R")))
+@pytest.mark.parametrize("script_path", collect_files(".R"))
 def test_r_syntax(script_path):
     result = subprocess.run(
         ["Rscript", "-e", f"parse(file = '{script_path}')"],
