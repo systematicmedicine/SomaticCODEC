@@ -86,6 +86,8 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt", ex_sample = ex_sample_ids),
+    "metrics/trinucleotide_context_metrics.txt",
     "metrics/ex_duplication_metrics.txt"
 ]
 
