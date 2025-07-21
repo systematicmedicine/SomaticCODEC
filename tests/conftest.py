@@ -59,7 +59,8 @@ def lightweight_test_run():
         "ex_lane1_Chr21_10000reads_r1.fastq.gz",
         "ex_lane1_Chr21_10000reads_r2.fastq.gz",
         "ex_lane2_Chr21_5000reads_r1.fastq.gz",
-        "ex_lane2_Chr21_5000reads_r2.fastq.gz"
+        "ex_lane2_Chr21_5000reads_r2.fastq.gz",
+        "nanoseq_trinucleotide_contexts.csv"
         ]
 
     for filename in files_to_copy:
@@ -82,5 +83,5 @@ def lightweight_test_run():
     yield
 
     # Cleanup test environmnt
-    clean_workspace()
+    #clean_workspace()
 
