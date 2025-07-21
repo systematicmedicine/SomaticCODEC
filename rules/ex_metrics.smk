@@ -236,3 +236,38 @@ rule ex_dsc_coverage_metrics:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
     script:
         "../scripts/ex_dsc_coverage_metrics.py"
+
+"""
+Calculate percent of positions with somatic SNV clustering
+    - ex_somatic_depth_per_position: Percent of somatic SNVs called that have >1x alt depth
+    - ex_somatic_clustered_or_mnv: Percent of somatic SNVs called that are within 150bp of another SNV
+"""
+rule ex_somatic_SNV_clustering_metrics:
+    input:
+        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf"
+    output:
+        metrics = "metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt"
+    log:
+        "logs/{ex_sample}/ex_somatic_SNV_clustering_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_somatic_SNV_clustering_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_somatic_SNV_clustering_metrics.py"
+
+"""
+Calculate 96 trinucleotide contexts for called somatic mutations
+    - ex_trinucleotide_cosine_similarity: Cosine similarity compared to nanoseq granulocyte data (which also matches closely with Bae 2023 trinucleotide contexts)
+"""
+rule ex_trinucleotide_context_metrics:
+    input:
+        vcf_snvs = expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config)),
+        nanoseq_contexts = config["ex_nanoseq_tri_contexts"],
+        ref = config["GRCh38_path"]
+    output:
+        metrics = "metrics/trinucleotide_context_metrics.txt"
+    log:
+        "logs/ex_trinucleotide_context_metrics.log"
+    benchmark:
+        "logs/ex_trinucleotide_context_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_trinucleotide_context_metrics.py"
