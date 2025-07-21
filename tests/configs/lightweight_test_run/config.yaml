@@ -11,7 +11,7 @@ ms_low_depth_mask:
   threshold: 1
 
 # File paths
-GRCh38_path: tmp/downloads/GRCh38_Chr21.fna
+GRCh38_path: tmp/downloads/GRCh38_Chr21_plus_stubs.fna
 difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions_10lines.bed
 common_variants_path: tmp/downloads/gnomad_common_af01_merged_10lines.bed
 ex_samples_path: tests/configs/lightweight_test_run/ex_samples.csv

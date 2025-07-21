@@ -68,7 +68,11 @@ def assert_spans_reference(mask_df, include_df, fai_df):
     genome_df["end"] = genome_df["length"]
     genome_df = genome_df[["chrom", "start", "end"]]
 
-    combined = pd.concat([mask_df, include_df]).sort_values(["chrom", "start"]).reset_index(drop=True)
+    chrom_order = list(genome_df["chrom"].unique())
+    combined = (pd.concat([mask_df, include_df])
+                .assign(chrom=lambda d: pd.Categorical(d["chrom"], categories=chrom_order, ordered=True))
+                .sort_values(["chrom", "start"])
+                .reset_index(drop=True))
 
     # Collapse adjacent/overlapping intervals
     collapsed = []

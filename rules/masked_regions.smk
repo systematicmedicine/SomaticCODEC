@@ -114,7 +114,8 @@ rule combine_masks:
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed"
+        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
+        fai = config['GRCh38_path'] + ".fai" 
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
         intermediate_cat = temp("tmp/{ms_sample}/{ms_sample}_masks_cat.bed"),
@@ -132,7 +133,7 @@ rule combine_masks:
         {input.ms_germ_ins_bed} \
         {input.ms_germ_snv_bed} > {output.intermediate_cat} 2>> {log}
         
-        sort {output.intermediate_cat} -k1,1 -k2,2n > {output.intermediate_sorted} 2>> {log}
+        bedtools sort -i {output.intermediate_cat} -faidx {input.fai} > {output.intermediate_sorted} 2>> {log}
 
         bedtools merge -i {output.intermediate_sorted} > {output.combined_bed} 2>> {log}
         """
