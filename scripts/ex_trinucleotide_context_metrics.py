@@ -36,7 +36,7 @@ output_path = snakemake.output.metrics
 # Load reference genome
 ref = pysam.FastaFile(ref_path)
 
-# Predefined standard 96 trinucleotide context order
+# Predefined standard 96 trinucleotide context order (with pyrimidine-centric convention - ie. C or T as the middle base)
 mutation_types = ["C>A", "C>G", "C>T", "T>A", "T>C", "T>G"]
 bases = ["A", "C", "G", "T"]
 contexts_96 = [
@@ -47,7 +47,7 @@ contexts_96 = [
 ]
 contexts_96 = pd.Series(contexts_96, name="Context")
 
-# Reverse complement function
+# Reverse complement function (if mutation is a G or A, convert to C or T)
 def reverse_complement(seq):
     return seq.translate(str.maketrans("ACGT", "TGCA"))[::-1]
 
@@ -85,7 +85,7 @@ def count_trinucleotide_contexts(vcf_file, reference):
                 continue
     return counts, total
 
-# Load and average NanoSeq contexts (CSV version)
+# Load and average NanoSeq contexts
 try:
     nanoseq_df_all = pd.read_csv(nanoseq_contexts_path)
 except Exception as e:
@@ -108,7 +108,7 @@ nanoseq_df = (
 )
 nanoseq_df = contexts_96.to_frame().merge(nanoseq_df, on="Context", how="left").fillna(0)
 
-# Cosine similarity + per-sample processing
+# Count trinucleotide mutations, normalize to proportions and merge with full 96 trinucleotide context list
 results = []
 all_samples_df = []
 
@@ -123,7 +123,7 @@ for vcf_file in vcf_paths:
     sample_df["SampleID"] = sample_id
 
     sample_df = contexts_96.to_frame().merge(sample_df, on="Context", how="left").fillna(0)
-
+# Compare cosine similarity of nanoseq and sample trinucleotide contexts 
     v1 = sample_df["Proportion"].to_numpy()
     v2 = nanoseq_df["Proportion"].to_numpy()
 
