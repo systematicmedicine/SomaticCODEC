@@ -1,10 +1,10 @@
-tmp/downloads/GRCh38_Chr21.fna.amb
-tmp/downloads/GRCh38_Chr21.fna.ann
-tmp/downloads/GRCh38_Chr21.fna.bwt.2bit.64
-tmp/downloads/GRCh38_Chr21.fna.pac
-tmp/downloads/GRCh38_Chr21.fna.0123
-tmp/downloads/GRCh38_Chr21.fna.fai
-tmp/downloads/GRCh38_Chr21.dict
+tmp/downloads/GRCh38_Chr21_plus_stubs.fna.amb
+tmp/downloads/GRCh38_Chr21_plus_stubs.fna.ann
+tmp/downloads/GRCh38_Chr21_plus_stubs.fna.bwt.2bit.64
+tmp/downloads/GRCh38_Chr21_plus_stubs.fna.pac
+tmp/downloads/GRCh38_Chr21_plus_stubs.fna.0123
+tmp/downloads/GRCh38_Chr21_plus_stubs.fna.fai
+tmp/downloads/GRCh38_Chr21_plus_stubs.dict
 tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz

@@ -49,7 +49,7 @@ def lightweight_test_run():
     dst_dir.mkdir(exist_ok=True)
 
     files_to_copy = [
-        "GRCh38_Chr21.fna",
+        "GRCh38_Chr21_plus_stubs.fna",
         "ms_S004_Chr21_5000reads_r1.fastq.gz",
         "ms_S004_Chr21_5000reads_r2.fastq.gz",
         "ms_S005_Chr21_5000reads_r1.fastq.gz",
