@@ -123,7 +123,7 @@ for vcf_file in vcf_paths:
     sample_df["SampleID"] = sample_id
 
     sample_df = contexts_96.to_frame().merge(sample_df, on="Context", how="left").fillna(0)
-# Compare cosine similarity of nanoseq and sample trinucleotide contexts 
+# Compare sample's trinucleotide profile to NanoSeq reference using cosine similarity
     v1 = sample_df["Proportion"].to_numpy()
     v2 = nanoseq_df["Proportion"].to_numpy()
 
