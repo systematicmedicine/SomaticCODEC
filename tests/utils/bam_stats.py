@@ -28,12 +28,18 @@ def count_bam_data_points(path):
 def count_bam_q2_bases(path):
     path = str(path)
     count = 0
-    try:
-        with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
-            for read in bam.fetch(until_eof=True):
+    with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
+        for read in bam.fetch(until_eof=True):
                 quals = read.query_qualities
                 if quals:
                     count += sum(1 for q in quals if q == 2)
-        return count
-    except Exception as e:
-        raise RuntimeError(f"Failed while parsing {path}:\n{e}")
+    return count
+    
+def count_bam_mapq_under_60(path):
+    path = str(path)
+    count = 0
+    with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
+        for read in bam.fetch(until_eof=True):
+            if not read.is_unmapped and read.mapping_quality < 60:
+                count += 1
+    return count
