@@ -11,7 +11,7 @@ from pathlib import Path
 import glob
 from utils.bam_stats import count_bam_data_points, count_bam_mapq_under_60
 
-def test_reads_decrease():
+def test_reads_decrease(lightweight_test_run):
     # Locate all pre-filtering BAM files
     pre_files = glob.glob("tmp/*/*_map_dsc_anno.bam")
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
@@ -27,7 +27,7 @@ def test_reads_decrease():
         f"Post-filtering reads ({total_post_reads}) > pre-filtering reads ({total_pre_reads})"
     )
 
-def test_mapq_under_60_removed():
+def test_mapq_under_60_removed(lightweight_test_run):
     # Locate all post-filtering BAM files
     post_files = glob.glob("tmp/*/*_map_dsc_anno_filtered.bam")
     post_counts = {Path(f).name: count_bam_mapq_under_60(f) for f in post_files}
