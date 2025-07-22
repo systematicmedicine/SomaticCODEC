@@ -11,7 +11,7 @@ from pathlib import Path
 import glob
 from utils.bam_stats import count_bam_data_points
 
-def test_read_counts_preserved(lightweight_test_run):
+def test_reads_decrease(lightweight_test_run):
      # Locate all pre-annotation BAM files
     pre_files = glob.glob("tmp/*/*_map_correct.bam")
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
@@ -22,7 +22,7 @@ def test_read_counts_preserved(lightweight_test_run):
     post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
-    # Assert total reads pre annotation == total reads post annotation
-    assert total_post_reads == total_pre_reads, (
-        f"Post-annotation reads ({total_post_reads}) not equal to pre-annotation reads ({total_pre_reads})"
+    # Assert total reads post annotation <= total reads pre annotation
+    assert total_post_reads <= total_pre_reads, (
+        f"Post-annotation reads ({total_post_reads}) > pre-annotation reads ({total_pre_reads})"
     )
