@@ -64,10 +64,13 @@ rule ms_germline_variants_mask:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
-        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
-        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
-        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"),
-        intermediate_uncompressed = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants_uncompressed.vcf")
+        intermediate_uncompressed = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants_uncompressed.vcf"),
+        intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
+        intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
+        intermediate_snv_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"),
+        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
+        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
+        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
     log:
         "logs/{ms_sample}/ms_germline_variants_mask.log"
     benchmark:
@@ -76,34 +79,17 @@ rule ms_germline_variants_mask:
         """
         zcat {input.vcf} > {output.intermediate_uncompressed} 2>> {log}
         
-        vcf2bed --deletions < {output.intermediate_uncompressed} > {output.ms_germ_del_bed} 2>> {log}
+        vcf2bed --deletions < {output.intermediate_uncompressed} > {output.intermediate_del_unformatted} 2>> {log}
 
-        vcf2bed --insertions < {output.intermediate_uncompressed} > {output.ms_germ_ins_bed} 2>> {log}
+        vcf2bed --insertions < {output.intermediate_uncompressed} > {output.intermediate_ins_unformatted} 2>> {log}
 
-        vcf2bed --snvs < {output.intermediate_uncompressed} > {output.ms_germ_snv_bed} 2>> {log}
-        """
+        vcf2bed --snvs < {output.intermediate_uncompressed} > {output.intermediate_snv_unformatted} 2>> {log}
 
-# Removes additional columns from germline variants mask to align with standard BED format
-rule ms_format_germline_variant_mask:
-    input:
-        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"
-    output:
-        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
-        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
-    log:
-        "logs/{ms_sample}/ms_format_germline_variant_mask.log"
-    benchmark:
-        "logs/{ms_sample}/ms_format_germline_variant_mask.benchmark.txt"
-    shell:
-        """
-        cut -f1-3 {input.ms_germ_del_bed} > {output.ms_germ_del_bed} 2>> {log}
+        cut -f1-3 {output.intermediate_del_unformatted} > {output.ms_germ_del_bed} 2>> {log}
 
-        cut -f1-3 {input.ms_germ_ins_bed} > {output.ms_germ_ins_bed} 2>> {log}
+        cut -f1-3 {output.intermediate_ins_unformatted} > {output.ms_germ_ins_bed} 2>> {log}
 
-        cut -f1-3 {input.ms_germ_snv_bed} > {output.ms_germ_snv_bed} 2>> {log}      
+        cut -f1-3 {output.intermediate_snv_unformatted} > {output.ms_germ_snv_bed} 2>> {log}  
         """
 
 # Combines all masks into a single BED file
