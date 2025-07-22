@@ -11,7 +11,7 @@ Authors:
 import pytest
 import glob
 from pathlib import Path
-from helper_functions import count_reads_fastq
+from utils.fastq_stats import count_fastq_data_points
 
 # Test that filtering decreases the number of reads
 def test_filtering_decreases_reads(lightweight_test_run):
@@ -29,8 +29,8 @@ def test_filtering_decreases_reads(lightweight_test_run):
         in_path = input_map[sample_id]
         out_path = output_map[sample_id]
 
-        in_reads = count_reads_fastq(in_path)
-        out_reads = count_reads_fastq(out_path)
+        in_reads = count_fastq_data_points(in_path)
+        out_reads = count_fastq_data_points(out_path)
 
         assert out_reads < in_reads, (
             f"Filtering did not reduce the number of reads for {sample_id}: "

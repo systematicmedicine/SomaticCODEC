@@ -10,6 +10,9 @@ ms_trim_fastq:
 ms_low_depth_mask:
   threshold: 1
 
+ms_candidate_germ_variants:
+  memory_limit_gb: 4
+
 # File paths
 GRCh38_path: tmp/downloads/GRCh38_Chr21_plus_stubs.fna
 difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions_10lines.bed

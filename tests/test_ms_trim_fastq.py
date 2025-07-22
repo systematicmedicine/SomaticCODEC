@@ -16,7 +16,7 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # Add PROJECT_ROOT to path
 from scripts.get_metadata import load_config, get_ms_sample_fastqs
-from helper_functions import count_reads_fastq, sum_len_fastq
+from utils.fastq_stats import count_fastq_data_points, sum_len_fastq
 
 
 # Test that the total number of reads does not change
@@ -31,8 +31,8 @@ def test_read_counts_preserved(lightweight_test_run):
         assert output_r1.exists(), f"Missing output file: {output_r1}"
         assert output_r2.exists(), f"Missing output file: {output_r2}"
 
-        assert count_reads_fastq(input_r1) == count_reads_fastq(output_r1), f"R1 read count mismatch for {ms_sample}"
-        assert count_reads_fastq(input_r2) == count_reads_fastq(output_r2), f"R2 read count mismatch for {ms_sample}"
+        assert count_fastq_data_points(input_r1) == count_fastq_data_points(output_r1), f"R1 read count mismatch for {ms_sample}"
+        assert count_fastq_data_points(input_r2) == count_fastq_data_points(output_r2), f"R2 read count mismatch for {ms_sample}"
 
 
 # Test that total number of bases is reduced by trimming
