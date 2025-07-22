@@ -15,7 +15,7 @@ def count_bam_data_points(path):
     path = str(path)
     try:
         result = subprocess.run(
-            ["samtools", "view", "-c", path],
+            ["samtools", "view", "-c", "-F", "0x900", path],
             capture_output=True,
             text=True,
             check=True
