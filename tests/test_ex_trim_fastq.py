@@ -13,7 +13,7 @@ Authors:
 import pytest
 import glob
 from pathlib import Path
-from helper_functions import count_reads_fastq, sum_len_fastq
+from utils.fastq_stats import count_fastq_data_points, sum_len_fastq
 
 def test_read_counts_preserved(lightweight_test_run):
     input_files = sorted(glob.glob("tmp/*/*_r1_demux.fastq.gz"))
@@ -29,8 +29,8 @@ def test_read_counts_preserved(lightweight_test_run):
         in_path = input_map[key]
         out_path = output_map[key]
 
-        in_reads = count_reads_fastq(in_path)
-        out_reads = count_reads_fastq(out_path)
+        in_reads = count_fastq_data_points(in_path)
+        out_reads = count_fastq_data_points(out_path)
 
         assert in_reads == out_reads, f"Read count mismatch for {key}: {in_reads} in vs {out_reads} out"
 
