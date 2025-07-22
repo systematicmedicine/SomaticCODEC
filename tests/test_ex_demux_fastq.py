@@ -12,17 +12,17 @@ import pytest
 import subprocess
 from pathlib import Path
 import glob
-from helper_functions import count_reads_fastq
+from utils.fastq_stats import count_fastq_data_points
 
 def test_read_counts(lightweight_test_run):
     # Locate all pre-demux FASTQ files
     pre_files = glob.glob("tmp/*_r1_umi_extracted.fastq.gz")
-    pre_counts = {Path(f).name: count_reads_fastq(f) for f in pre_files}
+    pre_counts = {Path(f).name: count_fastq_data_points(f) for f in pre_files}
     total_pre_reads = sum(pre_counts.values())
 
     # Locate all post-demux FASTQ files
     post_files = glob.glob("tmp/*__r1_demux.fastq.gz")
-    post_counts = {Path(f).name: count_reads_fastq(f) for f in post_files}
+    post_counts = {Path(f).name: count_fastq_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
     # Assertion 1: Total reads pre demux >= total reads post demux

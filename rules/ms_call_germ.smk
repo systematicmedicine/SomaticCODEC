@@ -22,6 +22,8 @@ rule ms_candidate_germ_variants:
         dictf = os.path.splitext(config["GRCh38_path"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
+    params:
+        memory_limit_gb = config["ms_candidate_germ_variants"]["memory_limit_gb"]
     log:
         "logs/{ms_sample}/ms_candidate_germ_variants.log"
     benchmark:
@@ -30,7 +32,7 @@ rule ms_candidate_germ_variants:
          max(1, os.cpu_count() // 8)
     shell:
         """
-        gatk --java-options "-Xmx32g" HaplotypeCaller  \
+        gatk --java-options "-Xmx{params.memory_limit_gb}g" HaplotypeCaller  \
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
