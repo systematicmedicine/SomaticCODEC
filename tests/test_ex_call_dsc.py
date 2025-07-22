@@ -22,9 +22,9 @@ def test_reads_decrease(lightweight_test_run):
     post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
-    # Assert total reads post annotation <= total reads pre annotation
+    # Assert total reads post calling <= total reads pre calling
     assert total_post_reads <= total_pre_reads, (
-        f"Post-sorting reads ({total_post_reads}) > pre-sorting reads ({total_pre_reads})"
+        f"Post-calling reads ({total_post_reads}) > pre-calling reads ({total_pre_reads})"
     )
 
 def test_q2_bases_increase(lightweight_test_run):
