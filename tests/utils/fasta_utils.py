@@ -1,7 +1,7 @@
 """
---- fasta_stats.py ---
+--- fasta_utils.py ---
 
-Functions for obtaining FASTA file statistics.
+Functions for obtaining data from FASTA files.
 
 Authors: 
     - Chat-GPT

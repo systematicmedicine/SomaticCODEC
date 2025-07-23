@@ -12,23 +12,7 @@ import pandas as pd
 from pathlib import Path
 from test_generate_include_bed import read_bed
 from scripts.get_metadata import load_config
-
-# Merge intervals of individual BED files
-def merge_bed_intervals(df):
-    collapsed = []
-    df = df.sort_values(["chrom", "start"]).reset_index(drop=True)
-    current_chr, current_start, current_end = df.iloc[0]
-
-    for _, row in df.iloc[1:].iterrows():
-        chrom, start, end = row
-        if chrom == current_chr and start <= current_end:
-            current_end = max(current_end, end)
-        else:
-            collapsed.append((current_chr, current_start, current_end))
-            current_chr, current_start, current_end = chrom, start, end
-
-    collapsed.append((current_chr, current_start, current_end))
-    return pd.DataFrame(collapsed, columns=["chrom", "start", "end"])
+from utils.bed_utils import merge_bed_intervals
 
 def assert_correctly_merged(ms_sample):
     # Load individual BED files

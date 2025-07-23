@@ -12,7 +12,7 @@ import pytest
 import subprocess
 from pathlib import Path
 import glob
-from utils.fastq_stats import count_fastq_data_points
+from utils.fastq_utils import count_fastq_data_points
 
 def test_read_counts(lightweight_test_run):
     # Locate all pre-demux FASTQ files

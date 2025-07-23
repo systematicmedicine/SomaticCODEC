@@ -9,7 +9,7 @@ Authors:
 """
 from pathlib import Path
 import glob
-from utils.bam_stats import count_bam_data_points, count_bam_q2_bases
+from utils.bam_utils import count_bam_data_points, count_bam_q2_bases
 
 def test_reads_decrease(lightweight_test_run):
      # Locate all pre-call BAM files

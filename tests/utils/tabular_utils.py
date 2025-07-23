@@ -1,7 +1,7 @@
 """
---- tabular_stats.py ---
+--- tabular_utils.py ---
 
-Functions for obtaining tabular (.csv, .tsv, .txt) file statistics.
+Functions for obtaining data from tabular (.csv, .tsv, .txt) files.
 
 Authors: 
     - Chat-GPT
