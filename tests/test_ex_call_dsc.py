@@ -11,6 +11,7 @@ from pathlib import Path
 import glob
 from utils.bam_utils import count_bam_data_points, count_bam_q2_bases
 
+# Test that the read count decreases due to collapsing reads
 def test_reads_decrease(lightweight_test_run):
      # Locate all pre-call BAM files
     pre_files = glob.glob("tmp/*/*_map_template_sorted.bam")
@@ -27,6 +28,7 @@ def test_reads_decrease(lightweight_test_run):
         f"Post-calling reads ({total_post_reads}) > pre-calling reads ({total_pre_reads})"
     )
 
+# Test that Q2 is assigned to single-stranded overhangs
 def test_q2_bases_increase(lightweight_test_run):
      # Locate all pre-call BAM files
     pre_files = glob.glob("tmp/*/*_map_template_sorted.bam")

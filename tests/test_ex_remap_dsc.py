@@ -11,6 +11,7 @@ from pathlib import Path
 import glob
 from utils.bam_utils import count_bam_data_points
 
+# Test that remapping does not change read count
 def test_read_counts_preserved(lightweight_test_run):
      # Locate all pre-remapping BAM files
     pre_files = glob.glob("tmp/*/*_unmap_dsc.bam")
