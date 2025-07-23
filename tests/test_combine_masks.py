@@ -14,6 +14,7 @@ from test_generate_include_bed import read_bed
 from scripts.get_metadata import load_config
 from utils.bed_utils import merge_bed_intervals
 
+# Assert that combined BED matches expected merge of individual beds
 def assert_correctly_merged(ms_sample):
     # Load individual BED files
     pre_files = [
@@ -43,11 +44,13 @@ def assert_correctly_merged(ms_sample):
         obj="Expected merge output and combined_mask.bed"
         )
 
+# Test that combined BED matches expected merge of individual beds
 def test_combined_bed_matches_individual_beds(lightweight_test_run):
     ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
     for ms_sample in ms_samples:
         assert_correctly_merged(ms_sample)
 
+# Assert that the chromosome order of the combined BED matches the reference order
 def assert_combined_bed_order_matches_ref(ms_sample):
     # Load combined BED file
     bed_df = read_bed(Path(f"tmp/{ms_sample}/{ms_sample}_combined_mask.bed"))
@@ -68,6 +71,7 @@ def assert_combined_bed_order_matches_ref(ms_sample):
         f"Found: {bed_chroms}\nExpected: {expected_order}"
         )
 
+# Test that the chromosome order of the combined BED matches the reference order
 def test_combined_bed_order_matches_ref(lightweight_test_run):
     ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
     for ms_sample in ms_samples:
