@@ -43,3 +43,19 @@ def count_bam_mapq_under_60(path):
             if not read.is_unmapped and read.mapping_quality < 60:
                 count += 1
     return count
+
+def count_marked_duplicates(bam_path):
+    count = 0
+    with pysam.AlignmentFile(bam_path, "rb") as bam:
+        for read in bam:
+            if read.is_duplicate:
+                count += 1
+    return count
+
+def count_reads_with_read_group(bam_path):
+    reads_with_rg = 0
+    with pysam.AlignmentFile(bam_path, "rb") as bam:
+        for read in bam:
+            if read.has_tag("RG"):
+                reads_with_rg += 1
+    return reads_with_rg
