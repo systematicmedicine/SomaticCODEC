@@ -1,7 +1,7 @@
 """
---- bam_stats.py ---
+--- bam_utils.py ---
 
-Functions for obtaining BAM file statistics.
+Functions for obtaining data from BAM files.
 
 Authors: 
     - Chat-GPT

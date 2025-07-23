@@ -9,8 +9,9 @@ Authors:
 """
 from pathlib import Path
 import glob
-from utils.bam_stats import count_bam_data_points, count_bam_mapq_under_60
+from utils.bam_utils import count_bam_data_points, count_bam_mapq_under_60
 
+# Test that read count decreases due to filtering
 def test_reads_decrease(lightweight_test_run):
     # Locate all pre-filtering BAM files
     pre_files = glob.glob("tmp/*/*_map_dsc_anno.bam")
@@ -27,6 +28,7 @@ def test_reads_decrease(lightweight_test_run):
         f"Post-filtering reads ({total_post_reads}) > pre-filtering reads ({total_pre_reads})"
     )
 
+# Test that all reads with MAPQ <60 are removed
 def test_mapq_under_60_removed(lightweight_test_run):
     # Locate all post-filtering BAM files
     post_files = glob.glob("tmp/*/*_map_dsc_anno_filtered.bam")

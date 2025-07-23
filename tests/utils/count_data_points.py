@@ -9,14 +9,14 @@ Authors:
 
 """
 from pathlib import Path
-from tests.utils.fastq_stats import count_fastq_data_points
-from tests.utils.vcf_stats import count_vcf_data_points
-from tests.utils.bed_stats import count_bed_data_points
-from tests.utils.tabular_stats import count_tabular_data_points
-from tests.utils.bam_stats import count_bam_data_points
-from tests.utils.sam_stats import count_sam_data_points
-from tests.utils.bcf_stats import count_bcf_data_points
-from tests.utils.fasta_stats import count_fasta_data_points
+from tests.utils.fastq_utils import count_fastq_data_points
+from tests.utils.vcf_utils import count_vcf_data_points
+from tests.utils.bed_utils import count_bed_data_points
+from tests.utils.tabular_utils import count_tabular_data_points
+from tests.utils.bam_utils import count_bam_data_points
+from tests.utils.sam_utils import count_sam_data_points
+from tests.utils.bcf_utils import count_bcf_data_points
+from tests.utils.fasta_utils import count_fasta_data_points
 
 # Calls the appropriate data counting function based on file suffix
 def count_data_points(path):

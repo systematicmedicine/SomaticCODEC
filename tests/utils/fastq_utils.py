@@ -1,7 +1,7 @@
 """
---- fastq_stats.py ---
+--- fastq_utils.py ---
 
-Functions for obtaining FASTQ file statistics.
+Functions for obtaining data from FASTQ files.
 
 Authors: 
     - Chat-GPT

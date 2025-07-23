@@ -1,7 +1,7 @@
 """
---- bcf_stats.py ---
+--- bcf_utils.py ---
 
-Functions for obtaining BCF file statistics.
+Functions for obtaining data from BCF files.
 
 Authors: 
     - Chat-GPT

@@ -9,8 +9,9 @@ Authors:
 """
 from pathlib import Path
 import glob
-from utils.bam_stats import count_bam_data_points
+from utils.bam_utils import count_bam_data_points
 
+# Test that sorting does not change read count
 def test_read_counts_preserved(lightweight_test_run):
      # Locate all pre-sorting BAM files
     pre_files = glob.glob("tmp/*/*_map_dsc_unsorted.bam")
