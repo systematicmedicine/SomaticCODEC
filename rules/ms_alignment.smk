@@ -46,8 +46,7 @@ rule ms_raw_alignment:
 # Adds read group information to aligned reads
 rule ms_add_read_groups:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam",
-        r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"
+        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
     log:
