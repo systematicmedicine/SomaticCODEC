@@ -18,24 +18,13 @@ import pytest
 import pandas as pd
 from pathlib import Path
 import sys
+from utils.bed_utils import read_bed
+from utils.fai_utils import read_fai
 
 # Add PROJECT_ROOT to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from scripts.get_metadata import load_config, get_ex_to_ms_sample_map
-
-
-# Read BED file as DataFrame with columns: chrom, start, end (preserve sort order)
-def read_bed(path):
-    df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 1, 2], names=["chrom", "start", "end"])
-    return df.reset_index(drop=True)
-
-
-# Read .fai file and return as a DataFrame with chrom, length
-def read_fai(path):
-    df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 1], names=["chrom", "length"])
-    return df
-
 
 # Load input and output BEDs for a sample
 def get_mask_and_include_beds(ex_sample, ms_sample):

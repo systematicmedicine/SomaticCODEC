@@ -1,7 +1,7 @@
 """
---- sam_stats.py ---
+--- sam_utils.py ---
 
-Functions for obtaining SAM file statistics.
+Functions for obtaining data from SAM files.
 
 Authors: 
     - Chat-GPT

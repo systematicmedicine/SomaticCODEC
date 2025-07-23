@@ -46,7 +46,7 @@ rule ms_low_depth_mask:
         awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
         {output.intermediate_depth_per_base} > {output.intermediate_lowdepth} 2>> {log}
 
-        sort {output.intermediate_lowdepth} -k1,1 -k2,2n > {output.intermediate_lowdepth_sorted} 2>> {log}
+        sort {output.intermediate_lowdepth} -k1,1V -k2,2n > {output.intermediate_lowdepth_sorted} 2>> {log}
 
         bedtools merge -i {output.intermediate_lowdepth_sorted} > {output.bed} 2>> {log}
 
@@ -119,7 +119,7 @@ rule combine_masks:
         {input.ms_germ_ins_bed} \
         {input.ms_germ_snv_bed} > {output.intermediate_cat} 2>> {log}
         
-        bedtools sort -i {output.intermediate_cat} -faidx {input.fai} > {output.intermediate_sorted} 2>> {log}
+        bedtools sort -faidx {input.fai} -i {output.intermediate_cat} > {output.intermediate_sorted} 2>> {log}
 
         bedtools merge -i {output.intermediate_sorted} > {output.combined_bed} 2>> {log}
         """
