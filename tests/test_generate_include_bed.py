@@ -25,10 +25,10 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 from scripts.get_metadata import load_config, get_ex_to_ms_sample_map
 
 
-# Read BED file as sorted DataFrame with columns: chrom, start, end
+# Read BED file as DataFrame with columns: chrom, start, end (preserve sort order)
 def read_bed(path):
     df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 1, 2], names=["chrom", "start", "end"])
-    return df.sort_values(["chrom", "start"]).reset_index(drop=True)
+    return df.reset_index(drop=True)
 
 
 # Read .fai file and return as a DataFrame with chrom, length
