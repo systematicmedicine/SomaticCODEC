@@ -9,8 +9,9 @@ Authors:
 """
 from pathlib import Path
 import glob
-from utils.bam_stats import count_bam_data_points
+from utils.bam_utils import count_bam_data_points
 
+# Test that the read count decreases due to collapsing by UMI
 def test_reads_decrease(lightweight_test_run):
      # Locate all pre-annotation BAM files
     pre_files = glob.glob("tmp/*/*_map_correct.bam")

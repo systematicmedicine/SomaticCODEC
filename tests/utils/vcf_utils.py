@@ -1,7 +1,7 @@
 """
---- vcf_stats.py ---
+--- vcf_utils.py ---
 
-Functions for obtaining VCF file statistics.
+Functions for obtaining data from VCF files.
 
 Authors: 
     - Chat-GPT

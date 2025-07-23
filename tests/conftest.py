@@ -83,5 +83,5 @@ def lightweight_test_run():
     yield
 
     # Cleanup test environmnt
-    clean_workspace()
+    #clean_workspace()
 
