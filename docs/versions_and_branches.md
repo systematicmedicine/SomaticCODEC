@@ -27,6 +27,10 @@ The purpose of this doc is to describe respoitory versioning and branch structur
 | MINOR    	| Changes that effect variant calling, but don't change the DAG | All componet level metrics pass   			|
 | MINOR    	| Changes that do not effect variant calling (e.g. metrics)  	| All unit & integration tests pass 			|
 
+When initiating a pull request to `master`:
+* Tag with the version number
+* Update the changelog, following the format outlined at (https://keepachangelog.com/en/1.1.0/)
+
 `dev` and `feature` branches do not use semantic versioning.
 
 ### Pull requests to dev
