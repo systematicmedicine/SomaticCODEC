@@ -6,6 +6,7 @@
 # Authors: 
 #     - Joshua Johnstone
 #     - Ben Barry
+#     - Chat-GPT
 # ---
 
 # Gets the path to the relevant metrics file
@@ -16,30 +17,17 @@ find_metric_file_path <- function(sample_dir, function_metric, component_metrics
   list.files(sample_dir, pattern = pattern, full.names = TRUE)
 }
 
-# Get peak of per sequence quality score distribution for raw r1
-get_per_sequence_quality_score_r1 <- function() {
-  
-  # Store metric name
-  function_metric = "per_sequence_quality_score_r1"
-  
-  # Print progress indicator
-  print(paste("Getting", function_metric))
-  
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+# Loops through each sample and collects the relevant metric
+process_samples_for_metric <- function(function_metric, metric_retrieval) {
   results <- data.frame(metric = character(), sample = character(), value = numeric())
   
   for (sample_dir in sample_dirs) {
     sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
     print(sample_name)
     
-    # Get path to metrics file
     metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
     
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
+    if (length(metric_file_path) == 0) {
       results <- rbind(results, data.frame(
         metric = function_metric,
         sample = sample_name,
@@ -47,1232 +35,549 @@ get_per_sequence_quality_score_r1 <- function() {
       ))
       next
     }
+
+    metric_value <- metric_retrieval(metric_file_path, function_metric, sample_name, sample_dir)
     
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Find start and end of the per sequence quality scores section
-    start_line <- grep("^>>Per sequence quality scores", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence quality scores section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line + 2):(end_line - 1)]
-    
-    # Parse to dataframe
-    quality_df <- read.table(text = section_lines, header = FALSE)
-    colnames(quality_df) <- c("Quality", "Count")
-    
-    # Get peak quality score
-    peak_quality <- round(quality_df$Quality[which.max(quality_df$Count)], digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(metric = function_metric,
-                                         sample = sample_name,
-                                         value = peak_quality))
+    results <- rbind(results, data.frame(
+      metric = function_metric,
+      sample = sample_name,
+      value = metric_value
+    ))
   }
   
   return(results)
 }
 
-# Get peak of per sequence quality score distribution for raw r2
-get_per_sequence_quality_score_r2 <- function() {
+# Extracts a specific section from a fastqc_data.txt file
+extract_fastqc_section <- function(metric_file_path, function_metric, sample_name, section_header) {
+  tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
+  if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
+  
+  zip_contents <- unzip(metric_file_path, list = TRUE)$Name
+  fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
+  unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
+  
+  fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
+  fastqc_data_lines <- readLines(fastqc_data_path)
+  
+  start_line <- grep(paste0("^", section_header), fastqc_data_lines)
+  end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
+  end_line <- end_lines[which(end_lines > start_line)[1]]
+  
+  # Extract header line + data lines
+  header_line <- fastqc_data_lines[start_line + 1]
+  data_lines <- fastqc_data_lines[(start_line + 2):(end_line - 1)]
+  
+  # Combine header and data lines for proper parsing downstream
+  section_lines <- c(header_line, data_lines)
+  
+  return(section_lines)
+}
+
+
+# Get peak of per sequence quality score distribution for raw r1
+get_per_sequence_quality_score_r1 <- function() {
+  
+  # Define function metric and print for logging
+  function_metric = "per_sequence_quality_score_r1"
+  print(paste("Getting", function_metric))
+  
+  # Define metric retrieval function
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per sequence quality scores")
     
-    # Store metric name
-    function_metric = "per_sequence_quality_score_r2"
+    quality_df <- read.table(text = section_lines, header = FALSE)
+    colnames(quality_df) <- c("Quality", "Count")
     
-    # Print progress indicator
-    print(paste("Getting", function_metric))
-    
-    # Get list of sample directories within metrics directory
-    sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-    results <- data.frame(metric = character(), sample = character(), value = numeric())
-    
-    for (sample_dir in sample_dirs) {
-      sample_name <- basename(sample_dir)
-      
-      # Print sample name for progress
-      print(sample_name)
-      
-      # Get path to metrics file
-      metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-      
-      # If missing metrics file enter NA value, then skip sample
-      if(length(metric_file_path) == 0) {
-        results <- rbind(results, data.frame(
-          metric = function_metric,
-          sample = sample_name,
-          value = NA
-        ))
-        next
-      }
-    
-      # Create tmp directory for unzipped file
-      tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-      if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-      
-      # List contents inside the zip to find the correct path to fastqc_data.txt
-      zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-      
-      # Identify the path to fastqc_data.txt inside the zip
-      fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-      
-      # Unzip only the fastqc_data.txt file
-      unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-      
-      # Get path for the unzipped data file
-      fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-      # Put all lines of txt file into character vector
-      fastqc_data_lines <- readLines(fastqc_data_path)
-    
-      # Find start and end of the per sequence quality scores section
-      start_line <- grep("^>>Per sequence quality scores", fastqc_data_lines)
-      end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-      end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-      # Extract per sequence quality scores section lines (skip headers and end module lines)
-      section_lines <- fastqc_data_lines[(start_line + 2):(end_line - 1)]
-    
-      # Parse to dataframe
-      quality_df <- read.table(text = section_lines, header = FALSE)
-      colnames(quality_df) <- c("Quality", "Count")
-    
-      # Get peak quality score
-      peak_quality <- round(quality_df$Quality[which.max(quality_df$Count)], digits = 1)
-    
-      # Add to results
-      results <- rbind(results, data.frame(metric = function_metric,
-                                         sample = sample_name,
-                                         value = peak_quality))
+    peak_quality <- round(quality_df$Quality[which.max(quality_df$Count)], digits = 1)
+    return(peak_quality)
   }
   
+  # Process samples and collect results
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
+  return(results)
+}
+
+# Get peak of per sequence quality score distribution for raw r2
+get_per_sequence_quality_score_r2 <- function() {
+  
+  # Define function metric and print for logging
+  function_metric = "per_sequence_quality_score_r2"
+  print(paste("Getting", function_metric))
+  
+  # Define metric retrieval function
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per sequence quality scores")
+    
+    quality_df <- read.table(text = section_lines, header = FALSE)
+    colnames(quality_df) <- c("Quality", "Count")
+    
+    peak_quality <- round(quality_df$Quality[which.max(quality_df$Count)], digits = 1)
+    return(peak_quality)
+  }
+  
+  # Process samples and collect results
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get percent reads filtered out during processing
 get_percent_reads_filtered <- function() {
   
-  # Store metric name
+  # Define function metric and print for logging
   function_metric = "percent_reads_filtered"
-  
-  # Print progress indicator
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
+  # Define metric retrieval function
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     cutadapt <- read.delim(metric_file_path)
     total_reads <- as.numeric(cutadapt$in_reads)
     written_reads <- as.numeric(cutadapt$out_reads)
     
     # Calculate percent filtered
     percent_reads_filtered <- round((1 - written_reads / total_reads) * 100, digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = percent_reads_filtered
-    ))
+    return(percent_reads_filtered)
   }
   
+  # Process samples and collect results
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get percent reads filtered out due to length
 get_percent_reads_filtered_readlength <- function() {
   
-  # Store metric name
-  function_metric = "percent_reads_filtered_readlength"
-  
-  # Print progress indicator
+  function_metric <- "percent_reads_filtered_readlength"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Read JSON and extract read counts
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     cutadapt <- fromJSON(metric_file_path)
     total_reads <- as.numeric(cutadapt$summary$before_filtering$total_reads)
     too_short_reads <- as.numeric(cutadapt$filtering_result$too_short_reads)
-    
-    # Calculate percent filtered due to length
     percent_reads_filtered_readlength <- round((too_short_reads / total_reads) * 100, digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = percent_reads_filtered_readlength
-    ))
+    return(percent_reads_filtered_readlength)
   }
   
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get percent reads filtered out due to low mean quality
 get_percent_reads_filtered_meanquality <- function() {
   
-  # Store metric name
-  function_metric = "percent_reads_filtered_meanquality"
-  
-  # Print progress indicator
+  function_metric <- "percent_reads_filtered_meanquality"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Read JSON and extract read counts
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     cutadapt <- fromJSON(metric_file_path)
     total_reads <- as.numeric(cutadapt$summary$before_filtering$total_reads)
     low_quality_reads <- as.numeric(cutadapt$filtering_result$low_quality_reads)
-    
-    # Calculate percent filtered due to length
     percent_reads_filtered_meanquality <- round((low_quality_reads / total_reads) * 100, digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = percent_reads_filtered_meanquality
-    ))
+    return(percent_reads_filtered_meanquality)
   }
   
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get read alignment rate
 get_read_alignment_rate <- function() {
   
-  # Store metric name
-  function_metric = "read_alignment_rate"
-  
-  # Print progress indicator
+  function_metric <- "read_alignment_rate"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Put all lines of txt file into character vector
     alignment_stats_lines <- readLines(metric_file_path)
     
-    # Calculate alignment rate
-    if(any(grepl("_alignment_stats\\.txt$", metric_file_path))){
-      total_reads <- as.numeric(sub("SN	sequences:\t", "", 
-                                    grep("^SN	sequences:", alignment_stats_lines, value = TRUE)))
-      reads_aligned <- as.numeric(sub("SN	reads mapped:\t", "", 
-                                      grep("^SN	reads mapped:", alignment_stats_lines, value = TRUE)))
+    if (any(grepl("_alignment_stats\\.txt$", metric_file_path))) {
+      total_reads <- as.numeric(sub("SN\\s+sequences:\\s+", "", 
+                                    grep("^SN\\s+sequences:", alignment_stats_lines, value = TRUE)))
+      reads_aligned <- as.numeric(sub("SN\\s+reads mapped:\\s+", "", 
+                                      grep("^SN\\s+reads mapped:", alignment_stats_lines, value = TRUE)))
     } else {
       total_reads <- as.numeric(sub(" .*", "", grep("in total", alignment_stats_lines, value = TRUE)))
       reads_aligned <- as.numeric(sub(" .*", "", grep("mapped \\(", alignment_stats_lines, value = TRUE)))
-      
     }
     
     alignment_rate <- round((reads_aligned / total_reads) * 100, digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = alignment_rate
-    ))
+    return(alignment_rate)
   }
   
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get percentage of reference genome masked by combined mask
-get_mask_coverage <- function(){
+get_mask_coverage <- function() {
   
-  # Store metric name
-  function_metric = "mask_coverage"
-  
-  # Print progress indicator
+  function_metric <- "mask_coverage"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Put all lines of txt file into character vector
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     mask_metrics_lines <- readLines(metric_file_path)
-    
-    # Get percent coverage of combined mask
     combined_mask_line <- grep("combined_mask\\.bed", mask_metrics_lines, value = TRUE)
-    percent_coverage <- round(as.numeric(sub("%", "",
-                                             strsplit(combined_mask_line, "\t")[[1]][3])), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = percent_coverage
-    ))
+    percent_coverage <- round(
+      as.numeric(sub("%", "", strsplit(combined_mask_line, "\t")[[1]][3])),
+      digits = 1
+    )
+    return(percent_coverage)
   }
   
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get percentage of reads contributed by each sample
-get_percent_read_contribution <- function(){
+get_percent_read_contribution <- function() {
   
-  library(jsonlite)
-  
-  # Store metric name
-  function_metric = "percent_read_contribution"
-  
-  # Print progress indicator
+  function_metric <- "percent_read_contribution"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Pull json file contents into list
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     demux_metrics <- fromJSON(metric_file_path)
-    
-    # Extract R1 and R2 adapter tables
     r1 <- demux_metrics$adapters_read1
     r2 <- demux_metrics$adapters_read2
-    
-    # Add read type column
     r1$read <- "r1"
     r2$read <- "r2"
     
-    # Combine and group by name
-    combined <- rbind(r1[, c("name", "total_matches", "read")],
-                      r2[, c("name", "total_matches", "read")])
+    combined <- rbind(
+      r1[, c("name", "total_matches", "read")],
+      r2[, c("name", "total_matches", "read")]
+    )
     
-    # Aggregate total_matches per sample
     adaptor_counts <- aggregate(total_matches ~ name, data = combined, sum)
     total_adaptors <- sum(adaptor_counts$total_matches)
-    adaptor_counts$percent_contrib = (adaptor_counts$total_matches / total_adaptors) * 100
+    adaptor_counts$percent_contrib <- (adaptor_counts$total_matches / total_adaptors) * 100
+    percent_contrib_diff <- max(adaptor_counts$percent_contrib) - min(adaptor_counts$percent_contrib)
     
-    percent_contrib_diff = max(adaptor_counts$percent_contrib) - min(adaptor_counts$percent_contrib)
-    
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = percent_contrib_diff))
-    
+    return(round(percent_contrib_diff, 1))
   }
   
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get correct product ratio
-get_correct_product_ratio <- function(){
+get_correct_product_ratio <- function() {
   
-  # Store metric name
-  function_metric = "correct_product_ratio"
-  
-  # Print progress indicator
+  function_metric <- "correct_product_ratio"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Pull metrics into data frame
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     correct_product_metrics <- read.delim(metric_file_path)
-    
-    # Get correct product ratio
-    correct_product_ratio <- round(as.numeric(correct_product_metrics$correct_aligned_. / 100), 
-                                   digits = 2)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = correct_product_ratio
-    ))
+    correct_product_ratio <- round(
+      as.numeric(correct_product_metrics$correct_aligned_. / 100),
+      digits = 2
+    )
+    return(correct_product_ratio)
   }
   
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get duplex coverage
-get_duplex_coverage <- function(){
+get_duplex_coverage <- function() {
   
-  # Store metric name
-  function_metric = "duplex_coverage"
-  
-  # Print progress indicator
+  function_metric <- "duplex_coverage"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-   
-   # Read lines and find data line
-   dsc_depth_metrics_lines <- readLines(metric_file_path)
-   data_line <- grep("^ex_dsc_coverage_wholegenome", dsc_depth_metrics_lines, value = TRUE)
-   
-   # Get percentage of genome with >0 duplex coverage
-   duplex_coverage <- round(as.numeric(sub("%", "", (strsplit(data_line, "\t")[[1]][2]))), digits = 1)
-   
-   # Add to results
-   results <- rbind(results, data.frame(
-     metric = function_metric,
-     sample = sample_name,
-     value = duplex_coverage
-   ))
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    dsc_depth_metrics_lines <- readLines(metric_file_path)
+    data_line <- grep("^ex_dsc_coverage_wholegenome", dsc_depth_metrics_lines, value = TRUE)
+    duplex_coverage <- round(
+      as.numeric(sub("%", "", strsplit(data_line, "\t")[[1]][2])),
+      digits = 1
+    )
+    return(duplex_coverage)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get mean analyzable duplex depth
-get_mean_analyzable_duplex_depth <- function(){
+get_mean_analyzable_duplex_depth <- function() {
   
-  # Store metric name
-  function_metric = "mean_analyzable_duplex_depth"
-  
-  # Print progress indicator
+  function_metric <- "mean_analyzable_duplex_depth"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Read lines and find data line
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     dsc_depth_metrics_lines <- readLines(metric_file_path)
     data_line <- grep("^ex_mean_analyzable_duplex_depth", dsc_depth_metrics_lines, value = TRUE)
-    
-    # Get percentage of bed region with >0 duplex coverage
-    mean_analyzable_duplex_depth <- round(as.numeric(strsplit(data_line, "\t")[[1]][2]), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = mean_analyzable_duplex_depth
-    ))
+    mean_analyzable_duplex_depth <- round(
+      as.numeric(strsplit(data_line, "\t")[[1]][2]),
+      digits = 1
+    )
+    return(mean_analyzable_duplex_depth)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get percentage of genome eligible for variant calling
-get_variant_call_eligible <- function(){
+get_variant_call_eligible <- function() {
   
-  # Store metric name
-  function_metric = "variant_call_eligible"
-  
-  # Print progress indicator
+  function_metric <- "variant_call_eligible"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Read lines and find data line
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     dsc_depth_metrics_lines <- readLines(metric_file_path)
     data_line <- grep("^ex_dsc_coverage_bedregions", dsc_depth_metrics_lines, value = TRUE)
-    
-    # Get percentage of genome variant call eligible
-    variant_call_eligible <- round(as.numeric(sub("%", "", (strsplit(data_line, "\t")[[1]][2]))), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = variant_call_eligible
-    ))
+    variant_call_eligible <- round(
+      as.numeric(sub("%", "", strsplit(data_line, "\t")[[1]][2])),
+      digits = 1
+    )
+    return(variant_call_eligible)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get duplex realignment
-get_duplex_realignment <- function(){
+get_duplex_realignment <- function() {
   
-  # Store metric name
-  function_metric = "duplex_realignment"
-  
-  # Print progress indicator
+  function_metric <- "duplex_realignment"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Read lines and find data line
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     dsc_remap_metrics_lines <- readLines(metric_file_path)
     data_line <- grep("^Percentage mapped", dsc_remap_metrics_lines, value = TRUE)
-    
-    # Get percentage of reads aligned
-    duplex_realignment <- round(as.numeric(sub("%", "", (strsplit(data_line, "\t")[[1]][2]))), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = duplex_realignment
-    ))
+    duplex_realignment <- round(
+      as.numeric(sub("%", "", strsplit(data_line, "\t")[[1]][2])),
+      digits = 1
+    )
+    return(duplex_realignment)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
-# Get duplex reads with MAPQ >60
-get_duplex_mapQ <- function(){
+# Get duplex reads with MAPQ > 60
+get_duplex_mapQ <- function() {
   
-  # Store metric name
-  function_metric = "duplex_mapQ"
-  
-  # Print progress indicator
+  function_metric <- "duplex_mapQ"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Read lines and find data line
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     dsc_remap_metrics_lines <- readLines(metric_file_path)
     data_line <- grep("^Percentage with MAPQ ≥ 60 (of mapped)", dsc_remap_metrics_lines, value = TRUE)
-    
-    # Get percentage of reads aligned with MAPQ >60
-    duplex_mapQ <- round(as.numeric(sub("%", "", (strsplit(data_line, "\t")[[1]][2]))), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = duplex_mapQ
-    ))
+    duplex_mapQ <- round(
+      as.numeric(sub("%", "", strsplit(data_line, "\t")[[1]][2])),
+      digits = 1
+    )
+    return(duplex_mapQ)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
 # Get germline variant call metrics
-get_germline_variants <- function(){
+get_germline_variants <- function() {
   
-  # Store metric name
-  function_metric = "germline_variants"
-  
-  # Print progress indicator
+  function_metric <- "germline_variants"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # read file
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     lines <- readLines(metric_file_path)
     
-    # Get the data from "SN"
-    SN_data <- grep(paste0("^", "SN", "\t"), lines, value = TRUE)
+    SN_data <- grep("^SN\t", lines, value = TRUE)
+    SN_info_index <- min(grep("^SN\t", lines))
+    SN_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
     
-    #idenfity the line the data came from
-    SN_info_index <- min(grep(paste("SN", "\t", sep=""), lines))
-    
-    # Clean the decription of the data
-    SN_info <- gsub("\\[[0-9]+\\]", "", 
-                    unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
-    
-    #parse into a DF
     df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
     
-    #select the total variants
     total_variants <- df %>%
-      filter(key == "number of records:") %>%
-      pull(value) %>%
+      dplyr::filter(key == "number of records:") %>%
+      dplyr::pull(value) %>%
       as.numeric()
     
-    #put into the results frame
-    results <- rbind(results, data.frame(
-      sample = sample_name,
-      metric = function_metric,
-      value = total_variants / 1000000,
-      stringsAsFactors = FALSE
-    )
-    )
-    
+    return(total_variants / 1e6)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
-get_SNV_indel_ratio <- function(){
+get_SNV_indel_ratio <- function() {
   
-  # Store metric name
-  function_metric = "SNV_indel_ratio"
-  
-  # Print progress indicator
+  function_metric <- "SNV_indel_ratio"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # read file
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     lines <- readLines(metric_file_path)
     
-    # Get the data from "SN"
-    SN_data <- grep(paste0("^", "SN", "\t"), lines, value = TRUE)
+    SN_data <- grep("^SN\t", lines, value = TRUE)
+    SN_info_index <- min(grep("^SN\t", lines))
+    SN_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
     
-    #idenfity the line the data came from
-    SN_info_index <- min(grep(paste("SN", "\t", sep=""), lines))
-    
-    # Clean the decription of the data
-    SN_info <- gsub("\\[[0-9]+\\]", "", 
-                    unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
-    
-    #parse into a DF
     df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
     
-    
-    # calculate the snv/indel ratio
     snp <- as.numeric(df$value[df$key == "number of SNPs:"])
     indel <- as.numeric(df$value[df$key == "number of indels:"])
     ratio <- round(snp / indel, digits = 1)
-    
-    #parse into results frame
-    results <- rbind(results, data.frame(
-      sample = sample_name,
-      metric = function_metric,
-      value = ratio,
-      stringsAsFactors = FALSE
-    )
-    )
-    
+    return(ratio)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
-get_insertion_deletion_ratio <- function(){
+get_insertion_deletion_ratio <- function() {
   
-  # Store metric name
-  function_metric = "insertion_deletion_ratio"
-  
-  # Print progress indicator
+  function_metric <- "insertion_deletion_ratio"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # read file
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     lines <- readLines(metric_file_path)
     
-    # Get the data from "SN"
-    IDD_data <- grep(paste0("^", "IDD", "\t"), lines, value = TRUE)
+    IDD_data <- grep("^IDD\t", lines, value = TRUE)
+    IDD_info_index <- min(grep("^IDD\t", lines))
+    IDD_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[IDD_info_index]), "\t")))
     
-    #idenfity the line the data came from
-    IDD_info_index <- min(grep(paste("IDD", "\t", sep=""), lines))
-    
-    # Clean the decription of the data
-    IDD_info <- gsub("\\[[0-9]+\\]", "", 
-                     unlist(strsplit(gsub("# ", "", lines[IDD_info_index]), "\t")))
-    
-    #parse into a DF
     df <- read.delim(textConnection(IDD_data), header = FALSE, col.names = IDD_info) %>%
-      rename(indel_len = `length..deletions.negative.`)
+      dplyr::rename(indel_len = `length..deletions.negative.`)
     
-    #select the total variants
-    insetions_deletions <- df %>%
-      dplyr::select(indel_len, `number.of.sites`)
-    
-    #count insertions and deletions 
-    ins_del_count <- insetions_deletions %>%
-      dplyr::mutate(type = case_when(
+    ins_del_count <- df %>%
+      dplyr::select(indel_len, `number.of.sites`) %>%
+      dplyr::mutate(type = dplyr::case_when(
         indel_len > 0 ~ "insertion",
-        indel_len < 0 ~ "deletion")
-      ) %>%
+        indel_len < 0 ~ "deletion",
+        TRUE ~ NA_character_
+      )) %>%
+      dplyr::filter(!is.na(type)) %>%
       dplyr::group_by(type) %>%
-      dplyr::summarise(count = sum(number.of.sites)) %>%
-      dplyr::ungroup()
+      dplyr::summarise(count = sum(number.of.sites), .groups = "drop")
     
     ins_count <- ins_del_count$count[ins_del_count$type == "insertion"]
     del_count <- ins_del_count$count[ins_del_count$type == "deletion"]
-    ratio <- round(ins_count/del_count, digits = 1)
     
-    #put into the results frame
-    results <- rbind(results, data.frame(
-      sample = sample_name,
-      metric = function_metric,
-      value = ratio,
-      stringsAsFactors = FALSE
-    )
-    )
-    
+    ratio <- round(ins_count / del_count, digits = 1)
+    return(ratio)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
-get_MNP_other_variants <- function(){
+get_MNP_other_variants <- function() {
   
-  # Store metric name
-  function_metric = "MNP_other_variants"
-  
-  # Print progress indicator
+  function_metric <- "MNP_other_variants"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # read file
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     lines <- readLines(metric_file_path)
     
-    # Get the data from "SN"
-    SN_data <- grep(paste0("^", "SN", "\t"), lines, value = TRUE)
+    SN_data <- grep("^SN\t", lines, value = TRUE)
+    SN_info_index <- min(grep("^SN\t", lines))
+    SN_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
     
-    #idenfity the line the data came from
-    SN_info_index <- min(grep(paste("SN", "\t", sep=""), lines))
-    
-    # Clean the decription of the data
-    SN_info <- gsub("\\[[0-9]+\\]", "", 
-                    unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
-    
-    #parse into a DF
     df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
     
-    #select the total variants
-    MNP <- df$value[df$key == "number of MNPs:"]
-    other <- df$value[df$key == "number of others:"]
+    MNP <- as.numeric(df$value[df$key == "number of MNPs:"])
+    other <- as.numeric(df$value[df$key == "number of others:"])
     
-    #put into the results frame
-    results <- rbind(results, data.frame(
-      sample = sample_name,
-      metric = function_metric,
-      value = MNP + other,
-      stringsAsFactors = FALSE
-    )
-    )
-    
+    return(MNP + other)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
-} 
+}
 
-get_transition_transversion_ratio <- function(){
+get_transition_transversion_ratio <- function() {
   
-  # Store metric name
-  function_metric = "transition_transversion_ratio"
-  
-  # Print progress indicator
+  function_metric <- "transition_transversion_ratio"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # read file
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     lines <- readLines(metric_file_path)
     
-    # Get the data from "SN"
-    TSTV_data <- grep(paste0("^", "TSTV", "\t"), lines, value = TRUE)
+    TSTV_data <- grep("^TSTV\t", lines, value = TRUE)
+    TSTV_info_index <- min(grep("^TSTV\t", lines))
+    TSTV_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[TSTV_info_index]), "\t")))
     
-    #idenfity the line the data came from
-    TSTV_info_index <- min(grep(paste("TSTV", "\t", sep=""), lines))
-    
-    # Clean the decription of the data
-    TSTV_info <- gsub("\\[[0-9]+\\]", "", 
-                      unlist(strsplit(gsub("# ", "", lines[TSTV_info_index]), "\t")))
-    
-    #parse into a DF
     df <- read.delim(textConnection(TSTV_data), header = FALSE, col.names = TSTV_info)
     ratio <- round(df$ts.tv[1], digits = 1)
-    
-    
-    #put into the results frame
-    results <- rbind(results, data.frame(
-      sample = sample_name,
-      metric = function_metric,
-      value = ratio,
-      stringsAsFactors = FALSE
-    )
-    )
+    return(ratio)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
-} 
+}
 
-get_het_hom_ratio <- function(){
+get_het_hom_ratio <- function() {
   
-  # Store metric name
-  function_metric = "het_hom_ratio"
-  
-  # Print progress indicator
+  function_metric <- "het_hom_ratio"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Read lines from metrics file
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     lines <- readLines(metric_file_path)
     psc_line <- grep("^PSC", lines, value = TRUE)
     fields <- strsplit(psc_line, "\t")[[1]]
     het <- as.numeric(fields[4])
     hom <- as.numeric(fields[5])
     het_hom_ratio <- round(het / hom, digits = 1)
-    
-    #add key metrics to results format  
-    results <- rbind(results, data.frame(
-      sample = sample_name,
-      metric = function_metric,
-      value = het_hom_ratio)
-    ) 
-    
+    return(het_hom_ratio)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
-# Get read multimapping rate
 get_multimapping_rate <- function() {
   
-  # Store metric name
-  function_metric = "multimapping_rate"
-  
-  # Print progress indicator
+  function_metric <- "multimapping_rate"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Put all lines of txt file into character vector
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     alignment_stats_lines <- readLines(metric_file_path)
     
-    # extract the total raw sequences and the multimapped 
-    if(any(grepl("_alignment_stats\\.txt$", metric_file_path))){
-      
+    if (any(grepl("_alignment_stats\\.txt$", metric_file_path))) {
       raw_total_sequences <- grep("^SN\\s+sequences:", alignment_stats_lines, value = TRUE) %>%
-        sub(pattern = "^SN\\s+sequences:", replacement = "") %>%
+        sub("^SN\\s+sequences:", "", .) %>%
         as.numeric()
-      
       
       reads_multimapped <- grep("^SN\tnon-primary alignments:", alignment_stats_lines, value = TRUE) %>%
-        sub(pattern = "SN\tnon-primary alignments:\t", replacement = "") %>%
+        sub("SN\tnon-primary alignments:\t", "", .) %>%
         as.numeric()
     } else {
-      
       raw_total_sequences <- grep("in total", alignment_stats_lines, value = TRUE) %>%
-        sub(pattern = " .*", replacement = "") %>%
+        sub(" .*", "", .) %>%
         as.numeric()
       
       reads_multimapped <- grep("secondary", alignment_stats_lines, value = TRUE) %>%
-        sub(pattern = " .*", replacement = "") %>%
+        sub(" .*", "", .) %>%
         as.numeric()
     }
     
     multimapping <- round((reads_multimapped / raw_total_sequences) * 100, digits = 1)
-    
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = multimapping)
-    )
+    return(multimapping)
   }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
-# Extract the duplication rate
-get_duplication_rate <- function(){
-  
+get_duplication_rate <- function() {
   function_metric = "duplication_rate"
   print(paste("Getting", function_metric))
   
-  # Find metrics file
+  # This assumes "metrics" directory contains a single metrics file for all samples
   metric_file_path <- find_metric_file_path("metrics", function_metric, component_metrics)
   
-  # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
+  if(length(metric_file_path) == 0) {
+    # Return empty with NA if missing
+    return(data.frame(metric = function_metric, sample = NA, value = NA))
+  }
   
-  # Read metrics file
   df <- read.delim(metric_file_path, stringsAsFactors = FALSE)
-  
-  # Convert duplication rate to percentage
   df$dup_rate_percent <- round(df$Duplication.rate * 100, digits = 2)
   
-  # Prepare results
   results <- data.frame(
     metric = function_metric,
     sample = df$Sample,
@@ -1284,1369 +589,297 @@ get_duplication_rate <- function(){
 }
 
 get_total_reads_r1 <- function() {
-  
-  # Store metric name
   function_metric = "total_reads_r1"
-  
-  # Print progress indicator
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # Give if missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Get total reads
-    line <- grep("^Total Sequences", fastqc_data_lines, value = TRUE)
-    total_reads_value <- as.numeric(strsplit(line, "\t")[[1]][2])
-    total_reads <- round(total_reads_value / 1e6, 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(metric = function_metric,
-                                         sample = sample_name,
-                                         value = total_reads))
-  }
-  
+  results <- process_samples_for_metric(function_metric, get_total_reads_fastqc)
   return(results)
 }
 
+# Total reads R2
 get_total_reads_r2 <- function() {
-  
-  # Store metric name
   function_metric = "total_reads_r2"
-  
-  # Print progress indicator
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # Give if missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Get total reads
-    line <- grep("^Total Sequences", fastqc_data_lines, value = TRUE)
-    total_reads_value <- as.numeric(strsplit(line, "\t")[[1]][2])
-    total_reads <- round(total_reads_value / 1e6, 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(metric = function_metric,
-                                         sample = sample_name,
-                                         value = total_reads))
-  }
-  
+  results <- process_samples_for_metric(function_metric, get_total_reads_fastqc)
   return(results)
 }
 
-get_insert_size <- function(){
-  
-  # Store metric name
-  function_metric = "insert_size"
-  
-  # Print progress indicator
+get_insert_size <- function() {
+  function_metric <- "insert_size"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    lines <- readLines(metric_file_path)
+    table_start <- grep("^MEDIAN_INSERT_SIZE", lines)
     
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Put all lines of txt file into character vector
-    insert_metrics_lines <- readLines(metric_file_path)
-    
-    # Find start of metrics table
-    table_start <- grep("^MEDIAN_INSERT_SIZE", insert_metrics_lines)
-    
-    # Read metrics table
     insert_metrics_table <- read.delim(metric_file_path,
                                        skip = table_start - 1,
                                        nrows = 1,
                                        header = TRUE)
-    
-    # Get mean insert size
-    insert_size <- round(insert_metrics_table$MEAN_INSERT_SIZE, digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = insert_size
-    ))
+    round(insert_metrics_table$MEAN_INSERT_SIZE, 1)
   }
   
-  return(results)
-  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_overrepresented_sequences_r1 <- function(){
-  
-  # Store metric name
-  function_metric = "overrepresented_sequences_r1"
-  
-  # Print progress indicator
+get_overrepresented_sequences_r1 <- function() {
+  function_metric <- "overrepresented_sequences_r1"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Overrepresented sequences")
     
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
+    if (any(grepl("pass", section_lines))) {
+      return(0)
     }
     
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-    
-    # Find start and end of the overrepresented sequences section
-    start_line <- grep("^>>Overrepresented sequences", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence quality scores section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-    
-    # If pass, add 0 for percent overrepresented sequences
-    if(any(grepl("pass", section_lines))){
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = 0))
-    } else {
-      # Parse to dataframe
-      overrepresented_sequences_df <- read.delim(text = section_lines,
-                                                 skip = 1,
-                                                 header = TRUE)
-      
-      # Get percentage represented by most overrepresented sequence
-      overrepresented_sequences <- round(max(overrepresented_sequences_df$Percentage), digits = 1)
-      
-      # Add to results
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = overrepresented_sequences))
-    }
+    df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    round(max(df$Percentage), 1)
   }
   
-  return(results)
-  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_overrepresented_sequences_r2 <- function(){
-  
-  # Store metric name
-  function_metric = "overrepresented_sequences_r2"
-  
-  # Print progress indicator
+get_overrepresented_sequences_r2 <- function() {
+  function_metric <- "overrepresented_sequences_r2"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Overrepresented sequences")
     
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
+    if (any(grepl("pass", section_lines))) {
+      return(0)
     }
     
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-    
-    # Find start and end of the overrepresented sequences section
-    start_line <- grep("^>>Overrepresented sequences", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence quality scores section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-    
-    # If pass, add 0 for percent overrepresented sequences
-    if(any(grepl("pass", section_lines))){
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = 0))
-    } else {
-      # Parse to dataframe
-      overrepresented_sequences_df <- read.delim(text = section_lines,
-                                                 skip = 1,
-                                                 header = TRUE)
-      
-      # Get percentage represented by most overrepresented sequence
-      overrepresented_sequences <- round(max(overrepresented_sequences_df$Percentage), digits = 1)
-      
-      # Add to results
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = overrepresented_sequences))
-    }
+    df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    round(max(df$Percentage), 1)
   }
   
-  return(results)
-  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_gc_deviation_r1 <- function(){
-
-  # Store metric name
-  function_metric = "gc_deviation_r1"
-  
-  # Print progress indicator
+get_gc_deviation_r1 <- function() {
+  function_metric <- "gc_deviation_r1"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-
-    # Find start and end of per sequence GC content section
-    start_line <- grep("^>>Per sequence GC content", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-
-    # Parse lines to dataframe
-    gc_content_df <- read.delim(text = section_lines,
-                                               skip = 1,
-                                               header = TRUE)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per sequence GC content")
+    gc_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
     colnames(gc_content_df) <- c("GC_content", "Count")
-
-    # Estimate parameters for normal distribution
+    
     total_reads <- sum(gc_content_df$Count)
     mean_gc <- sum(gc_content_df$GC_content * gc_content_df$Count) / total_reads
     sd_gc <- sqrt(sum(gc_content_df$Count * (gc_content_df$GC_content - mean_gc)^2) / total_reads)
     
-    # Calculate expected counts if normal distribution
-    expected_counts <- dnorm(gc_content_df$`GC_content`, mean = mean_gc, sd = sd_gc) * total_reads
-    
-    # Get sum of deviations from normal distribution counts
-    gc_deviation_r1 <- round(sum(abs(gc_content_df$Count - expected_counts)) / total_reads * 100, 
-                             digits = 1)
-
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = gc_deviation_r1))
-    }
-  return(results)
+    expected_counts <- dnorm(gc_content_df$GC_content, mean = mean_gc, sd = sd_gc) * total_reads
+    gc_deviation <- round(sum(abs(gc_content_df$Count - expected_counts)) / total_reads * 100, digits = 1)
+    return(gc_deviation)
+  }
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_gc_deviation_r2 <- function(){
-  
-  # Store metric name
-  function_metric = "gc_deviation_r2"
-  
-  # Print progress indicator
+get_gc_deviation_r2 <- function() {
+  function_metric <- "gc_deviation_r2"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-    
-    # Find start and end of per sequence GC content section
-    start_line <- grep("^>>Per sequence GC content", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    gc_content_df <- read.delim(text = section_lines,
-                                skip = 1,
-                                header = TRUE)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per sequence GC content")
+    gc_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
     colnames(gc_content_df) <- c("GC_content", "Count")
     
-    # Estimate parameters for normal distribution
     total_reads <- sum(gc_content_df$Count)
     mean_gc <- sum(gc_content_df$GC_content * gc_content_df$Count) / total_reads
     sd_gc <- sqrt(sum(gc_content_df$Count * (gc_content_df$GC_content - mean_gc)^2) / total_reads)
     
-    # Calculate expected counts if normal distribution
-    expected_counts <- dnorm(gc_content_df$`GC_content`, mean = mean_gc, sd = sd_gc) * total_reads
-    
-    # Get sum of deviations from normal distribution counts
-    gc_deviation_r2 <- round(sum(abs(gc_content_df$Count - expected_counts)) / total_reads * 100,
-                             digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = gc_deviation_r2))
+    expected_counts <- dnorm(gc_content_df$GC_content, mean = mean_gc, sd = sd_gc) * total_reads
+    gc_deviation <- round(sum(abs(gc_content_df$Count - expected_counts)) / total_reads * 100, digits = 1)
+    return(gc_deviation)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_base_content_diff_r1 <- function(){
-  
-  # Store metric name
-  function_metric = "per_base_content_diff_r1"
-  
-  # Print progress indicator
+get_per_base_content_diff_r1 <- function() {
+  function_metric <- "per_base_content_diff_r1"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-    
-    # Find start and end of per base sequence content section
-    start_line <- grep("^>>Per base sequence content", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    sequence_content_df <- read.delim(text = section_lines,
-                                skip = 1,
-                                header = TRUE)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence content")
+    sequence_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
     colnames(sequence_content_df) <- c("Base", "G", "A", "T", "C")
     
-    # Calculate maximum difference between A and T or C and G at each base
-    sequence_content_diff <- sequence_content_df %>%
-      rowwise() %>% 
-      mutate(diff_AT = abs(A - T),
-             diff_CG = abs(C - G)) %>%
-      ungroup()
+    # Calculate max difference between A and T or C and G per base
+    diffs <- apply(sequence_content_df[, c("A", "T", "C", "G")], 1, function(row) {
+      max(abs(row["A"] - row["T"]), abs(row["C"] - row["G"]))
+    })
     
-    per_base_content_diff_r1 <- round(max(sequence_content_diff$diff_AT,
-                                          sequence_content_diff$diff_CG), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_base_content_diff_r1))
+    round(max(diffs), digits = 1)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_base_content_diff_r2 <- function(){
-  
-  # Store metric name
-  function_metric = "per_base_content_diff_r2"
-  
-  # Print progress indicator
+get_per_base_content_diff_r2 <- function() {
+  function_metric <- "per_base_content_diff_r2"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-    
-    # Find start and end of per base sequence content section
-    start_line <- grep("^>>Per base sequence content", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    sequence_content_df <- read.delim(text = section_lines,
-                                      skip = 1,
-                                      header = TRUE)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence content")
+    sequence_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
     colnames(sequence_content_df) <- c("Base", "G", "A", "T", "C")
     
-    # Calculate maximum difference between A and T or C and G at each base
-    sequence_content_diff <- sequence_content_df %>%
-      rowwise() %>% 
-      mutate(diff_AT = abs(A - T),
-             diff_CG = abs(C - G)) %>%
-      ungroup()
+    diffs <- apply(sequence_content_df[, c("A", "T", "C", "G")], 1, function(row) {
+      max(abs(row["A"] - row["T"]), abs(row["C"] - row["G"]))
+    })
     
-    per_base_content_diff_r2 <- round(max(sequence_content_diff$diff_AT,
-                                          sequence_content_diff$diff_CG), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_base_content_diff_r2))
+    round(max(diffs), digits = 1)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_base_sequencing_quality_r1 <- function(){
-  
-  # Store metric name
-  function_metric = "per_base_sequencing_quality_r1"
-  
-  # Print progress indicator
+get_per_base_sequencing_quality_r1 <- function() {
+  function_metric <- "per_base_sequencing_quality_r1"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-    
-    # Find start and end of Per base sequence quality section
-    start_line <- grep("^>>Per base sequence quality", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    sequence_quality_df <- read.delim(text = section_lines,
-                                      skip = 1,
-                                      header = TRUE)
-    
-    # Get lowest lower quartile score
-    per_base_sequencing_quality_r1 <- round(min(sequence_quality_df$Lower.Quartile), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_base_sequencing_quality_r1))
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence quality")
+    sequence_quality_df <- read.delim(text = section_lines, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+    round(min(sequence_quality_df$Lower.Quartile), digits = 1)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_base_sequencing_quality_r2 <- function(){
-  
-  # Store metric name
-  function_metric = "per_base_sequencing_quality_r2"
-  
-  # Print progress indicator
+get_per_base_sequencing_quality_r2 <- function() {
+  function_metric <- "per_base_sequencing_quality_r2"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    proc_fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    proc_fastqc_lines <- readLines(proc_fastqc_data_path)
-    
-    # Find start and end of Per base sequence quality section
-    start_line <- grep("^>>Per base sequence quality", proc_fastqc_lines)
-    end_lines <- grep("^>>END_MODULE", proc_fastqc_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- proc_fastqc_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    sequence_quality_df <- read.delim(text = section_lines,
-                                      skip = 1,
-                                      header = TRUE)
-    
-    # Get lowest lower quartile score
-    per_base_sequencing_quality_r2 <- round(min(sequence_quality_df$Lower.Quartile), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_base_sequencing_quality_r2))
-    
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence quality")
+    sequence_quality_df <- read.delim(text = section_lines, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+    round(min(sequence_quality_df$Lower.Quartile), digits = 1)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_tile_sequencing_quality_r1 <- function(){
-  
-  # Store metric name
-  function_metric = "per_tile_sequencing_quality_r1"
-  
-  # Print progress indicator
+get_per_tile_sequencing_quality_r1 <- function() {
+  function_metric <- "per_tile_sequencing_quality_r1"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    # Extract Per base sequence quality section for global mean
+    base_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence quality")
+    base_df <- read.delim(text = base_section, skip = 1, header = TRUE)
+    mean_seq_quality <- mean(base_df$Mean)
     
-    # Print sample name for progress
-    print(sample_name)
+    # Extract Per tile sequence quality section
+    tile_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per tile sequence quality")
+    tile_df <- read.delim(text = tile_section, skip = 1, header = TRUE)
+    colnames(tile_df) <- c("tile", "base", "mean_deviation")
+    tile_df$mean_qual_global <- mean_seq_quality
+    tile_df$mean_qual_tile_pos <- tile_df$mean_qual_global + tile_df$mean_deviation
     
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
+    library(dplyr)
+    per_tile_quality <- tile_df %>%
+      group_by(tile) %>%
+      summarise(mean_quality = mean(mean_qual_tile_pos), .groups = "drop")
     
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Find start and end of Per base sequence quality section
-    start_line <- grep("^>>Per base sequence quality", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract Per base sequence quality lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    sequence_quality_df <- read.delim(text = section_lines,
-                                      skip = 1,
-                                      header = TRUE)
-    
-    # Get mean quality score
-    mean_seq_quality <- mean(sequence_quality_df$Mean)
-    
-    # Find start and end of Per tile sequence quality section
-    start_line <- grep("^>>Per tile sequence quality", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract Per tile sequence quality section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to data frame
-    per_tile_deviation <- read.delim(text = section_lines,
-                                      skip = 1,
-                                      header = TRUE)
-    
-    colnames(per_tile_deviation) <- c("tile", "base", "mean_deviation")
-    
-    # Add global mean quality
-    per_tile_deviation$mean_qual_global <- mean_seq_quality
-    
-    # Calculate mean quality per tile and position
-    per_tile_deviation$mean_qual_tile_pos <- per_tile_deviation$mean_qual_global + per_tile_deviation$mean_deviation
-    
-    # Summarise mean quality by tile
-    per_tile_quality <- per_tile_deviation %>%
-      group_by(tile) %>% 
-      summarise(mean_quality = mean(mean_qual_tile_pos))
-    
-    # Get percent tiles with mean quality <36
-    num_tiles = nrow(per_tile_quality)
-    num_tiles_low_qual <- nrow(per_tile_quality[per_tile_quality$mean_quality < 36, ])
-    per_tile_sequencing_quality_r1 <- round((num_tiles_low_qual / num_tiles * 100), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_tile_sequencing_quality_r1))
-    
+    num_tiles <- nrow(per_tile_quality)
+    num_tiles_low_qual <- sum(per_tile_quality$mean_quality < 36)
+    round((num_tiles_low_qual / num_tiles) * 100, digits = 1)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_tile_sequencing_quality_r2 <- function(){
-  
-  # Store metric name
-  function_metric = "per_tile_sequencing_quality_r2"
-  
-  # Print progress indicator
+get_per_tile_sequencing_quality_r2 <- function() {
+  function_metric <- "per_tile_sequencing_quality_r2"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    base_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence quality")
+    base_df <- read.delim(text = base_section, skip = 1, header = TRUE)
+    mean_seq_quality <- mean(base_df$Mean)
     
-    # Print sample name for progress
-    print(sample_name)
+    tile_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per tile sequence quality")
+    tile_df <- read.delim(text = tile_section, skip = 1, header = TRUE)
+    colnames(tile_df) <- c("tile", "base", "mean_deviation")
+    tile_df$mean_qual_global <- mean_seq_quality
+    tile_df$mean_qual_tile_pos <- tile_df$mean_qual_global + tile_df$mean_deviation
     
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
+    library(dplyr)
+    per_tile_quality <- tile_df %>%
+      group_by(tile) %>%
+      summarise(mean_quality = mean(mean_qual_tile_pos), .groups = "drop")
     
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Find start and end of Per base sequence quality section
-    start_line <- grep("^>>Per base sequence quality", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract Per base sequence quality section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to data frame
-    sequence_quality_df <- read.delim(text = section_lines,
-                                      skip = 1,
-                                      header = TRUE)
-    
-    # Get mean quality score
-    mean_seq_quality <- mean(sequence_quality_df$Mean)
-    
-    # Find start and end of Per base sequence quality section
-    start_line <- grep("^>>Per tile sequence quality", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract Per tile sequence quality section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to data frame
-    per_tile_deviation <- read.delim(text = section_lines,
-                                     skip = 1,
-                                     header = TRUE)
-    
-    colnames(per_tile_deviation) <- c("tile", "base", "mean_deviation")
-    
-    # Add global mean quality
-    per_tile_deviation$mean_qual_global <- mean_seq_quality
-    
-    # Calculate mean quality per tile and position
-    per_tile_deviation$mean_qual_tile_pos <- per_tile_deviation$mean_qual_global + per_tile_deviation$mean_deviation
-    
-    # Summarise mean quality by tile
-    per_tile_quality <- per_tile_deviation %>%
-      group_by(tile) %>% 
-      summarise(mean_quality = mean(mean_qual_tile_pos))
-    
-    # Get percent tiles with mean quality <36
-    num_tiles = nrow(per_tile_quality)
-    num_tiles_low_qual <- nrow(per_tile_quality[per_tile_quality$mean_quality < 36, ])
-    per_tile_sequencing_quality_r2 <- round((num_tiles_low_qual / num_tiles * 100), digits = 1)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_tile_sequencing_quality_r2))
-    
+    num_tiles <- nrow(per_tile_quality)
+    num_tiles_low_qual <- sum(per_tile_quality$mean_quality < 36)
+    round((num_tiles_low_qual / num_tiles) * 100, digits = 1)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_sequence_length_r1 <- function(){
-  
-  # Store metric name
-  function_metric = "sequence_length_r1"
-  
-  # Print progress indicator
+get_sequence_length_r1 <- function() {
+  function_metric <- "sequence_length_r1"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Find start and end of sequence length distribution section
-    start_line <- grep("^>>Sequence Length Distribution", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    sequence_length_df <- read.delim(text = section_lines,
-                                      skip = 1,
-                                      header = TRUE)
-    colnames(sequence_length_df) <- c("Length", "Count")
-    
-    # Get sequence length peak
-    sequence_length_r1 <- sequence_length_df$Length[which.max(sequence_length_df$Count)]
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = sequence_length_r1))
-    
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Sequence Length Distribution")
+    seq_len_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    colnames(seq_len_df) <- c("Length", "Count")
+    seq_len_df$Length[which.max(seq_len_df$Count)]
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_sequence_length_r2 <- function(){
-  
-  # Store metric name
-  function_metric = "sequence_length_r2"
-  
-  # Print progress indicator
+get_sequence_length_r2 <- function() {
+  function_metric <- "sequence_length_r2"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Find start and end of sequence length distribution section
-    start_line <- grep("^>>Sequence Length Distribution", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    sequence_length_df <- read.delim(text = section_lines,
-                                     skip = 1,
-                                     header = TRUE)
-    colnames(sequence_length_df) <- c("Length", "Count")
-    
-    # Get sequence length peak
-    sequence_length_r2 <- sequence_length_df$Length[which.max(sequence_length_df$Count)]
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = sequence_length_r2))
-    
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Sequence Length Distribution")
+    seq_len_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    colnames(seq_len_df) <- c("Length", "Count")
+    seq_len_df$Length[which.max(seq_len_df$Count)]
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_base_N_content_r1 <- function(){
-  
-  # Store metric name
-  function_metric = "per_base_N_content_r1"
-  
-  # Print progress indicator
+get_per_base_N_content_r1 <- function() {
+  function_metric <- "per_base_N_content_r1"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Find start and end of sequence length distribution section
-    start_line <- grep("^>>Per base N content", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    N_content_df <- read.delim(text = section_lines,
-                                     skip = 1,
-                                     header = TRUE)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base N content")
+    N_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
     colnames(N_content_df) <- c("base", "percent_N")
-    
-    # Get max N content
-    per_base_N_content_r1 <- round(max(N_content_df$percent_N), digits = 2)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_base_N_content_r1))
-    
+    round(max(N_content_df$percent_N), digits = 2)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
 
-get_per_base_N_content_r2 <- function(){
-  
-  # Store metric name
-  function_metric = "per_base_N_content_r2"
-  
-  # Print progress indicator
+get_per_base_N_content_r2 <- function() {
+  function_metric <- "per_base_N_content_r2"
   print(paste("Getting", function_metric))
   
-  # Get list of sample directories within metrics directory
-  sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
-  results <- data.frame(metric = character(), sample = character(), value = numeric())
-  
-  for (sample_dir in sample_dirs) {
-    sample_name <- basename(sample_dir)
-    
-    # Print sample name for progress
-    print(sample_name)
-    
-    # Get path to metrics file
-    metric_file_path <- find_metric_file_path(sample_dir, function_metric, component_metrics)
-    
-    # If missing metrics file enter NA value, then skip sample
-    if(length(metric_file_path) == 0) {
-      results <- rbind(results, data.frame(
-        metric = function_metric,
-        sample = sample_name,
-        value = NA
-      ))
-      next
-    }
-    
-    # Create tmp directory for unzipped file
-    tmp_dir <- file.path("metrics/tmp", function_metric, sample_name)
-    if (!dir.exists(tmp_dir)) dir.create(tmp_dir, recursive = TRUE)
-    
-    # List contents inside the zip to find the correct path to fastqc_data.txt
-    zip_contents <- unzip(metric_file_path, list = TRUE)$Name
-    
-    # Identify the path to fastqc_data.txt inside the zip
-    fastqc_data_inside_zip <- zip_contents[grepl("fastqc_data.txt$", zip_contents)][1]
-    
-    # Unzip only the fastqc_data.txt file
-    unzip(metric_file_path, files = fastqc_data_inside_zip, exdir = tmp_dir)
-    
-    # Get path for the unzipped data file
-    fastqc_data_path <- file.path(tmp_dir, fastqc_data_inside_zip)
-    
-    # Put all lines of txt file into character vector
-    fastqc_data_lines <- readLines(fastqc_data_path)
-    
-    # Find start and end of sequence length distribution section
-    start_line <- grep("^>>Per base N content", fastqc_data_lines)
-    end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
-    end_line <- end_lines[which(end_lines > start_line)[1]]
-    
-    # Extract per sequence GC content section lines (skip headers and end module lines)
-    section_lines <- fastqc_data_lines[(start_line):(end_line - 1)]
-    
-    # Parse lines to dataframe
-    N_content_df <- read.delim(text = section_lines,
-                               skip = 1,
-                               header = TRUE)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base N content")
+    N_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
     colnames(N_content_df) <- c("base", "percent_N")
-    
-    # Get max N content
-    per_base_N_content_r2 <- round(max(N_content_df$percent_N), digits = 2)
-    
-    # Add to results
-    results <- rbind(results, data.frame(
-      metric = function_metric,
-      sample = sample_name,
-      value = per_base_N_content_r2))
-    
+    round(max(N_content_df$percent_N), digits = 2)
   }
-  return(results)
+  
+  process_samples_for_metric(function_metric, metric_retrieval)
 }
+
 
 
 
