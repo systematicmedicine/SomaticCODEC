@@ -8,7 +8,7 @@ Duplicates are caused by:
 2. Flow cell 'PCR' duplication (when both the p5 and p7 strands of the original double stranded molecule bind to different regions of the flow cell)
 3. Optical duplicates (optical cross-talk/signal bleed from adjacent spots on the flow cell)
 
-The bam used for this calculation is the aligned bam with byproducts removed (correct product only).
+The BAM used for this calculation is the aligned BAM with byproducts removed (correct product only).
 
 The calculation is 1 - (unique reads/total reads). Unique reads are the number of reads with a unique UMI. 
 
@@ -24,8 +24,8 @@ sys.stderr = open(snakemake.log[0], "a")
 print("[INFO] Starting ex_duplication_metrics.py")
 
 # Begin script
-hist_files = snakemake.input
-output_file = snakemake.output[0]
+hist_files = snakemake.input.umi_metrics
+output_file = snakemake.output.file_path
 
 rows = []
 for path in hist_files:
