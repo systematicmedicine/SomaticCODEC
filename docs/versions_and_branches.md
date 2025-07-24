@@ -27,7 +27,7 @@ The purpose of this doc is to describe respoitory versioning and branch structur
 | MINOR    	| Changes that effect variant calling, but don't change the DAG | All componet level metrics pass   			|
 | MINOR    	| Changes that do not effect variant calling (e.g. metrics)  	| All unit & integration tests pass 			|
 
-`dev` and `feature` brnaches do not use semantic versioning.
+`dev` and `feature` branches do not use semantic versioning.
 
 ### Pull requests to dev
 1. Create unit tests for any new rules created (optional for metrics rules)
