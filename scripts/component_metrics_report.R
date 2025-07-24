@@ -3,7 +3,9 @@
 # 
 # Calls on get_metrics.R functions and generates a pass/fail report for all metrics.
 # 
-# Authors: Joshua Johnstone & Cameron Fraser
+# Authors: 
+#     - Joshua Johnstone
+#     - Cameron Fraser
 
 # Redirect stdout and stderr to Snakemake log
 log_con <- file(snakemake@log[[1]], open = "wt")
@@ -80,6 +82,9 @@ component_metrics_report <- combined_metrics_values %>%
 
 # Export metrics report as csv
 write.csv(component_metrics_report, "metrics/component_metrics_report.csv", row.names = FALSE)
+
+# Remove tmp directory
+unlink(file.path("metrics/tmp"), recursive = TRUE)
 
 # Clean up logging
 sink(type = "message")
