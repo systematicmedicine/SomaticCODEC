@@ -11,7 +11,6 @@ Authors:
 """
 
 # Import libraries
-import pytest
 import glob
 from pathlib import Path
 from utils.fastq_utils import count_fastq_data_points

@@ -8,8 +8,6 @@ Authors:
     - Cameron Fraser
 """
 
-import pytest
-import subprocess
 from pathlib import Path
 import glob
 from utils.fastq_utils import count_fastq_data_points

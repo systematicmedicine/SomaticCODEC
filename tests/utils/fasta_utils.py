@@ -22,3 +22,27 @@ def count_fasta_data_points(path):
             if line.startswith('>'):
                 count += 1
     return count
+
+# Checks that the file has correct FASTA structure
+def check_fasta_structure(path):
+    path = Path(path)
+    open_func = open
+    if str(path).endswith(".gz"):
+        open_func = gzip.open
+
+    with open_func(path, 'rt') as file:
+        lines = [line.rstrip('\n') for line in file if line.strip()]
+
+    assert len(lines) % 2 == 0, f"FASTA file {path} does not have alternating header/sequence lines (lines: {len(lines)})."
+
+    for line in range(0, len(lines), 2):
+        header = lines[line]
+        sequence = lines[line + 1]
+
+        assert header.startswith(">"), f"Line {line+1} does not start with '>': {header}"
+        assert len(header) > 1, f"Header on line {line+1} is empty."
+
+        valid_bases = set("ACGTNacgtn")
+        invalid_chars = set(sequence) - valid_bases
+        assert not invalid_chars, f"Invalid characters {invalid_chars} in sequence on line {line+2}: {sequence}"
+        assert len(sequence) > 0, f"Empty sequence on line {line+2}."

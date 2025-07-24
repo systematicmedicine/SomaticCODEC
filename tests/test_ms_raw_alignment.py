@@ -13,7 +13,7 @@ from utils.bam_utils import count_bam_data_points
 from utils.fastq_utils import count_fastq_data_points
 
 # Test that aligned read count is not greater than input read count
-def test_aligned_reads_less_than_input_reads():
+def test_aligned_reads_less_than_input_reads(lightweight_test_run):
     ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
 
     for ms_sample in ms_samples:
