@@ -25,7 +25,7 @@ The purpose of this doc is to describe respoitory versioning and branch structur
 |----------	|---------------------------------------------------------------|-----------------------------------------------|
 | MAJOR    	| Changes that effect variant calling, and change the DAG  		| All system and component level metrics pass	|
 | MINOR    	| Changes that effect variant calling, but don't change the DAG | All componet level metrics pass   			|
-| MINOR    	| Changes that do not effect variant calling (e.g. metrics)  	| All unit & integration tests pass 			|
+| PATCH    	| Changes that do not effect variant calling (e.g. metrics)  	| All unit & integration tests pass 			|
 
 When initiating a pull request to `master`:
 * Tag with the version number
