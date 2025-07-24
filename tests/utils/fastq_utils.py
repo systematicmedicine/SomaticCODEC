@@ -9,6 +9,8 @@ Authors:
     - Joshua Johnstone
 """
 import subprocess
+import gzip
+
 # Counts the number of reads in a FASTQ file
 def count_fastq_data_points(path):
     result = subprocess.run(
@@ -32,5 +34,16 @@ def sum_len_fastq(fastq_path):
         check=True
     )
     lines = result.stdout.strip().split('\n')
-    sum_len_str = lines[1].split()[5].replace(",", "")
+    sum_len_str = lines[1].split()[4].replace(",", "")
     return int(sum_len_str)
+
+# Returns the n headers (without metadata), defaults to 100 headers
+def first_n_headers(fastq_path, n=100):
+    headers = []
+    with gzip.open(fastq_path, "rt") as f:
+        for line in f:
+            if line.startswith("@"):
+                headers.append(line.split()[0])
+                if len(headers) >= n:
+                    break
+    return headers
