@@ -29,6 +29,9 @@ ex_lanes <- read.csv("config/ex_lanes.csv") %>%
 ms_samples <- read.csv("config/ms_samples.csv") %>% 
   pull(ms_sample)
 
+# Get list of sample directories within metrics directory
+sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
+
 # Load get_metrics.R functions
 source("scripts/get_metrics.R")
 
