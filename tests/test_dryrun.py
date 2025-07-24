@@ -11,7 +11,6 @@ Authors:
     - Chat-GPT
 """
 
-import pytest
 import subprocess
 from pathlib import Path
 

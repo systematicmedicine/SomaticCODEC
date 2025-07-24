@@ -11,7 +11,6 @@ Authors:
 """
 
 # Import modules
-import pytest
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # Add PROJECT_ROOT to path

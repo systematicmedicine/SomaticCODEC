@@ -8,9 +8,6 @@ Authors:
     - Cameron Fraser
 """
 
-# test_ex_trim_fastq.py
-
-import pytest
 import glob
 from pathlib import Path
 from utils.fastq_utils import count_fastq_data_points, sum_len_fastq
