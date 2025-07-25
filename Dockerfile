@@ -33,7 +33,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libbz2-dev \
     liblzma-dev \
     zlib1g-dev \
-    gnupg && \
+    gnupg \
+    vim && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Conda packages using Mambaforge
