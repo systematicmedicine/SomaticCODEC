@@ -12,9 +12,6 @@ Authors:
 # Import modules
 import scripts.get_metadata as md
 
-# Legacy use of global variables yet to be refactored out
-ex_samples = pd.read_csv(config["ex_samples_path"])
-ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
 """
 FastQC on raw fastq files (before demultiplexing or any processing)
@@ -104,14 +101,23 @@ Replace default index names with experiment specific sample names as defined in 
 """
 rule ex_correctproduct_metrics:
     input:
+        ex_samples = config["ex_samples_path"],
+        ex_lanes = config["ex_lanes_path"],        
         demux_json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
-        filter_length = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
-        filter_meanquality = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
-        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_lane_to_sample[wildcards.ex_lane])
+        filter_length = lambda wildcards: expand(
+            "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
+            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
+        ),
+        filter_meanquality = lambda wildcards: expand(
+            "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json",
+            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
+        ),
+        flagstats = lambda wildcards: expand(
+            "metrics/{ex_sample}/{ex_sample}_map_metrics.txt",
+            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
+        ),
     output:
-        "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
-    params:
-        samples = lambda wildcards: ex_lane_to_sample[wildcards.ex_lane]
+        file_path = "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
     log:
         "logs/{ex_lane}/ex_correctproduct_metrics.log"
     benchmark:
