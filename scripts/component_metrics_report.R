@@ -17,7 +17,8 @@ library(dplyr)
 library(jsonlite)
 
 # Load component metrics
-component_metrics <- read.csv("config/component_metrics.csv") %>% 
+component_metrics_path <- Sys.glob("config/component_metrics*.csv")[1]
+component_metrics <- read.csv(component_metrics_path) %>% 
   select(1:3, 5:9)
 
 # Get sample types from config
