@@ -41,7 +41,7 @@ process_samples_for_metric <- function(function_metric, metric_retrieval) {
     results <- rbind(results, data.frame(
       metric = function_metric,
       sample = sample_name,
-      value = metric_value
+      value = round(metric_value, digits = 2)
     ))
   }
   
@@ -63,7 +63,7 @@ extract_fastqc_section <- function(metric_file_path, function_metric, sample_nam
   start_line <- grep(paste0("^", section_header), fastqc_data_lines)
   end_lines <- grep("^>>END_MODULE", fastqc_data_lines)
   end_line <- end_lines[which(end_lines > start_line)[1]]
-  
+
   # Extract header line + data lines
   header_line <- fastqc_data_lines[start_line + 1]
   data_lines <- fastqc_data_lines[(start_line + 2):(end_line - 1)]
@@ -197,10 +197,10 @@ get_read_alignment_rate <- function() {
                                       grep("^SN\\s+reads mapped:", alignment_stats_lines, value = TRUE)))
     } else {
       total_reads <- as.numeric(sub(" .*", "", grep("in total", alignment_stats_lines, value = TRUE)))
-      reads_aligned <- as.numeric(sub(" .*", "", grep("mapped \\(", alignment_stats_lines, value = TRUE)))
+      reads_aligned <- as.numeric(sub(" .*", "", grep("mapped \\(", alignment_stats_lines, value = TRUE)))[1]
     }
     
-    alignment_rate <- round((reads_aligned / total_reads) * 100, digits = 1)
+    alignment_rate <- round((reads_aligned / total_reads) * 100, digits = 2)
     return(alignment_rate)
   }
   
@@ -387,10 +387,8 @@ get_germline_variants <- function() {
     lines <- readLines(metric_file_path)
     
     SN_data <- grep("^SN\t", lines, value = TRUE)
-    SN_info_index <- min(grep("^SN\t", lines))
-    SN_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
-    
-    df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
+    df <- read.delim(textConnection(SN_data), header = TRUE)
+    colnames(df) <- c("SN", "ID", "key", "value")
     
     total_variants <- df %>%
       dplyr::filter(key == "number of records:") %>%
@@ -404,6 +402,7 @@ get_germline_variants <- function() {
   return(results)
 }
 
+# Get ratio of SNVs to INDELs
 get_SNV_indel_ratio <- function() {
   
   function_metric <- "SNV_indel_ratio"
@@ -413,10 +412,9 @@ get_SNV_indel_ratio <- function() {
     lines <- readLines(metric_file_path)
     
     SN_data <- grep("^SN\t", lines, value = TRUE)
-    SN_info_index <- min(grep("^SN\t", lines))
-    SN_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
     
-    df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
+    df <- read.delim(textConnection(SN_data), header = TRUE)
+    colnames(df) <- c("SN", "ID", "key", "value")
     
     snp <- as.numeric(df$value[df$key == "number of SNPs:"])
     indel <- as.numeric(df$value[df$key == "number of indels:"])
@@ -428,6 +426,7 @@ get_SNV_indel_ratio <- function() {
   return(results)
 }
 
+# Get ratio of insertions to deletions
 get_insertion_deletion_ratio <- function() {
   
   function_metric <- "insertion_deletion_ratio"
@@ -437,14 +436,12 @@ get_insertion_deletion_ratio <- function() {
     lines <- readLines(metric_file_path)
     
     IDD_data <- grep("^IDD\t", lines, value = TRUE)
-    IDD_info_index <- min(grep("^IDD\t", lines))
-    IDD_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[IDD_info_index]), "\t")))
     
-    df <- read.delim(textConnection(IDD_data), header = FALSE, col.names = IDD_info) %>%
-      dplyr::rename(indel_len = `length..deletions.negative.`)
+    df <- read.delim(textConnection(IDD_data), header = TRUE)
+    colnames(df) <- c("IDD", "id", "indel_len", "num_sites", "genotypes", "mean_VAF")
     
     ins_del_count <- df %>%
-      dplyr::select(indel_len, `number.of.sites`) %>%
+      dplyr::select(indel_len, num_sites) %>%
       dplyr::mutate(type = dplyr::case_when(
         indel_len > 0 ~ "insertion",
         indel_len < 0 ~ "deletion",
@@ -452,7 +449,7 @@ get_insertion_deletion_ratio <- function() {
       )) %>%
       dplyr::filter(!is.na(type)) %>%
       dplyr::group_by(type) %>%
-      dplyr::summarise(count = sum(number.of.sites), .groups = "drop")
+      dplyr::summarise(count = sum(num_sites), .groups = "drop")
     
     ins_count <- ins_del_count$count[ins_del_count$type == "insertion"]
     del_count <- ins_del_count$count[ins_del_count$type == "deletion"]
@@ -465,6 +462,7 @@ get_insertion_deletion_ratio <- function() {
   return(results)
 }
 
+# Get number of MNPs/other variants
 get_MNP_other_variants <- function() {
   
   function_metric <- "MNP_other_variants"
@@ -474,10 +472,9 @@ get_MNP_other_variants <- function() {
     lines <- readLines(metric_file_path)
     
     SN_data <- grep("^SN\t", lines, value = TRUE)
-    SN_info_index <- min(grep("^SN\t", lines))
-    SN_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[SN_info_index]), "\t")))
     
-    df <- read.delim(textConnection(SN_data), header = FALSE, skip = 1, col.names = SN_info)
+    df <- read.delim(textConnection(SN_data), header = TRUE)
+    colnames(df) <- c("SN", "ID", "key", "value")
     
     MNP <- as.numeric(df$value[df$key == "number of MNPs:"])
     other <- as.numeric(df$value[df$key == "number of others:"])
@@ -489,6 +486,7 @@ get_MNP_other_variants <- function() {
   return(results)
 }
 
+# Get ratio of transitions to transversions
 get_transition_transversion_ratio <- function() {
   
   function_metric <- "transition_transversion_ratio"
@@ -497,12 +495,11 @@ get_transition_transversion_ratio <- function() {
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     lines <- readLines(metric_file_path)
     
-    TSTV_data <- grep("^TSTV\t", lines, value = TRUE)
-    TSTV_info_index <- min(grep("^TSTV\t", lines))
-    TSTV_info <- gsub("\\[[0-9]+\\]", "", unlist(strsplit(gsub("# ", "", lines[TSTV_info_index]), "\t")))
+    TSTV_data <- grep("^TSTV", lines, value = TRUE)
+    df <- read.delim(textConnection(TSTV_data), header = FALSE)
+    colnames(df) <- c("TSTV", "id", "ts", "tv", "ts_tv", "ts_1st_alt", "tv_1st_alt", "ts_tv_1st_alt")
     
-    df <- read.delim(textConnection(TSTV_data), header = FALSE, col.names = TSTV_info)
-    ratio <- round(df$ts.tv[1], digits = 1)
+    ratio <- round(df$ts_tv, digits = 1)
     return(ratio)
   }
   
@@ -510,6 +507,7 @@ get_transition_transversion_ratio <- function() {
   return(results)
 }
 
+# Get ratio of het/hom variants
 get_het_hom_ratio <- function() {
   
   function_metric <- "het_hom_ratio"
@@ -519,7 +517,7 @@ get_het_hom_ratio <- function() {
     lines <- readLines(metric_file_path)
     psc_line <- grep("^PSC", lines, value = TRUE)
     fields <- strsplit(psc_line, "\t")[[1]]
-    het <- as.numeric(fields[4])
+    het <- as.numeric(fields[6])
     hom <- as.numeric(fields[5])
     het_hom_ratio <- round(het / hom, digits = 1)
     return(het_hom_ratio)
@@ -529,6 +527,7 @@ get_het_hom_ratio <- function() {
   return(results)
 }
 
+# Get multimapping rate
 get_multimapping_rate <- function() {
   
   function_metric <- "multimapping_rate"
@@ -563,6 +562,7 @@ get_multimapping_rate <- function() {
   return(results)
 }
 
+# Get duplication rate
 get_duplication_rate <- function() {
   function_metric = "duplication_rate"
   print(paste("Getting", function_metric))
@@ -588,23 +588,41 @@ get_duplication_rate <- function() {
   return(results)
 }
 
+# Get total reads r1
 get_total_reads_r1 <- function() {
   function_metric = "total_reads_r1"
   print(paste("Getting", function_metric))
   
-  results <- process_samples_for_metric(function_metric, get_total_reads_fastqc)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Basic Statistics")
+    
+    df <- read.delim(text = section, header = FALSE, sep = "\t")
+    total_reads <- as.numeric(df[df$V1 == "Total Sequences", "V2"]) / 1000000
+    return(total_reads)
+  }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
-# Total reads R2
+# Get total reads r2
 get_total_reads_r2 <- function() {
   function_metric = "total_reads_r2"
   print(paste("Getting", function_metric))
   
-  results <- process_samples_for_metric(function_metric, get_total_reads_fastqc)
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+    section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Basic Statistics")
+    
+    df <- read.delim(text = section, header = FALSE, sep = "\t")
+    total_reads <- as.numeric(df[df$V1 == "Total Sequences", "V2"]) / 1000000
+    return(total_reads)
+  }
+  
+  results <- process_samples_for_metric(function_metric, metric_retrieval)
   return(results)
 }
 
+# Get mean insert size
 get_insert_size <- function() {
   function_metric <- "insert_size"
   print(paste("Getting", function_metric))
@@ -623,6 +641,7 @@ get_insert_size <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get overrespresented sequences in r1
 get_overrepresented_sequences_r1 <- function() {
   function_metric <- "overrepresented_sequences_r1"
   print(paste("Getting", function_metric))
@@ -634,13 +653,14 @@ get_overrepresented_sequences_r1 <- function() {
       return(0)
     }
     
-    df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    df <- read.delim(text = section_lines, header = TRUE)
     round(max(df$Percentage), 1)
   }
   
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get overrespresented sequences in r2
 get_overrepresented_sequences_r2 <- function() {
   function_metric <- "overrepresented_sequences_r2"
   print(paste("Getting", function_metric))
@@ -652,20 +672,21 @@ get_overrepresented_sequences_r2 <- function() {
       return(0)
     }
     
-    df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    df <- read.delim(text = section_lines, header = TRUE)
     round(max(df$Percentage), 1)
   }
   
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get devation from GC distribution r1
 get_gc_deviation_r1 <- function() {
   function_metric <- "gc_deviation_r1"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per sequence GC content")
-    gc_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    gc_content_df <- read.delim(text = section_lines, header = TRUE)
     colnames(gc_content_df) <- c("GC_content", "Count")
     
     total_reads <- sum(gc_content_df$Count)
@@ -680,13 +701,14 @@ get_gc_deviation_r1 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get devation from GC distribution r2
 get_gc_deviation_r2 <- function() {
   function_metric <- "gc_deviation_r2"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per sequence GC content")
-    gc_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    gc_content_df <- read.delim(text = section_lines, header = TRUE)
     colnames(gc_content_df) <- c("GC_content", "Count")
     
     total_reads <- sum(gc_content_df$Count)
@@ -701,6 +723,7 @@ get_gc_deviation_r2 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per base sequence content difference r1
 get_per_base_content_diff_r1 <- function() {
   function_metric <- "per_base_content_diff_r1"
   print(paste("Getting", function_metric))
@@ -721,13 +744,14 @@ get_per_base_content_diff_r1 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per base sequence content difference r2
 get_per_base_content_diff_r2 <- function() {
   function_metric <- "per_base_content_diff_r2"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence content")
-    sequence_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    sequence_content_df <- read.delim(text = section_lines, header = TRUE)
     colnames(sequence_content_df) <- c("Base", "G", "A", "T", "C")
     
     diffs <- apply(sequence_content_df[, c("A", "T", "C", "G")], 1, function(row) {
@@ -740,6 +764,7 @@ get_per_base_content_diff_r2 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per base sequence quality r1
 get_per_base_sequencing_quality_r1 <- function() {
   function_metric <- "per_base_sequencing_quality_r1"
   print(paste("Getting", function_metric))
@@ -753,6 +778,7 @@ get_per_base_sequencing_quality_r1 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per base sequence quality r2
 get_per_base_sequencing_quality_r2 <- function() {
   function_metric <- "per_base_sequencing_quality_r2"
   print(paste("Getting", function_metric))
@@ -766,6 +792,7 @@ get_per_base_sequencing_quality_r2 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per tile sequence quality r1
 get_per_tile_sequencing_quality_r1 <- function() {
   function_metric <- "per_tile_sequencing_quality_r1"
   print(paste("Getting", function_metric))
@@ -773,12 +800,13 @@ get_per_tile_sequencing_quality_r1 <- function() {
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     # Extract Per base sequence quality section for global mean
     base_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence quality")
-    base_df <- read.delim(text = base_section, skip = 1, header = TRUE)
+    base_df <- read.delim(text = base_section, header = TRUE)
     mean_seq_quality <- mean(base_df$Mean)
     
     # Extract Per tile sequence quality section
     tile_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per tile sequence quality")
-    tile_df <- read.delim(text = tile_section, skip = 1, header = TRUE)
+    
+    tile_df <- read.delim(text = tile_section, header = TRUE)
     colnames(tile_df) <- c("tile", "base", "mean_deviation")
     tile_df$mean_qual_global <- mean_seq_quality
     tile_df$mean_qual_tile_pos <- tile_df$mean_qual_global + tile_df$mean_deviation
@@ -786,7 +814,7 @@ get_per_tile_sequencing_quality_r1 <- function() {
     library(dplyr)
     per_tile_quality <- tile_df %>%
       group_by(tile) %>%
-      summarise(mean_quality = mean(mean_qual_tile_pos), .groups = "drop")
+      summarise(mean_quality = mean(mean_qual_tile_pos))
     
     num_tiles <- nrow(per_tile_quality)
     num_tiles_low_qual <- sum(per_tile_quality$mean_quality < 36)
@@ -796,17 +824,18 @@ get_per_tile_sequencing_quality_r1 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per tile sequence quality r2
 get_per_tile_sequencing_quality_r2 <- function() {
   function_metric <- "per_tile_sequencing_quality_r2"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     base_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base sequence quality")
-    base_df <- read.delim(text = base_section, skip = 1, header = TRUE)
+    base_df <- read.delim(text = base_section, header = TRUE)
     mean_seq_quality <- mean(base_df$Mean)
     
     tile_section <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per tile sequence quality")
-    tile_df <- read.delim(text = tile_section, skip = 1, header = TRUE)
+    tile_df <- read.delim(text = tile_section, header = TRUE)
     colnames(tile_df) <- c("tile", "base", "mean_deviation")
     tile_df$mean_qual_global <- mean_seq_quality
     tile_df$mean_qual_tile_pos <- tile_df$mean_qual_global + tile_df$mean_deviation
@@ -814,7 +843,7 @@ get_per_tile_sequencing_quality_r2 <- function() {
     library(dplyr)
     per_tile_quality <- tile_df %>%
       group_by(tile) %>%
-      summarise(mean_quality = mean(mean_qual_tile_pos), .groups = "drop")
+      summarise(mean_quality = mean(mean_qual_tile_pos))
     
     num_tiles <- nrow(per_tile_quality)
     num_tiles_low_qual <- sum(per_tile_quality$mean_quality < 36)
@@ -824,13 +853,14 @@ get_per_tile_sequencing_quality_r2 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get sequence length for r1
 get_sequence_length_r1 <- function() {
   function_metric <- "sequence_length_r1"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Sequence Length Distribution")
-    seq_len_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    seq_len_df <- read.delim(text = section_lines, header = TRUE)
     colnames(seq_len_df) <- c("Length", "Count")
     seq_len_df$Length[which.max(seq_len_df$Count)]
   }
@@ -838,13 +868,14 @@ get_sequence_length_r1 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get sequence length for r2
 get_sequence_length_r2 <- function() {
   function_metric <- "sequence_length_r2"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Sequence Length Distribution")
-    seq_len_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    seq_len_df <- read.delim(text = section_lines, header = TRUE)
     colnames(seq_len_df) <- c("Length", "Count")
     seq_len_df$Length[which.max(seq_len_df$Count)]
   }
@@ -852,13 +883,14 @@ get_sequence_length_r2 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per base N content for r1
 get_per_base_N_content_r1 <- function() {
   function_metric <- "per_base_N_content_r1"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base N content")
-    N_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    N_content_df <- read.delim(text = section_lines, header = TRUE)
     colnames(N_content_df) <- c("base", "percent_N")
     round(max(N_content_df$percent_N), digits = 2)
   }
@@ -866,13 +898,14 @@ get_per_base_N_content_r1 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get per base N content for r2
 get_per_base_N_content_r2 <- function() {
   function_metric <- "per_base_N_content_r2"
   print(paste("Getting", function_metric))
   
   metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
     section_lines <- extract_fastqc_section(metric_file_path, function_metric, sample_name, ">>Per base N content")
-    N_content_df <- read.delim(text = section_lines, skip = 1, header = TRUE)
+    N_content_df <- read.delim(text = section_lines, header = TRUE)
     colnames(N_content_df) <- c("base", "percent_N")
     round(max(N_content_df$percent_N), digits = 2)
   }
