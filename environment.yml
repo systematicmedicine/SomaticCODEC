@@ -6,49 +6,48 @@ channels:
 dependencies:
   # Core Python
   - python=3.9
-  - pip
+  - pip=25.1.1
 
   # Python libraries
-  - biopython
-  - cyvcf2
-  - matplotlib
-  - numpy
-  - pandas
-  - pysam
-  - pytest
-  - quicksect
-  - scipy
-  - seaborn
+  - biopython=1.85
+  - cyvcf2=0.31.1
+  - matplotlib=3.9.4
+  - numpy=2.0.2
+  - pandas=2.3.1
+  - pysam=0.23.3
+  - pytest=8.4.1
+  - quicksect=0.2.2
+  - scipy=1.13.1
+  - seaborn=0.13.2
 
   # Bioinformatics tools
-  - bcftools
-  - bedops
-  - bedtools
-  - bwa-mem2
-  - cutadapt
-  - fastp
-  - fastqc
-  - gatk4
-  - graphviz
-  - picard
-  - samtools
-  - seqkit
-  - snakemake
-  - umi_tools
-  - varscan
+  - bcftools=1.22
+  - bedops=2.4.42
+  - bedtools=2.31.1
+  - bwa-mem2=2.3
+  - cutadapt=5.1
+  - fastp=1.0.1
+  - fastqc=0.12.1
+  - gatk4=4.6.2.0
+  - graphviz=12.2.1
+  - picard=3.4.0
+  - samtools=1.22.1
+  - seqkit=2.10.0
+  - snakemake=7.32.4
+  - umi_tools=1.1.6
   
   # R packages
-  - r-dplyr
-  - r-jsonlite
+  - r-dplyr=1.1.4
+  - r-jsonlite=2.0.0
 
   # System utilities
-  - click
-  - perl
-  - python-graphviz
-  - r-base
-  - tmux
+  - click=8.1.8
+  - perl=5.32.1
+  - python-graphviz=0.21
+  - r-base=4.4.2
+  - tmux=3.5
 
   # pip-only packages (not in conda-forge/bioconda)
   - pip:
-      - awscli
-      - pytest-order
+      - awscli==1.41.13
+      - pytest-order==1.3.0
