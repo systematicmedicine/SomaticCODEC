@@ -1,0 +1,54 @@
+name: codec-env
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  # Core Python
+  - python=3.9
+  - pip
+
+  # Python libraries
+  - biopython
+  - cyvcf2
+  - matplotlib
+  - numpy
+  - pandas
+  - pysam
+  - pytest
+  - quicksect
+  - scipy
+  - seaborn
+
+  # Bioinformatics tools
+  - bcftools
+  - bedops
+  - bedtools
+  - bwa-mem2
+  - cutadapt
+  - fastp
+  - fastqc
+  - gatk4
+  - graphviz
+  - picard
+  - samtools
+  - seqkit
+  - snakemake
+  - umi_tools
+  - varscan
+  
+  # R packages
+  - r-dplyr
+  - r-jsonlite
+
+  # System utilities
+  - click
+  - perl
+  - python-graphviz
+  - r-base
+  - tmux
+
+  # pip-only packages (not in conda-forge/bioconda)
+  - pip:
+      - awscli
+      - pytest-order
