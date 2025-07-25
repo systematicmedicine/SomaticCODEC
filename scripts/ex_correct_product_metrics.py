@@ -12,16 +12,22 @@ To be considered a CODECseq correct product, the following criteria must be met:
 A large proportion (>20%) of CODECseq byproducts are expected to be intermolecular byproducts, where a different dsDNA molecule binds to each end of the adapter quadruplex.
 These byproducts should mainly be filtered in step 2 above. 
 
-The correct product is calculated as number of properly paired read pairs in the aligned bam for all samples in the lane divided by total reads in the lane
+The correct product is calculated as number of properly paired read pairs in the aligned BAM for all samples in the lane divided by total reads in the lane
 
 Number filtered as singleton reads (filtered_missingread), and filtered for small insert size (filtered_smallinsertsize) are already factored into the above calculation.
  
 Author: James Phie
 """
 
+# Import libraries
 import json
 import pandas as pd
 import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
+sys.path.insert(0, str(PROJECT_ROOT))
+import scripts.get_metadata as md
 
 # Redirect stdout and stderr to the Snakemake log file
 sys.stdout = open(snakemake.log[0], "a")
@@ -33,9 +39,12 @@ demux_json = snakemake.input.demux_json
 filter_insertlengths = snakemake.input.filter_length
 filter_meanquality = snakemake.input.filter_meanquality
 flagstats = snakemake.input.flagstats
-samples = snakemake.params.samples
-output_file = snakemake.output[0] 
+output_file = snakemake.output.file_path 
 lane = snakemake.wildcards.ex_lane
+config = snakemake.config
+
+# Get ex_sample metadata
+ex_samples = md.get_ex_sample_ids(config)
 
 # Load global adapter match stats from demux_report
 with open(demux_json) as f:
@@ -61,7 +70,7 @@ total_filtered_mapping = 0
 total_correct = 0
 
 # Iterate using explicit sample order
-for sample, insert_path, meanqual_path, flagstat_path in zip(samples, filter_insertlengths, filter_meanquality, flagstats):
+for sample, insert_path, meanqual_path, flagstat_path in zip(ex_samples, filter_insertlengths, filter_meanquality, flagstats):
     # Too short filter
     with open(insert_path) as f:
         insertlength_data = json.load(f)
