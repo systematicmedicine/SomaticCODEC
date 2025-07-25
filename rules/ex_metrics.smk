@@ -12,9 +12,6 @@ Authors:
 # Import modules
 import scripts.get_metadata as md
 
-# Legacy use of global variables yet to be refactored out
-ex_samples = pd.read_csv(config["ex_samples_path"])
-ex_lane_to_sample = ex_samples.groupby("lane")["ex_sample"].apply(list).to_dict()
 
 """
 FastQC on raw fastq files (before demultiplexing or any processing)
@@ -104,14 +101,23 @@ Replace default index names with experiment specific sample names as defined in 
 """
 rule ex_correctproduct_metrics:
     input:
+        ex_samples = config["ex_samples_path"],
+        ex_lanes = config["ex_lanes_path"],        
         demux_json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
-        filter_length = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
-        filter_meanquality = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json", ex_sample=ex_lane_to_sample[wildcards.ex_lane]),
-        flagstats = lambda wildcards: expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample=ex_lane_to_sample[wildcards.ex_lane])
+        filter_length = lambda wildcards: expand(
+            "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
+            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
+        ),
+        filter_meanquality = lambda wildcards: expand(
+            "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json",
+            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
+        ),
+        flagstats = lambda wildcards: expand(
+            "metrics/{ex_sample}/{ex_sample}_map_metrics.txt",
+            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
+        ),
     output:
-        "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
-    params:
-        samples = lambda wildcards: ex_lane_to_sample[wildcards.ex_lane]
+        file_path = "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
     log:
         "logs/{ex_lane}/ex_correctproduct_metrics.log"
     benchmark:
@@ -153,9 +159,10 @@ Duplication rate calculated based on unique UMI families output from ex_groupbyu
 """
 rule ex_duplication_metrics:
     input:
-        expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample=ex_samples["ex_sample"].tolist())
+        ex_samples = config["ex_samples_path"],
+        umi_metrics = expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample = md.get_ex_sample_ids(config))
     output:
-        "metrics/ex_duplication_metrics.txt"
+        file_path = "metrics/ex_duplication_metrics.txt"
     log:
         "logs/ex_duplication_metrics.log"
     benchmark:
@@ -169,12 +176,13 @@ Custom python script to assess demultiplexing
 """
 rule ex_raw_read_counts_metrics:
     input:
+        ex_samples = config["ex_samples_path"],
+        ex_lanes = config["ex_lanes_path"],
         json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
     output:
         readcounts = "metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt"
     params:
-        fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta",
-        used = ex_samples
+        fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta"
     log:
         "logs/{ex_lane}/ex_raw_read_counts_metrics.log"
     benchmark:

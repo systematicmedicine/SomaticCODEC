@@ -12,6 +12,11 @@ Author: James Phie
 import json
 import pandas as pd
 import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
+sys.path.insert(0, str(PROJECT_ROOT))
+import scripts.get_metadata as md
 
 # Redirect stdout and stderr to the Snakemake log file
 sys.stdout = open(snakemake.log[0], "a")
@@ -23,14 +28,10 @@ json_path = snakemake.input.json
 output_path = snakemake.output.readcounts
 fasta_path = snakemake.params.fasta  # Not used currently, but preserved for future use
 lane = snakemake.wildcards.ex_lane
-df = snakemake.params.used
-
-# Validate lane exists
-if lane not in df["lane"].unique():
-    raise ValueError(f"Lane '{lane}' not found in ex_samples.csv.")
+config = snakemake.config
 
 # Extract expected samples from this lane
-used_samples = sorted(df[df["lane"] == lane]["ex_sample"])
+used_samples = md.get_ex_lane_samples(config)[lane]
 
 # Load demux JSON
 with open(json_path) as f:
