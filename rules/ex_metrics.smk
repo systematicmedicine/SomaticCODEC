@@ -170,6 +170,8 @@ Custom python script to assess demultiplexing
 """
 rule ex_raw_read_counts_metrics:
     input:
+        ex_samples = config["ex_samples_path"],
+        ex_lanes = config["ex_lanes_path"],
         json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
     output:
         readcounts = "metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt"
