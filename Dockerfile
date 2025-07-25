@@ -1,76 +1,56 @@
+# ------------------------------------------------------------------------------
+# Dockerfile for the codec-opensource pipeline
+#
+# Description : Builds a Docker image with all dependencies needed to run
+#               the Snakemake-based bioinformatics pipeline for variant calling.
+# Maintainers : Cameron Fraser, James Phie <info@systematicmedicine.com>
+# Base image  : Ubuntu:24.04
+# Notes       : fgbio is built from a custom commit for duplex support.
+# ------------------------------------------------------------------------------
+
+# Define base image
 FROM ubuntu:24.04
 
-# Set working directory (overridden later to /work)
-WORKDIR /root
-
-# Avoid interactive prompts during package installs
+# Configure environment
 ENV DEBIAN_FRONTEND=noninteractive
-
-# Set PATH for conda and conda env
 ENV PATH="/opt/conda/bin:/opt/conda/envs/codec-env/bin:/root/.cargo/bin:$PATH"
-
-# Use bash as default shell
 SHELL ["/bin/bash", "-c"]
 
-# Install system dependencies (including Java runtime for fgbio)
-RUN apt-get update && apt-get install -y \
-    wget curl git nano python3-pip unzip default-jdk \
-    ca-certificates bzip2 liblzma-dev zlib1g-dev libbz2-dev \
-    build-essential openjdk-11-jre r-base \
-    && pip install --break-system-packages awscli \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install Linux packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    nano \
+    unzip \
+    wget \
+    default-jdk \
+    openjdk-11-jre \
+    python3-pip \
+    r-base \
+    bzip2 \
+    ca-certificates \
+    libbz2-dev \
+    liblzma-dev \
+    zlib1g-dev \
+    gnupg && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_24.1.2-0-Linux-x86_64.sh -O miniconda.sh && \
-    bash miniconda.sh -b -p /opt/conda && \
-    rm miniconda.sh && \
-    /opt/conda/bin/conda init bash
+# Install Conda packages using Mambaforge
+ENV MINIFORGE_VERSION=25.3.0-3
+ENV MINIFORGE_URL=https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-Linux-x86_64.sh
 
-# Create and populate conda environment
-RUN /opt/conda/bin/conda create -y -n codec-env python=3.9 && \
-    /opt/conda/bin/conda run -n codec-env conda install -y -c conda-forge -c bioconda \
-        bwa-mem2 \
-        tmux \
-        samtools \
-        #fgbio \ This will be added in place of feature branch build once CallCodecConsensusReads is added to fgbio
-        picard \
-        gatk4 \
-        bcftools \
-        bedops \
-        pandas \
-        seaborn \
-        pysam \
-        numpy \
-        matplotlib \
-        scipy \
-        biopython \
-        cyvcf2 \
-        click \
-        quicksect \
-        snakemake \
-        seqkit \
-        bedtools \
-        fastqc \
-        cutadapt \
-        fastp \
-        umi_tools \
-        graphviz \
-        python-graphviz \
-        varscan \
-        pytest \
-        perl && \
-    /opt/conda/bin/conda clean -afy
+RUN wget --quiet ${MINIFORGE_URL} -O miniforge.sh && \
+    bash miniforge.sh -b -p /opt/conda && \
+    rm miniforge.sh
 
-# Make varscan available as a direct command
-RUN VARSCAN_JAR=$(find /opt/conda/envs/codec-env -name 'VarScan.jar') && \
-    echo -e '#!/bin/bash\nexec java -jar '"$VARSCAN_JAR"' "$@"' > /opt/conda/envs/codec-env/bin/varscan && \
-    chmod +x /opt/conda/envs/codec-env/bin/varscan
+COPY environment.yml /tmp/environment.yml
+RUN conda env create -f /tmp/environment.yml && conda clean -afy
 
-# Install required R packages
-RUN Rscript -e 'install.packages(c("dplyr", "jsonlite"), repos="https://mirror.aarnet.edu.au/pub/CRAN/")' \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+ENV PATH="/opt/conda/envs/codec-env/bin:/opt/conda/bin:/root/.cargo/bin:$PATH"
+ENV CONDA_DEFAULT_ENV=codec-env
 
-# Install feature branch of fgbio at commit d93b8c3 (supports duplex agreement and ssc filters)
+# Install fgbio feature branch
 RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | \
     gpg --dearmor > /usr/share/keyrings/sbt-keyring.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/sbt-keyring.gpg] https://repo.scala-sbt.org/scalasbt/debian all main" \
@@ -86,15 +66,9 @@ RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A7564
     chmod +x /usr/local/bin/fgbio && \
     rm -rf ~/.sbt ~/.ivy2 ~/.cache /var/lib/apt/lists/*
 
-# Optional: set workdir and default entrypoint
+# Cleanup
 WORKDIR /work
-
-# Auto-activate codec-env when bash starts
-RUN echo "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env" >> ~/.bashrc
-
-# Declare volume and set default working directory
 VOLUME ["/work"]
-WORKDIR /work
 
-# Default command: activate env and launch bash
+RUN echo "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env" >> ~/.bashrc
 CMD ["bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env && exec bash"]
