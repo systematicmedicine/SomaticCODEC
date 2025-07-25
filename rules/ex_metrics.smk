@@ -174,8 +174,7 @@ rule ex_raw_read_counts_metrics:
     output:
         readcounts = "metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt"
     params:
-        fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta",
-        used = ex_samples
+        fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta"
     log:
         "logs/{ex_lane}/ex_raw_read_counts_metrics.log"
     benchmark:
