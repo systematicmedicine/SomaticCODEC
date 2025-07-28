@@ -3,7 +3,7 @@
 
 This tests forces the creation of fixtures required for downstream tests.
 
-The purpose of this is to seperate errors that occur in creation of these fixtures, from genuine test cases failing
+The purpose of this is to decouple fixture creation from the running of dependent tests
 
 Author: Cameron Fraser
 """
