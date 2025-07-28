@@ -25,8 +25,15 @@ except Exception as e:
 # -- Determine project root using Git --
 def get_git_root():
     try:
-        return subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).decode().strip()
-    except subprocess.CalledProcessError as e:
+        git_root = subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).decode().strip()
+
+        # Ensure Git accepts the root as a safe directory
+        subprocess.run(
+            ["git", "config", "--global", "--add", "safe.directory", git_root],
+            check=False,
+        )
+        return git_root
+    except subprocess.CalledProcessError:
         raise RuntimeError("Not a Git repository or unsafe directory")
 
 GIT_ROOT = get_git_root()
