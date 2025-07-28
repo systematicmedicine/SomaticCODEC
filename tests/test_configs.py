@@ -11,9 +11,17 @@ Authors:
     - Cameron Fraser
 """
 
+# Import libraries
 import pytest
 import yaml
 from pathlib import Path
+import pytest
+
+# Pytest marking
+pytestmark = [
+    pytest.mark.quicktests,
+    pytest.mark.order(2)
+]
 
 # --- CONFIG ---
 
