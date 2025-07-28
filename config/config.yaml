@@ -3,15 +3,20 @@
 experiment_name: experiment_1
 
 # Rule parameters
-ms_trim_fastq:
-  adaptor_1: CTGTCTCTTATACACATCT
-  adaptor_2: ATGTGTATAAGAGACA
+ex_filter_fastq:
+  min_read_length: 70
+  average_quality_threshold: 34
+  n_base_limit: 3
+
+ms_candidate_germ_variants:
+  memory_limit_gb: 32
 
 ms_low_depth_mask:
   threshold: 30
 
-ms_candidate_germ_variants:
-  memory_limit_gb: 32
+ms_trim_fastq:
+  adaptor_1: CTGTCTCTTATACACATCT
+  adaptor_2: ATGTGTATAAGAGACA
 
 # File paths
 GRCh38_path: tmp/downloads/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
