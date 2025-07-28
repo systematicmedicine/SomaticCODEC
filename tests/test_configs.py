@@ -20,7 +20,7 @@ import pytest
 # Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(2)
+    pytest.mark.order(3)
 ]
 
 # --- CONFIG ---

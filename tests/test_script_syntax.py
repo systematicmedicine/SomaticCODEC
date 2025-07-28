@@ -19,7 +19,7 @@ import pytest
 # Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(1)
+    pytest.mark.order(2)
 ]
 
 # Allowed extensions
