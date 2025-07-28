@@ -67,9 +67,20 @@ RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A7564
     chmod +x /usr/local/bin/fgbio && \
     rm -rf ~/.sbt ~/.ivy2 ~/.cache /var/lib/apt/lists/*
 
+# Copy Dockerfile & checksum to image-info
+COPY Dockerfile /tmp/Dockerfile
+RUN mkdir -p /image-info && \
+    cp /tmp/Dockerfile /image-info/Dockerfile && \
+    sha256sum /image-info/Dockerfile | awk '{print $1}' > /image-info/dockerfile.sha256
+
 # Cleanup
+RUN rm -rf ~/.sbt ~/.ivy2 ~/.cache /var/lib/apt/lists/* /tmp/Dockerfile
+
 WORKDIR /work
 VOLUME ["/work"]
+
+ENV GIT_CONFIG_GLOBAL=/etc/gitconfig
+RUN git config --system --add safe.directory /work/codec-opensource
 
 RUN echo "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env" >> ~/.bashrc
 CMD ["bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate codec-env && exec bash"]
