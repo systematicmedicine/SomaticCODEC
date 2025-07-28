@@ -30,11 +30,13 @@ rule ex_fastqcraw_metrics:
         "logs/{ex_lane}/ex_fastqcraw_metrics.log"
     benchmark:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
+    threads: 
+        4
     shell:
         """
-        fastqc {input.fastq1} -o metrics/ 2>> {log}
+        fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
 
-        fastqc {input.fastq2} -o metrics/ 2>> {log}
+        fastqc -t {threads} {input.fastq2} -o metrics/ 2>> {log}
 
         mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1} 2>> {log}
 
@@ -62,11 +64,13 @@ rule ex_fastqctrim_metrics:
         "logs/{ex_sample}/ex_fastqctrim_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
+    threads: 
+        4
     shell:
         """
-        fastqc {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
+        fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
 
-        fastqc {input.fastq2} -o metrics/{wildcards.ex_sample} 2>> {log}
+        fastqc -t {threads} {input.fastq2} -o metrics/{wildcards.ex_sample} 2>> {log}
 
         mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1} 2>> {log}
 

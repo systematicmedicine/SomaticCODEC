@@ -28,7 +28,7 @@ rule ms_raw_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
     threads: 
-        max(1, os.cpu_count() // 16)
+        4
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)
@@ -57,7 +57,7 @@ rule ms_processed_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_processed_fastq_metrics.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 16)
+        4
     shell:
         """        
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2} 2>> {log}
