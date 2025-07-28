@@ -10,9 +10,17 @@ Authors:
     - Cameron Fraser
 
 """
+# Import libraries
 import subprocess
 import pytest
 from pathlib import Path
+import pytest
+
+# Pytest marking
+pytestmark = [
+    pytest.mark.quicktests,
+    pytest.mark.order(1)
+]
 
 # Allowed extensions
 ALLOWED_EXTS = {".py", ".sh", ".R"}
