@@ -11,8 +11,16 @@ Authors:
     - Chat-GPT
 """
 
+# Import libraries
 import subprocess
 from pathlib import Path
+import pytest
+
+# Pytest marking
+pytestmark = [
+    pytest.mark.quicktests,
+    pytest.mark.order(4)
+]
 
 def test_snakemake_dryrun():
      

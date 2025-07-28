@@ -6,7 +6,9 @@
 
 For each file, the file type is determined from the file extenstion
 
-Author: Cameron Fraser
+Authors:
+    - Cameron Fraser
+    - Joshua Johnstone
 
 """
 
@@ -16,6 +18,8 @@ from pathlib import Path
 import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from utils.count_data_points import count_data_points
+
+pytestmark = pytest.mark.order(6)
 
 """ (1) Test that all expected files exist"""
 def test_expected_outputs_exist(lightweight_test_run, expected_files_list):
