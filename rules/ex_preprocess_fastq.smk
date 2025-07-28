@@ -173,9 +173,9 @@ rule ex_trim_fastq:
 
 """
 Filter reads
-    - Remove reads that are < 70bp
-    - Remove reads with mean quality <Q36
-    - Remove reads with >3 N bases
+    - Remove reads that are too short
+    - Remove reads where the mean quality score is too low
+    - Remove reads with too many N bases
 """ 
 rule ex_filter_fastq:
     input: 
@@ -188,6 +188,10 @@ rule ex_filter_fastq:
         intermediate_r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter_tmp.fastq.gz"),
         json_length = "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
         json_meanquality = "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json",
+    params:
+        min_read_length = config["ex_filter_fastq"]["min_read_length"],
+        average_quality_threshold = config["ex_filter_fastq"]["average_quality_threshold"],
+        n_base_limit = config["ex_filter_fastq"]["n_base_limit"],
     log:
         "logs/{ex_sample}/ex_filter.log"
     benchmark:
@@ -201,9 +205,9 @@ rule ex_filter_fastq:
           -I {input.r2} \
           -o {output.intermediate_r1} \
           -O {output.intermediate_r2} \
-          --length_required 70 \
+          --length_required {params.min_read_length} \
           --disable_quality_filtering \
-          --n_base_limit 49 \
+          --n_base_limit 50 \
           --disable_adapter_trimming \
           --thread {threads} \
           --html /dev/null \
@@ -214,8 +218,8 @@ rule ex_filter_fastq:
           -I {output.intermediate_r2} \
           -o {output.r1} \
           -O {output.r2} \
-          --average_qual 36 \
-          --n_base_limit 3 \
+          --average_qual {params.average_quality_threshold} \
+          --n_base_limit {params.n_base_limit} \
           --disable_adapter_trimming \
           --thread {threads} \
           --html /dev/null \

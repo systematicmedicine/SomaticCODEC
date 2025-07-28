@@ -1,17 +1,22 @@
 ---
 # Experiment name
-experiment_name: lightweight_test_run
+experiment_name: dryrun
 
 # Rule parameters
-ms_trim_fastq:
-  adaptor_1: CTGTCTCTTATACACATCT
-  adaptor_2: ATGTGTATAAGAGACA
+ex_filter_fastq:
+  min_read_length: 70
+  average_quality_threshold: 34
+  n_base_limit: 3
+
+ms_candidate_germ_variants:
+  memory_limit_gb: 4
 
 ms_low_depth_mask:
   threshold: 1
 
-ms_candidate_germ_variants:
-  memory_limit_gb: 4
+ms_trim_fastq:
+  adaptor_1: CTGTCTCTTATACACATCT
+  adaptor_2: ATGTGTATAAGAGACA
 
 # File paths
 GRCh38_path: tests/data/dryrun/GRCh38_Chr21.fna
