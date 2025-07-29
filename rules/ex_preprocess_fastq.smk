@@ -118,6 +118,13 @@ rule ex_trim_fastq:
         intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
         intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     params:
+        max_adapter_errors = config["ex_trim_fastq"]["max_adapter_errors"],
+        min_adapter_overlap = ["ex_trim_fastq"]["min_adapter_overlap"],
+        quality_cutoff = config["ex_trim_fastq"]["quality_cutoff"],
+        r1_cut_start = config["ex_trim_fastq"]["r1_cut_start"],
+        r2_cut_start = config["ex_trim_fastq"]["r2_cut_start"],
+        r1_cut_end = config["ex_trim_fastq"]["r1_cut_end"],
+        r2_cut_end = config["ex_trim_fastq"]["r2_cut_end"],
         r1_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_start"],
         r1_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_end"],
         r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
@@ -132,7 +139,7 @@ rule ex_trim_fastq:
         """
         cutadapt \
           -j {threads} \
-          -e 2 \
+          --error-rate {params.max_adapter_errors} \
           -g ^{params.r1_start} \
           -G ^{params.r2_start} \
           -o {output.intermediate_r1_1} \
@@ -142,8 +149,8 @@ rule ex_trim_fastq:
 
         cutadapt \
           -j {threads} \
-          -e 2 \
-          --overlap 8 \
+          --error-rate {params.max_adapter_errors} \
+          --overlap {params.min_adapter_overlap} \
           -b {params.r1_end} \
           -o {output.intermediate_r1_2} \
           {output.intermediate_r1_1} \
@@ -151,8 +158,8 @@ rule ex_trim_fastq:
 
         cutadapt \
           -j {threads} \
-          -e 2 \
-          --overlap 8 \
+          --error-rate {params.max_adapter_errors} \
+          --overlap {params.min_adapter_overlap} \
           -b {params.r2_end} \
           -o {output.intermediate_r2_2} \
           {output.intermediate_r2_1} \
@@ -160,11 +167,11 @@ rule ex_trim_fastq:
 
         cutadapt \
           -j {threads} \
-          -u 3 \
-          -U 3 \
-          -u -9 \
-          -U -9 \
-          --quality-cutoff 20 \
+          -u {params.r1_cut_start} \
+          -U {params.r2.cut_start} \
+          -u {params.r1.cut_end} \
+          -U {params.r2.cut_end} \
+          --quality-cutoff {params.quality_cutoff} \
           -o {output.r1} \
           -p {output.r2} \
           {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
