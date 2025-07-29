@@ -31,8 +31,8 @@ rule ex_call_somatic_snv:
         intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
         intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
     params:
-        max_base_quality = confg["ex_call_somatic_snv"]["max_base_quality"],
-        min_base_quality = confg["ex_call_somatic_snv"]["min_base_quality"]
+        max_base_quality = config["ex_call_somatic_snv"]["max_base_quality"],
+        min_base_quality = config["ex_call_somatic_snv"]["min_base_quality"]
     log:
         "logs/{ex_sample}/ex_call_somatic_snv.log"
     benchmark:
