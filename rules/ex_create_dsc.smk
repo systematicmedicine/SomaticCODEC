@@ -33,6 +33,8 @@ rule ex_annotate_map:
         intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
         intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam")
+    params:
+        min_umi_length = config["ex_annotate_map"]["min_umi_length"]
     log:
         "logs/{ex_sample}/annotate_bam.log"
     benchmark:
@@ -59,7 +61,7 @@ rule ex_annotate_map:
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             --compression 1 --async-io \
             GroupReadsByUmi \
-            --min-umi-length 6 \
+            --min-umi-length {params.min_umi_length} \
             -i {output.intermediate_mateinfo} \
             -o {output.intermediate_groupbyumi} \
             -f {output.histogram} \
@@ -116,6 +118,10 @@ rule ex_call_dsc:
         bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam")
+    params:
+        max_duplex_disagreements = config["ex_call_dsc"]["max_duplex_disagreements"],
+        min_read_pairs = config["ex_call_dsc"]["min_read_pairs"],
+        single_strand_qual = config["ex_call_dsc"]["single_strand_qual"]
     log:
         "logs/{ex_sample}/ex_call_dsc.log"
     benchmark:
@@ -128,9 +134,9 @@ rule ex_call_dsc:
          CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
-            --max-duplex-disagreements 3 \
-            --single-strand-qual 2 \
-            -M 1 2>> {log}
+            --max-duplex-disagreements {params.max_duplex_disagreements} \
+            --single-strand-qual {params.single_strand_qual} \
+            --min-read-pairs {params.min_read_pairs} 2>> {log}
         """
 
 
@@ -204,6 +210,8 @@ rule ex_annotate_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
         intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
+    params:
+        min_mapq = config["ex_filter_dsc"]["min_mapq"]
     log:
         "logs/{ex_sample}/ex_annotate_dsc.log"
     benchmark:
@@ -230,7 +238,7 @@ rule ex_annotate_dsc:
 
 """
 Filter reads from DSC
-    - Remove reads with mapQ <= 60
+    - Remove reads with low MAPQ
 """
 rule ex_filter_dsc:
     input:
@@ -239,13 +247,19 @@ rule ex_filter_dsc:
         intermediate_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered_unsorted.bam"),
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
+    params:
+        min_mapq = config["ex_filter_dsc"]["min_mapq"]
     log:
         "logs/{ex_sample}/ex_filter_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
     shell:
         """
-        samtools view -b -q 60 {input.bam} > {output.intermediate_bam} 2>> {log}
+        samtools view -b \
+        --min-MQ {params.min_mapq} \
+        {input.bam} > {output.intermediate_bam} 2>> {log}
+        
         samtools sort -o {output.bam} {output.intermediate_bam} 2>> {log}
+        
         samtools index {output.bam} 2>> {log}
         """

@@ -10,6 +10,17 @@ experiment_name: experiment_1
 # Rule parameters
 # ------------------------------------------------------------------------------
 
+ex_annotate_map:
+  min_umi_length: 6
+
+ex_call_dsc:
+  max_duplex_disagreements: 3
+  min_read_pairs: 1
+  single_strand_qual: 2
+
+ex_filter_dsc:
+  min_mapq: 60
+
 ex_filter_fastq:
   min_read_length: 70
   average_quality_threshold: 34

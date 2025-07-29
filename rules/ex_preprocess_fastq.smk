@@ -119,7 +119,7 @@ rule ex_trim_fastq:
         intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     params:
         max_adapter_errors = config["ex_trim_fastq"]["max_adapter_errors"],
-        min_adapter_overlap = ["ex_trim_fastq"]["min_adapter_overlap"],
+        min_adapter_overlap = config["ex_trim_fastq"]["min_adapter_overlap"],
         quality_cutoff = config["ex_trim_fastq"]["quality_cutoff"],
         r1_cut_start = config["ex_trim_fastq"]["r1_cut_start"],
         r2_cut_start = config["ex_trim_fastq"]["r2_cut_start"],
