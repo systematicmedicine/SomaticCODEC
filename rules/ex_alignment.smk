@@ -27,6 +27,19 @@ rule ex_map:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
+    params:
+        band_width = config["ex_map"]["band_width"],
+        clipping_penalty = config["ex_map"]["clipping_penalty"],
+        gap_extension_penalty = config["ex_map"]["gap_extension_penalty"],
+        gap_open_penalty = config["ex_map"]["gap_open_penalty"],
+        matching_score = config["ex_map"]["matching_score"],
+        mem_max_occurances = config["ex_map"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["ex_map"]["min_alignment_score_thresh"],
+        min_seed_length = config["ex_map"]["min_seed_length"],
+        mismatch_penalty = config["ex_map"]["mismatch_penalty"],
+        reseed_factor = config["ex_map"]["reseed_factor"],
+        unpaired_read_penalty = config["ex_map"]["unpaired_read_penalty"],
+        z_dropoff = config["ex_map"]["z_dropoff"]
     log:
         "logs/{ex_sample}/ex_map.log"
     benchmark:
@@ -35,7 +48,22 @@ rule ex_map:
         max(1, os.cpu_count() // 4)
     shell:
         """
-        bwa-mem2 mem -t {threads} -Y {input.ref} {input.fastq1} {input.fastq2} > {output.intermediate_sam} 2>> {log}
+        bwa-mem2 mem \
+        -t {threads} \
+        -k {params.min_seed_length} \
+        -w {params.band_width} \
+        -d {params.z_dropoff} \
+        -r {params.reseed_factor} \
+        -c {params.mem_max_occurances} \
+        -A {params.matching_score} \
+        -B {params.mismatch_penalty} \
+        -O {params.gap_open_penalty} \
+        -E {params.gap_extension_penalty} \
+        -L {params.clipping_penalty} \
+        -U {params.unpaired_read_penalty} \
+        -T {params.min_alignment_score_thresh} \
+        -Y \
+        {input.ref} {input.fastq1} {input.fastq2} > {output.intermediate_sam} 2>> {log}
 
         samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """

@@ -18,7 +18,7 @@ Authors:
 Call somatic variants
     - Current version only calls SNVs
 """
-rule ex_call_somatic_variants:
+rule ex_call_somatic_snv:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
         bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
@@ -30,18 +30,21 @@ rule ex_call_somatic_variants:
         intermediate_mpileup = temp("tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf"),
         intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
         intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
+    params:
+        max_base_quality = config["ex_call_somatic_snv"]["max_base_quality"],
+        min_base_quality = config["ex_call_somatic_snv"]["min_base_quality"]
     log:
-        "logs/{ex_sample}/ex_call_somatic_variants.log"
+        "logs/{ex_sample}/ex_call_somatic_snv.log"
     benchmark:
-        "logs/{ex_sample}/ex_call_somatic_variants.benchmark.txt"
+        "logs/{ex_sample}/ex_call_somatic_snv.benchmark.txt"
     shell:
         """
         bcftools mpileup \
             --fasta-ref {input.ref} \
             --output-type b \
             --count-orphans \
-            --max-BQ 150 \
-            --min-BQ 70 \
+            --max-BQ {params.max_base_quality} \
+            --min-BQ {params.min_base_quality} \
             --min-MQ 0 \
             --no-BAQ \
             --annotate AD,DP \
