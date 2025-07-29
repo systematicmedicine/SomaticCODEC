@@ -30,6 +30,34 @@ ex_filter_fastq:
   average_quality_threshold: 34
   n_base_limit: 3
 
+ex_map:
+  band_width: 100
+  gap_extension_penalty: 1
+  clipping_penalty: 5
+  gap_open_penalty: 6
+  matching_score: 1
+  mem_max_occurances: 10000
+  min_alignment_score_thresh: 30
+  min_seed_length: 19
+  mismatch_penalty: 4
+  reseed_factor: 1.5
+  unpaired_read_penalty: 9
+  z_dropoff: 100
+
+ex_remap_dsc:
+  band_width: 100
+  gap_extension_penalty: 1
+  clipping_penalty: 5
+  gap_open_penalty: 6
+  matching_score: 1
+  mem_max_occurances: 10000
+  min_alignment_score_thresh: 30
+  min_seed_length: 19
+  mismatch_penalty: 4
+  reseed_factor: 1.5
+  unpaired_read_penalty: 9
+  z_dropoff: 100
+
 ex_trim_fastq:
   max_adapter_errors: 2
   min_adapter_overlap: 8

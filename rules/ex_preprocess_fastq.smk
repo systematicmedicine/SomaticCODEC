@@ -168,9 +168,9 @@ rule ex_trim_fastq:
         cutadapt \
           -j {threads} \
           -u {params.r1_cut_start} \
-          -U {params.r2.cut_start} \
-          -u {params.r1.cut_end} \
-          -U {params.r2.cut_end} \
+          -U {params.r2_cut_start} \
+          -u {params.r1_cut_end} \
+          -U {params.r2_cut_end} \
           --quality-cutoff {params.quality_cutoff} \
           -o {output.r1} \
           -p {output.r2} \
