@@ -39,9 +39,8 @@ rule ms_extract_fastq_umis:
         """
         cutadapt \
           -j {threads} \
-          --cut 3 \
-          -U 3 \
-          --rename='{{id}}:{{r1.cut_prefix}}{{r2.cut_prefix}}' \
+          --cut 12 \
+          --rename='{{id}}:{{r1.cut_prefix}}' \
           -o {output.r1} \
           -p {output.r2} \
           {input.r1} {input.r2} 2>> {log}

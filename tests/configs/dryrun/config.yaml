@@ -74,8 +74,8 @@ ms_low_depth_mask:
   threshold: 1
 
 ms_trim_fastq:
-  adaptor_1: CTGTCTCTTATACACATCT
-  adaptor_2: ATGTGTATAAGAGACA
+  adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+  adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
 
 
 # ------------------------------------------------------------------------------

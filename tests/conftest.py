@@ -50,10 +50,10 @@ def lightweight_test_run():
 
     files_to_copy = [
         "GRCh38_Chr21_plus_stubs.fna",
-        "Buffy_old_500Kreads_R1.fastq.gz",
-        "Buffy_old_500Kreads_R2.fastq.gz",
-        "Buffy_young_500Kreads_R1.fastq.gz",
-        "Buffy_young_500Kreads_R2.fastq.gz",
+        "S004_Chr21_10000reads_r1.fastq.gz",
+        "S004_Chr21_10000reads_r2.fastq.gz",
+        "S005_Chr21_10000reads_r1.fastq.gz",
+        "S005_Chr21_10000reads_r2.fastq.gz",
         "GRCh38_alldifficultregions_10lines.bed",
         "gnomad_common_af01_merged_10lines.bed",
         "ex_lane1_Chr21_10000reads_r1.fastq.gz",
@@ -83,5 +83,5 @@ def lightweight_test_run():
     yield
 
     # Cleanup test environmnt
-    #clean_workspace()
+    clean_workspace()
 
