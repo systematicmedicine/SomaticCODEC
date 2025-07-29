@@ -18,6 +18,10 @@ ex_call_dsc:
   min_read_pairs: 1
   single_strand_qual: 2
 
+ex_call_somatic_snv:
+  max_base_quality: 150
+  min_base_quality: 70
+
 ex_filter_dsc:
   min_mapq: 60
 
