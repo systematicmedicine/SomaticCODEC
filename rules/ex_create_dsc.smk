@@ -33,6 +33,8 @@ rule ex_annotate_map:
         intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
         intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam")
+    params:
+        min_umi_length = config["ex_annotate_map"]["min_umi_length"]
     log:
         "logs/{ex_sample}/annotate_bam.log"
     benchmark:
@@ -59,7 +61,7 @@ rule ex_annotate_map:
         JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
             --compression 1 --async-io \
             GroupReadsByUmi \
-            --min-umi-length 6 \
+            --min-umi-length {params.min_umi_length} \
             -i {output.intermediate_mateinfo} \
             -o {output.intermediate_groupbyumi} \
             -f {output.histogram} \
@@ -116,6 +118,10 @@ rule ex_call_dsc:
         bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam")
+    params:
+        max_duplex_disagreements = config["ex_call_dsc"]["max_duplex_disagreements"],
+        min_read_pairs = config["ex_call_dsc"]["min_read_pairs"],
+        single_strand_qual = config["ex_call_dsc"]["single_strand_qual"]
     log:
         "logs/{ex_sample}/ex_call_dsc.log"
     benchmark:
@@ -128,9 +134,9 @@ rule ex_call_dsc:
          CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
-            --max-duplex-disagreements 3 \
-            --single-strand-qual 2 \
-            -M 1 2>> {log}
+            --max-duplex-disagreements {params.max_duplex_disagreements} \
+            --single-strand-qual {params.single_strand_qual} \
+            --min-read-pairs {params.min_read_pairs} 2>> {log}
         """
 
 
@@ -152,6 +158,19 @@ rule ex_remap_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam")
+    params:
+        band_width = config["ex_remap_dsc"]["band_width"],
+        clipping_penalty = config["ex_remap_dsc"]["clipping_penalty"],
+        gap_extension_penalty = config["ex_remap_dsc"]["gap_extension_penalty"],
+        gap_open_penalty = config["ex_remap_dsc"]["gap_open_penalty"],
+        matching_score = config["ex_remap_dsc"]["matching_score"],
+        mem_max_occurances = config["ex_remap_dsc"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["ex_remap_dsc"]["min_alignment_score_thresh"],
+        min_seed_length = config["ex_remap_dsc"]["min_seed_length"],
+        mismatch_penalty = config["ex_remap_dsc"]["mismatch_penalty"],
+        reseed_factor = config["ex_remap_dsc"]["reseed_factor"],
+        unpaired_read_penalty = config["ex_remap_dsc"]["unpaired_read_penalty"],
+        z_dropoff = config["ex_remap_dsc"]["z_dropoff"]
     log:
         "logs/{ex_sample}/ex_remap_dsc.log"
     benchmark:
@@ -162,7 +181,22 @@ rule ex_remap_dsc:
         """
         samtools fastq -0 {output.intermediate_fastq} {input.bam} 2>> {log}
 
-        bwa-mem2 mem -t {threads} -Y {input.ref} {output.intermediate_fastq} > {output.intermediate_sam} 2>> {log}
+        bwa-mem2 mem \
+        -t {threads} \
+        -k {params.min_seed_length} \
+        -w {params.band_width} \
+        -d {params.z_dropoff} \
+        -r {params.reseed_factor} \
+        -c {params.mem_max_occurances} \
+        -A {params.matching_score} \
+        -B {params.mismatch_penalty} \
+        -O {params.gap_open_penalty} \
+        -E {params.gap_extension_penalty} \
+        -L {params.clipping_penalty} \
+        -U {params.unpaired_read_penalty} \
+        -T {params.min_alignment_score_thresh} \
+        -Y \
+        {input.ref} {output.intermediate_fastq} > {output.intermediate_sam} 2>> {log}
 
         samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
@@ -204,6 +238,8 @@ rule ex_annotate_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
         intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
+    params:
+        min_mapq = config["ex_filter_dsc"]["min_mapq"]
     log:
         "logs/{ex_sample}/ex_annotate_dsc.log"
     benchmark:
@@ -230,7 +266,7 @@ rule ex_annotate_dsc:
 
 """
 Filter reads from DSC
-    - Remove reads with mapQ <= 60
+    - Remove reads with low MAPQ
 """
 rule ex_filter_dsc:
     input:
@@ -239,13 +275,19 @@ rule ex_filter_dsc:
         intermediate_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered_unsorted.bam"),
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
+    params:
+        min_mapq = config["ex_filter_dsc"]["min_mapq"]
     log:
         "logs/{ex_sample}/ex_filter_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
     shell:
         """
-        samtools view -b -q 60 {input.bam} > {output.intermediate_bam} 2>> {log}
+        samtools view -b \
+        --min-MQ {params.min_mapq} \
+        {input.bam} > {output.intermediate_bam} 2>> {log}
+        
         samtools sort -o {output.bam} {output.intermediate_bam} 2>> {log}
+        
         samtools index {output.bam} 2>> {log}
         """

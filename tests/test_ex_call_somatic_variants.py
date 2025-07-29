@@ -1,7 +1,7 @@
 """
---- test_ex_call_somatic_variants.py
+--- test_ex_call_somatic_snv.py
 
-Tests the rule ex_call_somatic_variants
+Tests the rule ex_call_somatic_snv
 
 Authors:
     - Chat-GPT
