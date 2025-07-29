@@ -66,7 +66,7 @@ rule ms_processed_fastq_metrics:
 # Generates ms alignment metrics
 rule ms_alignment_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_markdup_map.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
     output:
         stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt",
         insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",

@@ -4,7 +4,7 @@
 Rules for calling and filtering germline variants
 
 Input: 
-    - Aligned, sorted and dulpicate marked BAM
+    - Aligned, sorted and deduplicated BAM
     - GCRh38 human reference genome
 Output: 
     - Filtered VCF file
@@ -16,7 +16,7 @@ Author: Ben Barry
 # Call candidate germline variants (no filtering)
 rule ms_candidate_germ_variants:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_markdup_map.bam",
+        bam = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam",
         ref = config["GRCh38_path"],
         fai = config["GRCh38_path"] + ".fai",
         dictf = os.path.splitext(config["GRCh38_path"])[0] + ".dict"

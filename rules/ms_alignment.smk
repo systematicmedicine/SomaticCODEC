@@ -6,7 +6,7 @@ Rules for performing a raw alignment with matched sample processed reads
 Input: 
     - Processed ms FASTQ files
 Outputs: 
-    - BAM with reads aligned to GCRh38, sorted and duplicates marked
+    - BAM with reads aligned to GCRh38, sorted and duplicates removed
 
 Author: Joshua Johnstone
 
@@ -25,7 +25,7 @@ rule ms_raw_alignment:
         r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
-        intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_intermediate.sam")
+        intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.sam")
     log:
         "logs/{ms_sample}/ms_raw_alignment.log"
     benchmark:
@@ -48,29 +48,64 @@ rule ms_add_read_groups:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
+        intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_read_group_unsorted.bam"),
+        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam"),
+        bai = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai")
     log:
         "logs/{ms_sample}/ms_add_read_groups.log"
     benchmark:
         "logs/{ms_sample}/ms_add_read_groups.benchmark.txt"
+    threads:
+        max(1, os.cpu_count() // 8)
     shell:
         """
         picard AddOrReplaceReadGroups \
             I={input.bam} \
-            O={output.bam} \
+            O={output.intermediate_unsorted} \
             RGID={wildcards.ms_sample} \
             RGLB={wildcards.ms_sample}_lib \
             RGPL=ILLUMINA \
             RGPU={wildcards.ms_sample} \
             RGSM={wildcards.ms_sample} 2>> {log}
+
+        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
+
+        samtools index {output.bam} 2>> {log}
+        """
+
+# Removes duplicates of reads (those with the same UMI and position)
+#   - Keeps the read with the lowest number of mapping coordinates
+#   - If tied, keeps the read with the highest mapping quality
+#   - If tied, chooses one duplicate read at random  
+rule ms_remove_duplicates:
+    input:
+        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"
+    output:
+        bam = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam"),
+        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt"
+    log:
+        "logs/{ms_sample}/ms_remove_duplicates.log"
+    benchmark:
+        "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
+    shell:
+        """
+        umi_tools dedup \
+            --extract-umi-method=read_id \
+            --umi-separator=":" \
+            --paired \
+            --stdin {input.bam} \
+            --stdout {output.bam} \
+            --log {output.dedup_metrics} 2>> {log}
         """
 
 # Sorts bam by coordinate
 rule ms_sort_bam:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam"
     output:
-        bam_sorted =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam")
+        bam =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam"),
+        bai = temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam.bai")
     log:
         "logs/{ms_sample}/ms_sort_bam.log"
     benchmark:
@@ -79,26 +114,7 @@ rule ms_sort_bam:
         max(1, os.cpu_count() // 8)
     shell:
         """
-        samtools sort -@ {threads} -o {output.bam_sorted} {input.bam} 2>> {log}
-        """
+        samtools sort -@ {threads} -o {output.bam} {input.bam} 2>> {log}
 
-# Marks duplicate reads in bam file
-rule ms_mark_duplicates:
-    input:
-        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
-    output:
-        bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
-        bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bai"),
-        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
-    log:
-        "logs/{ms_sample}/ms_mark_duplicates.log"
-    benchmark:
-        "logs/{ms_sample}/ms_mark_duplicates.benchmark.txt"
-    shell:
-        """
-        picard MarkDuplicates \
-        I={input.bam_sorted} \
-        O={output.bam_markdup} \
-        M={output.dup_metrics} \
-        CREATE_INDEX=true 2>> {log}
+        samtools index {output.bam} 2>> {log}
         """
