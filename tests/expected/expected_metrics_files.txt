@@ -30,6 +30,7 @@ metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
 metrics/ex_duplication_metrics.txt
 metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt
 metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt
+metrics/{ex_lane}/{ex_lane}_total_read_loss.json
 metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html
 metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html
 metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.zip

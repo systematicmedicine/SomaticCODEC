@@ -283,3 +283,26 @@ rule ex_trinucleotide_context_metrics:
         "logs/ex_trinucleotide_context_metrics.benchmark.txt"
     script:
         "../scripts/ex_trinucleotide_context_metrics.py"
+
+
+"""
+Calculate the total read loss between raw FASTQ, and DSC immediately before variant calling
+"""
+rule ex_total_read_loss:
+    input:
+        ex_samples = config["ex_samples_path"],
+        ex_lanes = config["ex_lanes_path"],
+        input_fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
+        input_fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
+        dsc_final = lambda wildcards: expand(
+            "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
+        ),
+    output:
+        file_path = "metrics/{ex_lane}/{ex_lane}_total_read_loss.json"
+    log:
+        "logs/{ex_lane}/ex_total_read_loss.log"
+    benchmark:
+        "logs/{ex_lane}/{ex_lane}_ex_total_read_loss.benchmark.txt"
+    script:
+        "../scripts/ex_total_read_loss.py"
