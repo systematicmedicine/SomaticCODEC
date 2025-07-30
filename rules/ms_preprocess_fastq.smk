@@ -16,6 +16,47 @@ Authors:
 import scripts.get_metadata as md
 
 """
+Moves the read pair UMI to readname
+    - Cut 3bp spacer from 5' end of reads
+    - Cut 12bp UMI from the 5'end of read 1
+    - Append read 1 12bp UMI sequence to the readname of read 1 and read 2
+""" 
+rule ms_extract_fastq_umis:
+    input:
+        ms_samples = config["ms_samples_path"],
+        r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
+        r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
+    output:
+        intermediate_spacer_removed_r1 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz"),
+        intermediate_spacer_removed_r2 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz"),
+        r1 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz")
+    log:
+        "logs/{ms_sample}/ms_extract_umis.log"
+    benchmark:
+        "logs/{ms_sample}/ms_extract_umis.benchmark.txt"
+    threads:
+        max(1, os.cpu_count() // 4)
+    shell:
+        """
+        cutadapt \
+          -j {threads} \
+          -u 3 \
+          -U 3\
+          -o {output.intermediate_spacer_removed_r1} \
+          -p {output.intermediate_spacer_removed_r2} \
+          {input.r1} {input.r2} 2>> {log}
+        
+        cutadapt \
+          -j {threads} \
+          --cut 12 \
+          --rename='{{id}}:{{r1.cut_prefix}}' \
+          -o {output.r1} \
+          -p {output.r2} \
+          {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} 2>> {log}
+        """
+
+"""
 Trims FASTQ files
     - Adaptors
     - Poly-G artifacts (>10 Gs at 3' end)
@@ -24,8 +65,8 @@ Trims FASTQ files
 rule ms_trim_fastq:
     input:
         ms_samples = config["ms_samples_path"],
-        r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
-        r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
+        r1 = "tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz",
+        r2 = "tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz"
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
@@ -55,7 +96,6 @@ rule ms_trim_fastq:
             {input.r1} {input.r2} \
             --report=minimal > {output.report} 2>> {log}
         """
-
 
 """
 Filters FASTQ files

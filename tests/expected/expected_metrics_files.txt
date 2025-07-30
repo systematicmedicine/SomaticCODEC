@@ -8,7 +8,7 @@ metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip
 metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip
-metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt
+metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt
 metrics/{ms_sample}/{ms_sample}_alignment_stats.txt
 metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt
 metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf
