@@ -31,6 +31,9 @@ rule ms_extract_fastq_umis:
         intermediate_spacer_removed_r2 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz"),
         r1 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz")
+    params:
+        spacer_length = config["ms_extract_fastq_umis"]["spacer_length"],
+        umi_length = config["ms_extract_fastq_umis"]["umi_length"]
     log:
         "logs/{ms_sample}/ms_extract_umis.log"
     benchmark:
@@ -41,15 +44,15 @@ rule ms_extract_fastq_umis:
         """
         cutadapt \
           -j {threads} \
-          -u 3 \
-          -U 3\
+          -u {params.spacer_length} \
+          -U {params.spacer_length} \
           -o {output.intermediate_spacer_removed_r1} \
           -p {output.intermediate_spacer_removed_r2} \
           {input.r1} {input.r2} 2>> {log}
         
         cutadapt \
           -j {threads} \
-          --cut 12 \
+          --cut {params.umi_length} \
           --rename='{{id}}:{{r1.cut_prefix}}' \
           -o {output.r1} \
           -p {output.r2} \

@@ -9,11 +9,12 @@ Authors:
 """
 from utils.vcf_utils import check_vcf_structure
 from pathlib import Path
-import pandas as pd
+from scripts.get_metadata import load_config, get_ex_sample_ids
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):
-    ex_samples = pd.read_csv("tests/configs/lightweight_test_run/ex_samples.csv")["ex_sample"].to_list()
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ex_samples = get_ex_sample_ids(config)
 
     for ex_sample in ex_samples:
         # Locate VCF file

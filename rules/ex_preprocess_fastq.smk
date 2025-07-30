@@ -49,6 +49,8 @@ rule ex_extract_fastq_umis:
     output:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
+    params:
+        umi_length = config["ex_extract_fastq_umis"]["umi_length"]
     log:
         "logs/{ex_lane}/ex_extract_umis.log"
     benchmark:
@@ -59,8 +61,8 @@ rule ex_extract_fastq_umis:
         """
         cutadapt \
           -j {threads} \
-          --cut 3 \
-          -U 3 \
+          --cut {params.umi_length} \
+          -U {params.umi_length} \
           --rename='{{id}}:{{r1.cut_prefix}}{{r2.cut_prefix}}' \
           -o {output.fastq1} \
           -p {output.fastq2} \
