@@ -1,5 +1,5 @@
 """
---- ex_total_read_loss.py
+--- ex_total_read_loss.py ---
 
 Calculates the number of reads lost between the start and end of the ex pipeline
 
