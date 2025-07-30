@@ -7,6 +7,7 @@
 #     - Joshua Johnstone
 #     - Ben Barry
 #     - Chat-GPT
+#     - Cameron Fraser
 # ---
 
 # Gets the path to the relevant metrics file
@@ -913,7 +914,31 @@ get_per_base_N_content_r2 <- function() {
   process_samples_for_metric(function_metric, metric_retrieval)
 }
 
+# Get number of soft clipped bases for 90th percentile most softclipped reads
+get_dsc_softclipping <- function(){
+  function_metric <- "dsc_softclipping"
+  print(paste("Getting", function_metric))
 
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+  soft_clip_stats <- fromJSON(metric_file_path)
+  ninetieth_percentle <- as.numeric(soft_clip_stats$softclip_bases_per_read_percentiles[["90th_percentile"]])
+  return(ninetieth_percentle)
+  }
 
+  process_samples_for_metric(function_metric, metric_retrieval)
+}
 
+# Get percentage of reads lost between start and end of ex pipeline
+get_lane_total_read_loss <- function(){
+  function_metric <- "lane_total_read_loss"
+  print(paste("Getting", function_metric))
 
+  metric_retrieval <- function(metric_file_path, function_metric, sample_name, sample_dir) {
+  read_loss_stats <- fromJSON(metric_file_path)
+  pct_lost <- as.numeric(read_loss_stats$percent_reads_lost)
+  pct_lost <- round(pct_lost, 2)
+  return(pct_lost)
+  }
+
+  process_samples_for_metric(function_metric, metric_retrieval)
+}

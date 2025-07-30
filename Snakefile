@@ -31,7 +31,6 @@ Setup
 
 # Load libraries
 import os
-import pandas as pd
 import scripts.get_metadata as md
 
 # Set working directory
@@ -88,6 +87,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
     "metrics/trinucleotide_context_metrics.txt",
     "metrics/ex_duplication_metrics.txt"
 ]
