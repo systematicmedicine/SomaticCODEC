@@ -56,6 +56,7 @@ def count_reads_with_read_group(bam_path):
     reads_with_rg = 0
     with pysam.AlignmentFile(bam_path, "rb") as bam:
         for read in bam:
-            if read.has_tag("RG"):
-                reads_with_rg += 1
+            if not read.is_secondary and not read.is_supplementary:
+                if read.has_tag("RG"):
+                    reads_with_rg += 1
     return reads_with_rg
