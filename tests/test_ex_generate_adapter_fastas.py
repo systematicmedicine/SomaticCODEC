@@ -9,8 +9,8 @@ Authors:
 """
 import glob
 from utils.fasta_utils import count_fasta_data_points, check_fasta_structure
-import pandas as pd
 from pathlib import Path
+from scripts.get_metadata import load_config, get_ex_sample_ids
 
 # Tests that FASTA files have correct structure
 def test_fasta_structure_correct(lightweight_test_run):
@@ -31,7 +31,8 @@ def test_fasta_entries_per_sample(lightweight_test_run):
     total_fasta_entries = sum(fasta_entries.values())
 
     # Get number of ex samples
-    ex_samples = pd.read_csv("tests/configs/lightweight_test_run/ex_samples.csv")["ex_sample"].to_list()
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ex_samples = get_ex_sample_ids(config)
     ex_sample_count = len(ex_samples)
 
     # Assert that there are 4 FASTA entries per sample (r1 start/end, r2 start/end)

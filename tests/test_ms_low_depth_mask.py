@@ -8,11 +8,12 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-import pandas as pd
+from scripts.get_metadata import load_config, get_ms_sample_ids
 
 # Test that low depth BED has the correct structure
 def test_bed_structure_correct(lightweight_test_run):
-    ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ms_samples = get_ms_sample_ids(config)
 
     for ms_sample in ms_samples:
         bed_file = Path(f"tmp/{ms_sample}/{ms_sample}_lowdepth.bed")

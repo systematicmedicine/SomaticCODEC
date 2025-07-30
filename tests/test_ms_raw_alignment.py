@@ -8,13 +8,14 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-import pandas as pd
+from scripts.get_metadata import load_config, get_ms_sample_ids
 from utils.bam_utils import count_bam_data_points
 from utils.fastq_utils import count_fastq_data_points
 
 # Test that aligned read count is not greater than input read count
 def test_aligned_reads_less_than_input_reads(lightweight_test_run):
-    ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ms_samples = get_ms_sample_ids(config)
 
     for ms_sample in ms_samples:
         

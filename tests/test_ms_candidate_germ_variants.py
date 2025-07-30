@@ -8,12 +8,13 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-import pandas as pd
+from scripts.get_metadata import load_config, get_ms_sample_ids
 from utils.vcf_utils import check_vcf_structure
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):
-    ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ms_samples = get_ms_sample_ids(config)
 
     for ms_sample in ms_samples:
         # Locate VCF file
