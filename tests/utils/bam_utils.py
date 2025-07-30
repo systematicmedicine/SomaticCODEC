@@ -9,6 +9,7 @@ Authors:
 """
 import subprocess
 import pysam
+from scripts.get_metadata import load_config
 
 # Counts the number of reads in a BAM file
 def count_bam_data_points(path):
@@ -25,22 +26,26 @@ def count_bam_data_points(path):
         raise RuntimeError(f"samtools failed on {path} with error:\n{e.stderr}")
     
 # Counts the number of bases with quality of 2 in a BAM file
-def count_bam_q2_bases(path):
+def count_bam_ss_qual_bases(path):
     path = str(path)
     count = 0
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ss_qual = config["ex_call_dsc"]["single_strand_qual"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
                 quals = read.query_qualities
                 if quals:
-                    count += sum(1 for q in quals if q == 2)
+                    count += sum(1 for q in quals if q == ss_qual)
     return count
     
-def count_bam_mapq_under_60(path):
+def count_bam_reads_under_min_mapq(path):
     path = str(path)
     count = 0
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    min_mapq = config["ex_filter_dsc"]["min_mapq"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
-            if not read.is_unmapped and read.mapping_quality < 60:
+            if not read.is_unmapped and read.mapping_quality < min_mapq:
                 count += 1
     return count
 

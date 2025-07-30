@@ -22,6 +22,9 @@ ex_call_somatic_snv:
   max_base_quality: 150
   min_base_quality: 70
 
+ex_extract_fastq_umis:
+  umi_length: 3
+
 ex_filter_dsc:
   min_mapq: 60
 
@@ -70,6 +73,10 @@ ex_trim_fastq:
 ms_candidate_germ_variants:
   memory_limit_gb: 4
 
+ms_extract_fastq_umis:
+  spacer_length: 3
+  umi_length: 12
+
 ms_low_depth_mask:
   threshold: 1
 
@@ -79,9 +86,6 @@ ms_trim_fastq:
 
 
 # ------------------------------------------------------------------------------
-# File paths
-# -------------------------------------------------------------------------------
-
 # File paths
 # -------------------------------------------------------------------------------
 
