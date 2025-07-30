@@ -306,3 +306,19 @@ rule ex_total_read_loss:
         "logs/{ex_lane}/{ex_lane}_ex_total_read_loss.benchmark.txt"
     script:
         "../scripts/ex_total_read_loss.py"
+
+
+"""
+Quantifies how much soft clipping is present in final DSC
+"""
+rule ex_softclipping_metrics:
+    input:
+        dsc_final = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
+    output:
+        file_path = "metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json"
+    log:
+        "logs/{ex_sample}/ex_softclipping_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/{ex_sample}_ex_softclipping_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_softclipping_metrics.py"
