@@ -10,6 +10,7 @@ Authors:
 import glob
 from pathlib import Path
 from utils.fastq_utils import count_fastq_data_points, sum_len_fastq, first_n_headers
+from scripts.get_metadata import load_config
 
 # Test that extracting UMIs does not change read count
 def test_read_counts_preserved(lightweight_test_run):
@@ -30,8 +31,8 @@ def test_read_counts_preserved(lightweight_test_run):
         f"Post-UMI extraction reads ({total_post_reads}) not equal to pre-UMI extraction reads ({total_pre_reads})"
     )
 
-# Test that each read sequence is reduced by 3bp (removed UMI length)
-def test_sequences_are_shorter_by_3bp(lightweight_test_run):
+# Test that reads are reduced by umi length
+def test_sequences_are_shorter_by_umi_length(lightweight_test_run):
     # Locate all pre-UMI extraction FASTQs
     pre_files = glob.glob("tmp/downloads/*lane*.fastq.gz")
 
@@ -49,8 +50,10 @@ def test_sequences_are_shorter_by_3bp(lightweight_test_run):
     # Get total number of pre-UMI extraction reads
     post_counts = {Path(f).name: count_fastq_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    umi_length = config["ex_extract_fastq_umis"]["umi_length"]
 
-    assert total_post_length == total_pre_length - (3 * total_post_reads), (f"Expected 3bp reduction per read. "
+    assert total_post_length == total_pre_length - (umi_length * total_post_reads), (f"Expected {umi_length}bp reduction per read. "
                                                                             f"Actual reduction: {(total_pre_length - total_post_length) / total_post_reads}bp per read")
 # Test that reads 
 def test_reads_added_to_headers(lightweight_test_run):
