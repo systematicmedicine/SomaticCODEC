@@ -15,7 +15,7 @@ Authors:
 import sys
 import pytest
 from pathlib import Path
-import pandas as pd
+from scripts.get_metadata import load_config, get_ms_sample_ids, get_ex_lane_ids, get_ex_sample_ids
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from utils.count_data_points import count_data_points
 
@@ -90,10 +90,11 @@ def expected_files_list():
     ]
     expected_files_generic = sum([Path(f).read_text().splitlines() for f in source_files], [])
 
-    # Load sample config files
-    ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
-    ex_lanes = pd.read_csv("tests/configs/lightweight_test_run/ex_lanes.csv")["ex_lane"].to_list()
-    ex_samples = pd.read_csv("tests/configs/lightweight_test_run/ex_samples.csv")["ex_sample"].to_list()
+    # Load sample IDs
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ms_samples = get_ms_sample_ids(config)
+    ex_lanes = get_ex_lane_ids(config)
+    ex_samples = get_ex_sample_ids(config)
 
     # Expand wildcards
     expected_files_expanded = []

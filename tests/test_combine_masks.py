@@ -11,7 +11,7 @@ Authors:
 import pandas as pd
 from pathlib import Path
 from test_generate_include_bed import read_bed
-from scripts.get_metadata import load_config
+from scripts.get_metadata import load_config, get_ms_sample_ids
 from utils.bed_utils import merge_bed_intervals
 
 # Assert that combined BED matches expected merge of individual beds
@@ -46,7 +46,8 @@ def assert_correctly_merged(ms_sample):
 
 # Test that combined BED matches expected merge of individual beds
 def test_combined_bed_matches_individual_beds(lightweight_test_run):
-    ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ms_samples = get_ms_sample_ids(config)
     for ms_sample in ms_samples:
         assert_correctly_merged(ms_sample)
 
@@ -73,6 +74,7 @@ def assert_combined_bed_order_matches_ref(ms_sample):
 
 # Test that the chromosome order of the combined BED matches the reference order
 def test_combined_bed_order_matches_ref(lightweight_test_run):
-    ms_samples = pd.read_csv("tests/configs/lightweight_test_run/ms_samples.csv")["ms_sample"].to_list()
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    ms_samples = get_ms_sample_ids(config)
     for ms_sample in ms_samples:
         assert_combined_bed_order_matches_ref(ms_sample)
