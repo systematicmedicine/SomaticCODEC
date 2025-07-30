@@ -10,6 +10,7 @@ Authors:
 import glob
 from pathlib import Path
 from utils.fastq_utils import count_fastq_data_points, sum_len_fastq, first_n_headers
+from scripts.get_metadata import load_config
 
 # Test that extracting UMIs does not change read count
 def test_read_counts_preserved(lightweight_test_run):
@@ -30,8 +31,8 @@ def test_read_counts_preserved(lightweight_test_run):
         f"Post-UMI extraction reads ({total_post_reads}) not equal to pre-UMI extraction reads ({total_pre_reads})"
     )
 
-# Test that each r1 read sequence is reduced by 15bp (removed UMI and spacer length)
-def test_sequences_are_shorter_by_15bp(lightweight_test_run):
+# Test that each r1 read sequence is reduced by the length of the spacer + umi
+def test_sequences_are_shorter_by_spacer_plus_umi(lightweight_test_run):
     # Locate all pre-UMI extraction r1 FASTQs
     pre_files = glob.glob("tmp/downloads/S004*r1.fastq.gz") + glob.glob("tmp/downloads/S005*r1.fastq.gz")
 
@@ -50,7 +51,13 @@ def test_sequences_are_shorter_by_15bp(lightweight_test_run):
     post_counts = {Path(f).name: count_fastq_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
-    assert total_post_length == total_pre_length - (15 * total_post_reads), (f"Expected 15bp reduction per read. "
+    # Get lengths from config
+    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    spacer_length = config["ms_extract_fastq_umis"]["spacer_length"]
+    umi_length = config["ms_extract_fastq_umis"]["umi_length"]
+    spacer_umi = spacer_length + umi_length
+
+    assert total_post_length == total_pre_length - (spacer_umi * total_post_reads), (f"Expected {spacer_umi}bp reduction per read. "
                                                                             f"Actual reduction: {(total_pre_length - total_post_length) / total_post_reads}bp per read")
 # Test that reads 
 def test_reads_added_to_headers(lightweight_test_run):
