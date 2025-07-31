@@ -13,7 +13,7 @@ Author: Joshua Johnstone
 """
 
 # Aligns reads to reference genome
-rule ms_raw_alignment:
+rule ms_map:
     input: 
         ref = config['GRCh38_path'],
         amb = config["GRCh38_path"] + ".amb",
@@ -44,7 +44,7 @@ rule ms_raw_alignment:
         """
 
 # Adds read group information to aligned reads
-rule ms_add_read_groups:
+rule ms_annotate_map:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
     output:
@@ -68,11 +68,12 @@ rule ms_add_read_groups:
         """
 
 # Sorts bam by coordinate
-rule ms_sort_bam:
+rule ms_sort_map:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
-        bam =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam")
+        bam =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam"),
+        bai = temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam.bai")
     log:
         "logs/{ms_sample}/ms_sort_bam.log"
     benchmark:
@@ -82,26 +83,6 @@ rule ms_sort_bam:
     shell:
         """
         samtools sort -@ {threads} -o {output.bam} {input.bam} 2>> {log}
-        """
 
-# Marks duplicate reads in bam file
-rule ms_mark_duplicates:
-    input:
-        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
-    output:
-        bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
-        bai_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bai"),
-        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
-    log:
-        "logs/{ms_sample}/ms_mark_duplicates.log"
-    benchmark:
-        "logs/{ms_sample}/ms_mark_duplicates.benchmark.txt"
-    shell:
+        samtools index {output.bam} 2>> {log}
         """
-        picard MarkDuplicates \
-        I={input.bam_sorted} \
-        O={output.bam_markdup} \
-        M={output.dup_metrics} \
-        CREATE_INDEX=true 2>> {log}
-        """
-

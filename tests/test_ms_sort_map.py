@@ -1,7 +1,7 @@
 """
---- test_ms_sort_bam.py
+--- test_ms_sort_map.py
 
-Tests the rule ms_sort_bam
+Tests the rule ms_sort_map
 
 Authors:
     - Chat-GPT

@@ -1,7 +1,7 @@
 """
---- test_ms_mark_duplicates.py
+--- test_ms_duplication_metrics.py
 
-Tests the rule ms_mark_duplicates
+Tests the rule ms_duplication_metrics
 
 Authors:
     - Chat-GPT
