@@ -14,7 +14,7 @@ from utils.bam_utils import count_bam_data_points
 # Test that sorting does not change read count
 def test_read_counts_preserved(lightweight_test_run):
     # Locate all pre-sorting BAM files
-    pre_files = glob.glob("tmp/*/*_deduped_map.bam")
+    pre_files = glob.glob("tmp/*/*_read_group_map.bam")
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
     total_pre_reads = sum(pre_counts.values())
 
