@@ -16,18 +16,17 @@ sink(log_con, type = "message")
 library(dplyr)
 library(jsonlite)
 
+# Load config
+config <- snakemake@config
+
 # Load component metrics
-component_metrics_path <- Sys.glob("config/component_metrics*.csv")[1]
-component_metrics <- read.csv(component_metrics_path) %>% 
+component_metrics <- read.csv(config$component_metrics_path) %>% 
   select(1:3, 5:9)
 
-# Get sample types from config
-ex_samples <- read.csv("config/ex_samples.csv") %>% 
-  pull(ex_sample)
-ex_lanes <- read.csv("config/ex_lanes.csv") %>% 
-  pull(ex_lane)
-ms_samples <- read.csv("config/ms_samples.csv") %>% 
-  pull(ms_sample)
+# Get samples from config
+ex_samples <- read.csv(config$ex_samples_path) %>% pull("ex_sample")
+ex_lanes <- read.csv(config$ex_lanes_path) %>% pull("ex_lane")
+ms_samples <- read.csv(config$ms_samples_path) %>% pull("ms_sample")
 
 # Get list of sample directories within metrics directory
 sample_dirs <- list.dirs("metrics", full.names = TRUE, recursive = FALSE)
