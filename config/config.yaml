@@ -73,17 +73,13 @@ ex_trim_fastq:
 ms_candidate_germ_variants:
   memory_limit_gb: 32
 
-ms_extract_fastq_umis:
-  spacer_length: 3
-  umi_length: 12
-
 ms_low_depth_mask:
   threshold: 30
 
 ms_trim_fastq:
   adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
   adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
-
+  spacer_length: 3
 
 # ------------------------------------------------------------------------------
 # File paths
