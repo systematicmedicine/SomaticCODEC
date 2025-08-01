@@ -16,12 +16,13 @@ Authors:
 import scripts.get_metadata as md
 
 """
-Moves the read pair UMI to readname
-    - Cut 3bp spacer from 5' end of reads
-    - Cut 12bp UMI from the 5'end of read 1
-    - Append read 1 12bp UMI sequence to the readname of read 1 and read 2
-""" 
-rule ms_extract_fastq_umis:
+Trims FASTQ files
+    - 3bp spacer from 5' end of reads
+    - Adaptors
+    - Poly-G artifacts (>10 Gs at 3' end)
+    - Trims bases of quality <20 from read ends
+"""
+rule ms_trim_fastq:
     input:
         ms_samples = config["ms_samples_path"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
@@ -29,16 +30,18 @@ rule ms_extract_fastq_umis:
     output:
         intermediate_spacer_removed_r1 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz"),
         intermediate_spacer_removed_r2 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz"),
-        r1 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz"),
-        r2 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz")
+        r1 = temp("tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
+        report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv"
     params:
-        spacer_length = config["ms_extract_fastq_umis"]["spacer_length"],
-        umi_length = config["ms_extract_fastq_umis"]["umi_length"]
+        spacer_length = config["ms_trim_fastq"]["spacer_length"],
+        adaptor_1 = config["ms_trim_fastq"]["adaptor_1"],
+        adaptor_2 = config["ms_trim_fastq"]["adaptor_2"]
     log:
-        "logs/{ms_sample}/ms_extract_umis.log"
+        "logs/{ms_sample}/ms_trim_fastq.log"
     benchmark:
-        "logs/{ms_sample}/ms_extract_umis.benchmark.txt"
-    threads:
+        "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
+    threads: 
         max(1, os.cpu_count() // 4)
     shell:
         """
@@ -51,41 +54,6 @@ rule ms_extract_fastq_umis:
           {input.r1} {input.r2} 2>> {log}
         
         cutadapt \
-          -j {threads} \
-          --cut {params.umi_length} \
-          --rename='{{id}}:{{r1.cut_prefix}}' \
-          -o {output.r1} \
-          -p {output.r2} \
-          {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} 2>> {log}
-        """
-
-"""
-Trims FASTQ files
-    - Adaptors
-    - Poly-G artifacts (>10 Gs at 3' end)
-    - Trims bases of quality <20 from read ends
-"""
-rule ms_trim_fastq:
-    input:
-        ms_samples = config["ms_samples_path"],
-        r1 = "tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz"
-    output:
-        r1 = temp("tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz"),
-        r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv"
-    params:
-        adaptor_1 = config["ms_trim_fastq"]["adaptor_1"],
-        adaptor_2 = config["ms_trim_fastq"]["adaptor_2"]
-    log:
-        "logs/{ms_sample}/ms_trim_fastq.log"
-    benchmark:
-        "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
-    threads: 
-        max(1, os.cpu_count() // 4)
-    shell:
-        """
-        cutadapt \
             -j {threads} \
             -a {params.adaptor_1} \
             -A {params.adaptor_1} \
@@ -96,7 +64,7 @@ rule ms_trim_fastq:
             --quality-cutoff 20 \
             -o {output.r1} \
             -p {output.r2} \
-            {input.r1} {input.r2} \
+            {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \
             --report=minimal > {output.report} 2>> {log}
         """
 

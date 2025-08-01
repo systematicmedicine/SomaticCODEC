@@ -13,7 +13,7 @@ Author: Joshua Johnstone
 """
 
 # Aligns reads to reference genome
-rule ms_raw_alignment:
+rule ms_map:
     input: 
         ref = config['GRCh38_path'],
         amb = config["GRCh38_path"] + ".amb",
@@ -44,13 +44,11 @@ rule ms_raw_alignment:
         """
 
 # Adds read group information to aligned reads
-rule ms_add_read_groups:
+rule ms_annotate_map:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
     output:
-        intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_read_group_unsorted.bam"),
-        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam"),
-        bai = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai")
+        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
     log:
         "logs/{ms_sample}/ms_add_read_groups.log"
     benchmark:
@@ -61,48 +59,18 @@ rule ms_add_read_groups:
         """
         picard AddOrReplaceReadGroups \
             I={input.bam} \
-            O={output.intermediate_unsorted} \
+            O={output.bam} \
             RGID={wildcards.ms_sample} \
             RGLB={wildcards.ms_sample}_lib \
             RGPL=ILLUMINA \
             RGPU={wildcards.ms_sample} \
             RGSM={wildcards.ms_sample} 2>> {log}
-
-        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
-
-        samtools index {output.bam} 2>> {log}
-        """
-
-# Removes duplicates of reads (those with the same UMI and position)
-#   - Keeps the read with the lowest number of mapping coordinates
-#   - If tied, keeps the read with the highest mapping quality
-#   - If tied, chooses one duplicate read at random  
-rule ms_remove_duplicates:
-    input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"
-    output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam"),
-        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt"
-    log:
-        "logs/{ms_sample}/ms_remove_duplicates.log"
-    benchmark:
-        "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
-    shell:
-        """
-        umi_tools dedup \
-            --extract-umi-method=read_id \
-            --umi-separator=":" \
-            --paired \
-            --stdin {input.bam} \
-            --stdout {output.bam} \
-            --log {output.dedup_metrics} 2>> {log}
         """
 
 # Sorts bam by coordinate
-rule ms_sort_bam:
+rule ms_sort_map:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
         bam =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam"),
         bai = temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam.bai")
