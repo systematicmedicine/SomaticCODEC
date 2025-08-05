@@ -21,8 +21,10 @@ rule ms_raw_fastq_metrics:
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html",
         r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html",
-        r1_zip = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip",
-        r2_zip = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip"
+        r1_zip = temp("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip"),
+        r2_zip = temp("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip"),
+        r1_txt = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt",
+        r2_txt = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt"
     log:
         "logs/{ms_sample}/ms_raw_fastq_metrics.log"
     benchmark:
@@ -32,14 +34,22 @@ rule ms_raw_fastq_metrics:
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)
+
         r2_base=$(basename {input.r2} .fastq.gz)
         
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2} 2>> {log}
 
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}
+
         mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report} 2>> {log}
+
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.zip {output.r1_zip} 2>> {log}
+
         mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.zip {output.r2_zip} 2>> {log}
+
+        unzip -p {output.r1_zip} */fastqc_data.txt > {output.r1_txt} 2>> {log}
+
+        unzip -p {output.r2_zip} */fastqc_data.txt > {output.r2_txt} 2>> {log}
         """
 
 # Generates a fastqc report for ms processed reads
@@ -50,8 +60,10 @@ rule ms_processed_fastq_metrics:
     output:
         r1_report = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html",
         r2_report = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html",
-        r1_zip = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip",
-        r2_zip = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip"
+        r1_zip = temp("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip"),
+        r2_zip = temp("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip"),
+        r1_txt = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt",
+        r2_txt = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt"
     log:
         "logs/{ms_sample}/ms_processed_fastq_metrics.log"
     benchmark:
@@ -61,6 +73,10 @@ rule ms_processed_fastq_metrics:
     shell:
         """        
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2} 2>> {log}
+
+        unzip -p {output.r1_zip} */fastqc_data.txt > {output.r1_txt} 2>> {log}
+
+        unzip -p {output.r2_zip} */fastqc_data.txt > {output.r2_txt} 2>> {log}
         """
 
 # Generates ms alignment metrics
