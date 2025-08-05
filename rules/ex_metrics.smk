@@ -208,7 +208,12 @@ rule ex_dsc_coverage_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
         bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
-        bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
+        lowdepth_bed = lambda wc: (
+            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
+            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_lowdepth.bed"
+        ),
+        fai = config["GRCh38_path"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.txt"
     log:
