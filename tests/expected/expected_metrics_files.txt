@@ -2,12 +2,16 @@ metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html
 metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html
 metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip
 metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip
+metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt
+metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt
 metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv
 metrics/{ms_sample}/{ms_sample}_filter_metrics.tsv
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip
 metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip
+metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt
+metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt
 metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt
 metrics/{ms_sample}/{ms_sample}_alignment_stats.txt
 metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt
@@ -20,6 +24,8 @@ metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html
 metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html
 metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.zip
 metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.zip
+metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt
+metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt
 metrics/{ex_lane}/{ex_lane}_demux_metrics.json
 metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json
@@ -34,6 +40,8 @@ metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html
 metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html
 metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.zip
 metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.zip
+metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.txt
+metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.txt
 metrics/{ex_sample}/{ex_sample}_map_metrics.txt
 metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
 metrics/{ex_sample}/{ex_sample}_insert_metrics.txt

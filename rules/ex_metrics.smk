@@ -24,8 +24,10 @@ rule ex_fastqcraw_metrics:
     output:
         fastqc_report1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html",
         fastqc_report2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html",
-        zip_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.zip",
-        zip_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.zip"
+        zip_r1 = temp("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.zip"),
+        zip_r2 = temp("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.zip"),
+        txt_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
+        txt_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"
     log:
         "logs/{ex_lane}/ex_fastqcraw_metrics.log"
     benchmark:
@@ -45,6 +47,10 @@ rule ex_fastqcraw_metrics:
         mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.zip {output.zip_r1} 2>> {log}
 
         mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2} 2>> {log}
+
+        unzip -p {output.zip_r1} */fastqc_data.txt > {output.txt_r1} 2>> {log}
+
+        unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
 
 
@@ -58,8 +64,10 @@ rule ex_fastqctrim_metrics:
     output:
         fastqc_report1 = "metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html",
         fastqc_report2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html",
-        zip_r1 = "metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.zip",
-        zip_r2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.zip"
+        zip_r1 = temp("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.zip"),
+        zip_r2 = temp("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.zip"),
+        txt_r1 = "metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.txt",
+        txt_r2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.txt"
     log:
         "logs/{ex_sample}/ex_fastqctrim_metrics.log"
     benchmark:
@@ -79,6 +87,10 @@ rule ex_fastqctrim_metrics:
         mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.zip {output.zip_r1} 2>> {log}
 
         mv metrics/{wildcards.ex_sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2} 2>> {log}
+
+        unzip -p {output.zip_r1} */fastqc_data.txt > {output.txt_r1} 2>> {log}
+        
+        unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
 
 
