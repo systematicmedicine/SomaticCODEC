@@ -99,37 +99,6 @@ rule ex_map_metrics:
         samtools flagstat {input.bam} > {output.txt} 2>> {log}
         """
 
-
-"""
-Replace default index names with experiment specific sample names as defined in the input.tsv
-"""
-rule ex_correctproduct_metrics:
-    input:
-        ex_samples = config["ex_samples_path"],
-        ex_lanes = config["ex_lanes_path"],        
-        demux_json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json",
-        filter_length = lambda wildcards: expand(
-            "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
-            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
-        ),
-        filter_meanquality = lambda wildcards: expand(
-            "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json",
-            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
-        ),
-        flagstats = lambda wildcards: expand(
-            "metrics/{ex_sample}/{ex_sample}_map_metrics.txt",
-            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
-        ),
-    output:
-        file_path = "metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt"
-    log:
-        "logs/{ex_lane}/ex_correctproduct_metrics.log"
-    benchmark:
-        "logs/{ex_lane}/ex_correctproduct_metrics.benchmark.txt"
-    script:
-        "../scripts/ex_correct_product_metrics.py"
-
-
 """
 Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
 """

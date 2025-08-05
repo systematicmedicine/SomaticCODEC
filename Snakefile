@@ -75,7 +75,6 @@ ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_correctproduct_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_total_read_loss.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample = ex_sample_ids),
