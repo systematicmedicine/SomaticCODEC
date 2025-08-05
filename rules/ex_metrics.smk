@@ -199,26 +199,6 @@ rule ex_dsc_remap_metrics:
 
 
 """
-Calculate DSC coverage metrics
-    - ex_mean_analyzable_duplex_depth: Total duplex bases in include_beg region divided by total positions in include_bed region
-    - ex_duplex_coverage_bedregions: Percentage of positions in include_bed region that have >0x duplex depth
-    - ex_duplex_coverage_wholegenome: Positions with >0x duplex depth in the include_bed region as a percentage of the whole genome
-"""
-rule ex_dsc_coverage_metrics:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
-        bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
-    output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.txt"
-    log:
-        "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
-    benchmark:
-        "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
-    script:
-        "../scripts/ex_dsc_coverage_metrics.py"
-
-"""
 Calculate percent of positions with somatic SNV clustering
     - ex_somatic_depth_per_position: Percent of somatic SNVs called that have >1x alt depth
     - ex_somatic_clustered_or_mnv: Percent of somatic SNVs called that are within 150bp of another SNV
@@ -234,6 +214,7 @@ rule ex_somatic_SNV_clustering_metrics:
         "logs/{ex_sample}/ex_somatic_SNV_clustering_metrics.benchmark.txt"
     script:
         "../scripts/ex_somatic_SNV_clustering_metrics.py"
+
 
 """
 Calculate 96 trinucleotide contexts for called somatic mutations
