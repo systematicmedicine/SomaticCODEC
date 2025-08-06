@@ -33,7 +33,7 @@ metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json
 metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json
 metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
-metrics/ex_duplication_metrics.txt
+metrics/{ex_sample}/{ex_sample}_duplication_metrics.txt
 metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt
 metrics/{ex_lane}/{ex_lane}_total_read_loss.json
 metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html
