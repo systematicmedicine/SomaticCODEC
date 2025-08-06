@@ -147,7 +147,7 @@ rule ex_duplication_metrics:
         ex_samples = config["ex_samples_path"],
         umi_metrics = expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample = md.get_ex_sample_ids(config))
     output:
-        file_path = "metrics/ex_duplication_metrics.txt"
+        file_paths = expand("metrics/{ex_sample}/{ex_sample}_duplication_metrics.txt", ex_sample = md.get_ex_sample_ids(config))
     log:
         "logs/ex_duplication_metrics.log"
     benchmark:
@@ -202,6 +202,8 @@ rule ex_dsc_remap_metrics:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam",
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt"
+    params:
+        min_mapq = config["ex_filter_dsc"]["min_mapq"]
     log:
         "logs/{ex_sample}/ex_dsc_remap_metrics.log"
     benchmark:

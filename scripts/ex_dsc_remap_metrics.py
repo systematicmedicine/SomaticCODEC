@@ -19,6 +19,7 @@ sys.stderr = open(snakemake.log[0], "a")
 # Inputs from Snakemake
 dsc_bam = snakemake.input.bam
 metrics_file = snakemake.output.metrics
+min_mapq = snakemake.params.min_mapq
 
 def count_reads(cmd):
     """Run a samtools view command and return the count as int"""
@@ -34,17 +35,18 @@ total_reads = count_reads(f"samtools view -c {dsc_bam}")
 # Count mapped reads (excluding unmapped)
 mapped_reads = count_reads(f"samtools view -F 0x4 -c {dsc_bam}")
 
-# Count mapped reads with MAPQ ≥ 60
-mapq60_reads = count_reads(f"samtools view -F 0x4 -q 60 -c {dsc_bam}")
+# Count mapped reads with MAPQ ≥ min MAPQ threshold
+over_min_MAPQ_reads = count_reads(f"samtools view -F 0x4 -q {min_mapq} -c {dsc_bam}")
 
 # Compute metrics
 aligned_pct = 100 * mapped_reads / total_reads if total_reads else 0
-mapq60_pct = 100 * mapq60_reads / mapped_reads if mapped_reads else 0
+over_min_MAPQ_pct = 100 * over_min_MAPQ_reads / mapped_reads if mapped_reads else 0
 
 # Write output
 with open(metrics_file, "w") as f:
     f.write(f"Total reads: {total_reads}\n")
     f.write(f"Mapped reads: {mapped_reads}\n")
-    f.write(f"Reads with MAPQ ≥ 60: {mapq60_reads}\n")
+    f.write(f"Reads with MAPQ ≥ min MAPQ threshold: {over_min_MAPQ_reads}\n")
     f.write(f"Percentage mapped: {aligned_pct:.2f}%\n")
-    f.write(f"Percentage with MAPQ ≥ 60 (of mapped): {mapq60_pct:.2f}%\n")
+    f.write(f"Percentage of mapped with MAPQ ≥ min MAPQ threshold: {over_min_MAPQ_pct:.2f}%\n")
+    f.write(f"Reads lost to MAPQ filter: {100 - over_min_MAPQ_pct:.2f}%\n")

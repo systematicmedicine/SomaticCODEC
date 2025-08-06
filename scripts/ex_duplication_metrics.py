@@ -25,10 +25,10 @@ print("[INFO] Starting ex_duplication_metrics.py")
 
 # Begin script
 hist_files = snakemake.input.umi_metrics
-output_file = snakemake.output.file_path
+output_files = snakemake.output.file_paths
 
 rows = []
-for path in hist_files:
+for path, out_path in zip(hist_files, output_files):
     sample = path.split("/")[-1].replace("_map_umi_metrics.txt", "")
     df = pd.read_csv(path, sep="\t")
     
@@ -36,11 +36,12 @@ for path in hist_files:
     total_reads = (df["family_size"] * df["count"] * 2).sum()
     duplication_rate = 1 - (unique_reads / total_reads) if total_reads > 0 else 0
 
-    rows.append([sample, unique_reads, total_reads, round(duplication_rate, 6)])
-
-# Save output table
-result_df = pd.DataFrame(rows, columns=["Sample", "Unique reads", "Total reads", "Duplication rate"])
-result_df.to_csv(output_file, sep="\t", index=False)
+    # Save output table
+    result_df = pd.DataFrame(
+        [[sample, unique_reads, total_reads, round(duplication_rate, 6)]],
+        columns=["Sample", "Unique reads", "Total reads", "Duplication rate"]
+    )
+    result_df.to_csv(out_path, sep="\t", index=False)
 
 # Print script completion message to log
 print("[INFO] Completed ex_duplication_metrics.py")
