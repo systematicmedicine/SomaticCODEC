@@ -31,13 +31,13 @@ sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
 
 # Loop over each lane
-for lane in md.get_ex_lane_ids(snakemake.config):
+for lane in md.get_ex_lane_ids(snakemake.config):    
     fastq1 = f"tmp/{lane}/{lane}_r1_umi_extracted.fastq.gz"
     fastq2 = f"tmp/{lane}/{lane}_r2_umi_extracted.fastq.gz"
 
     r1_fasta = f"tmp/{lane}/{lane}_r1_start.fasta"
     r2_fasta = f"tmp/{lane}/{lane}_r2_start.fasta"
-    json_out = f"metrics/{lane}/{lane}_demux_metrics.json"
+    txt_out = f"metrics/{lane}/{lane}_demux_metrics.txt"
 
     cmd = [
         "cutadapt",
@@ -46,7 +46,7 @@ for lane in md.get_ex_lane_ids(snakemake.config):
         f"-g", f"^file:{r1_fasta}",
         f"-G", f"^file:{r2_fasta}",
         "--pair-adapters",
-        "--json", json_out,
+        "--report=full",
         "--action=none",
         "-o", "tmp/{name}_r1_demux.fastq.gz",
         "-p", "tmp/{name}_r2_demux.fastq.gz",
@@ -54,8 +54,8 @@ for lane in md.get_ex_lane_ids(snakemake.config):
         fastq2
     ]
 
-    with open(snakemake.log[0], "a") as log_file:
-        subprocess.run(cmd, check=True, stdout=log_file, stderr=log_file)
+    with open(txt_out, "w") as report_file, open(snakemake.log[0], "a") as log_file:
+        subprocess.run(cmd, stdout=report_file, stderr=log_file, text=True, check=True)
 
     # Move output files into per-sample folders
     for sample in md.get_ex_lane_samples(snakemake.config)[lane]:

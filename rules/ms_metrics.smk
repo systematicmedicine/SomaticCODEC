@@ -93,7 +93,7 @@ rule ms_alignment_metrics:
         "logs/{ms_sample}/ms_alignment_metrics.benchmark.txt"
     shell:
         """
-        samtools stats {input.bam} > {output.stats} 2>> {log}
+        samtools flagstat {input.bam} > {output.stats} 2>> {log}
 
         picard CollectInsertSizeMetrics \
             I={input.bam} \
@@ -126,7 +126,7 @@ rule ms_candidate_variant_metrics:
     input: 
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     output:
-        stat = "metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt"
+        stat = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt"
     log:
         "logs/{ms_sample}/ms_candidate_variant_metrics.log"
     benchmark:

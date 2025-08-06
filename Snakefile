@@ -66,7 +66,7 @@ results = [
 
 # Define metrics for ex samples
 ex_metrics = [
-    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
@@ -74,7 +74,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane = ex_lane_ids),
+    #expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_total_read_loss.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample = ex_sample_ids),
@@ -94,8 +94,8 @@ ex_metrics = [
 ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_metrics.tsv", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_trim_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_filter_metrics.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample_ids),
@@ -104,7 +104,7 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_depth_histogram.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_sample_ids)
 ]
 
