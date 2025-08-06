@@ -158,7 +158,7 @@ rule ex_duplication_metrics:
 
 """
 Custom python script to assess demultiplexing
-"""
+
 rule ex_raw_read_counts_metrics:
     input:
         ex_samples = config["ex_samples_path"],
@@ -174,7 +174,7 @@ rule ex_raw_read_counts_metrics:
         "logs/{ex_lane}/ex_raw_read_counts_metrics.benchmark.txt"
     script:
         "../scripts/ex_raw_read_counts_metrics.py"
-
+"""
 
 """
 Calculate the somatic variant rate
