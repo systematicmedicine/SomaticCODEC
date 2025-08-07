@@ -79,6 +79,27 @@ rule ms_processed_fastq_metrics:
         unzip -p {output.r2_zip} */fastqc_data.txt > {output.r2_txt} 2>> {log}
         """
 
+rule ms_fastqc_summary_metrics:
+    input:
+        ms_raw_r1 = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt",
+        ms_raw_r2 = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt",
+         ms_filter_r1 = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt",
+        ms_filter_r2 = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt"
+    output:
+        ms_raw_summary_r1 = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json",
+        ms_raw_summary_r2 = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json",
+        ms_filter_summary_r1 = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json",
+        ms_filter_summary_r2 = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json"
+    params:
+        sample = "{ms_sample}"
+    log:
+        "logs/{ms_sample}/fastqc_summary_metrics.log"
+    benchmark:
+        "logs/{ms_sample}/fastqc_summary_metrics.benchmark.txt"
+    script:
+        "../scripts/fastqc_summary_metrics.py"
+
+
 # Generates ms alignment metrics
 rule ms_alignment_metrics:
     input:
