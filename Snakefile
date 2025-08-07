@@ -110,7 +110,6 @@ ms_metrics = [
 
 # Define other metrics
 other_metrics = [
-    "metrics/component_metrics_report.csv",
     "logs/git_metadata.json",
     "logs/combined_benchmarks.csv"
 ]
