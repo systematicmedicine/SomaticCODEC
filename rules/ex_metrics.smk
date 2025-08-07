@@ -53,6 +53,9 @@ rule ex_fastqcraw_metrics:
         unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
 
+"""
+Generates a summary of key metrics for ex raw fastqc reports
+"""
 rule ex_fastqc_raw_summary_metrics:
     input:
         ex_lane_raw_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
@@ -108,7 +111,9 @@ rule ex_fastqcfilter_metrics:
         
         unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
-
+"""
+Generates a summary of key metrics for ex filter fastqc reports
+"""
 rule ex_fastqc_filter_summary_metrics:
     input:
         ex_filter_r1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt",
