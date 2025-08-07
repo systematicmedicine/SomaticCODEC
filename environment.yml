@@ -14,6 +14,7 @@ dependencies:
   - matplotlib=3.9.4
   - numpy=2.0.2
   - pandas=2.3.1
+  - openpyxl = 3.1.5
   - pysam=0.23.3
   - pytest=8.4.1
   - quicksect=0.2.2
@@ -35,10 +36,6 @@ dependencies:
   - seqkit=2.10.0
   - snakemake=7.32.4
   - umi_tools=1.1.6
-  
-  # R packages
-  - r-dplyr=1.1.4
-  - r-jsonlite=2.0.0
 
   # System utilities
   - click=8.1.8
