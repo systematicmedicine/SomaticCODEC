@@ -272,6 +272,24 @@ rule ex_somatic_variant_rate:
 
 
 """
+Calculate percentage of reads lost when calling DSC
+"""
+rule ex_call_dsc_metrics:
+    input:
+        pre_call_bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam",
+        post_call_bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"
+    output:
+        call_dsc_metrics = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json"
+    params:
+        sample = "{ex_sample}"
+    log:
+        "logs/{ex_sample}/ex_call_dsc_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_call_dsc_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_call_dsc_metrics.py"
+
+"""
 Calculate DSC remapping metrics
     - ex_duplex_realignment: Percentage of reads which successfully aligned during DSC realignment
     - ex_duplex_mapQ: Percentage of reads with a mapQ score of at least 60

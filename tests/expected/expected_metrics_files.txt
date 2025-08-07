@@ -57,6 +57,7 @@ metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
 metrics/{ex_sample}/{ex_sample}_insert_metrics.txt
 metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf
 metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt
+metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json
 metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt
 metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt
 metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json
