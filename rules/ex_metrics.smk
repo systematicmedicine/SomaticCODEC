@@ -298,9 +298,10 @@ rule ex_dsc_remap_metrics:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam",
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt"
+        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
     params:
-        min_mapq = config["ex_filter_dsc"]["min_mapq"]
+        min_mapq = config["ex_filter_dsc"]["min_mapq"],
+        sample = "{ex_sample}"
     log:
         "logs/{ex_sample}/ex_dsc_remap_metrics.log"
     benchmark:
