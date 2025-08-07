@@ -10,7 +10,6 @@ Authors:
     - Joshua Johnstone
 """
 import pandas as pd
-import get_metadata as md
 import glob
 import json
 
@@ -20,7 +19,6 @@ sys.stderr = open(snakemake.log[0], "a")
 print("[INFO] Starting fastqc_summary_metrics.py")
 
 # Parses fastqc_data.txt into a dictionary of dataframes
-
 def parse_fastqc_data(file_path):
     modules = {}
     with open(file_path) as f:
@@ -44,11 +42,12 @@ def parse_fastqc_data(file_path):
         i += 1
     return modules
 
-# Load sample names
+# Load sample name
 sample = snakemake.params.sample
 
 fastqc_file_paths = glob.glob(f"metrics/{sample}/*fastqc*.txt")
 
+# For each fastqc_data file, pull out key metrics and output in json
 for file_path in fastqc_file_paths:
         
     output_json = file_path.replace(".txt", "_summary.json") 
