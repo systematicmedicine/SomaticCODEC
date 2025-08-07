@@ -1,0 +1,259 @@
+# ===========================================================================
+# Metrics report.R
+#
+# Collate component level and system level metrics into a report
+#   - Component level metrics are defined in config/component_metrics.xlsx
+#
+# Author: Cameron Fraser
+# ===========================================================================
+
+library(jsonlite)
+library(ggplot2)
+library(dplyr)
+
+# ---------------------------------------------------------------------------
+# Coerce dataframe columns to expected types
+# ---------------------------------------------------------------------------
+
+coerce_types <- function(df, schema) {
+  
+  for (col in names(schema)) {
+    expected_type <- schema[[col]] 
+    
+    # If the column is missing from the data, create it with NA values
+    if (!col %in% names(df)) {
+      warning(sprintf("Column '%s' missing from data. Filling with NA.", col))
+      df[[col]] <- NA
+    }
+
+    # Type coercion based on schema
+    if (expected_type == "numeric") {
+      df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
+    } else if (expected_type == "character") {
+      df[[col]] <- as.character(df[[col]])
+    } else if (expected_type == "logical") {
+      df[[col]] <- suppressWarnings(as.logical(df[[col]]))
+    } else {
+      stop(sprintf("Unsupported type: %s for column %s", expected_type, col))
+    }
+  }
+
+  # Return dataframe
+  return(df)
+}
+
+# ---------------------------------------------------------------------------
+# Find all files that match a pattern
+# ---------------------------------------------------------------------------
+
+find_metric_files <- function(pattern) {
+  
+  # Ensure the pattern only matches files ending in the given suffix
+  full_pattern <- paste0(pattern, "$")
+  
+  files <- list.files(
+    path = "metrics",
+    pattern = full_pattern,
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  
+  return(files)
+}
+
+# ---------------------------------------------------------------------------
+# Get a metric from a txt file, using a regex pattern (single line)
+# ---------------------------------------------------------------------------
+
+get_metric_txt <- function(file_path, pattern) {
+  # Check file exists
+  if (!file.exists(file_path)) {
+    warning(sprintf("File not found: %s", file_path))
+    return(NA)
+  }
+
+  lines <- readLines(file_path, warn = FALSE)
+
+  # Attempts to match pattern, a single line at a time
+  match <- tryCatch({
+    regmatches(lines, regexpr(pattern, lines, perl = TRUE))
+  }, error = function(e) {
+    message(sprintf("Invalid regex pattern for file '%s': %s", file_path, e$message))
+    return(NA)
+  })
+
+  # Filter out empty or NA matches
+  first_match <- match[!is.na(match) & match != ""]
+
+  if (length(first_match) == 0) {
+    return(NA)
+  }
+
+  # Attempt numeric conversion
+  numeric_value <- suppressWarnings(as.numeric(first_match[1]))
+  if (is.na(numeric_value) || length(numeric_value) != 1) {
+    return(NA)
+  }
+
+  return(numeric_value)
+}
+
+
+
+# ---------------------------------------------------------------------------
+# Get a metric from a JSON file, using a dot notation key pattern
+# ---------------------------------------------------------------------------
+
+get_metric_json <- function(file_path, key_path) {
+  # Return NA if file doesn't exist
+  if (!file.exists(file_path)) return(NA)
+  
+  # Try parsing JSON
+  json_data <- tryCatch(jsonlite::fromJSON(file_path), error = function(e) return(NULL))
+  if (is.null(json_data)) return(NA)
+
+  # Traverse nested structure using dot-separated key path
+  keys <- strsplit(key_path, "\\.")[[1]]
+  value <- json_data
+  for (key in keys) {
+    if (!is.list(value) || is.null(value[[key]])) return(NA)
+    value <- value[[key]]
+  }
+
+  # Ensure output is numeric or NA
+  numeric_value <- suppressWarnings(as.numeric(value))
+  if (length(numeric_value) != 1 || is.na(numeric_value)) return(NA)
+  
+  return(numeric_value)
+}
+
+
+# ---------------------------------------------------------------------------
+# Grades a metric agains nn & ideal criteria
+# ---------------------------------------------------------------------------
+
+grade_metric_value <- function(value, ideal_lower, ideal_upper, nn_lower, nn_upper) {
+  # Ensure all bounds are numeric
+  value <- suppressWarnings(as.numeric(value))
+  ideal_lower <- as.numeric(ideal_lower)
+  ideal_upper <- as.numeric(ideal_upper)
+  nn_lower <- as.numeric(nn_lower)
+  nn_upper <- as.numeric(nn_upper)
+
+  if (is.na(value)) {
+    return(NA)
+  } else if (!is.na(ideal_lower) && !is.na(ideal_upper) &&
+             value >= ideal_lower && value <= ideal_upper) {
+    return("pass_ideal")
+  } else if (!is.na(nn_lower) && !is.na(nn_upper) &&
+             value >= nn_lower && value <= nn_upper) {
+    return("pass_nn")
+  } else {
+    return("fail")
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Assess a single metric
+# ---------------------------------------------------------------------------
+
+assess_metric <- function(metric) {
+  # Create empty results list
+  results_list <- list()
+  
+  # Extract values from the input
+  metric_name <- metric[["Name"]]
+  nn_lower <- metric["nn_lower"]
+  nn_upper <- metric["nn_upper"]
+  ideal_lower <- metric["ideal_lower"]
+  ideal_upper <- metric["ideal_upper"]
+  file_pattern <- metric[["file_pattern"]]
+  value_pattern <- metric[["value_pattern"]]
+ 
+  # Find all relevant metrics files
+  matching_files <- find_metric_files(file_pattern)
+  message(sprintf("[INFO] Found %d files for pattern: %s", length(matching_files), file_pattern))
+  
+  for (file_path in matching_files) {
+    # Decide which getter to use based on file extension
+    if (grepl("\\.json$", file_path, ignore.case = TRUE)) {
+      value <- get_metric_json(file_path, value_pattern)
+    } else if (grepl("\\.txt$", file_path, ignore.case = TRUE)) {
+      value <- get_metric_txt(file_path, value_pattern)
+    } else {
+      message(sprintf("Unsupported file type: %s", file_path))
+      next
+    }
+    
+    # Determine metric grade
+    grade <- grade_metric_value(value, ideal_lower, ideal_upper, nn_lower, nn_upper)
+
+    # Extract sample ID from filename (e.g., S001_metric.txt → S001)
+    sample_id <- sub("^metrics/([^/]+)/.*$", "\\1", file_path)
+
+    # Append a row to results list
+    results_list[[length(results_list) + 1]] <- data.frame(
+      Metric = metric_name,
+      Sample = sample_id,
+      Value = value,
+      Grade = grade
+    )
+  }
+  
+  # Combine all rows into one data frame
+  return(bind_rows(results_list))
+}
+
+# ---------------------------------------------------------------------------
+# Create metrics heatmap
+# ---------------------------------------------------------------------------
+
+plot_metric_heatmap <- function(df, title = "Metric Grades Heatmap") {
+  library(ggplot2)
+  library(dplyr)
+
+  required_cols <- c("Sample", "Metric", "Grade")
+  if (!all(required_cols %in% names(df))) {
+    stop("Data frame must contain columns: Sample, Metric, Grade")
+  }
+
+  df <- df %>%
+    mutate(
+      Grade = factor(
+        Grade,
+        levels = c("pass_ideal", "pass_nn", "fail", NA),
+        labels = c("pass_ideal", "pass_nn", "fail", "NA"),
+        exclude = NULL
+      )
+    )
+
+  ggplot(df, aes(x = Sample, y = Metric, fill = Grade)) +
+    geom_tile(color = "white", linewidth = 0.2) +
+    scale_fill_manual(
+      values = c(
+        "pass_ideal" = "#2ecc71",
+        "pass_nn" = "#f1c40f",
+        "fail" = "#e74c3c",
+        "NA" = "#bdc3c7"
+      ),
+      na.value = "#bdc3c7",
+      drop = FALSE
+    ) +
+    theme_minimal(base_size = 10) +
+    theme(
+      panel.grid = element_blank(),
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+      axis.text.y = element_text(size = 6),
+      plot.background = element_rect(fill = "white", color = NA),
+      panel.background = element_rect(fill = "white", color = NA),
+      legend.background = element_rect(fill = "white", color = NA),
+      legend.box.background = element_rect(fill = "white", color = NA)
+    ) +
+    labs(
+      title = title,
+      x = "Sample",
+      y = "Metric",
+      fill = "Grade"
+    )
+}
+

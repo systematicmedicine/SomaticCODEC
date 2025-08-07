@@ -93,4 +93,4 @@ ex_samples_path: config/ex_samples.csv
 ex_lanes_path: config/ex_lanes.csv
 ex_adapters_path: config/ex_adapters.csv
 ms_samples_path: config/ms_samples.csv
-component_metrics_path: config/component_metrics.csv
+component_metrics_path: config/component_metrics.xlsx
