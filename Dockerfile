@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     default-jdk \
     openjdk-11-jre \
     python3-pip \
+    r-base \
     bzip2 \
     ca-certificates \
     libbz2-dev \

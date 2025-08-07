@@ -37,6 +37,11 @@ dependencies:
   - snakemake=7.32.4
   - umi_tools=1.1.6
 
+  # R packages
+  - r-dplyr=1.1.4
+  - r-jsonlite=2.0.0
+  - r-openxlsx=4.2.8
+
   # System utilities
   - click=8.1.8
   - perl=5.32.1
