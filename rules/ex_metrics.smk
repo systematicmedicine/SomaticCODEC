@@ -53,6 +53,7 @@ rule ex_fastqcraw_metrics:
         unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
 
+
 """
 Generates a summary of key metrics for ex raw fastqc reports
 """
@@ -72,6 +73,10 @@ rule ex_fastqc_raw_summary_metrics:
     script:
         "../scripts/fastqc_summary_metrics.py"
 
+
+"""
+Generates a summary file with the Gini coefficient of demuxed sample read counts
+"""
 rule ex_demux_metrics_gini:
     input:
         demux_metrics = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
@@ -86,6 +91,25 @@ rule ex_demux_metrics_gini:
     script:
         "../scripts/ex_demux_metrics_gini.py"
     
+
+"""
+Generates a summary of reads filtered by ex_filter_fastq
+"""
+rule ex_fastp_filter_summary_metrics:
+    input:
+        json_length = "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
+        json_meanquality = "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json"
+    output:
+        filter_summary_metrics = "metrics/{ex_sample}/{ex_sample}_fastp_filter_summary_metrics.json"
+    params:
+        sample = "{ex_sample}"
+    log:
+        "logs/{ex_sample}/ex_fastp_filter_summary_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_fastp_filter_summary_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_fastp_filter_summary_metrics.py"
+
 
 """
 FastQC on demultiplexed, trimmed, filtered FASTQs 
@@ -125,6 +149,8 @@ rule ex_fastqcfilter_metrics:
         
         unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
+
+
 """
 Generates a summary of key metrics for ex filter fastqc reports
 """
@@ -161,6 +187,7 @@ rule ex_map_metrics:
         """
         samtools flagstat {input.bam} > {output.txt} 2>> {log}
         """
+
 
 """
 Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
@@ -226,6 +253,7 @@ rule ex_raw_read_counts_metrics:
     script:
         "../scripts/ex_raw_read_counts_metrics.py"
 """
+
 
 """
 Calculate the somatic variant rate

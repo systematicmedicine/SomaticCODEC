@@ -46,6 +46,9 @@ with open(demux_metrics_path, "r") as f:
 
 # Collate counts and calculate Gini coefficient
 output_data = {
+     "description": (
+    "Summary of adaptor counts and Gini coefficient for inequality between counts."
+    ),
     "trimmed_counts": dict(trimmed_counts),
     "gini_coefficient": round(gini_coefficient(list(trimmed_counts.values())), 3)
 }
