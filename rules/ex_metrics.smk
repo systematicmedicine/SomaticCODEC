@@ -53,21 +53,37 @@ rule ex_fastqcraw_metrics:
         unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
 
+rule ex_fastqc_raw_summary_metrics:
+    input:
+        ex_lane_raw_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
+        ex_lane_raw_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"
+    output:
+        ex_lane_raw_summary_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json",
+        ex_lane_raw_summary_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json"
+    params:
+        sample = "{ex_lane}"
+    log:
+        "logs/{ex_lane}/fastqc_summary_metrics.log"
+    benchmark:
+        "logs/{ex_lane}/fastqc_summary_metrics.benchmark.txt"
+    script:
+        "../scripts/fastqc_summary_metrics.py"
+
 
 """
 FastQC on demultiplexed, trimmed, filtered FASTQs 
 """
-rule ex_fastqctrim_metrics:
+rule ex_fastqcfilter_metrics:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"
     output:
-        fastqc_report1 = "metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html",
-        fastqc_report2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html",
-        zip_r1 = temp("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.zip"),
-        zip_r2 = temp("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.zip"),
-        txt_r1 = "metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.txt",
-        txt_r2 = "metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.txt"
+        fastqc_report1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html",
+        fastqc_report2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html",
+        zip_r1 = temp("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.zip"),
+        zip_r2 = temp("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.zip"),
+        txt_r1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt",
+        txt_r2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt"
     log:
         "logs/{ex_sample}/ex_fastqctrim_metrics.log"
     benchmark:
@@ -92,6 +108,22 @@ rule ex_fastqctrim_metrics:
         
         unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """
+
+rule ex_fastqc_filter_summary_metrics:
+    input:
+        ex_filter_r1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt",
+        ex_filter_r2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt"
+    output:
+        ex_filter_summary_r1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics_summary.json",
+        ex_filter_summary_r2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics_summary.json"
+    params:
+        sample = "{ex_sample}"
+    log:
+        "logs/{ex_sample}/fastqc_summary_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/fastqc_summary_metrics.benchmark.txt"
+    script:
+        "../scripts/fastqc_summary_metrics.py"
 
 
 """
