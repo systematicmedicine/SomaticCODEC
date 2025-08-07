@@ -96,9 +96,9 @@ rule ms_fastqc_summary_metrics:
     params:
         sample = "{ms_sample}"
     log:
-        "logs/{ms_sample}/fastqc_summary_metrics.log"
+        "logs/{ms_sample}/ms_fastqc_summary_metrics.log"
     benchmark:
-        "logs/{ms_sample}/fastqc_summary_metrics.benchmark.txt"
+        "logs/{ms_sample}/ms_fastqc_summary_metrics.benchmark.txt"
     script:
         "../scripts/fastqc_summary_metrics.py"
 
@@ -209,7 +209,7 @@ rule ms_candidate_variant_metrics_summary:
     benchmark:
         "logs/{ms_sample}/ms_candidate_variant_metrics_summary.benchmark.txt"
     script:
-        "../scripts/candidate_variant_metrics_summary.py"
+        "../scripts/ms_candidate_variant_metrics_summary.py"
 
 
 # Generates metrics for each mask BED file

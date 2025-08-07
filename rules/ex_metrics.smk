@@ -66,12 +66,26 @@ rule ex_fastqc_raw_summary_metrics:
     params:
         sample = "{ex_lane}"
     log:
-        "logs/{ex_lane}/fastqc_summary_metrics.log"
+        "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.log"
     benchmark:
-        "logs/{ex_lane}/fastqc_summary_metrics.benchmark.txt"
+        "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.benchmark.txt"
     script:
         "../scripts/fastqc_summary_metrics.py"
 
+rule ex_demux_metrics_gini:
+    input:
+        demux_metrics = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
+    output:
+        demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json"
+    params:
+        sample = "{ex_lane}"
+    log:
+        "logs/{ex_lane}/ex_demux_metrics_gini.log"
+    benchmark:
+        "logs/{ex_lane}/ex_demux_metrics_gini.benchmark.txt"
+    script:
+        "../scripts/ex_demux_metrics_gini.py"
+    
 
 """
 FastQC on demultiplexed, trimmed, filtered FASTQs 
@@ -124,9 +138,9 @@ rule ex_fastqc_filter_summary_metrics:
     params:
         sample = "{ex_sample}"
     log:
-        "logs/{ex_sample}/fastqc_summary_metrics.log"
+        "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.log"
     benchmark:
-        "logs/{ex_sample}/fastqc_summary_metrics.benchmark.txt"
+        "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.benchmark.txt"
     script:
         "../scripts/fastqc_summary_metrics.py"
 

@@ -1,9 +1,9 @@
 """
---- candidate_variant_metrics_summary.py ---
+--- ms_candidate_variant_metrics_summary.py ---
 
 Generates a summary file with key candidate variant metrics
 
-To be used with candidate_variant_metrics_summary rule
+To be used with ms_candidate_variant_metrics_summary rule
 
 Authors:
     - Chat-GPT
@@ -16,7 +16,7 @@ from collections import defaultdict
 # Initiate logging
 sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
-print("[INFO] Starting candidate_variant_metrics_summary.py")
+print("[INFO] Starting ms_candidate_variant_metrics_summary.py")
 
 # Parses fastqc_data.txt into a dictionary of dataframes
 def parse_bcftools_stats(file_path):
@@ -81,7 +81,7 @@ result = {
 with open(output_json, 'w') as f:
     json.dump(result, f, indent=4)
 
-print("[INFO] Completed candidate_variant_metrics_summary.py")
+print("[INFO] Completed ms_candidate_variant_metrics_summary.py")
 
 
 
