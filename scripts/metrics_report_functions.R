@@ -69,36 +69,45 @@ get_metric_txt <- function(file_path, pattern) {
   # Check file exists
   if (!file.exists(file_path)) {
     warning(sprintf("File not found: %s", file_path))
-    return(NA)
+    return(NA_real_)
   }
 
   lines <- readLines(file_path, warn = FALSE)
 
-  # Attempts to match pattern, a single line at a time
-  match <- tryCatch({
-    regmatches(lines, regexpr(pattern, lines, perl = TRUE))
-  }, error = function(e) {
-    message(sprintf("Invalid regex pattern for file '%s': %s", file_path, e$message))
-    return(NA)
-  })
+  for (line in lines) {
+    match <- regexpr(pattern, line, perl = TRUE)
+    if (match[[1]] == -1) next  # No match on this line
 
-  # Filter out empty or NA matches
-  first_match <- match[!is.na(match) & match != ""]
+    # Get metadata for capture groups
+    capture_names  <- attr(match, "capture.names")
+    capture_start  <- attr(match, "capture.start")
+    capture_length <- attr(match, "capture.length")
 
-  if (length(first_match) == 0) {
-    return(NA)
+    if (length(capture_names) == 0 || all(capture_start == -1)) {
+      warning(sprintf("Pattern matched line but no named capture groups were extracted.\nLine: %s", line))
+      return(NA_real_)
+    }
+
+    # Extract non-empty named groups
+    values <- mapply(function(start, len) {
+      if (start == -1) return(NA_character_)
+      substr(line, start, start + len - 1)
+    }, capture_start, capture_length, USE.NAMES = FALSE)
+
+    # Try to coerce non-empty groups to numeric
+    for (val in values) {
+      val_num <- suppressWarnings(as.numeric(gsub(",", "", val)))
+      if (!is.na(val_num)) return(val_num)
+    }
+
+    warning(sprintf("Pattern matched line, but no numeric values found in named groups.\nLine: %s", line))
+    return(NA_real_)
   }
 
-  # Attempt numeric conversion
-  numeric_value <- suppressWarnings(as.numeric(first_match[1]))
-  if (is.na(numeric_value) || length(numeric_value) != 1) {
-    return(NA)
-  }
-
-  return(numeric_value)
+  # If no lines matched the pattern
+  warning(sprintf("No line in %s matched the pattern:\n%s", file_path, pattern))
+  return(NA_real_)
 }
-
-
 
 # ---------------------------------------------------------------------------
 # Get a metric from a JSON file, using a dot notation key pattern
