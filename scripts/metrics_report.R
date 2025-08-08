@@ -2,22 +2,38 @@
 # Metrics report.R
 #
 # Collate component level and system level metrics into a report
-#   - Component level metrics are defined in config/component_metrics.xlsx
+#   - To be used exclusively with Snakemake parent rule create_metrics_report
+#   - Recieves parameter injection from parent rule
 #
 # Author: Cameron Fraser
 # ===========================================================================
+
+# ---------------------------------------------------------------------------
+# Setup environment
+# ---------------------------------------------------------------------------
 
 # Load libraries
 library(dplyr)
 library(openxlsx)
 source("scripts/metrics_report_functions.R")
 
-# Define data paths (replace with Snakemake injection)
+# Define hard coded variables
 
-COMPONENT_METRICS_PATH <- "config//component_level_metrics.xlsx"
-SYSTEM_METRICS_PATH <- "config//system_level_metrics.xlsx"
-CSV_OUTPUT_PATH <- "metrics//metrics_report.csv"
-HEATMAP_PATH <- "metrics//metrics_heatmap.png"
+if (!exists("snakemake")) {
+  # Manual mode (for local testing)
+  COMPONENT_METRICS_PATH <- "config/component_level_metrics.xlsx"
+  SYSTEM_METRICS_PATH <- "config/system_level_metrics.xlsx"
+  CSV_OUTPUT_PATH <- "metrics/metrics_report.csv"
+  HEATMAP_PATH <- "metrics/metrics_heatmap.png"
+  LOG_PATH <- "logs/metrics_report.log"
+} else {
+  # Snakemake-injected paths
+  COMPONENT_METRICS_PATH <- snakemake@input[["component_metrics_metadata"]]
+  SYSTEM_METRICS_PATH <- snakemake@input[["system_metrics_metadata"]]
+  CSV_OUTPUT_PATH <- snakemake@output[["csv_path"]]
+  HEATMAP_PATH <- snakemake@output[["heatmap_path"]]
+  LOG_PATH <- snakemake@log[[1]]
+}
 
 # Define hard coded variables
 METRICS_FILE_SCHEMA <- list(
@@ -33,6 +49,15 @@ METRICS_FILE_SCHEMA <- list(
   file_pattern = "character",
   value_pattern = "character"
 )
+
+# Start logging
+log_con <- file(LOG_PATH, open = "wt")
+sink(log_con, type = "message")
+message(sprintf("[INFO] Script started at %s\n", Sys.time()))
+
+# ---------------------------------------------------------------------------
+# Create metrics report
+# ---------------------------------------------------------------------------
 
 # Load metrics metadata
 component.meta <- read.xlsx(COMPONENT_METRICS_PATH, sheet = "Metrics") %>%
@@ -53,4 +78,13 @@ write.csv(report.df, CSV_OUTPUT_PATH, row.names = FALSE, quote = FALSE)
 
 # Create heatmap report
 report.heatmap <- plot_metric_heatmap(report.df)
-ggsave(HEATMAP_PATH, plot = report.heatmap, width = 12, height = 10, dpi = 300)
+save_scaled_heatmap(report.heatmap, HEATMAP_PATH, nrow(report.df), ncol(report.df))
+
+# ---------------------------------------------------------------------------
+# Cleanup
+# ---------------------------------------------------------------------------
+
+# Release logging
+message(sprintf("[INFO] Script finished at %s\n", Sys.time()))
+sink(type = "message")
+close(log_con)

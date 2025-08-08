@@ -39,7 +39,7 @@ def test_expected_outputs_nonzero_size(lightweight_test_run, expected_files_list
 def test_expected_outputs_have_datapoints(lightweight_test_run, expected_files_list):
 
     # Omit certain file types from this check
-    file_exts_to_omit = [".amb", ".ann", ".pac", ".0123", ".64", ".fai", ".dict", ".html", ".pdf", ".json", ".zip", ".bai", ".tbi"]
+    file_exts_to_omit = [".amb", ".ann", ".pac", ".0123", ".64", ".fai", ".dict", ".html", ".pdf", ".json", ".zip", ".bai", ".tbi", ".png"]
     expected_files_list = [path for path in expected_files_list if not any(path.endswith(ext) for ext in file_exts_to_omit)]
 
     # For remaining files, check number of datapoints > 0
