@@ -129,6 +129,8 @@ ms_metrics = [
 
 # Define other metrics
 other_metrics = [
+    "metrics/metrics_report.csv",
+    "metrics/metrics_heatmap.png",
     "logs/git_metadata.json",
     "logs/combined_benchmarks.csv"
 ]
