@@ -93,4 +93,4 @@ ex_samples_path: tests/configs/dryrun/ex_samples.csv
 ex_lanes_path: tests/configs/dryrun/ex_lanes.csv
 ex_adapters_path: tests/configs/dryrun/ex_adapters.csv
 ms_samples_path: tests/configs/dryrun/ms_samples.csv
-component_metrics_path: config/component_metrics.csv
+component_metrics_path: config/component_metrics.xlsx
