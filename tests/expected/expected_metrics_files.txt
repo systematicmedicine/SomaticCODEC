@@ -63,3 +63,5 @@ metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json
 metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt
 metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json
 metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json
+metrics/metrics_report.csv
+metrics/metrics_heatmap.png

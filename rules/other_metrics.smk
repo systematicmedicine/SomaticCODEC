@@ -11,21 +11,23 @@ Authors:
 
 import scripts.get_metadata as md
 
-# Generates a pass/fail report for all component level metrics
-rule component_metrics_report:
+# Generates a pass/fail report for component & system level metrics
+rule create_metrics_report:
     input:
-        ms_samples = config["ms_samples_path"],
-        ex_samples = config["ex_samples_path"],
+        component_metrics_metadata = config["component_metrics_path"],
+        system_metrics_metadata = config["system_metrics_path"],
         final_ms_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = md.get_ms_sample_ids(config)),
         final_ex_metrics_file = expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = md.get_ex_sample_ids(config))
     output:
-        report = "metrics/component_metrics_report.csv"
+        csv_path = "metrics/metrics_report.csv",
+        heatmap_path = "metrics/metrics_heatmap.png"
     log:
-        "logs/component_metrics_report.log"
+        "logs/create_metrics_report.log"
     benchmark:
-        "logs/component_metrics_report.benchmark.txt"
+        "logs/create_metrics_report.benchmark.txt"
     script:
-        "../scripts/component_metrics_report.R"
+        "../scripts/metrics_report.R"
+
 
 
 # Write git metadata to file for version tracking

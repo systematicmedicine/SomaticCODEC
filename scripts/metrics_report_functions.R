@@ -257,3 +257,18 @@ plot_metric_heatmap <- function(df, title = "Metric Grades Heatmap") {
     )
 }
 
+# ---------------------------------------------------------------------------
+# Scale heatmap and save to disk
+# ---------------------------------------------------------------------------
+save_scaled_heatmap <- function(plot, path, nrows, ncols,
+                                base_width = 0.3, base_height = 0.25,
+                                min_width = 6, max_width = 20,
+                                min_height = 6, max_height = 30,
+                                dpi = 300) {
+  # Calculate width and height
+  width  <- max(min_width, min(ncols * base_width, max_width))
+  height <- max(min_height, min(nrows * base_height, max_height))
+
+  # Save the plot
+  ggsave(path, plot = plot, width = width, height = height, dpi = dpi)
+}
