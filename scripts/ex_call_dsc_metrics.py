@@ -56,4 +56,4 @@ def main(snakemake):
 
 # Only run in Snakemake
 if __name__ == "__main__":
-    print("This script should be run via Snakemake.")
+    main(snakemake) 
