@@ -13,9 +13,10 @@ import os
 import hashlib
 import pytest
 from pathlib import Path
+import re
+import yaml
 
 # Pytest marks
-# Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
     pytest.mark.order(1)
@@ -95,4 +96,45 @@ def test_environment_sha256_matches():
         f"environment.yml SHA mismatch:\n"
         f"  Local: {local_sha}\n"
         f"  Image: {image_sha}"
+    )
+
+# Checks that all dependencies have an explicit version specified
+def test_environment_pins_versions():
+    if not LOCAL_ENVIRONMENT.exists():
+        pytest.fail("Local environment.yml not found.")
+
+    with open(LOCAL_ENVIRONMENT, "r") as f:
+        env = yaml.safe_load(f)
+
+    conda_packages = env.get("dependencies", [])
+    pip_packages = []
+
+    # Extract pip sublist if present
+    for dep in conda_packages:
+        if isinstance(dep, dict) and "pip" in dep:
+            pip_packages = dep["pip"]
+
+    # Helper: check version format
+    def is_version_pinned(pkg_str, conda=True):
+        if conda:
+            return re.match(r"^[a-zA-Z0-9_.+-]+(=|==)[0-9]", pkg_str) is not None
+        else:
+            return re.match(r"^[a-zA-Z0-9_.+-]+==[0-9]", pkg_str) is not None
+
+    # Check conda dependencies
+    unpinned_conda = [
+        pkg for pkg in conda_packages
+        if isinstance(pkg, str) and not is_version_pinned(pkg, conda=True)
+    ]
+
+    # Check pip dependencies
+    unpinned_pip = [
+        pkg for pkg in pip_packages
+        if not is_version_pinned(pkg, conda=False)
+    ]
+
+    assert not unpinned_conda and not unpinned_pip, (
+        "Unpinned dependencies found:\n" +
+        (f"Conda: {unpinned_conda}\n" if unpinned_conda else "") +
+        (f"Pip: {unpinned_pip}\n" if unpinned_pip else "")
     )
