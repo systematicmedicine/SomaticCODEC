@@ -364,7 +364,7 @@ Calculate 96 trinucleotide contexts for called somatic mutations
 """
 rule ex_trinucleotide_context_metrics:
     input:
-        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config),
+        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
         nanoseq_contexts = config["ex_nanoseq_tri_contexts"],
         ref = config["GRCh38_path"]
     output:
