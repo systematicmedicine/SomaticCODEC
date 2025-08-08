@@ -25,7 +25,9 @@ pytestmark = [
 # Define hard coded parameters
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 IMAGE_INFO_SHA_FILE = "/image-info/dockerfile.sha256"
+IMAGE_INFO_ENVIRONMENT_SHA = "/image-info/environment.sha256"
 LOCAL_DOCKERFILE = PROJECT_ROOT / "Dockerfile"
+LOCAL_ENVIRONMENT = PROJECT_ROOT / "environment.yml"
 
 # Returns true if running inside docker container
 def is_inside_docker() -> bool:
@@ -53,11 +55,11 @@ def sha256sum(path: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
-
+# Checks that tests are being run within a Docker container
 def test_running_inside_docker():
     assert is_inside_docker(), "Test must be run inside a Docker container."
 
-
+# Checks that Dockerfile sha256 sum matches
 def test_dockerfile_sha256_matches():
     if not LOCAL_DOCKERFILE.exists():
         pytest.fail("Local Dockerfile not found in PROJECT_ROOT.")
@@ -72,6 +74,25 @@ def test_dockerfile_sha256_matches():
 
     assert image_sha == local_sha, (
         f"Dockerfile SHA mismatch:\n"
+        f"  Local: {local_sha}\n"
+        f"  Image: {image_sha}"
+    )
+
+# Checks that environment.yml sha256sum matchs
+def test_environment_sha256_matches():
+    if not LOCAL_ENVIRONMENT.exists():
+        pytest.fail("Local environment.yml not found in PROJECT_ROOT.")
+
+    try:
+        with open(IMAGE_INFO_ENVIRONMENT_SHA, "rt") as f:
+            image_sha = f.read().strip()
+    except FileNotFoundError:
+        pytest.fail(f"File not found in container: {IMAGE_INFO_ENVIRONMENT_SHA}")
+
+    local_sha = sha256sum(LOCAL_ENVIRONMENT)
+
+    assert image_sha == local_sha, (
+        f"environment.yml SHA mismatch:\n"
         f"  Local: {local_sha}\n"
         f"  Image: {image_sha}"
     )
