@@ -1,0 +1,10 @@
+chr1	2	0
+chr2	2	1
+chr3	2	0
+chr4	2	1
+chr5	2	0
+chr6	2	1
+chr7	2	0
+chr8	2	1
+chr9	2	0
+chr10	2	0
