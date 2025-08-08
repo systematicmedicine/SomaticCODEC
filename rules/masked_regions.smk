@@ -23,8 +23,8 @@ import scripts.get_metadata as md
 # Creates a mask for genomic positions with low ms read depth
 rule ms_low_depth_mask:
     input:
-        markdup_bam = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam",
-        markdup_bai = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam.bai"
+        bam = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam.bai"
     output:
         bed = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.bed"),
         depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram.txt",
@@ -41,7 +41,7 @@ rule ms_low_depth_mask:
         threshold = config["ms_low_depth_mask"]["threshold"]
     shell:
         """
-        samtools depth -aa {input.markdup_bam} > {output.intermediate_depth_per_base} 2>> {log}
+        samtools depth -aa {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
 
         awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
         {output.intermediate_depth_per_base} > {output.intermediate_lowdepth} 2>> {log}
