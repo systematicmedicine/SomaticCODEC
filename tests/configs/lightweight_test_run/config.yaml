@@ -94,4 +94,5 @@ ex_samples_path: tests/configs/lightweight_test_run/ex_samples.csv
 ex_lanes_path: tests/configs/lightweight_test_run/ex_lanes.csv
 ex_adapters_path: tests/configs/lightweight_test_run/ex_adapters.csv
 ms_samples_path: tests/configs/lightweight_test_run/ms_samples.csv
-component_metrics_path: config/component_metrics.xlsx
+component_metrics_path: config/component_level_metrics.xlsx
+system_metrics_path: config/system_level_metrics.xlsx
