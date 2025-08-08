@@ -66,46 +66,65 @@ results = [
 
 # Define metrics for ex samples
 ex_metrics = [
-    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_fastp_filter_summary_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
+    #expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_total_read_loss.json", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r1_filter_metrics.html", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r2_filter_metrics.html", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics_summary.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics_summary.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_duplication_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.txt", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
-    "metrics/trinucleotide_context_metrics.txt",
-    "metrics/ex_duplication_metrics.txt"
+    "metrics/trinucleotide_context_metrics.txt"
 ]
 
 # Define metrics for ms samples
 ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_metrics.tsv", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_trim_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_filter_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_depth_histogram.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_variantCall_summary.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_sample_ids)
+    expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json", ms_sample = ms_sample_ids)
 ]
 
 # Define other metrics

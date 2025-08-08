@@ -86,7 +86,7 @@ rule ex_demux_fastq:
     output:
         demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
         demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
-        json = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.json", ex_lane = md.get_ex_lane_ids(config))
+        txt = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = md.get_ex_lane_ids(config))
     log:
         "logs/ex_demux.log"
     benchmark:

@@ -32,7 +32,7 @@ rule ms_trim_fastq:
         intermediate_spacer_removed_r2 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz"),
         r1 = temp("tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.tsv"
+        report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.txt"
     params:
         spacer_length = config["ms_trim_fastq"]["spacer_length"],
         adaptor_1 = config["ms_trim_fastq"]["adaptor_1"],
@@ -65,7 +65,7 @@ rule ms_trim_fastq:
             -o {output.r1} \
             -p {output.r2} \
             {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \
-            --report=minimal > {output.report} 2>> {log}
+            --report=full > {output.report} 2>> {log}
         """
 
 """
@@ -79,7 +79,7 @@ rule ms_filter_fastq:
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_filter_metrics.tsv"
+        report = "metrics/{ms_sample}/{ms_sample}_filter_metrics.txt"
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
@@ -94,5 +94,5 @@ rule ms_filter_fastq:
             -o {output.r1} \
             -p {output.r2} \
             {input.r1} {input.r2} \
-            --report=minimal > {output.report} 2>> {log}
+            --report=full > {output.report} 2>> {log}
         """
