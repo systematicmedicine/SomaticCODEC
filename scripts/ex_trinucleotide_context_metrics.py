@@ -11,7 +11,9 @@ Donor characteristics for nanoseq reference trinucleotide contexts:
     - Aged 20-80
     - 6 Female 2 Male
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Joshua Johnstone
 """
 
 # Load libraries
@@ -21,6 +23,7 @@ import pandas as pd
 import numpy as np
 import pysam
 from collections import Counter
+import json
 
 # Redirect stdout and stderr to Snakemake log file
 sys.stdout = open(snakemake.log[0], "a")
@@ -28,10 +31,11 @@ sys.stderr = open(snakemake.log[0], "a")
 print("[INFO] Starting ex_trinucleotide_context_metrics.py")
 
 # Inputs
-vcf_paths = snakemake.input.vcf_snvs
+vcf_path = snakemake.input.vcf_snvs
 ref_path = snakemake.input.ref
 nanoseq_contexts_path = snakemake.input.nanoseq_contexts
-output_path = snakemake.output.metrics
+sample = snakemake.params.sample
+json_out_path = snakemake.output.metrics
 
 # Load reference genome
 ref = pysam.FastaFile(ref_path)
@@ -109,31 +113,33 @@ nanoseq_df = (
 nanoseq_df = contexts_96.to_frame().merge(nanoseq_df, on="Context", how="left").fillna(0)
 
 # Count trinucleotide mutations, normalize to proportions and merge with full 96 trinucleotide context list
-results = []
-all_samples_df = []
+sample_id = os.path.basename(vcf_path).split("_")[0]
+context_counts, total_mutations = count_trinucleotide_contexts(vcf_path, ref)
 
-for vcf_file in vcf_paths:
-    sample_id = os.path.basename(vcf_file).split("_")[0]
-    context_counts, total_mutations = count_trinucleotide_contexts(vcf_file, ref)
+sample_df = pd.DataFrame.from_dict(context_counts, orient="index", columns=["Mutations"])
+sample_df.index.name = "Context"
+sample_df = sample_df.reset_index()
+sample_df["Proportion"] = sample_df["Mutations"] / total_mutations
+sample_df["SampleID"] = sample_id
 
-    sample_df = pd.DataFrame.from_dict(context_counts, orient="index", columns=["Mutations"])
-    sample_df.index.name = "Context"
-    sample_df = sample_df.reset_index()
-    sample_df["Proportion"] = sample_df["Mutations"] / total_mutations
-    sample_df["SampleID"] = sample_id
+sample_df = contexts_96.to_frame().merge(sample_df, on="Context", how="left").fillna(0)
 
-    sample_df = contexts_96.to_frame().merge(sample_df, on="Context", how="left").fillna(0)
 # Compare sample's trinucleotide profile to NanoSeq reference using cosine similarity
-    v1 = sample_df["Proportion"].to_numpy()
-    v2 = nanoseq_df["Proportion"].to_numpy()
+v1 = sample_df["Proportion"].to_numpy()
+v2 = nanoseq_df["Proportion"].to_numpy()
 
-    cosine_sim = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
-    print(f"[INFO] Cosine similarity for {sample_id} = {cosine_sim:.4f}")
-    results.append((sample_id, cosine_sim))
-    all_samples_df.append(sample_df)
+cosine_sim = round(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)), 3)
 
 # Write cosine similarity results
-metrics_df = pd.DataFrame(results, columns=["SampleID", "Cosine_similarity_score"])
-metrics_df.to_csv(output_path, sep="\t", index=False)
+output_data = {
+     "description": (
+    "Cosine similarity for trinucleotide context compared to nanoseq granulocyte reference data."
+    ),
+    "sample": sample,
+    "cosine_similarity_score": cosine_sim
+}
+
+with open(json_out_path, "w") as out_f:
+    json.dump(output_data, out_f, indent=4)
 
 print("[INFO] Finished ex_trinucleotide_context_metrics.py")
