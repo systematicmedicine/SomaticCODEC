@@ -34,9 +34,8 @@ print("[INFO] Starting ex_trinucleotide_context_metrics.py")
 vcf_path = snakemake.input.vcf_snvs
 ref_path = snakemake.input.ref
 nanoseq_contexts_path = snakemake.input.nanoseq_contexts
-output_path = snakemake.output.metrics
 sample = snakemake.params.sample
-json_out_path = snakemake.outputs.metrics
+json_out_path = snakemake.output.metrics
 
 # Load reference genome
 ref = pysam.FastaFile(ref_path)
@@ -129,7 +128,7 @@ sample_df = contexts_96.to_frame().merge(sample_df, on="Context", how="left").fi
 v1 = sample_df["Proportion"].to_numpy()
 v2 = nanoseq_df["Proportion"].to_numpy()
 
-cosine_sim = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+cosine_sim = round(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)), 3)
 
 # Write cosine similarity results
 output_data = {
@@ -137,7 +136,7 @@ output_data = {
     "Cosine similarity for trinucleotide context compared to nanoseq granulocyte reference data."
     ),
     "sample": sample,
-    "Cosine_similarity_score": cosine_sim
+    "cosine_similarity_score": cosine_sim
 }
 
 with open(json_out_path, "w") as out_f:
