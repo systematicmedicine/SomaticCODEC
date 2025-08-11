@@ -19,7 +19,7 @@ import pytest
 # Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(4)
+    pytest.mark.order(5)
 ]
 
 def test_snakemake_dryrun():
