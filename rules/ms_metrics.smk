@@ -213,7 +213,7 @@ rule ms_candidate_variant_metrics_summary:
 
 
 # Generates metrics for each mask BED file
-rule masking_metrics:
+rule ms_masking_metrics:
     input:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
@@ -224,34 +224,15 @@ rule masking_metrics:
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
         ref_index = config['GRCh38_path'] + ".fai"
     output:
-        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.txt",
+        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json",
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),
         intermediate_merged = temp("tmp/{ms_sample}/{ms_sample}_masks_merged.txt")
+    params:
+        sample = "{ms_sample}"
     log:
-        "logs/{ms_sample}/masking_metrics.log"
+        "logs/{ms_sample}/ms_masking_metrics.log"
     benchmark:
-        "logs/{ms_sample}/masking_metrics.benchmark.txt"
-    shell:
-        """
-        total_genome_bp=$(awk '{{sum += $2}} END {{print sum}}' {input.ref_index} 2>> {log})
-
-        printf "Mask File\\tMasked bases\\t%% of ref genome\\n" > {output.mask_metrics} 2>> {log}
-
-        for bed in \
-            {input.gnomAD_bed} \
-            {input.GIAB_bed} \
-            {input.ms_lowdepth_bed} \
-            {input.ms_germ_del_bed} \
-            {input.ms_germ_ins_bed} \
-            {input.ms_germ_snv_bed} \
-            {input.combined_bed}
-        do
-            name=$(basename "$bed")
-            bedtools sort -i "$bed" > {output.intermediate_sorted} 2>> {log}
-            bedtools merge -i {output.intermediate_sorted} > {output.intermediate_merged} 2>> {log}
-            masked_bp=$(awk '{{sum += $3 - $2}} END {{print sum}}' {output.intermediate_merged} 2>> {log})
-            pct=$(awk -v masked="$masked_bp" -v total="$total_genome_bp" 'BEGIN {{printf "%.2f", (masked / total) * 100}}' 2>> {log})
-            printf "%s\\t%s\\t%s%%\\n" "$name" "$masked_bp" "$pct" >> {output.mask_metrics} 2>> {log}
-        done
-        """
+        "logs/{ms_sample}/ms_masking_metrics.benchmark.txt"
+    script:
+       "../scripts/ms_masking_metrics.py"
 
