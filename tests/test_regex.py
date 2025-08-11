@@ -23,8 +23,11 @@ from rpy2.robjects.conversion import localconverter
 from rpy2.robjects import default_converter
 from rpy2.robjects import pandas2ri
 
-# Skip untill docker file has been updated
-@pytest.mark.skip
+# Pytest marking
+pytestmark = [
+    pytest.mark.quicktests,
+    pytest.mark.order(4)
+]
 
 # Define paths
 TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
