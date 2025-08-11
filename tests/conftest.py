@@ -12,6 +12,7 @@ import pytest
 from pathlib import Path
 import shutil
 import subprocess
+from datetime import datetime
 
 # Deletes all files from metrics, results, logs, tmp and .snakemake directories
 def clean_workspace():
@@ -66,6 +67,11 @@ def lightweight_test_run():
     for filename in files_to_copy:
         shutil.copy2(src_dir / filename, dst_dir / filename)
 
+    # Log file setup
+    log_dir = Path("logs")
+    log_dir.mkdir(exist_ok=True)
+    log_file = log_dir / f"pipeline_run_{datetime.now():%Y%m%d}.log"
+    
     # Run snakemake
     snakemake_cmd = [
         "snakemake",
@@ -75,13 +81,24 @@ def lightweight_test_run():
         "--notemp",
     ]
 
-    result = subprocess.run(snakemake_cmd, capture_output = True)
+    try:
+        with log_file.open("w", encoding="utf-8") as log:
+            result = subprocess.run(
+                snakemake_cmd,
+                stdout=log,
+                stderr=subprocess.STDOUT,  # merge stderr into stdout
+                text=True,
+                check=False,               # we handle failure below
+            )
+    except FileNotFoundError as e:
+        raise RuntimeError("Failed to launch Snakemake. Is it installed and on PATH?") from e
+
     if result.returncode != 0:
-        raise RuntimeError("Pipeline failed:\n" + result.stderr.decode())
+        raise RuntimeError(f"Pipeline failed — see log: {log_file}")
 
     # Yield control to the test
     yield
 
-    # Cleanup test environmnt
+    # Cleanup test environment
     clean_workspace()
 
