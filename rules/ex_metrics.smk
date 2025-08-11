@@ -236,27 +236,6 @@ rule ex_duplication_metrics:
 
 
 """
-Custom python script to assess demultiplexing
-
-rule ex_raw_read_counts_metrics:
-    input:
-        ex_samples = config["ex_samples_path"],
-        ex_lanes = config["ex_lanes_path"],
-        json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
-    output:
-        readcounts = "metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt"
-    params:
-        fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta"
-    log:
-        "logs/{ex_lane}/ex_raw_read_counts_metrics.log"
-    benchmark:
-        "logs/{ex_lane}/ex_raw_read_counts_metrics.benchmark.txt"
-    script:
-        "../scripts/ex_raw_read_counts_metrics.py"
-"""
-
-
-"""
 Calculate the somatic variant rate
 """
 rule ex_somatic_variant_rate:
