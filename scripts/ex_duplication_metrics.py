@@ -12,7 +12,9 @@ The BAM used for this calculation is the aligned BAM with byproducts removed (co
 
 The calculation is 1 - (unique reads/total reads). Unique reads are the number of reads with a unique UMI. 
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Joshua Johnstone
 """
 
 import pandas as pd
@@ -34,10 +36,10 @@ def main(snakemake):
 
     rows = []
     df = pd.read_csv(hist_file, sep="\t")
-    unique_reads = int((df["count"] * 2).sum())
-    total_reads = int((df["family_size"] * df["count"] * 2).sum())
-    duplication_rate = round(100 * (1 - unique_reads / total_reads), 2)
-    pct_unique_reads = round(100 * (unique_reads / total_reads), 2)
+    unique_reads = int(df.loc[df['family_size'] == 1, 'count'].sum())
+    total_reads = int((df['family_size'] * df['count']).sum())
+    duplication_rate = round(100 * (1 - unique_reads / total_reads), 2) if unique_reads else 100
+    pct_unique_reads = round(100 * (unique_reads / total_reads), 2) if unique_reads else 0
 
     # Create output JSON object
     output_data = {
