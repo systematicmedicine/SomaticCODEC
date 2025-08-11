@@ -85,10 +85,10 @@ def lightweight_test_run():
         with log_file.open("w", encoding="utf-8") as log:
             result = subprocess.run(
                 snakemake_cmd,
-                stdout=log,
-                stderr=subprocess.STDOUT,  # merge stderr into stdout
+                stdout=None,
+                stderr=log, 
                 text=True,
-                check=False,               # we handle failure below
+                check=False,
             )
     except FileNotFoundError as e:
         raise RuntimeError("Failed to launch Snakemake. Is it installed and on PATH?") from e
