@@ -79,7 +79,7 @@ rule ms_filter_fastq:
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_filter_metrics.txt"
+        report = "metrics/{ms_sample}/{ms_sample}_filtered_fq_metrics.txt"
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
