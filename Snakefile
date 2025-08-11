@@ -25,9 +25,9 @@ Authors:
 """
 
 
-"""
-Setup
-"""
+# ---------------------------------------------------------------------------------------------
+# Setup
+# ---------------------------------------------------------------------------------------------
 
 # Load libraries
 import os
@@ -36,23 +36,9 @@ import scripts.get_metadata as md
 # Set working directory
 os.chdir(workflow.basedir)
 
-# Include required rules files
-include: "rules/ms_preprocess_fastq.smk"
-include: "rules/ms_alignment.smk"
-include: "rules/ms_call_germ.smk"
-include: "rules/ms_metrics.smk"
-include: "rules/ex_preprocess_fastq.smk"
-include: "rules/ex_alignment.smk"
-include: "rules/ex_create_dsc.smk"
-include: "rules/ex_call_somatic.smk"
-include: "rules/ex_metrics.smk"
-include: "rules/index_reference_genome.smk"
-include: "rules/masked_regions.smk"
-include: "rules/other_metrics.smk"
-
-"""
-Define outputs
-"""
+# ---------------------------------------------------------------------------------------------
+# Define pipeline outputs
+# ---------------------------------------------------------------------------------------------
 
 # Get lists of sample ids
 ex_lane_ids = md.get_ex_lane_ids(config)
@@ -80,7 +66,6 @@ ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
-    #expand("metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_total_read_loss.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
@@ -129,14 +114,31 @@ ms_metrics = [
 
 # Define other metrics
 other_metrics = [
+    "logs/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
-    "logs/git_metadata.json",
     "logs/combined_benchmarks.csv"
 ]
 
-# Call rule all
+# Define rule all
 rule all:
     input:
         results + ex_metrics + ms_metrics + other_metrics
-        
+
+
+# ---------------------------------------------------------------------------------------------
+# Include required rules files
+# ---------------------------------------------------------------------------------------------
+
+include: "rules/ms_preprocess_fastq.smk"
+include: "rules/ms_alignment.smk"
+include: "rules/ms_call_germ.smk"
+include: "rules/ms_metrics.smk"
+include: "rules/ex_preprocess_fastq.smk"
+include: "rules/ex_alignment.smk"
+include: "rules/ex_create_dsc.smk"
+include: "rules/ex_call_somatic.smk"
+include: "rules/ex_metrics.smk"
+include: "rules/index_reference_genome.smk"
+include: "rules/masked_regions.smk"
+include: "rules/other_metrics.smk"        
