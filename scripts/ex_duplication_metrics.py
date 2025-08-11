@@ -17,31 +17,44 @@ Author: James Phie
 
 import pandas as pd
 import sys
+import json
 
-# Redirect stdout and stderr to the Snakemake log file
-sys.stdout = open(snakemake.log[0], "a")
-sys.stderr = open(snakemake.log[0], "a")
-print("[INFO] Starting ex_duplication_metrics.py")
+def main(snakemake):
+    # Redirect stdout and stderr to the Snakemake log file
+    sys.stdout = open(snakemake.log[0], "a")
+    sys.stderr = open(snakemake.log[0], "a")
+    print("[INFO] Starting ex_duplication_metrics.py")
 
-# Begin script
-hist_files = snakemake.input.umi_metrics
-output_files = snakemake.output.file_paths
+    # Define inputs
+    hist_file = snakemake.input.umi_metrics
+    sample = snakemake.params.sample
 
-rows = []
-for path, out_path in zip(hist_files, output_files):
-    sample = path.split("/")[-1].replace("_map_umi_metrics.txt", "")
-    df = pd.read_csv(path, sep="\t")
-    
-    unique_reads = (df["count"] * 2).sum()
-    total_reads = (df["family_size"] * df["count"] * 2).sum()
-    duplication_rate = 1 - (unique_reads / total_reads) if total_reads > 0 else 0
+    # Define output
+    output_json = snakemake.output.json
 
-    # Save output table
-    result_df = pd.DataFrame(
-        [[sample, unique_reads, total_reads, round(duplication_rate, 6)]],
-        columns=["Sample", "Unique reads", "Total reads", "Duplication rate"]
-    )
-    result_df.to_csv(out_path, sep="\t", index=False)
+    rows = []
+    df = pd.read_csv(hist_file, sep="\t")
+    unique_reads = int((df["count"] * 2).sum())
+    total_reads = int((df["family_size"] * df["count"] * 2).sum())
+    duplication_rate = round(100 * (1 - unique_reads / total_reads), 2)
+    pct_unique_reads = round(100 * (unique_reads / total_reads), 2)
 
-# Print script completion message to log
-print("[INFO] Completed ex_duplication_metrics.py")
+    # Create output JSON object
+    output_data = {
+        "description": "Duplication rates calculated from umihistogram data",
+        "sample": sample,
+        "unique_reads": unique_reads,
+        "total_reads": total_reads,
+        "duplication_rate": duplication_rate,
+        "pct_unique_reads": pct_unique_reads
+        }
+
+    # Write JSON output
+    with open(output_json, "w") as out_f:
+        json.dump(output_data, out_f, indent=4)
+
+    # Print script completion message to log
+    print("[INFO] Completed ex_duplication_metrics.py")
+
+if __name__ == "__main__":
+    main(snakemake)

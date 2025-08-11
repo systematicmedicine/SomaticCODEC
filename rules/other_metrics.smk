@@ -16,7 +16,7 @@ rule create_metrics_report:
     input:
         component_metrics_metadata = config["component_metrics_path"],
         system_metrics_metadata = config["system_metrics_path"],
-        final_ms_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = md.get_ms_sample_ids(config)),
+        final_ms_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = md.get_ms_sample_ids(config)),
         final_ex_metrics_file = expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = md.get_ex_sample_ids(config))
     output:
         csv_path = "metrics/metrics_report.csv",
@@ -44,7 +44,7 @@ rule collate_benchmarks:
     input:
         final_output_1 = "logs/git_metadata.json",
         final_output_2 = "metrics/metrics_report.csv",
-        final_ms_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.txt", ms_sample = md.get_ms_sample_ids(config)),
+        final_ms_metrics_file = expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = md.get_ms_sample_ids(config)),
         final_ex_metrics_file = expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = md.get_ex_sample_ids(config))
     output:
         file_path = "logs/combined_benchmarks.csv"

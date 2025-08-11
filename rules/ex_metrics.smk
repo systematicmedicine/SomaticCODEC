@@ -222,14 +222,15 @@ Duplication rate calculated based on unique UMI families output from ex_groupbyu
 """
 rule ex_duplication_metrics:
     input:
-        ex_samples = config["ex_samples_path"],
-        umi_metrics = expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample = md.get_ex_sample_ids(config))
+        umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt"
+    params:
+        sample = "{ex_sample}"
     output:
-        file_paths = expand("metrics/{ex_sample}/{ex_sample}_duplication_metrics.txt", ex_sample = md.get_ex_sample_ids(config))
+        json = "metrics/{ex_sample}/{ex_sample}_duplication_metrics.json"
     log:
-        "logs/ex_duplication_metrics.log"
+        "logs/{ex_sample}/ex_duplication_metrics.log"
     benchmark:
-        "logs/ex_duplication_metrics.benchmark.txt"
+        "logs/{ex_sample}/ex_duplication_metrics.benchmark.txt"
     script:
         "../scripts/ex_duplication_metrics.py"
 
