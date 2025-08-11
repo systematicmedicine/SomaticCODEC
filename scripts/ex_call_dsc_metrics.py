@@ -11,57 +11,49 @@ Authors:
 """
 import subprocess
 import json
+import sys
 
-# Initiate logging
-sys.stdout = open(snakemake.log[0], "a")
-sys.stderr = open(snakemake.log[0], "a")
-print("[INFO] Starting ex_call_dsc_metrics.py")
+def main(snakemake):
+    # Redirect stdout and stderr to log file
+    sys.stdout = open(snakemake.log[0], "a")
+    sys.stderr = open(snakemake.log[0], "a")
+    print("[INFO] Starting ex_call_dsc_metrics.py")
 
-# Get BAM file paths
-pre_call_bam_path = snakemake.input.pre_call_bam
-post_call_bam_path = snakemake.input.post_call_bam
+    # Load Snakemake inputs
+    pre_call_bam_path = snakemake.input["pre_call_bam"]
+    post_call_bam_path = snakemake.input["post_call_bam"]
+    json_out_path = snakemake.output["call_dsc_metrics"]
+    sample = snakemake.params["sample"]
 
-# Define output JSON path
-json_out_path = snakemake.output.call_dsc_metrics
-
-# Define sample name
-sample = snakemake.params.sample
-
-# Function to count primarily alignment reads in a BAM file
-def count_reads(bam_path):
-    with open(snakemake.log[0], "a") as log_file:
-        result = subprocess.run(
-            ["samtools", "view", "-c", "-F", "0x900", bam_path],
-            stdout=subprocess.PIPE,
-            stderr=log_file,
-            text=True,
-            check=True
+    # Count primary aligned reads in a BAM
+    def count_reads(bam_path):
+        with open(snakemake.log[0], "a") as log_file:
+            result = subprocess.run(
+                ["samtools", "view", "-c", "-F", "0x900", bam_path],
+                stdout=subprocess.PIPE,
+                stderr=log_file,
+                text=True,
+                check=True
             )
-    return int(result.stdout.strip())
+        return int(result.stdout.strip())
 
-pre_reads = count_reads(pre_call_bam_path)
-post_reads = count_reads(post_call_bam_path)
+    # Calculate reads pre and post calling dsc
+    pre_reads = count_reads(pre_call_bam_path)
+    post_reads = count_reads(post_call_bam_path)
+    reads_lost = round(100 * (pre_reads - post_reads) / pre_reads, 1)
 
-reads_lost = round(100 * (pre_reads - post_reads) / pre_reads, 1)
+    # Write data to JSON
+    output_data = {
+        "description": "Percentage of reads lost during ex_call_dsc.",
+        "sample": sample,
+        "reads_lost": reads_lost
+    }
 
-output_data = {
-     "description": (
-    "Percentage of reads lost during ex_call_dsc."
-    ),
-    "sample": sample,
-    "reads_lost": reads_lost
-}
+    with open(json_out_path, "w") as out_f:
+        json.dump(output_data, out_f, indent=4)
 
-# Write to JSON
-with open(json_out_path, "w") as out_f:
-    json.dump(output_data, out_f, indent=4)
+    print("[INFO] Completed ex_call_dsc_metrics.py")
 
-print("[INFO] Completed ex_call_dsc_metrics.py")
-
-
-
-
-
-
-
-
+# Only run in Snakemake
+if __name__ == "__main__":
+    main(snakemake) 
