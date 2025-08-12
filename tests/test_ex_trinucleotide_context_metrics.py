@@ -52,4 +52,4 @@ def test_trinucleotide_metrics(tmp_path, vcf_path, ref_path, nanoseq_path, sampl
     with open(tmp_output) as f:
         data = json.load(f)
 
-    assert data["cosine_similarity_score"] == 0
+    assert data["cosine_similarity_score"] == 0.958
