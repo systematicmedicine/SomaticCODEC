@@ -13,15 +13,17 @@ import shutil
 from scripts.ms_candidate_variant_metrics_summary import main
 
 @pytest.mark.parametrize(
-    "variant_metrics_path, fai_path, het_hom_ratio_path, sample_name, expected_metrics",
+    "mask_metrics_path, variant_metrics_path, fai_path, het_hom_ratio_path, sample_name, expected_metrics",
     [
         (
+            "tests/data/test_ms_candidate_variant_metrics_summary/mask_metrics.json",
             "tests/data/test_ms_candidate_variant_metrics_summary/variant_metrics.txt",
             "tests/data/test_ms_candidate_variant_metrics_summary/reference.fai",
             "tests/data/test_ms_candidate_variant_metrics_summary/ms_het_hom_ratio.txt",
             "TestSample",
             {
-                "germline_variant_rate": 0.0025,
+                "fraction_genome_over_depth_threshold": 0.5,
+                "germline_variant_rate": 0.005,
                 "snv_indel_ratio": 9,
                 "insertion_deletion_ratio": 0.92,
                 "MNP_other_variants": 3,
@@ -31,12 +33,14 @@ from scripts.ms_candidate_variant_metrics_summary import main
         )
     ]
 )
-def test_ms_candidate_variant_metrics_summary(tmp_path, variant_metrics_path, fai_path, het_hom_ratio_path, sample_name, expected_metrics):
+def test_ms_candidate_variant_metrics_summary(tmp_path, mask_metrics_path, variant_metrics_path, fai_path, het_hom_ratio_path, sample_name, expected_metrics):
 
+    mmp = tmp_path / "mask_metrics.json"
     vmp = tmp_path / "variant_metrics.txt"
     fp = tmp_path / "reference.fai"
     hhp = tmp_path / "ms_het_hom_ratio.txt"
 
+    shutil.copy(mask_metrics_path, mmp)
     shutil.copy(variant_metrics_path, vmp)
     shutil.copy(fai_path, fp)
     shutil.copy(het_hom_ratio_path, hhp)
@@ -45,7 +49,8 @@ def test_ms_candidate_variant_metrics_summary(tmp_path, variant_metrics_path, fa
         input = type("input", (), {
             "variant_metrics": str(vmp),
             "fai": str(fp),
-            "ms_het_hom_ratio": str(hhp)
+            "ms_het_hom_ratio": str(hhp),
+            "mask_metrics": str(mmp)
         })
         params = type("params", (), {"sample": sample_name})
         output = type("output", (), {"summary": str(tmp_path / "summary.json")})
