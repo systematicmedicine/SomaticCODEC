@@ -193,23 +193,6 @@ rule ms_het_hom_ratio:
         ' OFS="\\t" {output.intermediate_counts} > {output.ms_het_hom_ratio} 2>> {log}
         """
 
-# Generates a summary of key metrics for candidate ms germline variants
-rule ms_candidate_variant_metrics_summary:
-    input: 
-        variant_metrics = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt",
-        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt",
-        fai = config['GRCh38_path'] + ".fai"
-    output:
-        summary = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json"
-    params:
-        sample = "{ms_sample}"
-    log:
-        "logs/{ms_sample}/ms_candidate_variant_metrics_summary.log"
-    benchmark:
-        "logs/{ms_sample}/ms_candidate_variant_metrics_summary.benchmark.txt"
-    script:
-        "../scripts/ms_candidate_variant_metrics_summary.py"
-
 
 # Generates metrics for each mask BED file
 rule ms_masking_metrics:
@@ -234,4 +217,23 @@ rule ms_masking_metrics:
         "logs/{ms_sample}/ms_masking_metrics.benchmark.txt"
     script:
        "../scripts/ms_masking_metrics.py"
+
+
+# Generates a summary of key metrics for candidate ms germline variants
+rule ms_candidate_variant_metrics_summary:
+    input: 
+        variant_metrics = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt",
+        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt",
+        fai = config['GRCh38_path'] + ".fai",
+        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json"
+    output:
+        summary = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json"
+    params:
+        sample = "{ms_sample}"
+    log:
+        "logs/{ms_sample}/ms_candidate_variant_metrics_summary.log"
+    benchmark:
+        "logs/{ms_sample}/ms_candidate_variant_metrics_summary.benchmark.txt"
+    script:
+        "../scripts/ms_candidate_variant_metrics_summary.py"
 
