@@ -8,6 +8,7 @@ Rule to be used exclusively with parent rule, ex_total_read_loss
 Authors:
     - Chat-GPT
     - Cameron Fraser
+    - Joshua Johnstone
 """
 
 # Import libraries
@@ -15,36 +16,36 @@ import json
 import subprocess
 import pysam
 import os
+import sys
 
-# Initiate logging
-sys.stdout = open(snakemake.log[0], "a")
-sys.stderr = open(snakemake.log[0], "a")
-print("[INFO] Starting ex_total_read_loss.py")
-
-# Count number of reads in a FASTQ file
-def count_fastq_reads(fastq_path):
-    try:
-        result = subprocess.run(
-            ["seqkit", "stats", "-T", fastq_path],
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        lines = result.stdout.strip().splitlines()
-        if len(lines) < 2:
-            raise ValueError(f"Unexpected output from seqkit:\n{result.stdout}")
-        return int(lines[1].split('\t')[3]) 
-    except Exception as e:
-        raise RuntimeError(f"Failed to count reads in {fastq_path} using seqkit:\n{e}")
-
-# Count number of reads in a BAM file
-def count_bam_reads(bam_path):
-
-    with pysam.AlignmentFile(bam_path, "rb") as bam:
-        return sum(1 for _ in bam)
-
-# Main logic
 def main(snakemake):
+    # Initiate logging
+    sys.stdout = open(snakemake.log[0], "a")
+    sys.stderr = open(snakemake.log[0], "a")
+    print("[INFO] Starting ex_total_read_loss.py")
+
+    # Count number of reads in a FASTQ file
+    def count_fastq_reads(fastq_path):
+        try:
+            result = subprocess.run(
+                ["seqkit", "stats", "-T", fastq_path],
+                check=True,
+                capture_output=True,
+                text=True
+            )
+            lines = result.stdout.strip().splitlines()
+            if len(lines) < 2:
+                raise ValueError(f"Unexpected output from seqkit:\n{result.stdout}")
+            return int(lines[1].split('\t')[3]) 
+        except Exception as e:
+            raise RuntimeError(f"Failed to count reads in {fastq_path} using seqkit:\n{e}")
+
+    # Count number of reads in a BAM file
+    def count_bam_reads(bam_path):
+
+        with pysam.AlignmentFile(bam_path, "rb") as bam:
+            return sum(1 for _ in bam)
+
     # Count R1 and R2 reads using seqkit
     r1_count = count_fastq_reads(snakemake.input.input_fastq1)
     r2_count = count_fastq_reads(snakemake.input.input_fastq2)

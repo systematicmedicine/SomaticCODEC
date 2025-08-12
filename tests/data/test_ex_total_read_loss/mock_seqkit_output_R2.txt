@@ -1,0 +1,2 @@
+file	format	type	reads	bases	Q1	Q2	Q3	min	max
+input_R2.fastq	fastq	DNA	4	48	0	0	0	0	12

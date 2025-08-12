@@ -1,19 +1,17 @@
 """
---- fastqc_summary_metrics.py ---
+--- ex_fastqc_summary_metrics.py ---
 
 Generates a summary file with key fastqc metrics
 
-To be used with all rules that generate fastqc reports
+To be used with rule ex_fastqc_summary_metrics
 
 Authors:
     - Chat-GPT
     - Joshua Johnstone
 """
 import pandas as pd
-from pathlib import Path
 import json
 import sys
-import numpy as np, scipy.stats
 
 def main(snakemake):
     # Initiate logging
@@ -48,45 +46,32 @@ def main(snakemake):
     sample = snakemake.params.sample
 
     # Load fastqc file paths
-    fastqc_file_paths = snakemake.input.fastqc_files
+    fastqc_file_paths = [snakemake.input.ex_lane_raw_r1, snakemake.input.ex_lane_raw_r2, snakemake.input.ex_filter_r1, snakemake.input.ex_filter_r2]
 
     # For each fastqc_data file, pull out key metrics and output in json
     for file_path in fastqc_file_paths:
             
-        file_path = Path(file_path)
-        output_json = file_path.with_name(file_path.stem + "_summary.json")
+        output_json = file_path.replace(".txt", "_summary.json") 
 
         modules = parse_fastqc_data(file_path)
 
         total_reads = int(modules["Basic Statistics"].set_index("Measure").loc["Total Sequences", "Value"])
-
-        per_sequence_quality = round(modules["Per sequence quality scores"].astype(float).loc[modules["Per sequence quality scores"].astype(float)["Count"].idxmax(), "Quality"], 2)
-
+        per_sequence_quality = round(float(modules["Per sequence quality scores"]["Quality"].astype(float).mode()[0]), 2)
         per_base_quality = round(float(modules["Per base sequence quality"]["Lower Quartile"].astype(float).min()), 2)
-
-        per_tile_quality = round(100 * modules["Per tile sequence quality"].assign(Mean=lambda df: df["Mean"].astype(float)).groupby("Tile")["Mean"].apply(lambda x: (x <= -4).any()).mean(), 2)
-
+        per_tile_quality = round(100 * (modules["Per tile sequence quality"]["Mean"].astype(float) < 36).mean(), 2)
         read_length = int(modules["Sequence Length Distribution"].sort_values("Count", ascending=False)["Length"].iloc[0].split('-')[0])
-
         overrepresented_sequences = round(float(modules["Overrepresented sequences"]["Percentage"].astype(float).max()) if "Overrepresented sequences" in modules and not modules["Overrepresented sequences"].empty else 0.0, 2)
-
-        gc_deviation = round(100 * (lambda b,c,n,m,s: np.abs(c - scipy.stats.norm.pdf(b,m,s)*n).sum() / n)(*(lambda df: (
-        df.index.astype(float),
-        df["Count"].values,
-        df["Count"].sum(),
-        np.average(df.index.astype(float), weights=df["Count"]),
-        np.sqrt(np.average((df.index.astype(float) - np.average(df.index.astype(float), weights=df["Count"]))**2, weights=df["Count"]))))(modules["Per sequence GC content"].astype(float))), 2)
-
+        gc_deviation = round(((modules["Per sequence GC content"]["Count"].astype(float).sum() - modules["Per sequence GC content"]["Count"].astype(float).max()) / modules["Per sequence GC content"]["Count"].astype(float).sum()) * 100, 2)
         per_base_content_diff = round(modules["Per base sequence content"][["A", "T", "C", "G"]].astype(float).pipe(lambda df: ((df["A"] - df["T"]).abs().combine((df["C"] - df["G"]).abs(), max))).max(), 2)
-
         per_base_N_content = round(float(modules["Per base N content"]["N-Count"].astype(float).max()), 2)
+
 
         result = {
         "description": (
             "Summary of key metrics from fastqc report (see component metrics csv for definitions)"
         ),
         "sample": sample,
-        "fastqc_file": str(file_path),
+        "fastqc_file": file_path,
         "total_reads": total_reads,
         "per_sequence_quality": per_sequence_quality,
         "per_base_quality": per_base_quality,

@@ -46,12 +46,26 @@ def main(snakemake):
                     count = int(trimmed_match.group(1).replace(",", ""))
                     trimmed_counts[current_adapter] += count
 
-    # Collate counts and calculate Gini coefficient
+        # Calculate total trimmed reads
+    total_trimmed = sum(trimmed_counts.values())
+
+    # Calculate percentage of total trimmed reads per adapter
+    trimmed_percentages = {}
+    if total_trimmed > 0:
+        for adapter, count in trimmed_counts.items():
+            trimmed_percentages[adapter] = round((count / total_trimmed) * 100, 2)
+    else:
+        # Avoid division by zero if no trimmed reads found
+        for adapter in trimmed_counts.keys():
+            trimmed_percentages[adapter] = 0.0
+
+    # Collate counts, percentages, and calculate Gini coefficient
     output_data = {
         "description": (
-        "Summary of adaptor counts and Gini coefficient for inequality between counts."
+            "Summary of adaptor counts and Gini coefficient for inequality between counts."
         ),
         "trimmed_counts": dict(trimmed_counts),
+        "trimmed_percentages": trimmed_percentages,
         "gini_coefficient": round(gini_coefficient(list(trimmed_counts.values())), 3)
     }
 
