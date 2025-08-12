@@ -172,6 +172,7 @@ assess_metric <- function(metric) {
   
   # Extract values from the input
   metric_name <- metric[["Name"]]
+  stage <- metric[["Stage"]]
   nn_lower <- metric["nn_lower"]
   nn_upper <- metric["nn_upper"]
   ideal_lower <- metric["ideal_lower"]
@@ -203,6 +204,7 @@ assess_metric <- function(metric) {
     # Append a row to results list
     results_list[[length(results_list) + 1]] <- data.frame(
       Metric = metric_name,
+      Stage = stage,
       Sample = sample_id,
       Value = value,
       Grade = grade
