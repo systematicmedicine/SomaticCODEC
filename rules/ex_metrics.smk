@@ -59,8 +59,8 @@ Generates a summary of key metrics for ex raw fastqc reports
 """
 rule ex_fastqc_raw_summary_metrics:
     input:
-        ex_lane_raw_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
-        ex_lane_raw_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"
+        fastqc_files = ["metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
+        "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"]
     output:
         ex_lane_raw_summary_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json",
         ex_lane_raw_summary_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json"
@@ -156,8 +156,8 @@ Generates a summary of key metrics for ex filter fastqc reports
 """
 rule ex_fastqc_filter_summary_metrics:
     input:
-        ex_filter_r1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt",
-        ex_filter_r2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt"
+        fastqc_files = ["metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt",
+        "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt"]
     output:
         ex_filter_summary_r1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics_summary.json",
         ex_filter_summary_r2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics_summary.json"
@@ -233,27 +233,6 @@ rule ex_duplication_metrics:
         "logs/{ex_sample}/ex_duplication_metrics.benchmark.txt"
     script:
         "../scripts/ex_duplication_metrics.py"
-
-
-"""
-Custom python script to assess demultiplexing
-
-rule ex_raw_read_counts_metrics:
-    input:
-        ex_samples = config["ex_samples_path"],
-        ex_lanes = config["ex_lanes_path"],
-        json = "metrics/{ex_lane}/{ex_lane}_demux_metrics.json"
-    output:
-        readcounts = "metrics/{ex_lane}/{ex_lane}_sample_readcounts_metrics.txt"
-    params:
-        fasta = lambda wildcards: f"tmp/{wildcards.ex_lane}/{wildcards.ex_lane}_r1_start.fasta"
-    log:
-        "logs/{ex_lane}/ex_raw_read_counts_metrics.log"
-    benchmark:
-        "logs/{ex_lane}/ex_raw_read_counts_metrics.benchmark.txt"
-    script:
-        "../scripts/ex_raw_read_counts_metrics.py"
-"""
 
 
 """
