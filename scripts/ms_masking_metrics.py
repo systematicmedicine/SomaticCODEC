@@ -12,20 +12,20 @@ import sys
 import subprocess
 import json
 
-def run_cmd(cmd):
-    # Run shell command and return stdout
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f"[ERROR] Command failed: {cmd}")
-        print(result.stderr)
-        sys.exit(1)
-    return result.stdout.strip()
-
 def main(snakemake):
     # Redirect stdout and stderr to log file
     sys.stdout = open(snakemake.log[0], "a")
     sys.stderr = open(snakemake.log[0], "a")
     print("[INFO] Starting masking_metrics.py")
+
+    # Run shell command and return stdout
+    def run_cmd(cmd):
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"[ERROR] Command failed: {cmd}")
+            print(result.stderr)
+            sys.exit(1)
+        return result.stdout.strip()
 
     # Map logical mask names to bed file paths
     mask_files = {
