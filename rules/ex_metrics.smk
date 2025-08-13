@@ -377,7 +377,7 @@ rule ex_total_read_loss:
     log:
         "logs/{ex_lane}/ex_total_read_loss.log"
     benchmark:
-        "logs/{ex_lane}/{ex_lane}_ex_total_read_loss.benchmark.txt"
+        "logs/{ex_lane}/ex_total_read_loss.benchmark.txt"
     script:
         "../scripts/ex_total_read_loss.py"
 
@@ -393,6 +393,6 @@ rule ex_softclipping_metrics:
     log:
         "logs/{ex_sample}/ex_softclipping_metrics.log"
     benchmark:
-        "logs/{ex_sample}/{ex_sample}_ex_softclipping_metrics.benchmark.txt"
+        "logs/{ex_sample}/ex_softclipping_metrics.benchmark.txt"
     script:
         "../scripts/ex_softclipping_metrics.py"
