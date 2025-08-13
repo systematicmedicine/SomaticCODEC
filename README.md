@@ -32,11 +32,11 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
     * `download_list.csv` (optional)
 * Create tmux session
 ```
-tmux new -s bioinf
+tmux new -s codec-session
 ```
 * Run docker container
 ```
-sudo docker run -it --name pipeline -v "$PWD":/work -w /work codec
+sudo docker run -it --name codec-container -v "$PWD":/work -w /work codec-image
 ```
 * Download FASTQ and reference files
 ```
