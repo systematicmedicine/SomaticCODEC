@@ -58,6 +58,6 @@ cd codec-opensource
 sudo snap install docker
 
 # Build docker image from dockerfile
-sudo docker build -t codec .
+sudo docker build -t codec-image .
 ```
 
