@@ -15,6 +15,11 @@ import subprocess
 import json
 from pathlib import Path
 
+# Redirect stdout and stderr to log file
+sys.stdout = open(snakemake.log[0], "a")
+sys.stderr = open(snakemake.log[0], "a")
+print("[INFO] Starting write_git_metadata.py")
+
 # -- Ensure Git will accept /work as a safe repo (even with UID mismatch) --
 # This must run before any Git commands
 try:
@@ -66,3 +71,6 @@ metadata = get_git_metadata()
 Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 with open(output_path, "w") as f:
     json.dump(metadata, f, indent=4)
+
+# Log completion
+print("[INFO] Completed write_git_metadata.py")

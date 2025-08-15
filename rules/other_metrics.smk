@@ -16,10 +16,34 @@ import scripts.get_metadata as md
 rule write_git_metadata:
     output:
         file_path = "logs/git_metadata.json"
+    log:
+        "logs/write_git_metadata.log"
     benchmark:
         "logs/write_git_metadata.benchmark.txt"
     script:
         "../scripts/write_git_metadata.py"
+
+
+# Count number of reads and bases in FASTQ and BAM files
+rule count_reads_and_bases:
+        input:
+            final_ex_bams = expand("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam", ex_sample = md.get_ex_sample_ids(config)),
+            final_ms_bams = expand("tmp/{ms_sample}/{ms_sample}_sorted_map.bam", ms_sample = md.get_ms_sample_ids(config))
+        output:
+            json_paths = expand(
+                "metrics/{sample}/{sample}_read_base_counts.json", 
+                sample = md.get_ex_sample_ids(config) + 
+                md.get_ms_sample_ids(config) + 
+                md.get_ex_lane_ids(config)
+                )
+        threads:
+            max(1, os.cpu_count() // 4)
+        log:
+            "logs/count_reads_and_bases.log"
+        benchmark:
+            "logs/count_reads_and_bases.benchmark.txt"
+        shell:
+             "python scripts/count_reads_and_bases.py > {log} 2>&1"
 
 
 # Generates a pass/fail report for component & system level metrics
@@ -44,6 +68,7 @@ rule create_metrics_report:
 rule collate_benchmarks:
     input:
         rules.write_git_metadata.output.file_path,
+        rules.count_reads_and_bases.output.json_paths,
         rules.create_metrics_report.output
     output:
         file_path = "logs/combined_benchmarks.csv"
