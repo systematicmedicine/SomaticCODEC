@@ -396,3 +396,16 @@ rule ex_softclipping_metrics:
         "logs/{ex_sample}/ex_softclipping_metrics.benchmark.txt"
     script:
         "../scripts/ex_softclipping_metrics.py"
+
+
+rule ex_chromosomal_variant_rate_metrics:
+    input:
+        vcf = "results/{ex_sample}/{ex_sample}_variants.vcf"
+    output:
+        metrics = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
+    log:
+        "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_chromosomal_variant_rate_metrics.py"
