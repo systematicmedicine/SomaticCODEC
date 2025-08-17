@@ -5,7 +5,6 @@
 # Maintainer        : Cameron Fraser <info@systematicmedicine.com>
 # Base image        : Ubuntu 24.04
 # Package sources   : All software installed via APT or Conda (see environment.yml)
-# Notes             : fgbio is currently built from a feature branch; switch to Conda install once released.
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -43,24 +42,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     vim && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# ------------------------------------------------------------------------------
-# INSTALL FGBIO FEATURE BRANCH
-# ------------------------------------------------------------------------------
-RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | \
-    gpg --dearmor > /usr/share/keyrings/sbt-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/sbt-keyring.gpg] https://repo.scala-sbt.org/scalasbt/debian all main" \
-    > /etc/apt/sources.list.d/sbt.list && \
-    apt-get update && apt-get install -y sbt git default-jdk && \
-    git clone https://github.com/fulcrumgenomics/fgbio.git && \
-    cd fgbio && \
-    git checkout 195055de9eac97e959f64a0cfd2ce7a178a866fe && \
-    sbt assembly && \
-    mkdir -p /opt/fgbio && \
-    cp target/scala-2.13/fgbio-*.jar /opt/fgbio/fgbio.jar && \
-    echo -e '#!/bin/bash\nexec java ${JAVA_OPTS} -jar /opt/fgbio/fgbio.jar "$@"' > /usr/local/bin/fgbio && \
-    chmod +x /usr/local/bin/fgbio && \
-    rm -rf ~/.sbt ~/.ivy2 ~/.cache /var/lib/apt/lists/*
 
 # ------------------------------------------------------------------------------
 # Install CONDA PACKAGES FROM ENVIRONMENT.YML
