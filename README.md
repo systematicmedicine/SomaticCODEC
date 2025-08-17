@@ -11,7 +11,6 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 
 ## Contribution guidleines
 * [Versions, branches & pull requests](docs/versions_and_branches.md)
-* [Integration testing guidelines](docs/testing.md)
 * [Logging](docs/logging.md)
 
 ## Library prep and sequencing
