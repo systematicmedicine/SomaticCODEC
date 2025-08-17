@@ -37,7 +37,7 @@ ssh -i "myKey.pem" ubuntu@ec2-3-97-145-201.ap-southeast-2.compute.amazonaws.com
 ```
 
 ### Clone the codec-opensource repository
-The repository deploy key can be found at `\RwoD Research\Personal\Cameron\Misc\codec-opensource deploy key`
+The repository deploy key can be found at `\RwoD Research\Team A\Keys\codec-opensource deploy key`
 
 ```
 # Create empty file using vim, and paste in key
