@@ -184,7 +184,6 @@ rule ex_trim_fastq:
 Filter reads
     - Remove reads that are too short
     - Remove reads where the mean quality score is too low
-    - Remove reads with too many N bases
 """ 
 rule ex_filter_fastq:
     input: 
@@ -193,14 +192,13 @@ rule ex_filter_fastq:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
-        intermediate_r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter_tmp.fastq.gz"),
-        intermediate_r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter_tmp.fastq.gz"),
-        json_length = "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
-        json_meanquality = "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json",
+        length_metrics = "metrics/{ex_sample}/{ex_sample}_filter_length.txt",
+        quality_metrics = "metrics/{ex_sample}/{ex_sample}_filter_quality.txt",
+        r1_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r1_filter_intermediate.fastq.gz"),
+        r2_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r2_filter_intermediate.fastq.gz")
     params:
-        min_read_length = config["ex_filter_fastq"]["min_read_length"],
         average_quality_threshold = config["ex_filter_fastq"]["average_quality_threshold"],
-        n_base_limit = config["ex_filter_fastq"]["n_base_limit"],
+        min_read_length = config["ex_filter_fastq"]["min_read_length"]
     log:
         "logs/{ex_sample}/ex_filter.log"
     benchmark:
@@ -209,29 +207,30 @@ rule ex_filter_fastq:
         max(1, os.cpu_count() // 4)
     shell:  
         """
-        fastp \
-          -i {input.r1} \
-          -I {input.r2} \
-          -o {output.intermediate_r1} \
-          -O {output.intermediate_r2} \
-          --length_required {params.min_read_length} \
-          --disable_quality_filtering \
-          --n_base_limit 50 \
-          --disable_adapter_trimming \
-          --thread {threads} \
-          --html /dev/null \
-          --json {output.json_length} 2>> {log}
+        # Length filter
+        trimmomatic PE \
+            -phred33 \
+            -threads {threads} \
+            -summary {output.length_metrics} \
+            {input.r1} \
+            {input.r2} \
+            {output.r1_intermediate} \
+            /dev/null \
+            {output.r2_intermediate} \
+            /dev/null \
+            MINLEN:{params.min_read_length} 2>> {log}
 
-        fastp \
-          -i {output.intermediate_r1} \
-          -I {output.intermediate_r2} \
-          -o {output.r1} \
-          -O {output.r2} \
-          --average_qual {params.average_quality_threshold} \
-          --n_base_limit {params.n_base_limit} \
-          --disable_adapter_trimming \
-          --thread {threads} \
-          --html /dev/null \
-          --json {output.json_meanquality} 2>> {log}
+        # Average quality filter
+        trimmomatic PE \
+            -phred33 \
+            -threads {threads} \
+            -summary {output.quality_metrics} \
+            {output.r1_intermediate} \
+            {output.r2_intermediate} \
+            {output.r1} \
+            /dev/null \
+            {output.r2} \
+            /dev/null \
+            AVGQUAL:{params.average_quality_threshold} 2>> {log}
         """
 

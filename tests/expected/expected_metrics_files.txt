@@ -38,9 +38,8 @@ metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json
 metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json
-metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json
-metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json
-metrics/{ex_sample}/{ex_sample}_fastp_filter_summary_metrics.json
+metrics/{ex_sample}/{ex_sample}_filter_length.txt
+metrics/{ex_sample}/{ex_sample}_filter_quality.txt
 metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
 metrics/{ex_sample}/{ex_sample}_duplication_metrics.json
 metrics/{ex_lane}/{ex_lane}_total_read_loss.json
