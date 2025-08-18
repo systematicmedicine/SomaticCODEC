@@ -78,7 +78,13 @@ write.csv(report.df, CSV_OUTPUT_PATH, row.names = FALSE, quote = FALSE)
 
 # Create heatmap report
 report.heatmap <- plot_metric_heatmap(report.df)
-save_scaled_heatmap(report.heatmap, HEATMAP_PATH, nrow(report.df), ncol(report.df))
+save_scaled_heatmap(
+  plot = report.heatmap, 
+  path = HEATMAP_PATH, 
+  nrows = nrow(report.df), 
+  ncols = ncol(report.df),
+  base_height = 0.06
+  )
 
 # ---------------------------------------------------------------------------
 # Cleanup
