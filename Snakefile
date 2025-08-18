@@ -79,6 +79,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt", ex_sample = ex_sample_ids),

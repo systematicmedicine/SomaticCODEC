@@ -117,7 +117,8 @@ rule ex_call_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
+        metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
     params:
         max_duplex_disagreements = config["ex_call_dsc"]["max_duplex_disagreements"],
         min_read_pairs = config["ex_call_dsc"]["min_read_pairs"],
@@ -136,7 +137,8 @@ rule ex_call_dsc:
             -o {output.bam} \
             --max-duplex-disagreements {params.max_duplex_disagreements} \
             --single-strand-qual {params.single_strand_qual} \
-            --min-read-pairs {params.min_read_pairs} 2>> {log}
+            --min-read-pairs {params.min_read_pairs} \
+            --stats {output.metrics} 2>> {log}
         """
 
 
