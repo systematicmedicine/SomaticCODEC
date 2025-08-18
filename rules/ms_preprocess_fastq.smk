@@ -34,9 +34,10 @@ rule ms_trim_fastq:
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.txt"
     params:
-        spacer_length = config["ms_trim_fastq"]["spacer_length"],
         adaptor_1 = config["ms_trim_fastq"]["adaptor_1"],
-        adaptor_2 = config["ms_trim_fastq"]["adaptor_2"]
+        adaptor_2 = config["ms_trim_fastq"]["adaptor_2"],
+        spacer_length = config["ms_trim_fastq"]["spacer_length"],
+        qual_trim_threshold = config["ms_trim_fastq"]["qual_trim_threshold"]
     log:
         "logs/{ms_sample}/ms_trim_fastq.log"
     benchmark:
@@ -61,7 +62,7 @@ rule ms_trim_fastq:
             -A {params.adaptor_2} \
             -a "G{{10}}" \
             -A "G{{10}}" \
-            --quality-cutoff 20 \
+            --quality-cutoff {params.qual_trim_threshold} \
             -o {output.r1} \
             -p {output.r2} \
             {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \
@@ -80,6 +81,8 @@ rule ms_filter_fastq:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_filtered_fq_metrics.txt"
+    params:
+        min_read_length = config["ms_filter_fastq"]["min_read_length"]
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
@@ -90,7 +93,7 @@ rule ms_filter_fastq:
         """
         cutadapt \
             -j {threads} \
-            --minimum-length 100 \
+            --minimum-length {params.min_read_length} \
             -o {output.r1} \
             -p {output.r2} \
             {input.r1} {input.r2} \
