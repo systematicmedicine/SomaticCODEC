@@ -76,3 +76,16 @@ rule collate_benchmarks:
         "logs/collate_benchmarks.log"
     script:
         "../scripts/collate_benchmarks.py"
+
+
+# Calculate disk usage at end of run
+rule log_disk_usage:
+    input:
+        rules.collate_benchmarks.output
+    output:
+        "logs/disk_usage.txt"
+    shell:
+        """
+        echo "End of run disk usage at $(date):" > {output}
+        du -h --max-depth=1 . >> {output}
+        """
