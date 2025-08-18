@@ -11,6 +11,8 @@ tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz
+tmp/{ex_sample}/{ex_sample}_r1_filter_intermediate.fastq.gz
+tmp/{ex_sample}/{ex_sample}_r2_filter_intermediate.fastq.gz
 tmp/{ms_sample}/{ms_sample}_raw_map.sam
 tmp/{ms_sample}/{ms_sample}_raw_map.bam
 tmp/{ms_sample}/{ms_sample}_read_group_map.bam
@@ -81,5 +83,3 @@ tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf
 tmp/{ex_sample}/{ex_sample}_bcf_called.bcf
 tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf
 tmp/{ex_sample}/{ex_sample}_all_positions.vcf
-tmp/{ex_sample}/{ex_sample}_r1_filter_tmp.fastq.gz
-tmp/{ex_sample}/{ex_sample}_r2_filter_tmp.fastq.gz
