@@ -5,7 +5,6 @@
 
 experiment_name: dryrun
 
-
 # ------------------------------------------------------------------------------
 # Rule parameters
 # ------------------------------------------------------------------------------
@@ -30,8 +29,7 @@ ex_filter_dsc:
 
 ex_filter_fastq:
   min_read_length: 70
-  average_quality_threshold: 34
-  n_base_limit: 3
+  average_quality_threshold: 30
 
 ex_map:
   band_width: 100
