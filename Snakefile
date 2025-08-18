@@ -83,7 +83,8 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json", ex_sample = ex_sample_ids)
+    expand("metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids)
 ]
 
 # Define metrics for ms samples
