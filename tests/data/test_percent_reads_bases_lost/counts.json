@@ -1,0 +1,37 @@
+{
+  "sample": "S001",
+  "files": [
+    {
+      "path": "/work/tests/data/test_percent_reads_bases_lost/pre.bam",
+      "type": "bam",
+      "reads": 100,
+      "bases": 1500
+    },
+    {
+      "path": "/work/tests/data/test_percent_reads_bases_lost/post.bam",
+      "type": "bam",
+      "reads": 10,
+      "bases": 150
+    },
+    {
+      "path":  "/work/tests/data/test_percent_reads_bases_lost/pre.fastq.gz",
+      "type": "fastq.gz",
+      "reads": 100,
+      "bases": 1500
+    },
+    {
+      "path": "/work/tests/data/test_percent_reads_bases_lost/post.fastq.gz",
+      "type": "fastq.gz",
+      "reads": 100,
+      "bases": 750
+    }
+  ],
+  "totals": {
+    "reads": 150786,
+    "bases": 17688503
+  },
+  "tools": {
+    "fastq": "seqkit stats -Ta",
+    "bam": "samtools view -F 2304 (primary only)"
+  }
+}
