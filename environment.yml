@@ -28,7 +28,6 @@ dependencies:
   - bedtools=2.31.1
   - bwa-mem2=2.3
   - cutadapt=5.1
-  - fastp=1.0.1
   - fastqc=0.12.1
   - fgbio=3.0.0
   - gatk4=4.6.2.0
