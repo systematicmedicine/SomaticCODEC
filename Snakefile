@@ -119,7 +119,8 @@ other_metrics = [
     "logs/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
-    "logs/combined_benchmarks.csv"
+    "logs/combined_benchmarks.csv",
+    "logs/disk_usage.txt"
 ]
 
 # Define rule all
