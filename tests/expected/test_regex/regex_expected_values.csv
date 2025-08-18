@@ -9,3 +9,4 @@ ex_properly_paired_initial_alignment,tests/data/test_regex/S00X_map_metrics.txt,
 ex_insert_size_initial_alignment,tests/data/test_regex/S00X_insert_metrics.txt,127
 ex_reads_filtered_length,tests/data/test_regex/S00X_filter_length.txt,92.15
 ex_reads_filtered_quality,tests/data/test_regex/S00X_filter_quality.txt,89.54
+ex_duplex_base_disagreement,tests/data/test_regex/S00X_call_codec_consensus_metrics.txt,0.005034
