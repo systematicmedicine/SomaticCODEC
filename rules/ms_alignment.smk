@@ -26,6 +26,19 @@ rule ms_map:
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
         intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.sam")
+    params:
+        band_width = config["ms_map"]["band_width"],
+        clipping_penalty = config["ms_map"]["clipping_penalty"],
+        gap_extension_penalty = config["ms_map"]["gap_extension_penalty"],
+        gap_open_penalty = config["ms_map"]["gap_open_penalty"],
+        matching_score = config["ms_map"]["matching_score"],
+        mem_max_occurances = config["ms_map"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["ms_map"]["min_alignment_score_thresh"],
+        min_seed_length = config["ms_map"]["min_seed_length"],
+        mismatch_penalty = config["ms_map"]["mismatch_penalty"],
+        reseed_factor = config["ms_map"]["reseed_factor"],
+        unpaired_read_penalty = config["ms_map"]["unpaired_read_penalty"],
+        z_dropoff = config["ms_map"]["z_dropoff"]        
     log:
         "logs/{ms_sample}/ms_raw_alignment.log"
     benchmark:
@@ -35,10 +48,20 @@ rule ms_map:
     shell:
         """
         bwa-mem2 mem \
-            -t {threads} \
-            {input.ref} \
-            {input.r1_processed} \
-            {input.r2_processed} > {output.intermediate_sam} 2>> {log}
+        -t {threads} \
+        -k {params.min_seed_length} \
+        -w {params.band_width} \
+        -d {params.z_dropoff} \
+        -r {params.reseed_factor} \
+        -c {params.mem_max_occurances} \
+        -A {params.matching_score} \
+        -B {params.mismatch_penalty} \
+        -O {params.gap_open_penalty} \
+        -E {params.gap_extension_penalty} \
+        -L {params.clipping_penalty} \
+        -U {params.unpaired_read_penalty} \
+        -T {params.min_alignment_score_thresh} \
+        {input.ref} {input.r1_processed} {input.r2_processed} > {output.intermediate_sam} 2>> {log}
 
         samtools view -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """

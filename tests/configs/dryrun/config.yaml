@@ -74,10 +74,28 @@ ms_candidate_germ_variants:
 ms_low_depth_mask:
   threshold: 1
 
+ms_map:
+  band_width: 100
+  gap_extension_penalty: 1
+  clipping_penalty: 5
+  gap_open_penalty: 6
+  matching_score: 1
+  mem_max_occurances: 10000
+  min_alignment_score_thresh: 30
+  min_seed_length: 19
+  mismatch_penalty: 4
+  reseed_factor: 1.5
+  unpaired_read_penalty: 9
+  z_dropoff: 100
+
+ms_filter_fastq:
+  min_read_length: 100
+
 ms_trim_fastq:
   adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
   adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
   spacer_length: 3
+  qual_trim_threshold: 20 # Trims low quality bases from 3' end of read
 
 # ------------------------------------------------------------------------------
 # File paths
