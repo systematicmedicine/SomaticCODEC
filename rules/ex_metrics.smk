@@ -93,22 +93,21 @@ rule ex_demux_metrics_gini:
     
 
 """
-Generates a summary of reads filtered by ex_filter_fastq
+Calculates the percentage of bases lost during ex_trim_fastq
 """
-rule ex_fastp_filter_summary_metrics:
+rule ex_bases_trimmed:
     input:
-        json_length = "metrics/{ex_sample}/{ex_sample}_filter_readlength_metrics.json",
-        json_meanquality = "metrics/{ex_sample}/{ex_sample}_filter_meanquality_metrics.json"
+        counts_json = "metrics/{ex_sample}/{ex_sample}_read_base_counts.json",
+        pre_files = ["tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz"],
+        post_files = ["tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz", "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"]
     output:
-        filter_summary_metrics = "metrics/{ex_sample}/{ex_sample}_fastp_filter_summary_metrics.json"
-    params:
-        sample = "{ex_sample}"
+        json = "metrics/{ex_sample}/{ex_sample}_bases_trimmed.json"
     log:
-        "logs/{ex_sample}/ex_fastp_filter_summary_metrics.log"
+        "logs/{ex_sample}/ex_bases_trimmed.log"
     benchmark:
-        "logs/{ex_sample}/ex_fastp_filter_summary_metrics.benchmark.txt"
+        "logs/{ex_sample}/ex_bases_trimmed.benchmark.txt"
     script:
-        "../scripts/ex_fastp_filter_summary_metrics.py"
+        "../scripts/percent_reads_bases_lost.py"
 
 
 """
