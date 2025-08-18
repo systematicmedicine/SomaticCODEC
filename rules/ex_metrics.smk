@@ -410,3 +410,15 @@ rule ex_chromosomal_variant_rate_metrics:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
     script:
         "../scripts/ex_chromosomal_variant_rate_metrics.py"
+
+rule ex_recurrent_variant_metrics:
+    input:
+        vcfs = expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config))
+    output:
+        metrics = "metrics/batch/batch_recurrent_variant_metrics.json"
+    log:
+        "logs/batch/batch_ex_recurrent_variant_metrics.log"
+    benchmark:
+        "logs/batch/batch_ex_recurrent_variant_metrics.benchmark.txt"
+    script:
+        "../scripts/ex_recurrent_variant_metrics.py"
