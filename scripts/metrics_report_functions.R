@@ -230,6 +230,7 @@ plot_metric_heatmap <- function(df, title = "Metric Grades Heatmap") {
 
   df <- df %>%
     mutate(
+      Metric = factor(Metric, levels = rev(unique(Metric))),
       Grade = factor(
         Grade,
         levels = c("pass_ideal", "pass_nn", "fail", NA),
