@@ -28,7 +28,7 @@ ex_filter_dsc:
   min_mapq: 60
 
 ex_filter_fastq:
-  min_read_length: 70
+  min_read_length: 80
   average_quality_threshold: 30
 
 ex_map:
