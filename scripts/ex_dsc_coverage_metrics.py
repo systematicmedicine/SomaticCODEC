@@ -97,7 +97,6 @@ def main(snakemake):
     genome_duplex_depth_positions = 0
     include_bed_covered_positions = 0
     ms_ex_overlap_bases = 0
-    ms_total_bases = sum(len(s) for s in ms_depth_half_pos.values())
     ex_total_bases = 0
     union_bases = 0
 
@@ -141,23 +140,30 @@ def main(snakemake):
     ex_mean_analyzable_duplex_depth = round((include_bed_total_depth / include_bed_total_positions) if include_bed_total_positions else 0, 2)
     ex_dsc_coverage_bedregions = round((include_bed_covered_positions / include_bed_total_positions * 100) if include_bed_total_positions else 0, 2)
     ex_dsc_coverage_wholegenome = round((include_bed_covered_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
-    duplex_bases_in_bed_positions = include_bed_total_depth
 
     # Write output
     output_data = {
         "description": (
-        "Duplex sequencing coverage metrics. See component metrics CSV for definitions."
+        "Duplex sequencing coverage metrics.",
+        "Definitions:",
+        "total_genome_positions: Number of positions in the reference genome.",
+        "include_bed_total_positions: Number of positions in the include BED file.",
+        "include_bed_coverage: Percentage of genome positions in the include BED file.",
+        "ex_dsc_coverage_bedregions: Percentage of include BED positions with EX duplex depth > 0.",
+        "ex_duplex_coverage: Percentage of genome positions with duplex depth > 0.",
+        "coverage_overlap_ex_ms: Percentage of sequenced positions with 1. MS depth > half MS depth theshold and 2. EX duplex depth > 0.",
+        "ex_dsc_coverage_wholegenome: Percentage of genome positions eligible for variant calling (duplex depth > 0 & unmasked).",
+        "ex_mean_analyzable_duplex_depth: Mean duplex depth of positions eligible for variant calling (duplex depth > 0 & unmasked)."
         ),
         "sample": sample,
         "total_genome_positions": total_genome_positions,
         "include_bed_total_positions": include_bed_total_positions,
-        "coverage_overlap_ex_ms": coverage_overlap_ex_ms,
-        "ex_duplex_coverage": ex_duplex_coverage,
         "include_bed_coverage": include_bed_coverage,
-        "ex_mean_analyzable_duplex_depth": ex_mean_analyzable_duplex_depth,
         "ex_dsc_coverage_bedregions": ex_dsc_coverage_bedregions,
+        "ex_duplex_coverage": ex_duplex_coverage,
+        "coverage_overlap_ex_ms": coverage_overlap_ex_ms,
         "ex_dsc_coverage_wholegenome": ex_dsc_coverage_wholegenome,
-        "duplex_bases_in_bed_positions": duplex_bases_in_bed_positions
+        "ex_mean_analyzable_duplex_depth": ex_mean_analyzable_duplex_depth        
     }
 
     with open(json_out_path, "w") as out_f:
