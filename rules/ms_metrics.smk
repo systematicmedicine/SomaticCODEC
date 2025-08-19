@@ -224,8 +224,7 @@ rule ms_candidate_variant_metrics_summary:
     input: 
         variant_metrics = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt",
         ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt",
-        fai = config['GRCh38_path'] + ".fai",
-        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json"
+        depth_hist = "metrics/{ms_sample}/{ms_sample}_depth_histogram.txt"
     output:
         summary = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json"
     params:

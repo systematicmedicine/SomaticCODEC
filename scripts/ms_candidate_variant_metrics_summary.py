@@ -41,16 +41,13 @@ def main(snakemake):
 
         return sections
 
-    # Load reference .fai file path
-    fai_path = snakemake.input.fai
-
     # Load sample name
     sample = snakemake.params.sample
 
     # Load metrics files
     variant_metrics_path = snakemake.input.variant_metrics
     het_hom_ratio_path = snakemake.input.ms_het_hom_ratio
-    mask_metrics_path = snakemake.input.mask_metrics
+    depth_hist_path = snakemake.input.depth_hist
 
     # Define output path
     output_json = snakemake.output.summary
@@ -59,11 +56,16 @@ def main(snakemake):
     sections = parse_bcftools_stats(variant_metrics_path)
 
     # Pull out key metrics and output in json
-    
-    with open(mask_metrics_path) as f:
-        mask_metrics_data = json.load(f)
-    frac_over_depth_threshold = 1 - (mask_metrics_data["mask_files"]["lowdepth"]["percentage_of_ref_genome"] / 100)
-    germline_variant_rate = round(int(sections["SN"].loc[sections["SN"][1] == "number of records:", 2].values[0]) / (sum(int(line.split()[1]) for line in open(fai_path)) * frac_over_depth_threshold), 4)
+    callable_bases = 0
+    with open(depth_hist_path) as f:
+        for line in f:
+            count, depth = map(int, line.split())
+            if depth >= 1:
+                callable_bases += count
+
+    variants_called = int(sections["SN"].loc[sections["SN"][1] == "number of records:", 2].values[0])
+
+    germline_variant_rate = round(variants_called / callable_bases, 4)
     
     snv_indel_ratio = round(int(sections["SN"].loc[sections["SN"][1] == "number of SNPs:", 2].values[0]) / int(sections["SN"].loc[sections["SN"][1] == "number of indels:", 2].values[0]), 2)
 
@@ -81,8 +83,9 @@ def main(snakemake):
         "Summary of key candidate variant metrics (see component metrics csv for definitions)"
     ),
     "sample": sample,
-    "fraction_genome_over_depth_threshold": frac_over_depth_threshold,
     "candidiate_variant_metrics_file": variant_metrics_path,
+    "callable_bases": callable_bases,
+    "variants_called": variants_called,
     "germline_variant_rate": germline_variant_rate,
     "snv_indel_ratio": snv_indel_ratio,
     "insertion_deletion_ratio": insertion_deletion_ratio,
