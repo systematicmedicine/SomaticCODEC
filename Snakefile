@@ -57,6 +57,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_bases_trimmed.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_filter_length.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_filter_quality.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
