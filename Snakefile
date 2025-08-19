@@ -45,6 +45,11 @@ ex_lane_ids = md.get_ex_lane_ids(config)
 ex_sample_ids = md.get_ex_sample_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
+# Define setup files
+setup = [
+    "logs/pipeline/check_ex_ms_mapping.done"
+]
+
 # Define results
 results = [
     expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = ex_sample_ids)
@@ -127,13 +132,14 @@ other_metrics = [
 # Define rule all
 rule all:
     input:
-        results + ex_metrics + ms_metrics + other_metrics
+        setup + results + ex_metrics + ms_metrics + other_metrics
 
 
 # ---------------------------------------------------------------------------------------------
 # Include required rules files
 # ---------------------------------------------------------------------------------------------
 
+include: "rules/setup.smk"
 include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
 include: "rules/ms_call_germ.smk"
@@ -143,6 +149,5 @@ include: "rules/ex_alignment.smk"
 include: "rules/ex_create_dsc.smk"
 include: "rules/ex_call_somatic.smk"
 include: "rules/ex_metrics.smk"
-include: "rules/index_reference_genome.smk"
 include: "rules/masked_regions.smk"
 include: "rules/other_metrics.smk"        

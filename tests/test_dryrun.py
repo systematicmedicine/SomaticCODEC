@@ -9,12 +9,15 @@ Runs a snakemake dry run
 Authors:
     - Cameron Fraser
     - Chat-GPT
+    - Joshua Johnstone
 """
 
 # Import libraries
 import subprocess
 from pathlib import Path
 import pytest
+import yaml
+import tempfile
 
 # Pytest marking
 pytestmark = [
@@ -27,7 +30,20 @@ def test_snakemake_dryrun():
     # Configure parameters
     project_root = Path(__file__).resolve().parent.parent
     snakefile = project_root / "Snakefile"
-    configfile = project_root / "tests" / "configs" / "dryrun" / "config.yaml"
+
+    # Create modified config.yaml with test parameters and file paths
+    config = Path("config/config.yaml")
+    with config.open("r", encoding="utf-8") as f:
+        config_data = yaml.safe_load(f)
+    config_data["experiment_name"] = "dryrun"
+    config_data["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
+    config_data["difficult_regions_path"] = "tests/data/dryrun/GRCh38_Chr21.fna"
+    config_data["common_variants_path"] = "tests/data/dryrun/nanoseq_trinucleotide_contexts.csv"
+    config_data["ex_nanoseq_tri_contexts"] = "tests/data/dryrun/nanoseq_trinucleotide_contexts.csv"
+
+    test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
+    with open(test_config_file.name, "w") as f:
+        yaml.safe_dump(config_data, f)
     
     # Create snakemake command
     cmd = [
@@ -35,7 +51,7 @@ def test_snakemake_dryrun():
         "--dryrun",
         "--quiet",
         "--snakefile", str(snakefile),
-        "--configfile", str(configfile),
+        "--configfile", test_config_file.name,
     ]
 
     # Run snakemake command

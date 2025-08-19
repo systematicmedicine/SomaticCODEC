@@ -1,2 +1,3 @@
 ex_lane,fastq1,fastq2
-lane1,tmp/downloads/200k_test_R1.fastq.gz,tmp/downloads/200k_test_R2.fastq.gz
+lane1,tmp/downloads/ex_lane1_Chr21_10000reads_r1.fastq.gz,tmp/downloads/ex_lane1_Chr21_10000reads_r2.fastq.gz
+lane2,tmp/downloads/ex_lane2_Chr21_5000reads_r1.fastq.gz,tmp/downloads/ex_lane2_Chr21_5000reads_r2.fastq.gz
