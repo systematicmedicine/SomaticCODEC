@@ -27,8 +27,7 @@ import io
       "include_bed_coverage": 80,
       "ex_mean_analyzable_duplex_depth": 0.5,
       "ex_dsc_coverage_bedregions": 50,
-      "ex_dsc_coverage_wholegenome": 40,
-      "duplex_bases_in_bed_positions": 4})
+      "ex_dsc_coverage_wholegenome": 40})
 ])
 @patch("subprocess.Popen")
 def test_ex_dsc_coverage_metrics(mock_popen, ms_depth_path, include_bed_path, ex_dsc_depth_path, ref_fai_path, expected_values, tmp_path):
