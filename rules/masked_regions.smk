@@ -92,11 +92,32 @@ rule ms_germline_variants_mask:
         cut -f1-3 {output.intermediate_snv_unformatted} > {output.ms_germ_snv_bed} 2>> {log}  
         """
 
+# Creates a mask for-non canonical genomic locations 
+    # e.g. chrUn, chr*_random, chrM, chrEBV
+
+rule mask_noncanonical_chroms:
+    input:
+        fai = config['GRCh38_path'] + ".fai"
+    output:
+        bed = temp("tmp/downloads/noncanonical_mask.bed")
+    run:
+        # Define canonical chromosomes
+        canonical = {f"chr{i}" for i in range(1, 23)} | {"chrX", "chrY"}
+
+        # Load the .fai and filter
+        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
+            for line in fai_in:
+                chrom, length, *_ = line.strip().split("\t")
+                if chrom not in canonical:
+                    bed_out.write(f"{chrom}\t0\t{length}\n")
+
+
 # Combines all masks into a single BED file
 rule combine_masks:
     input:
         gnomAD_bed = config['common_variants_path'],
         GIAB_bed = config['difficult_regions_path'],
+        noncanonical_bed = rules.mask_noncanonical_chroms.output.bed,
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
@@ -114,6 +135,7 @@ rule combine_masks:
         """
         cat {input.gnomAD_bed} \
         {input.GIAB_bed} \
+        {input.noncanonical_bed} \
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \
         {input.ms_germ_ins_bed} \
