@@ -1,4 +1,4 @@
-ex_sample,lane,adapter,ms_sample,donor_id,age,ex_sample_type,ms_sample_type
+ex_sample,ex_lane,ex_adapter,ms_sample,donor_id,age,ex_sample_type,ms_sample_type
 S001,lane1,Quadruplex001,S004,R0029,18,buffy,sperm
 S002,lane1,Quadruplex002,S005,R0064,80,buffy,buffy
 S003,lane2,Quadruplex003,S004,R0029,18,blood,sperm

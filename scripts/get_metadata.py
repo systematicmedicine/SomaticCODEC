@@ -48,9 +48,9 @@ def get_ex_lane_adapter_dict(config):
     nested_dict = {}
 
     for _, row in ex_samples.iterrows():
-        lane = row["lane"]
+        lane = row["ex_lane"]
         sample = row["ex_sample"]
-        adapter = row["adapter"]
+        adapter = row["ex_adapter"]
 
         if lane not in nested_dict:
             nested_dict[lane] = {}
@@ -74,11 +74,10 @@ def get_ex_sample_adapter_dict(config):
     ex_adapters = metadata["ex_adapters"]
 
     # Merge ex_samples with adapter sequences using the adapter name
-    merged = ex_samples[["ex_sample", "adapter"]].merge(
+    merged = ex_samples[["ex_sample", "ex_adapter"]].merge(
         ex_adapters,
         how="left",
-        left_on="adapter",
-        right_on="ex_adapter"
+        on="ex_adapter"
     )
 
     # Build the nested dictionary
@@ -115,9 +114,6 @@ Returns a dictionary mapping ex_lane to ex_sample
 def get_ex_lane_samples(config):
     metadata = load_metadata(config)
     df = metadata["ex_samples"]
-
-    # Rename 'lane' to 'ex_lane' for consistency
-    df = df.rename(columns={"lane": "ex_lane"})
 
     return (
         df.groupby("ex_lane")["ex_sample"]
