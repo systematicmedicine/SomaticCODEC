@@ -35,9 +35,9 @@ rule bwamem_index_files:
         pac = config['GRCh38_path'] + ".pac",
         sa = config['GRCh38_path'] + ".0123"
     log:
-        "logs/bwamem_index_files.log"
+        "logs/pipeline/bwamem_index_files.log"
     benchmark:
-        "logs/bwamem_index_files.benchmark.txt"
+        "logs/pipeline/bwamem_index_files.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 4)
     shell:
@@ -52,9 +52,9 @@ rule samtools_index_files:
     output:
         fai = config['GRCh38_path'] + ".fai"
     log:
-        "logs/samtools_index_files.log"
+        "logs/pipeline/samtools_index_files.log"
     benchmark:
-        "logs/samtools_index_files.benchmark.txt"
+        "logs/pipeline/samtools_index_files.benchmark.txt"
     shell:
         """
         samtools faidx {input.reference} 2>> {log}
@@ -67,9 +67,9 @@ rule picard_sequence_dict:
     output:
         dictf = config["GRCh38_path"].replace(".fna", ".dict")
     log:
-        "logs/picard_sequence_dict.log"
+        "logs/pipeline/picard_sequence_dict.log"
     benchmark:
-        "logs/picard_sequence_dict.benchmark.txt"
+        "logs/pipeline/picard_sequence_dict.benchmark.txt"
     shell:
         """
         picard CreateSequenceDictionary \
@@ -93,8 +93,8 @@ rule ex_generate_adapter_fastas:
             region = ["r1_start", "r1_end", "r2_start", "r2_end"]
         )
     log:
-        "logs/ex_generate_adapter_fastas.log"
+        "logs/pipeline/ex_generate_adapter_fastas.log"
     benchmark:
-        "logs/ex_generate_adapter_fastas.benchmark.txt"
+        "logs/pipeline/ex_generate_adapter_fastas.benchmark.txt"
     script:
         "../scripts/ex_generate_adapter_fastas.py"

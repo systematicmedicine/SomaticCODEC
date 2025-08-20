@@ -15,11 +15,11 @@ import scripts.get_metadata as md
 # Write git metadata to file for version tracking
 rule write_git_metadata:
     output:
-        file_path = "logs/git_metadata.json"
+        file_path = "logs/pipeline/git_metadata.json"
     log:
-        "logs/write_git_metadata.log"
+        "logs/pipeline/write_git_metadata.log"
     benchmark:
-        "logs/write_git_metadata.benchmark.txt"
+        "logs/pipeline/write_git_metadata.benchmark.txt"
     script:
         "../scripts/write_git_metadata.py"
 
@@ -39,9 +39,9 @@ rule count_reads_and_bases:
         threads:
             max(1, os.cpu_count() // 4)
         log:
-            "logs/count_reads_and_bases.log"
+            "logs/batch/count_reads_and_bases.log"
         benchmark:
-            "logs/count_reads_and_bases.benchmark.txt"
+            "logs/batch/count_reads_and_bases.benchmark.txt"
         shell:
              "python scripts/count_reads_and_bases.py > {log} 2>&1"
 
@@ -57,9 +57,9 @@ rule create_metrics_report:
         csv_path = "metrics/metrics_report.csv",
         heatmap_path = "metrics/metrics_heatmap.png"
     log:
-        "logs/create_metrics_report.log"
+        "logs/pipeline/create_metrics_report.log"
     benchmark:
-        "logs/create_metrics_report.benchmark.txt"
+        "logs/pipeline/create_metrics_report.benchmark.txt"
     script:
         "../scripts/metrics_report.R"
 
@@ -71,9 +71,9 @@ rule collate_benchmarks:
         rules.count_reads_and_bases.output.json_paths,
         rules.create_metrics_report.output
     output:
-        file_path = "logs/combined_benchmarks.csv"
+        file_path = "logs/pipeline/combined_benchmarks.csv"
     log:
-        "logs/collate_benchmarks.log"
+        "logs/pipeline/collate_benchmarks.log"
     script:
         "../scripts/collate_benchmarks.py"
 
@@ -83,7 +83,7 @@ rule log_disk_usage:
     input:
         rules.collate_benchmarks.output
     output:
-        "logs/disk_usage.txt"
+        "logs/pipeline/disk_usage.txt"
     shell:
         """
         echo "End of run disk usage at $(date):" > {output}
