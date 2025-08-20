@@ -14,28 +14,6 @@ Authors:
 import scripts.get_metadata as md
 
 """
-Generate adapter FASTA files for demultiplexing and trimming
-""" 
-rule ex_generate_adapter_fastas:
-    input:
-        ex_lanes = config["ex_lanes_path"],
-        ex_samples = config["ex_samples_path"],
-        ex_adapters = config["ex_adapters_path"]
-    output:
-        adapter_fasta_outputs = expand(
-            "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
-            ex_lane = md.get_ex_lane_ids(config),
-            region = ["r1_start", "r1_end", "r2_start", "r2_end"]
-        )
-    log:
-        "logs/ex_generate_adapter_fastas.log"
-    benchmark:
-        "logs/ex_generate_adapter_fastas.benchmark.txt"
-    script:
-        "../scripts/ex_generate_adapter_fastas.py"
-
-
-"""
 Moves the read pair UMI to readname
     - Cut 3bp from the start of the read 1 and read 2 sequence
     - Append read 1 3bp UMI sequence to the readname of read 1 and read 2
@@ -43,6 +21,7 @@ Moves the read pair UMI to readname
 """ 
 rule ex_extract_fastq_umis:
     input:
+        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         ex_lanes = config["ex_lanes_path"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]

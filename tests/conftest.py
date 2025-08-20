@@ -13,6 +13,8 @@ from pathlib import Path
 import shutil
 import subprocess
 from datetime import datetime
+import yaml
+import tempfile
 
 # Deletes all files from metrics, results, logs, tmp and .snakemake directories
 def clean_workspace():
@@ -42,9 +44,10 @@ def clean_workspace():
 @pytest.fixture(scope = "session")
 def lightweight_test_run():
     
-    # Setup test environment
+    # Clean test environment
     clean_workspace()
     
+    # Copy test files to tmp/downloads
     src_dir = Path("tests/data/lightweight_test_run")
     dst_dir = Path("tmp/downloads")
     dst_dir.mkdir(exist_ok=True)
@@ -67,6 +70,22 @@ def lightweight_test_run():
     for filename in files_to_copy:
         shutil.copy2(src_dir / filename, dst_dir / filename)
 
+    # Create modified config.yaml with test parameters and file paths
+    config = Path("config/config.yaml")
+    with config.open("r", encoding="utf-8") as f:
+        config_data = yaml.safe_load(f)
+    config_data["experiment_name"] = "lightweight_test_run"
+    config_data["ms_candidate_germ_variants"]["memory_limit_gb"] = 4
+    config_data["ms_low_depth_mask"]["threshold"] = 1
+    config_data["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
+    config_data["difficult_regions_path"] = "tmp/downloads/GRCh38_alldifficultregions_10lines.bed"
+    config_data["common_variants_path"] = "tmp/downloads/gnomad_common_af01_merged_10lines.bed"
+    config_data["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
+
+    test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
+    with open(test_config_file.name, "w") as f:
+        yaml.safe_dump(config_data, f)
+
     # Log file setup
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
@@ -76,7 +95,7 @@ def lightweight_test_run():
     snakemake_cmd = [
         "snakemake",
         "--snakefile", "Snakefile",
-        "--configfile", "tests/configs/lightweight_test_run/config.yaml",
+        "--configfile", test_config_file.name,
         "--cores", "all",
         "--notemp",
     ]
