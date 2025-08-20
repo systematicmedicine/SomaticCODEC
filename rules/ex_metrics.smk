@@ -304,7 +304,7 @@ rule ex_dsc_coverage_metrics:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
         ),
-        fai = config["GRCh38_path"] + ".fai"
+        fai = config["reference_path"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
@@ -345,7 +345,7 @@ rule ex_trinucleotide_context_metrics:
     input:
         vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
         nanoseq_contexts = config["ex_nanoseq_tri_contexts"],
-        ref = config["GRCh38_path"]
+        ref = config["reference_path"]
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json"
     params:
@@ -400,7 +400,7 @@ rule ex_softclipping_metrics:
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        fai = config["GRCh38_path"] + ".fai"
+        fai = config["reference_path"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     log:

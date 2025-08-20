@@ -17,9 +17,9 @@ Author: Ben Barry
 rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
-        ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai",
-        dictf = os.path.splitext(config["GRCh38_path"])[0] + ".dict"
+        ref = config["reference_path"],
+        fai = config["reference_path"] + ".fai",
+        dictf = os.path.splitext(config["reference_path"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
     params:

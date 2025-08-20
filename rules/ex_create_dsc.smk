@@ -60,12 +60,12 @@ Realign the DSC to the reference genome
 rule ex_remap_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["GRCh38_path"],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config["GRCh38_path"] + ".0123"
+        ref = config["reference_path"],
+        amb = config["reference_path"] + ".amb",
+        ann = config["reference_path"] + ".ann",
+        bwt = config["reference_path"] + ".bwt.2bit.64",
+        pac = config["reference_path"] + ".pac",
+        sa = config["reference_path"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
@@ -125,9 +125,9 @@ rule ex_annotate_dsc:
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai",
-        dictf = config["GRCh38_path"].replace(".fna", ".dict")
+        ref = config["reference_path"],
+        fai = config["reference_path"] + ".fai",
+        dictf = config["reference_path"].replace(".fna", ".dict")
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),

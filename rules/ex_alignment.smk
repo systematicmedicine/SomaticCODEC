@@ -18,12 +18,12 @@ rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
-        ref = config["GRCh38_path"],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config["GRCh38_path"] + ".0123"
+        ref = config["reference_path"],
+        amb = config["reference_path"] + ".amb",
+        ann = config["reference_path"] + ".ann",
+        bwt = config["reference_path"] + ".bwt.2bit.64",
+        pac = config["reference_path"] + ".pac",
+        sa = config["reference_path"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
