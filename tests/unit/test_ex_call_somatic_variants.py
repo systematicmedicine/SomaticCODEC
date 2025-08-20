@@ -7,8 +7,13 @@ Authors:
     - Chat-GPT
     - Joshua Johnstone
 """
-from utils.vcf_utils import check_vcf_structure
 from pathlib import Path
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from tests.utils.vcf_utils import check_vcf_structure
 from scripts.get_metadata import load_config, get_ex_sample_ids
 
 # Test that VCF has the correct structure

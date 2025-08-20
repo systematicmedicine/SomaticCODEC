@@ -18,6 +18,13 @@ from pathlib import Path
 import pytest
 import yaml
 import tempfile
+import shutil
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from tests.conftest import clean_workspace
 
 # Pytest marking
 pytestmark = [
@@ -26,20 +33,45 @@ pytestmark = [
 ]
 
 def test_snakemake_dryrun():
-     
+    
+    # Clean test environment
+    clean_workspace()
+
     # Configure parameters
-    project_root = Path(__file__).resolve().parent.parent
     snakefile = project_root / "Snakefile"
 
+    # Copy test files to tmp/downloads
+    src_dir = Path("tests/data/dryrun")
+    dst_dir = Path("tmp/downloads")
+    dst_dir.mkdir(exist_ok=True)
+
+    files_to_copy = [
+        "GRCh38_Chr21_plus_stubs.fna",
+        "S004_Chr21_10000reads_r1.fastq.gz",
+        "S004_Chr21_10000reads_r2.fastq.gz",
+        "S005_Chr21_10000reads_r1.fastq.gz",
+        "S005_Chr21_10000reads_r2.fastq.gz",
+        "GRCh38_alldifficultregions_10lines.bed",
+        "gnomad_common_af01_merged_10lines.bed",
+        "ex_lane1_Chr21_10000reads_r1.fastq.gz",
+        "ex_lane1_Chr21_10000reads_r2.fastq.gz",
+        "ex_lane2_Chr21_5000reads_r1.fastq.gz",
+        "ex_lane2_Chr21_5000reads_r2.fastq.gz",
+        "nanoseq_trinucleotide_contexts.csv"
+        ]
+
+    for filename in files_to_copy:
+        shutil.copy2(src_dir / filename, dst_dir / filename)
+
     # Create modified config.yaml with test parameters and file paths
-    config = Path("config/config.yaml")
+    config = project_root / "config/config.yaml"
     with config.open("r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
     config_data["experiment_name"] = "dryrun"
-    config_data["GRCh38_path"] = "tests/data/dryrun/GRCh38_Chr21_plus_stubs.fna"
-    config_data["difficult_regions_path"] = "tests/data/dryrun/GRCh38_alldifficultregions_10lines.bed"
-    config_data["common_variants_path"] = "tests/data/dryrun/nanoseq_trinucleotide_contexts.csv"
-    config_data["ex_nanoseq_tri_contexts"] = "tests/data/dryrun/nanoseq_trinucleotide_contexts.csv"
+    config_data["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
+    config_data["difficult_regions_path"] = "tmp/downloads/GRCh38_alldifficultregions_10lines.bed"
+    config_data["common_variants_path"] = "tmp/downloads/gnomad_common_af01_merged_10lines.bed"
+    config_data["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:
@@ -62,3 +94,5 @@ def test_snakemake_dryrun():
         f"Snakemake dryrun failed:\n"
         f"STDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}"
     )
+
+    clean_workspace()

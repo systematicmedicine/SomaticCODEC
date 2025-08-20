@@ -17,7 +17,7 @@ import pytest
 from scripts.count_reads_and_bases import count_fastq_with_seqkit, count_bam_with_samtools
 
 # Define hard coded parameters
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 TEST_FASTQ = PROJECT_ROOT / "tests" / "data" / "test_count_reads_and_bases" / "r1.fq"
 TEST_BAM = PROJECT_ROOT / "tests" / "data" / "test_count_reads_and_bases" / "r1.bam"
 EXPECTED_READS = 100

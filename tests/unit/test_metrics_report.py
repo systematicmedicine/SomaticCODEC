@@ -1,5 +1,5 @@
 """
---- test metrics reprot.py ---
+--- test metrics report.py ---
 
 Test the metrics report generated at the end of the pipeline
 
@@ -13,13 +13,13 @@ import os
 import sys
 import pytest
 import pandas as pd
+import sys
+from pathlib import Path
 
-# Add scripts/ to path
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-SCRIPTS_DIR = os.path.join(PROJECT_ROOT, "scripts")
-sys.path.insert(0, SCRIPTS_DIR)
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
 
-import get_metadata as md
+import scripts.get_metadata as md
 
 # -------------------------------------------------------------------------------------
 # Helper functions
