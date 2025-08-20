@@ -122,11 +122,11 @@ ms_metrics = [
 
 # Define other metrics
 other_metrics = [
-    "logs/git_metadata.json",
+    "logs/pipeline/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
-    "logs/combined_benchmarks.csv",
-    "logs/disk_usage.txt"
+    "logs/pipeline/combined_benchmarks.csv",
+    "logs/pipeline/disk_usage.txt"
 ]
 
 # Define rule all

@@ -87,7 +87,7 @@ def lightweight_test_run():
         yaml.safe_dump(config_data, f)
 
     # Log file setup
-    log_dir = Path("logs")
+    log_dir = Path("logs/pipeline")
     log_dir.mkdir(exist_ok=True)
     log_file = log_dir / f"pipeline_run_{datetime.now():%Y%m%d}.log"
     

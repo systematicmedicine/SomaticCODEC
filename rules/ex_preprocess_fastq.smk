@@ -67,9 +67,9 @@ rule ex_demux_fastq:
         demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
         txt = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = md.get_ex_lane_ids(config))
     log:
-        "logs/ex_demux.log"
+        "logs/batch/ex_demux.log"
     benchmark:
-        "logs/ex_demux.benchmark.txt"
+        "logs/batch/ex_demux.benchmark.txt"
     threads:
         max(1, os.cpu_count() // 4)
     script:
