@@ -12,7 +12,7 @@ from scripts.get_metadata import load_config, get_ms_sample_ids
 
 # Test that low depth BED has the correct structure
 def test_bed_structure_correct(lightweight_test_run):
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ms_samples = get_ms_sample_ids(config)
 
     for ms_sample in ms_samples:
