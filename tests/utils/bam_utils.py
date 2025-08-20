@@ -29,7 +29,7 @@ def count_bam_data_points(path):
 def count_bam_ss_qual_bases(path):
     path = str(path)
     count = 0
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ss_qual = config["ex_call_dsc"]["single_strand_qual"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
@@ -41,7 +41,7 @@ def count_bam_ss_qual_bases(path):
 def count_bam_reads_under_min_mapq(path):
     path = str(path)
     count = 0
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     min_mapq = config["ex_filter_dsc"]["min_mapq"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):

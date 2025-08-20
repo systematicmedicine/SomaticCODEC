@@ -91,7 +91,7 @@ def expected_files_list():
     expected_files_generic = sum([Path(f).read_text().splitlines() for f in source_files], [])
 
     # Load sample IDs
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ms_samples = get_ms_sample_ids(config)
     ex_lanes = get_ex_lane_ids(config)
     ex_samples = get_ex_sample_ids(config)
