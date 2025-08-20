@@ -36,8 +36,8 @@ def test_snakemake_dryrun():
     with config.open("r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
     config_data["experiment_name"] = "dryrun"
-    config_data["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
-    config_data["difficult_regions_path"] = "tests/data/dryrun/GRCh38_Chr21.fna"
+    config_data["GRCh38_path"] = "tests/data/dryrun/GRCh38_Chr21_plus_stubs.fna"
+    config_data["difficult_regions_path"] = "tests/data/dryrun/GRCh38_alldifficultregions_10lines.bed"
     config_data["common_variants_path"] = "tests/data/dryrun/nanoseq_trinucleotide_contexts.csv"
     config_data["ex_nanoseq_tri_contexts"] = "tests/data/dryrun/nanoseq_trinucleotide_contexts.csv"
 

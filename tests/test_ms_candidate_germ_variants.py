@@ -13,7 +13,7 @@ from utils.vcf_utils import check_vcf_structure
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ms_samples = get_ms_sample_ids(config)
 
     for ms_sample in ms_samples:
