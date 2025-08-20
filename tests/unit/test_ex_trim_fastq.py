@@ -10,7 +10,12 @@ Authors:
 
 import glob
 from pathlib import Path
-from utils.fastq_utils import count_fastq_data_points, sum_len_fastq
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from tests.utils.fastq_utils import count_fastq_data_points, sum_len_fastq
 
 def test_read_counts_preserved(lightweight_test_run):
     input_files = sorted(glob.glob("tmp/*/*_r1_demux.fastq.gz"))
