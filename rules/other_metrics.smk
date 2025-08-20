@@ -28,7 +28,7 @@ rule write_git_metadata:
 rule count_reads_and_bases:
         input:
             final_ex_bams = expand("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam", ex_sample = md.get_ex_sample_ids(config)),
-            final_ms_bams = expand("tmp/{ms_sample}/{ms_sample}_sorted_map.bam", ms_sample = md.get_ms_sample_ids(config))
+            final_ms_bams = expand("tmp/{ms_sample}/{ms_sample}_read_group_map.bam", ms_sample = md.get_ms_sample_ids(config))
         output:
             json_paths = expand(
                 "metrics/{sample}/{sample}_read_base_counts.json", 

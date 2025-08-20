@@ -255,7 +255,7 @@ Calculate percentage of reads lost when calling DSC
 """
 rule ex_call_dsc_metrics:
     input:
-        pre_call_bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam",
+        pre_call_bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam",
         post_call_bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"
     output:
         call_dsc_metrics = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json"

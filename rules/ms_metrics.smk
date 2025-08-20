@@ -105,7 +105,7 @@ rule ms_fastqc_summary_metrics:
 # Generates ms alignment metrics
 rule ms_alignment_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
         stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt",
         insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
@@ -128,7 +128,7 @@ rule ms_alignment_metrics:
 # Generates ms duplicate metrics
 rule ms_duplication_metrics:
     input:
-        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
+        bam_sorted = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
         bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
         dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
