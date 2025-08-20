@@ -27,7 +27,7 @@ import get_metadata as md
 
 @pytest.fixture(scope="module")
 def config():
-    return md.load_config("tests/configs/lightweight_test_run/config.yaml")
+    return md.load_config("config/config.yaml")
 
 @pytest.fixture(scope="module")
 def metrics_df():

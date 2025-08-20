@@ -84,7 +84,7 @@ def assert_spans_reference(mask_df, include_df, fai_df):
 # Test that the input (mask) and output (include) BEDs do not overlap
 def test_beds_dont_overlap(lightweight_test_run):
     
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ex_to_ms = get_ex_to_ms_sample_map(config)
 
     for ex_sample, ms_sample in ex_to_ms.items():
@@ -94,8 +94,9 @@ def test_beds_dont_overlap(lightweight_test_run):
 # Test that mask + include BEDs span the entire reference
 def test_beds_span_reference(lightweight_test_run):
 
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ex_to_ms = get_ex_to_ms_sample_map(config)
+    config["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
     fai_path = config["GRCh38_path"] + ".fai"
     fai_df = read_fai(fai_path)
 

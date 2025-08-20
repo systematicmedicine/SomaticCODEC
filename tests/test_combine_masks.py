@@ -46,7 +46,7 @@ def assert_correctly_merged(ms_sample):
 
 # Test that combined BED matches expected merge of individual beds
 def test_combined_bed_matches_individual_beds(lightweight_test_run):
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ms_samples = get_ms_sample_ids(config)
     for ms_sample in ms_samples:
         assert_correctly_merged(ms_sample)
@@ -57,7 +57,8 @@ def assert_combined_bed_order_matches_ref(ms_sample):
     bed_df = read_bed(Path(f"tmp/{ms_sample}/{ms_sample}_combined_mask.bed"))
 
     # Load reference fai file and get chromosome order as a list
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
+    config["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
     fai_path = config["GRCh38_path"] + ".fai"
     fai_df = pd.read_csv(fai_path, sep="\t", header=None, usecols=[0], names=["chrom"])
     fai_chrom_order = fai_df["chrom"].tolist()
@@ -74,7 +75,7 @@ def assert_combined_bed_order_matches_ref(ms_sample):
 
 # Test that the chromosome order of the combined BED matches the reference order
 def test_combined_bed_order_matches_ref(lightweight_test_run):
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ms_samples = get_ms_sample_ids(config)
     for ms_sample in ms_samples:
         assert_combined_bed_order_matches_ref(ms_sample)

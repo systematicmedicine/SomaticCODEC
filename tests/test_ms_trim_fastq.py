@@ -20,7 +20,7 @@ from utils.fastq_utils import count_fastq_data_points, sum_len_fastq
 
 # Test that the total number of reads does not change
 def test_read_counts_preserved(lightweight_test_run):
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ms_fastq_dict = get_ms_sample_fastqs(config)
 
     for ms_sample, (input_r1, input_r2) in ms_fastq_dict.items():
@@ -37,7 +37,7 @@ def test_read_counts_preserved(lightweight_test_run):
 # Test that total number of bases is reduced by trimming
 def test_sequences_are_shorter(lightweight_test_run):
 
-    config = load_config("tests/configs/lightweight_test_run/config.yaml")
+    config = load_config("config/config.yaml")
     ms_fastq_dict = get_ms_sample_fastqs(config)
 
     for ms_sample, (input_r1, input_r2) in ms_fastq_dict.items():
