@@ -15,12 +15,12 @@ Author: Joshua Johnstone
 # Aligns reads to reference genome
 rule ms_map:
     input: 
-        ref = config['GRCh38_path'],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config['GRCh38_path'] + ".0123",
+        ref = config['reference_path'],
+        amb = config["reference_path"] + ".amb",
+        ann = config["reference_path"] + ".ann",
+        bwt = config["reference_path"] + ".bwt.2bit.64",
+        pac = config["reference_path"] + ".pac",
+        sa = config['reference_path'] + ".0123",
         r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:

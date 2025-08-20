@@ -97,7 +97,7 @@ rule ms_germline_variants_mask:
 
 rule mask_noncanonical_chroms:
     input:
-        fai = config['GRCh38_path'] + ".fai"
+        fai = config['reference_path'] + ".fai"
     output:
         bed = temp("tmp/downloads/noncanonical_mask.bed")
     run:
@@ -122,7 +122,7 @@ rule combine_masks:
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
-        fai = config['GRCh38_path'] + ".fai" 
+        fai = config['reference_path'] + ".fai" 
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
         intermediate_cat = temp("tmp/{ms_sample}/{ms_sample}_masks_cat.bed"),
@@ -154,7 +154,7 @@ rule generate_include_bed:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_combined_mask.bed"
         ),
-        fai = config["GRCh38_path"] + ".fai"
+        fai = config["reference_path"] + ".fai"
     output:
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     log:
