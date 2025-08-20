@@ -24,6 +24,7 @@ Trims FASTQ files
 """
 rule ms_trim_fastq:
     input:
+        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         ms_samples = config["ms_samples_path"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
