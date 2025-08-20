@@ -19,7 +19,7 @@ from tests.utils.bam_utils import count_bam_data_points, count_bam_ss_qual_bases
 # Test that the read count decreases due to collapsing reads
 def test_reads_decrease(lightweight_test_run):
      # Locate all pre-call BAM files
-    pre_files = glob.glob("tmp/*/*_map_template_sorted.bam")
+    pre_files = glob.glob("tmp/*/*_map_anno.bam")
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
     total_pre_reads = sum(pre_counts.values())
 
@@ -36,7 +36,7 @@ def test_reads_decrease(lightweight_test_run):
 # Test that correct quality is assigned to single-stranded overhangs
 def test_ss_qual_bases_increase(lightweight_test_run):
      # Locate all pre-call BAM files
-    pre_files = glob.glob("tmp/*/*_map_template_sorted.bam")
+    pre_files = glob.glob("tmp/*/*_map_anno.bam")
     pre_counts = {Path(f).name: count_bam_ss_qual_bases(f) for f in pre_files}
     total_pre_Q2_bases = sum(pre_counts.values())
 
