@@ -84,9 +84,9 @@ def expected_files_list():
     
     # Load lists of expected files (generic wildcards)
     source_files = [
-        "tests/expected/expected_tmp_files.txt",
-        "tests/expected/expected_metrics_files.txt",
-        "tests/expected/expected_results_files.txt"
+        "tests/expected/expected_files/expected_tmp_files.txt",
+        "tests/expected/expected_files/expected_metrics_files.txt",
+        "tests/expected/expected_files/expected_results_files.txt"
     ]
     expected_files_generic = sum([Path(f).read_text().splitlines() for f in source_files], [])
 
