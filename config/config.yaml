@@ -86,7 +86,7 @@ ms_candidate_germ_variants:
   memory_limit_gb: 32
 
 ms_low_depth_mask:
-  threshold: 30
+  threshold: 40
 
 ms_map:
   band_width: 100
