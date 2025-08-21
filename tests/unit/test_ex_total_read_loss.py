@@ -13,26 +13,30 @@ from unittest.mock import patch
 from scripts.ex_total_read_loss import main
 
 @pytest.mark.parametrize(
-    "fastq1, fastq2, bam_files, expected_paired_reads, expected_final_dsc_reads, expected_percent_lost",
+    "fastq1, fastq2, bam_file, expected_paired_reads, expected_final_dsc_reads, expected_percent_lost",
     [
         (
             "tests/data/test_ex_total_read_loss/input_R1.fastq",
             "tests/data/test_ex_total_read_loss/input_R2.fastq",
-            ["tests/data/test_ex_total_read_loss/final_dsc.bam"],
+            "tests/data/test_ex_total_read_loss/final_dsc.bam",
             4, 2, 50.0
         )
     ]
 )
-def test_total_read_loss(tmp_path, fastq1, fastq2, bam_files, expected_paired_reads, expected_final_dsc_reads, expected_percent_lost):
+def test_total_read_loss(tmp_path, fastq1, fastq2, bam_file, expected_paired_reads, expected_final_dsc_reads, expected_percent_lost):
     output_file = tmp_path / "result.json"
     log_file = tmp_path / "log.txt"
+
+    sample_name = "TestSample"
 
     class MockSnakemake:
         input = type("input", (), {
             "input_fastq1": fastq1,
             "input_fastq2": fastq2,
-            "dsc_final": bam_files
+            "dsc_final": bam_file,
         })
+        params = type("params", (), {
+            "sample": sample_name})
         output = type("output", (), {"file_path": str(output_file)})
         log = [str(log_file)]
 
@@ -54,7 +58,7 @@ def test_total_read_loss(tmp_path, fastq1, fastq2, bam_files, expected_paired_re
     with open(output_file) as f:
         result = json.load(f)
 
-    assert result["paired_input_reads"] == expected_paired_reads
+    assert result["paired_reads_post_demux"] == expected_paired_reads
     assert result["final_dsc_reads"] == expected_final_dsc_reads
     assert result["percent_reads_lost"] == expected_percent_lost
 
