@@ -33,7 +33,7 @@ rule ex_fastqcraw_metrics:
     benchmark:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
     threads: 
-        4
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
@@ -129,7 +129,7 @@ rule ex_fastqcfilter_metrics:
     benchmark:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
     threads: 
-        4
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
@@ -198,14 +198,14 @@ rule ex_insert_metrics:
         txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
         hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", 
     resources:
-        mem = 128
+        memory = config["resource_allocation"]["memory"]["light"]
     log:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_insert_metrics.benchmark.txt"
     shell:
         """
-        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
+        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
             CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.txt} \
@@ -255,7 +255,7 @@ Calculate percentage of reads lost when calling DSC
 """
 rule ex_call_dsc_metrics:
     input:
-        pre_call_bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam",
+        pre_call_bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam",
         post_call_bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"
     output:
         call_dsc_metrics = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json"
@@ -304,7 +304,7 @@ rule ex_dsc_coverage_metrics:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
         ),
-        fai = config["GRCh38_path"] + ".fai"
+        fai = config["reference_path"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
@@ -345,7 +345,7 @@ rule ex_trinucleotide_context_metrics:
     input:
         vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
         nanoseq_contexts = config["ex_nanoseq_tri_contexts"],
-        ref = config["GRCh38_path"]
+        ref = config["reference_path"]
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json"
     params:
@@ -400,7 +400,7 @@ rule ex_softclipping_metrics:
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        fai = config["GRCh38_path"] + ".fai"
+        fai = config["reference_path"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     log:

@@ -30,7 +30,7 @@ rule ms_raw_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
     threads: 
-        4
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)
@@ -105,7 +105,7 @@ rule ms_fastqc_summary_metrics:
 # Generates ms alignment metrics
 rule ms_alignment_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
         stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt",
         insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
@@ -128,7 +128,7 @@ rule ms_alignment_metrics:
 # Generates ms duplicate metrics
 rule ms_duplication_metrics:
     input:
-        bam_sorted = "tmp/{ms_sample}/{ms_sample}_sorted_map.bam"
+        bam_sorted = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
     output:
         bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
         dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
@@ -204,7 +204,7 @@ rule ms_masking_metrics:
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
-        ref_index = config['GRCh38_path'] + ".fai"
+        ref_index = config["reference_path"] + ".fai"
     output:
         mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json",
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),

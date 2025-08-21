@@ -48,9 +48,9 @@ def get_ex_lane_adapter_dict(config):
     nested_dict = {}
 
     for _, row in ex_samples.iterrows():
-        lane = row["lane"]
+        lane = row["ex_lane"]
         sample = row["ex_sample"]
-        adapter = row["adapter"]
+        adapter = row["ex_adapter"]
 
         if lane not in nested_dict:
             nested_dict[lane] = {}
@@ -74,11 +74,10 @@ def get_ex_sample_adapter_dict(config):
     ex_adapters = metadata["ex_adapters"]
 
     # Merge ex_samples with adapter sequences using the adapter name
-    merged = ex_samples[["ex_sample", "adapter"]].merge(
+    merged = ex_samples[["ex_sample", "ex_adapter"]].merge(
         ex_adapters,
         how="left",
-        left_on="adapter",
-        right_on="ex_adapter"
+        on="ex_adapter"
     )
 
     # Build the nested dictionary
@@ -116,9 +115,6 @@ def get_ex_lane_samples(config):
     metadata = load_metadata(config)
     df = metadata["ex_samples"]
 
-    # Rename 'lane' to 'ex_lane' for consistency
-    df = df.rename(columns={"lane": "ex_lane"})
-
     return (
         df.groupby("ex_lane")["ex_sample"]
         .apply(list)
@@ -151,52 +147,6 @@ Returns a dictionary mapping ms_sample to its corresponding donor_id
 def get_ms_to_donor_id_map(config):
     df = load_metadata(config)["ms_samples"]
     return dict(zip(df["ms_sample"], df["donor_id"]))
-
-
-"""
-Returns a dictionary mapping ex_sample to its corresponding age
-    dict[ex_sample] -> age
-"""
-def get_ex_to_age_map(config):
-    df = load_metadata(config)["ex_samples"]
-    return dict(zip(df["ex_sample"], df["age"]))
-
-
-"""
-Returns a dictionary mapping ms_sample to its corresponding age
-    dict[ms_sample] -> age
-"""
-def get_ms_to_age_map(config):
-    df = load_metadata(config)["ms_samples"]
-    return dict(zip(df["ms_sample"], df["age"]))
-
-
-"""
-Returns a dictionary mapping ex_sample to its corresponding sample_type
-    dict[ex_sample] -> sample_type
-"""
-def get_ex_to_sample_type_map(config):
-    df = load_metadata(config)["ex_samples"]
-    return dict(zip(df["ex_sample"], df["ex_sample_type"]))
-
-
-"""
-Returns a dictionary mapping ms_sample to its corresponding sample_type
-    dict[ms_sample] -> sample_type
-"""
-def get_ms_to_sample_type_map(config):
-    df = load_metadata(config)["ms_samples"]
-    return dict(zip(df["ms_sample"], df["ms_sample_type"]))
-
-
-"""
-Returns a dictionary mapping ms_sample to its corresponding ms_sample_type in ex_samples.csv
-    dict[ms_sample] -> ms_sample_type
-"""
-def get_ms_to_sample_type_in_ex_samples_csv_map(config):
-    df = load_metadata(config)["ms_samples"]
-    return dict(zip(df["ms_sample"], df["ms_sample_type"]))
-
 
 """
 Returns a dictionary mapping ms_sample to its FASTQ file paths

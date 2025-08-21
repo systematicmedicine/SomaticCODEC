@@ -17,96 +17,6 @@ Authors:
 
 
 """
- Annotate the mapped reads for downstream rules
-    - Move UMI from read name to RX:Z tag
-    - Add mate information to read pairs
-    - Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
-    - Assign generic sample and read group metadata for tool compatibility
-"""
-rule ex_annotate_map:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
-    output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
-        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
-        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
-        intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
-        intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
-        intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam")
-    params:
-        min_umi_length = config["ex_annotate_map"]["min_umi_length"]
-    log:
-        "logs/{ex_sample}/annotate_bam.log"
-    benchmark:
-        "logs/{ex_sample}/annotate_bam.benchmark.txt"
-    threads:
-        max(1, os.cpu_count() // 16)
-    resources:
-        mem = 64
-    shell:
-        """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
-            CopyUmiFromReadName \
-            -i {input.bam} \
-            -o {output.intermediate_moveumi} \
-            --remove-umi true 2>> {log}
-
-        samtools sort -n -@ {threads} -o {output.intermediate_sorted} {output.intermediate_moveumi} 2>> {log}
-
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
-            SetMateInformation \
-            -i {output.intermediate_sorted} \
-            -o {output.intermediate_mateinfo} 2>> {log}
-
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression 1 --async-io \
-            GroupReadsByUmi \
-            --min-umi-length {params.min_umi_length} \
-            -i {output.intermediate_mateinfo} \
-            -o {output.intermediate_groupbyumi} \
-            -f {output.histogram} \
-            -@ {threads} \
-            -m 0 \
-            --strategy=adjacency 2>> {log}
-
-        picard AddOrReplaceReadGroups \
-            I={output.intermediate_groupbyumi} \
-            O={output.bam} \
-            RGID={wildcards.ex_sample} \
-            RGLB=lib1 \
-            RGPL=illumina \
-            RGPU=unit1 \
-            RGSM={wildcards.ex_sample} \
-            VALIDATION_STRINGENCY=LENIENT 2>> {log}
-        """
-
-
-"""
-Sort the mapped reads by coordinates
-    - Required for duplex consensus calling
-"""
-rule ex_sort_map:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
-    output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam")
-    log:
-        "logs/{ex_sample}/ex_sort_by_template.log"
-    benchmark:
-        "logs/{ex_sample}/ex_sort_by_template.benchmark.txt"
-    resources:
-        mem = 64
-    shell:
-        """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
-            SortBam \
-            -i {input.bam} \
-            -o {output.bam} \
-            -s TemplateCoordinate 2>> {log}
-        """
-
-
-"""
 Create duplex consensus (DSC)
     - All read 1's, and all read 2's belonging to a single molecular identifier are collapsed for single strand consensus (PCR duplicates)
     - All read 1 consensus and read 2 consensus belonging to a single molecular identifier are collapsed for duplex strand consensus 
@@ -115,7 +25,7 @@ Create duplex consensus (DSC)
 """
 rule ex_call_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
         metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
@@ -128,10 +38,10 @@ rule ex_call_dsc:
     benchmark:
         "logs/{ex_sample}/ex_call_dsc.benchmark.txt"
     resources:
-        mem = 64
+        memory = config["resource_allocation"]["memory"]["moderate"]
     shell:
         """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
          CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
@@ -150,16 +60,17 @@ Realign the DSC to the reference genome
 rule ex_remap_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["GRCh38_path"],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config["GRCh38_path"] + ".0123"
+        ref = config["reference_path"],
+        amb = config["reference_path"] + ".amb",
+        ann = config["reference_path"] + ".ann",
+        bwt = config["reference_path"] + ".bwt.2bit.64",
+        pac = config["reference_path"] + ".pac",
+        sa = config["reference_path"] + ".0123"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"),
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
-        intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam")
+        intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam"),
+        unsorted_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam")
     params:
         band_width = config["ex_remap_dsc"]["band_width"],
         clipping_penalty = config["ex_remap_dsc"]["clipping_penalty"],
@@ -178,7 +89,7 @@ rule ex_remap_dsc:
     benchmark:
         "logs/{ex_sample}/ex_remap_dsc.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["heavy"]
     shell:
         """
         samtools fastq -0 {output.intermediate_fastq} {input.bam} 2>> {log}
@@ -200,28 +111,9 @@ rule ex_remap_dsc:
         -Y \
         {input.ref} {output.intermediate_fastq} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
-        """
+        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.unsorted_bam} 2>> {log}
 
-
-"""
-Sort realigned DSC by read name
-    - Required for downstream rules
-"""
-rule ex_sort_dsc:
-    input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam"
-    output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam")
-    log:
-        "logs/{ex_sample}/ex_sort_dsc.log"
-    benchmark:
-        "logs/{ex_sample}/ex_sort_dsc.benchmark.txt"
-    threads:
-        max(1, os.cpu_count() // 4)
-    shell:
-        """
-        samtools sort -n -@ {threads} -o {output.bam} {input.bam} 2>> {log}
+        samtools sort -n -@ {threads} -o {output.bam} {output.unsorted_bam} 2>> {log}
         """
 
 
@@ -233,26 +125,24 @@ rule ex_annotate_dsc:
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["GRCh38_path"],
-        fai = config["GRCh38_path"] + ".fai",
-        dictf = config["GRCh38_path"].replace(".fna", ".dict")
+        ref = config["reference_path"],
+        fai = config["reference_path"] + ".fai",
+        dictf = config["reference_path"].replace(".fna", ".dict")
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
         intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
-    params:
-        min_mapq = config["ex_filter_dsc"]["min_mapq"]
     log:
         "logs/{ex_sample}/ex_annotate_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_annotate_dsc.benchmark.txt"
     resources:
-        mem = 64
+        memory = config["resource_allocation"]["memory"]["moderate"]
     threads:
-        max(1, os.cpu_count() // 16)
+        config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \

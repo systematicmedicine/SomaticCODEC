@@ -16,9 +16,9 @@ tmp/{ex_sample}/{ex_sample}_r1_filter_intermediate.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r2_filter_intermediate.fastq.gz
 tmp/{ms_sample}/{ms_sample}_raw_map.sam
 tmp/{ms_sample}/{ms_sample}_raw_map.bam
+tmp/{ms_sample}/{ms_sample}_read_group_map_unsorted.bam
 tmp/{ms_sample}/{ms_sample}_read_group_map.bam
-tmp/{ms_sample}/{ms_sample}_sorted_map.bam
-tmp/{ms_sample}/{ms_sample}_sorted_map.bam.bai
+tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai
 tmp/{ms_sample}/{ms_sample}_markdup_map.bam
 tmp/{ms_sample}/{ms_sample}_depth_per_base.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth.txt
@@ -62,12 +62,12 @@ tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz
 tmp/{ex_sample}/{ex_sample}_map.bam
 tmp/{ex_sample}/{ex_sample}_map_tmp.sam
 tmp/{ex_sample}/{ex_sample}_map_correct.bam
+tmp/{ex_sample}/{ex_sample}_map_anno_unsorted.bam
 tmp/{ex_sample}/{ex_sample}_map_anno.bam
 tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam
-tmp/{ex_sample}/{ex_sample}_map_template_sorted.bam
 tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam
 tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq
 tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam

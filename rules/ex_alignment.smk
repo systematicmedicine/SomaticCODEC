@@ -18,12 +18,12 @@ rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
-        ref = config["GRCh38_path"],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config["GRCh38_path"] + ".0123"
+        ref = config["reference_path"],
+        amb = config["reference_path"] + ".amb",
+        ann = config["reference_path"] + ".ann",
+        bwt = config["reference_path"] + ".bwt.2bit.64",
+        pac = config["reference_path"] + ".pac",
+        sa = config["reference_path"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
@@ -45,7 +45,7 @@ rule ex_map:
     benchmark:
         "logs/{ex_sample}/ex_map.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -85,8 +85,81 @@ rule ex_filter_map:
     benchmark:
         "logs/{ex_sample}/ex_filter_correct_product.benchmark.txt"
     threads: 
-        max(1, os.cpu_count() // 16)
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         samtools view -b -f 0x2 {input.bam} > {output.bam} 2>> {log}
         """
+
+
+"""
+ Annotate the mapped reads for downstream rules
+    - Move UMI from read name to RX:Z tag
+    - Add mate information to read pairs
+    - Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
+    - Assign generic sample and read group metadata for tool compatibility
+"""
+rule ex_annotate_map:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
+        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
+        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
+        intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
+        intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
+        intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam"),
+        intermediate_anno_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_anno_unsorted.bam")
+    params:
+        min_umi_length = config["ex_annotate_map"]["min_umi_length"]
+    log:
+        "logs/{ex_sample}/annotate_bam.log"
+    benchmark:
+        "logs/{ex_sample}/annotate_bam.benchmark.txt"
+    threads:
+        config["resource_allocation"]["threads"]["moderate"]
+    resources:
+        memory = config["resource_allocation"]["memory"]["moderate"]
+    shell:
+        """
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            CopyUmiFromReadName \
+            -i {input.bam} \
+            -o {output.intermediate_moveumi} \
+            --remove-umi true 2>> {log}
+
+        samtools sort -n -@ {threads} -o {output.intermediate_sorted} {output.intermediate_moveumi} 2>> {log}
+
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            SetMateInformation \
+            -i {output.intermediate_sorted} \
+            -o {output.intermediate_mateinfo} 2>> {log}
+
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression 1 --async-io \
+            GroupReadsByUmi \
+            --min-umi-length {params.min_umi_length} \
+            -i {output.intermediate_mateinfo} \
+            -o {output.intermediate_groupbyumi} \
+            -f {output.histogram} \
+            -@ {threads} \
+            -m 0 \
+            --strategy=adjacency 2>> {log}
+
+        picard AddOrReplaceReadGroups \
+            I={output.intermediate_groupbyumi} \
+            O={output.intermediate_anno_unsorted} \
+            RGID={wildcards.ex_sample} \
+            RGLB=lib1 \
+            RGPL=illumina \
+            RGPU=unit1 \
+            RGSM={wildcards.ex_sample} \
+            VALIDATION_STRINGENCY=LENIENT 2>> {log}
+
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            SortBam \
+            -i {output.intermediate_anno_unsorted} \
+            -o {output.bam} \
+            -s TemplateCoordinate 2>> {log}
+        """
+        

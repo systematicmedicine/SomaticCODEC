@@ -9,6 +9,11 @@ Authors:
 """
 # Import libraries
 import pytest
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 # Canonical chromosomes in UCSC naming
 CANONICAL_CHROMS = {f"chr{i}" for i in range(1, 23)} | {"chrX", "chrY"}

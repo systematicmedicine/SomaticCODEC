@@ -15,12 +15,12 @@ Author: Joshua Johnstone
 # Aligns reads to reference genome
 rule ms_map:
     input: 
-        ref = config['GRCh38_path'],
-        amb = config["GRCh38_path"] + ".amb",
-        ann = config["GRCh38_path"] + ".ann",
-        bwt = config["GRCh38_path"] + ".bwt.2bit.64",
-        pac = config["GRCh38_path"] + ".pac",
-        sa = config['GRCh38_path'] + ".0123",
+        ref = config['reference_path'],
+        amb = config["reference_path"] + ".amb",
+        ann = config["reference_path"] + ".ann",
+        bwt = config["reference_path"] + ".bwt.2bit.64",
+        pac = config["reference_path"] + ".pac",
+        sa = config['reference_path'] + ".0123",
         r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:
@@ -44,7 +44,7 @@ rule ms_map:
     benchmark:
         "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -71,41 +71,27 @@ rule ms_annotate_map:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
+        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam"),
+        bai = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"),
+        intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_read_group_map_unsorted.bam")
     log:
         "logs/{ms_sample}/ms_add_read_groups.log"
     benchmark:
         "logs/{ms_sample}/ms_add_read_groups.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 8)
+        config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
         picard AddOrReplaceReadGroups \
             I={input.bam} \
-            O={output.bam} \
+            O={output.intermediate_unsorted} \
             RGID={wildcards.ms_sample} \
             RGLB={wildcards.ms_sample}_lib \
             RGPL=ILLUMINA \
             RGPU={wildcards.ms_sample} \
             RGSM={wildcards.ms_sample} 2>> {log}
-        """
 
-# Sorts bam by coordinate
-rule ms_sort_map:
-    input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
-    output:
-        bam =  temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam"),
-        bai = temp("tmp/{ms_sample}/{ms_sample}_sorted_map.bam.bai")
-    log:
-        "logs/{ms_sample}/ms_sort_bam.log"
-    benchmark:
-        "logs/{ms_sample}/ms_sort_bam.benchmark.txt"
-    threads: 
-        max(1, os.cpu_count() // 8)
-    shell:
-        """
-        samtools sort -@ {threads} -o {output.bam} {input.bam} 2>> {log}
+        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
 
         samtools index {output.bam} 2>> {log}
         """
