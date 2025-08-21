@@ -148,52 +148,6 @@ def get_ms_to_donor_id_map(config):
     df = load_metadata(config)["ms_samples"]
     return dict(zip(df["ms_sample"], df["donor_id"]))
 
-
-"""
-Returns a dictionary mapping ex_sample to its corresponding age
-    dict[ex_sample] -> age
-"""
-def get_ex_to_age_map(config):
-    df = load_metadata(config)["ex_samples"]
-    return dict(zip(df["ex_sample"], df["age"]))
-
-
-"""
-Returns a dictionary mapping ms_sample to its corresponding age
-    dict[ms_sample] -> age
-"""
-def get_ms_to_age_map(config):
-    df = load_metadata(config)["ms_samples"]
-    return dict(zip(df["ms_sample"], df["age"]))
-
-
-"""
-Returns a dictionary mapping ex_sample to its corresponding sample_type
-    dict[ex_sample] -> sample_type
-"""
-def get_ex_to_sample_type_map(config):
-    df = load_metadata(config)["ex_samples"]
-    return dict(zip(df["ex_sample"], df["ex_sample_type"]))
-
-
-"""
-Returns a dictionary mapping ms_sample to its corresponding sample_type
-    dict[ms_sample] -> sample_type
-"""
-def get_ms_to_sample_type_map(config):
-    df = load_metadata(config)["ms_samples"]
-    return dict(zip(df["ms_sample"], df["ms_sample_type"]))
-
-
-"""
-Returns a dictionary mapping ms_sample to its corresponding ms_sample_type in ex_samples.csv
-    dict[ms_sample] -> ms_sample_type
-"""
-def get_ms_to_sample_type_in_ex_samples_csv_map(config):
-    df = load_metadata(config)["ms_samples"]
-    return dict(zip(df["ms_sample"], df["ms_sample_type"]))
-
-
 """
 Returns a dictionary mapping ms_sample to its FASTQ file paths
     dict[ms_sample] -> (fastq1_path, fastq2_path)

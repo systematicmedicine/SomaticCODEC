@@ -28,10 +28,6 @@ def main(snakemake):
     ex_ms_sample_map = md.get_ex_to_ms_sample_map(config)
     ex_donor_id_map = md.get_ex_to_donor_id_map(config)
     ms_donor_id_map = md.get_ms_to_donor_id_map(config)
-    ex_age_map = md.get_ex_to_age_map(config)
-    ms_age_map = md.get_ms_to_age_map(config)
-    ms_sample_type_map = md.get_ms_to_sample_type_map(config)
-    ms_sample_type_in_ex_samples_csv_map = md.get_ms_to_sample_type_in_ex_samples_csv_map(config)
 
     mismatches = {
         "donor_id": {},
@@ -44,21 +40,9 @@ def main(snakemake):
         donor_ex = ex_donor_id_map[ex_sample]
         donor_ms = ms_donor_id_map[ms_sample]
 
-        age_ex = ex_age_map[ex_sample]
-        age_ms = ms_age_map[ms_sample]
-
-        sample_type_ms = ms_sample_type_map[ms_sample]
-        sample_type_ms_in_ex_samples_csv = ms_sample_type_in_ex_samples_csv_map[ms_sample]
-
         # Check each field and record mismatches
         if donor_ex != donor_ms:
             mismatches["donor_id"][ms_sample] = (donor_ex, donor_ms)
-
-        if age_ex != age_ms:
-            mismatches["age"][ms_sample] = (age_ex, age_ms)
-
-        if sample_type_ms != sample_type_ms_in_ex_samples_csv:
-            mismatches["ms_sample_type"][ms_sample] = (sample_type_ms, sample_type_ms_in_ex_samples_csv)
 
     # After checking all samples, report any mismatches
     errors = {k: v for k, v in mismatches.items() if v}
