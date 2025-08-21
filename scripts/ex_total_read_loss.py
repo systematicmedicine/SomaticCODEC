@@ -45,28 +45,26 @@ def main(snakemake):
 
         with pysam.AlignmentFile(bam_path, "rb") as bam:
             return sum(1 for _ in bam)
+        
+    # Define sample name
+    sample = snakemake.params.sample
 
     # Count R1 and R2 reads using seqkit
     r1_count = count_fastq_reads(snakemake.input.input_fastq1)
     r2_count = count_fastq_reads(snakemake.input.input_fastq2)
-    paired_reads = min(r1_count, r2_count)
+    paired_reads_post_demux = min(r1_count, r2_count)
 
-    # Count reads in all final DSC BAMs
-    final_dsc_reads = 0
-    for bam in snakemake.input.dsc_final:
-        final_dsc_reads += count_bam_reads(bam)
+    # Count reads in final DSC BAM
+    final_dsc_reads = count_bam_reads(snakemake.input.dsc_final)
 
     # Calculate read loss
-    reads_lost = paired_reads - final_dsc_reads
-    percent_lost = (reads_lost / paired_reads * 100) if paired_reads > 0 else 0.0
-
-    # Determine lane name from output path
-    lane_name = os.path.basename(snakemake.output.file_path).split("_")[0]
+    reads_lost = paired_reads_post_demux - final_dsc_reads
+    percent_lost = (reads_lost / paired_reads_post_demux * 100) if paired_reads_post_demux > 0 else 0.0
 
     # Write results
     result = {
-        "lane": lane_name,
-        "paired_input_reads": paired_reads,
+        "sample": sample,
+        "paired_reads_post_demux": paired_reads_post_demux,
         "final_dsc_reads": final_dsc_reads,
         "percent_reads_lost": round(percent_lost, 2)
     }

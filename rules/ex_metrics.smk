@@ -363,20 +363,17 @@ Calculate the total read loss between raw FASTQ, and DSC immediately before vari
 """
 rule ex_total_read_loss:
     input:
-        ex_samples = config["ex_samples_path"],
-        ex_lanes = config["ex_lanes_path"],
-        input_fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
-        input_fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
-        dsc_final = lambda wildcards: expand(
-            "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
-        ),
+        input_fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
+        input_fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
+        dsc_final = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
     output:
-        file_path = "metrics/{ex_lane}/{ex_lane}_total_read_loss.json"
+        file_path = "metrics/{ex_sample}/{ex_sample}_total_read_loss.json"
+    params:
+        sample = "{ex_sample}"
     log:
-        "logs/{ex_lane}/ex_total_read_loss.log"
+        "logs/{ex_sample}/ex_total_read_loss.log"
     benchmark:
-        "logs/{ex_lane}/ex_total_read_loss.benchmark.txt"
+        "logs/{ex_sample}/ex_total_read_loss.benchmark.txt"
     script:
         "../scripts/ex_total_read_loss.py"
 
