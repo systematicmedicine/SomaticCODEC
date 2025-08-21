@@ -25,7 +25,7 @@ pytestmark = [
 
 # --- CONFIG ---
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 EXPECTED_KEYS = [
     "ex_samples_path",
     "ex_lanes_path",

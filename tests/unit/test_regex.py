@@ -17,6 +17,8 @@ Authors:
 import os
 import pytest
 import pandas as pd
+import sys
+from pathlib import Path
 from rpy2 import robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
@@ -30,8 +32,8 @@ pytestmark = [
 ]
 
 # Define paths
-TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(TESTS_DIR, ".."))
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 CSV_PATH = os.path.join(PROJECT_ROOT, 'tests', 'expected', 'test_regex', 'regex_expected_values.csv')
 XLSX_PATH = os.path.join(PROJECT_ROOT, 'config', 'component_level_metrics.xlsx')

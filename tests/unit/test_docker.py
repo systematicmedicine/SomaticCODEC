@@ -24,7 +24,7 @@ pytestmark = [
 
 
 # Define hard coded parameters
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 IMAGE_INFO_SHA_FILE = "/image-info/dockerfile.sha256"
 IMAGE_INFO_ENVIRONMENT_SHA = "/image-info/environment.sha256"
 LOCAL_DOCKERFILE = PROJECT_ROOT / "Dockerfile"

@@ -17,12 +17,12 @@ Authors:
 import pandas as pd
 from pathlib import Path
 import sys
-from utils.bed_utils import read_bed
-from utils.fai_utils import read_fai
 
-# Add PROJECT_ROOT to sys.path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
 
+from tests.utils.bed_utils import read_bed
+from tests.utils.fai_utils import read_fai
 from scripts.get_metadata import load_config, get_ex_to_ms_sample_map
 
 # Load input and output BEDs for a sample
@@ -96,8 +96,8 @@ def test_beds_span_reference(lightweight_test_run):
 
     config = load_config("config/config.yaml")
     ex_to_ms = get_ex_to_ms_sample_map(config)
-    config["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
-    fai_path = config["GRCh38_path"] + ".fai"
+    config["reference_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
+    fai_path = config["reference_path"] + ".fai"
     fai_df = read_fai(fai_path)
 
     for ex_sample, ms_sample in ex_to_ms.items():

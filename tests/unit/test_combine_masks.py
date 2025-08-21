@@ -10,9 +10,14 @@ Authors:
 
 import pandas as pd
 from pathlib import Path
-from test_generate_include_bed import read_bed
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from tests.unit.test_generate_include_bed import read_bed
 from scripts.get_metadata import load_config, get_ms_sample_ids
-from utils.bed_utils import merge_bed_intervals
+from tests.utils.bed_utils import merge_bed_intervals
 
 # Assert that combined BED matches expected merge of individual beds
 def assert_correctly_merged(ms_sample):
@@ -58,8 +63,8 @@ def assert_combined_bed_order_matches_ref(ms_sample):
 
     # Load reference fai file and get chromosome order as a list
     config = load_config("config/config.yaml")
-    config["GRCh38_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
-    fai_path = config["GRCh38_path"] + ".fai"
+    config["reference_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
+    fai_path = config["reference_path"] + ".fai"
     fai_df = pd.read_csv(fai_path, sep="\t", header=None, usecols=[0], names=["chrom"])
     fai_chrom_order = fai_df["chrom"].tolist()
 
