@@ -44,7 +44,7 @@ rule ms_map:
     benchmark:
         "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -79,7 +79,7 @@ rule ms_annotate_map:
     benchmark:
         "logs/{ms_sample}/ms_add_read_groups.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 8)
+        config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
         picard AddOrReplaceReadGroups \

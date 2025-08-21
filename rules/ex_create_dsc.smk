@@ -38,10 +38,10 @@ rule ex_call_dsc:
     benchmark:
         "logs/{ex_sample}/ex_call_dsc.benchmark.txt"
     resources:
-        mem = 64
+        memory = config["resource_allocation"]["memory"]["moderate"]
     shell:
         """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
          CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
@@ -89,7 +89,7 @@ rule ex_remap_dsc:
     benchmark:
         "logs/{ex_sample}/ex_remap_dsc.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["heavy"]
     shell:
         """
         samtools fastq -0 {output.intermediate_fastq} {input.bam} 2>> {log}
@@ -132,19 +132,17 @@ rule ex_annotate_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
         intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
-    params:
-        min_mapq = config["ex_filter_dsc"]["min_mapq"]
     log:
         "logs/{ex_sample}/ex_annotate_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_annotate_dsc.benchmark.txt"
     resources:
-        mem = 64
+        memory = config["resource_allocation"]["memory"]["moderate"]
     threads:
-        max(1, os.cpu_count() // 16)
+        config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \

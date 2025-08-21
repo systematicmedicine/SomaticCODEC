@@ -30,7 +30,7 @@ rule ms_raw_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
     threads: 
-        4
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)

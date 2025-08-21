@@ -22,17 +22,17 @@ rule ms_candidate_germ_variants:
         dictf = os.path.splitext(config["reference_path"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
-    params:
-        memory_limit_gb = config["ms_candidate_germ_variants"]["memory_limit_gb"]
+    resources:
+        memory = config["resource_allocation"]["memory"]["moderate"]
     log:
         "logs/{ms_sample}/ms_candidate_germ_variants.log"
     benchmark:
         "logs/{ms_sample}/ms_candidate_germ_variants.benchmark.txt"
     threads:
-         max(1, os.cpu_count() // 8)
+         config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
-        gatk --java-options "-Xmx{params.memory_limit_gb}g" HaplotypeCaller  \
+        gatk --java-options "-Xmx{resources.memory}g" HaplotypeCaller  \
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \

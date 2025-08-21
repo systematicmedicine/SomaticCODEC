@@ -33,7 +33,7 @@ rule ex_fastqcraw_metrics:
     benchmark:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
     threads: 
-        4
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
@@ -129,7 +129,7 @@ rule ex_fastqcfilter_metrics:
     benchmark:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
     threads: 
-        4
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
@@ -198,14 +198,14 @@ rule ex_insert_metrics:
         txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
         hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", 
     resources:
-        mem = 128
+        memory = config["resource_allocation"]["memory"]["light"]
     log:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_insert_metrics.benchmark.txt"
     shell:
         """
-        picard -Xmx{resources.mem}g -Djava.io.tmpdir=tmp \
+        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
             CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.txt} \
