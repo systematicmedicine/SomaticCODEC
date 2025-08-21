@@ -39,7 +39,7 @@ rule bwamem_index_files:
     benchmark:
         "logs/pipeline/bwamem_index_files.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
         bwa-mem2 index {input.reference} 2>> {log}

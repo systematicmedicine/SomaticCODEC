@@ -45,7 +45,7 @@ rule ex_map:
     benchmark:
         "logs/{ex_sample}/ex_map.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -85,7 +85,7 @@ rule ex_filter_map:
     benchmark:
         "logs/{ex_sample}/ex_filter_correct_product.benchmark.txt"
     threads: 
-        max(1, os.cpu_count() // 16)
+        config["resource_allocation"]["threads"]["light"]
     shell:
         """
         samtools view -b -f 0x2 {input.bam} > {output.bam} 2>> {log}
@@ -117,12 +117,12 @@ rule ex_annotate_map:
     benchmark:
         "logs/{ex_sample}/annotate_bam.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 16)
+        config["resource_allocation"]["threads"]["moderate"]
     resources:
-        mem = 64
+        memory = config["resource_allocation"]["memory"]["moderate"]
     shell:
         """
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             CopyUmiFromReadName \
             -i {input.bam} \
             -o {output.intermediate_moveumi} \
@@ -130,12 +130,12 @@ rule ex_annotate_map:
 
         samtools sort -n -@ {threads} -o {output.intermediate_sorted} {output.intermediate_moveumi} 2>> {log}
 
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             SetMateInformation \
             -i {output.intermediate_sorted} \
             -o {output.intermediate_mateinfo} 2>> {log}
 
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression 1 --async-io \
             GroupReadsByUmi \
             --min-umi-length {params.min_umi_length} \
@@ -156,7 +156,7 @@ rule ex_annotate_map:
             RGSM={wildcards.ex_sample} \
             VALIDATION_STRINGENCY=LENIENT 2>> {log}
 
-        JAVA_OPTS="-Xmx{resources.mem}g -Djava.io.tmpdir=tmp" fgbio \
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             SortBam \
             -i {output.intermediate_anno_unsorted} \
             -o {output.bam} \

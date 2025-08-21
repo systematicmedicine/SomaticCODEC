@@ -37,7 +37,7 @@ rule count_reads_and_bases:
                 md.get_ex_lane_ids(config)
                 )
         threads:
-            max(1, os.cpu_count() // 4)
+            config["resource_allocation"]["threads"]["moderate"]
         log:
             "logs/batch/count_reads_and_bases.log"
         benchmark:

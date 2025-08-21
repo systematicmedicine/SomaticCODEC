@@ -75,7 +75,12 @@ def lightweight_test_run():
     with config.open("r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
     config_data["experiment_name"] = "lightweight_test_run"
-    config_data["ms_candidate_germ_variants"]["memory_limit_gb"] = 4
+    config_data["resource_allocation"]["memory"]["heavy"] = 4
+    config_data["resource_allocation"]["memory"]["moderate"] = 4
+    config_data["resource_allocation"]["memory"]["light"] = 4
+    config_data["resource_allocation"]["threads"]["heavy"] = 4
+    config_data["resource_allocation"]["threads"]["moderate"] = 4
+    config_data["resource_allocation"]["threads"]["light"] = 4
     config_data["ms_low_depth_mask"]["threshold"] = 1
     config_data["reference_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
     config_data["difficult_regions_path"] = "tmp/downloads/GRCh38_alldifficultregions_10lines.bed"

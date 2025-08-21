@@ -44,7 +44,7 @@ rule ms_trim_fastq:
     benchmark:
         "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
     threads: 
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
         cutadapt \
@@ -89,7 +89,7 @@ rule ms_filter_fastq:
     benchmark:
         "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
     threads:
-        max(1, os.cpu_count() // 4)
+        config["resource_allocation"]["threads"]["moderate"]
     shell:
         """
         cutadapt \
