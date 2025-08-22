@@ -3,7 +3,6 @@ ms_reads_filtered_length,tests/data/test_regex/S00X_filtered_fq_metrics.txt,3.7
 ms_mapped_alignment,tests/data/test_regex/S00X_alignment_stats.txt,99.73
 ms_duplication_rate_alignment,tests/data/test_regex/S00X_markdup_metrics.txt,0.009474
 ms_insert_size_alignment,tests/data/test_regex/S00X_insert_size_metrics.txt,53
-ex_reads_lost_demux,tests/data/test_regex/laneX_demux_metrics.txt,17.2
 ex_mapped_initial_alignment,tests/data/test_regex/S00X_map_metrics.txt,91.37
 ex_properly_paired_initial_alignment,tests/data/test_regex/S00X_map_metrics.txt,67.52
 ex_insert_size_initial_alignment,tests/data/test_regex/S00X_insert_metrics.txt,127

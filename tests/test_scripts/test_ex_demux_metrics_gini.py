@@ -8,7 +8,7 @@ Authors:
     - Joshua Johnstone
 """
 import json
-from scripts.ex_demux_metrics_gini import main
+from scripts.ex_demux_counts_and_gini import main
 import pytest
 import os
 
