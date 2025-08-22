@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-Count reads and bases for FASTQ and BAM files under PROJECT_ROOT/tmp.
+count_reads.py
+
+Count reads for FASTQ and BAM files under PROJECT_ROOT/tmp.
 
 - Finds *.fastq.gz and *.bam (excluding anything in tmp/downloads).
 - Sample name = first-level subdirectory under tmp (e.g., tmp/S001/* -> sample "S001").
 - Uses seqkit (FASTQ) and samtools (BAM) for counts.
-- Writes one JSON per sample at tmp/<sample>/<sample>_read_base_counts.json.
+- Writes one JSON per sample at tmp/<sample>/<sample>_read_counts.json.
 - Only counts primary alignments in BAM files
 
 Requirements:
@@ -18,12 +20,12 @@ Usage:
 Authors:
     - Chat-GPT
     - Cameron Fraser
+    - Joshua Johnstone
 """
 
 # Import libraries
 from __future__ import annotations
 import json
-import os
 import shlex
 import subprocess
 from pathlib import Path
@@ -54,22 +56,19 @@ def run_cmd(cmd: List[str], capture_stderr: bool = True) -> str:
 
 
 # ---------------- FASTQ ----------------
-def count_fastq_with_seqkit(fastq_path: Path) -> Tuple[int, int]:
-    cmd = ["seqkit", "stats", "-Ta", str(fastq_path)]
+def count_fastq_with_seqkit(fastq_path: Path) -> int:
+    cmd = ["seqkit", "stats", "-T", str(fastq_path)]
     out = run_cmd(cmd)
     lines = [ln for ln in out.splitlines() if ln.strip()]
     if len(lines) < 2:
         raise RuntimeError(f"Unexpected seqkit stats output for {fastq_path}: {out}")
-
     header = lines[0].split("\t")
     row = lines[1].split("\t")
     try:
         idx_num = header.index("num_seqs")
-        idx_sum = header.index("sum_len")
     except ValueError:
-        idx_num, idx_sum = 3, 4
-    return int(row[idx_num]), int(row[idx_sum])
-
+        idx_num = 0
+    return int(row[idx_num])
 
 # ---------------- BAM ----------------
 def count_bam_reads(bam_path: Path, threads: int = 1) -> int:
@@ -77,29 +76,9 @@ def count_bam_reads(bam_path: Path, threads: int = 1) -> int:
     out = run_cmd(cmd)
     return int(out.strip())
 
-
-def count_bam_bases_from_sequences(bam_path: Path, threads: int = 1) -> int:
-    cmd = ["samtools", "view", "-@", str(threads), "-F", str(PRIMARY_ONLY_FILTER), str(bam_path)]
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    bases = 0
-    assert proc.stdout is not None
-    for line in proc.stdout:
-        if not line or line.startswith("@"):
-            continue
-        parts = line.rstrip("\n").split("\t")
-        if len(parts) >= 10 and parts[9] != "*":
-            bases += len(parts[9])
-    _, stderr = proc.communicate()
-    if proc.returncode != 0:
-        raise RuntimeError(f"samtools view failed for {bam_path}\n{stderr}")
-    return bases
-
-
 def count_bam_with_samtools(bam_path: Path, threads: int = 1) -> Tuple[int, int]:
     reads = count_bam_reads(bam_path, threads=threads)
-    bases = count_bam_bases_from_sequences(bam_path, threads=threads)
-    return reads, bases
-
+    return reads
 
 # ---------------- Discovery & Orchestration ----------------
 def is_in_downloads_under_tmp(p: Path, tmp_dir: Path) -> bool:
@@ -153,22 +132,20 @@ def collect_files(project_root: Path) -> Dict[str, List[Path]]:
 def summarize_sample(sample: str, files: List[Path], threads: int = 1) -> dict:
     per_file = []
     total_reads = 0
-    total_bases = 0
     for fp in sorted(files):
         ftype = detect_file_type(fp)
         if ftype == "fastq.gz":
-            reads, bases = count_fastq_with_seqkit(fp)
+            reads = count_fastq_with_seqkit(fp)
         elif ftype == "bam":
-            reads, bases = count_bam_with_samtools(fp, threads=threads)
+            reads = count_bam_with_samtools(fp, threads=threads)
         else:
             continue
-        per_file.append({"path": str(fp), "type": ftype, "reads": reads, "bases": bases})
+        per_file.append({"path": str(fp), "type": ftype, "reads": reads})
         total_reads += reads
-        total_bases += bases
     return {
         "sample": sample,
         "files": per_file,
-        "totals": {"reads": total_reads, "bases": total_bases},
+        "totals": {"reads": total_reads},
         "tools": {
             "fastq": "seqkit stats -Ta",
             "bam": "samtools view -F 2304 (primary only)",
@@ -177,7 +154,7 @@ def summarize_sample(sample: str, files: List[Path], threads: int = 1) -> dict:
 
 
 def write_sample_json(metrics_dir: Path, sample: str, payload: dict) -> Path:
-    out_path = metrics_dir / sample / f"{sample}_read_base_counts.json"
+    out_path = metrics_dir / sample / f"{sample}_read_counts.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with out_path.open("w", encoding="utf-8") as fh:
         json.dump(payload, fh, indent=2)
@@ -186,7 +163,7 @@ def write_sample_json(metrics_dir: Path, sample: str, payload: dict) -> Path:
 
 def main():
 
-    print("[INFO] Starting count_reads_and_bases.py")
+    print("[INFO] Starting count_reads.py")
 
     # Automatically detect PROJECT_ROOT from script location
     script_dir = Path(__file__).resolve().parent
@@ -208,7 +185,7 @@ def main():
     for p in written:
         print(f"  {p}")
 
-    print("[INFO] Completed count_reads_and_bases.py")
+    print("[INFO] Completed count_reads.py")
 
 if __name__ == "__main__":
     main()
