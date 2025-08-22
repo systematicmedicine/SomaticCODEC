@@ -64,7 +64,9 @@ def lightweight_test_run():
         "ex_lane1_Chr21_10000reads_r2.fastq.gz",
         "ex_lane2_Chr21_5000reads_r1.fastq.gz",
         "ex_lane2_Chr21_5000reads_r2.fastq.gz",
-        "nanoseq_trinucleotide_contexts.csv"
+        "nanoseq_trinucleotide_contexts.csv",
+        "gnomad-chr21-micro.vcf.bgz",
+        "gnomad-chr21-micro.vcf.bgz.tbi"
         ]
 
     for filename in files_to_copy:
@@ -86,6 +88,7 @@ def lightweight_test_run():
     config_data["difficult_regions_path"] = "tmp/downloads/GRCh38_alldifficultregions_10lines.bed"
     config_data["common_variants_path"] = "tmp/downloads/gnomad_common_af01_merged_10lines.bed"
     config_data["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
+    config_data["known_germline_varaints"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:
