@@ -84,3 +84,5 @@ tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf
 tmp/{ex_sample}/{ex_sample}_bcf_called.bcf
 tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf
 tmp/{ex_sample}/{ex_sample}_all_positions.vcf
+tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz
+tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi

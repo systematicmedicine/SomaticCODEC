@@ -397,6 +397,9 @@ rule ex_softclipping_metrics:
         "../scripts/ex_softclipping_metrics.py"
 
 
+"""
+Compares variant rate between chromosomes
+"""
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
@@ -410,6 +413,10 @@ rule ex_chromosomal_variant_rate_metrics:
     script:
         "../scripts/ex_chromosomal_variant_rate_metrics.py"
 
+
+"""
+Identify somatic variants present in multiple samples in a batch
+"""
 rule ex_recurrent_variant_metrics:
     input:
         vcfs = expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config))
@@ -421,3 +428,41 @@ rule ex_recurrent_variant_metrics:
         "logs/batch/batch_ex_recurrent_variant_metrics.benchmark.txt"
     script:
         "../scripts/ex_recurrent_variant_metrics.py"
+
+
+"""
+Determines how many called somatic variants are present in dataset of common germline variants
+"""
+rule ex_germline_contamination:
+    input:
+        somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        germline_vcf = config["known_germline_varaints"]
+    output:
+        intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
+        intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
+        germline_matches = "metrics/{ex_sample}/{ex_sample}_germline_matches.vcf",
+        metrics_file = "metrics/{ex_sample}/{ex_sample}_germline_matches.json"
+    log:
+        "logs/{ex_sample}/ex_germline_contamination.log"
+    benchmark:
+        "logs/{ex_sample}/ex_germline_contamination.benchmark.txt"
+    shell:
+        """
+        # Compress & index somatic VCF
+        bgzip -c {input.somatic_vcf} > {output.intermediate_somatic_bgz}
+        tabix -p vcf {output.intermediate_somatic_bgz}
+
+        # Determine intersect
+        bcftools isec -n=2 -w1 {output.intermediate_somatic_bgz} {input.germline_vcf} -o {output.germline_matches}
+
+        # Count number of germline matches
+        NUM_GERM_MATCHES=$(bcftools view -H {output.germline_matches} | wc -l)
+
+        # Create metrics file in JSON format
+        python3 -c 'import json; print(json.dumps({{
+        "description": "Number of called somatic variants overlapping known germline variants",
+        "somatic_vcf": "{input.somatic_vcf}",
+        "germline_vcf": "{input.germline_vcf}",
+        "germline_matches": int('"$NUM_GERM_MATCHES"')
+        }}, indent=2))' > {output.metrics_file}
+        """
