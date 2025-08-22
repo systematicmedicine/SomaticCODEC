@@ -75,13 +75,13 @@ rule ex_fastqc_raw_summary_metrics:
 
 
 """
-Generates a summary file with the Gini coefficient of demuxed sample read counts
+Generates a summary file with demuxed adaptor counts and Gini coefficient for inequality between adaptors
 """
-rule ex_demux_metrics_gini:
+rule ex_demux_counts_and_gini:
     input:
         demux_metrics = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
     output:
-        demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json"
+        demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
     params:
         sample = "{ex_lane}"
     log:
@@ -89,7 +89,7 @@ rule ex_demux_metrics_gini:
     benchmark:
         "logs/{ex_lane}/ex_demux_metrics_gini.benchmark.txt"
     script:
-        "../scripts/ex_demux_metrics_gini.py"
+        "../scripts/ex_demux_counts_and_gini.py"
     
 
 """

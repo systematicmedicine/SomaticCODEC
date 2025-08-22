@@ -58,7 +58,7 @@ results = [
 # Define metrics for ex samples
 ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
