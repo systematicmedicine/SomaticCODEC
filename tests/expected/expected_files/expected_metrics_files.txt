@@ -68,6 +68,8 @@ metrics/{ex_lane}/{ex_lane}_read_counts.json
 metrics/{ex_sample}/{ex_sample}_read_counts.json
 metrics/{ms_sample}/{ms_sample}_read_counts.json
 metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json
+metrics/{ex_sample}/{ex_sample}_germline_matches.vcf
+metrics/{ex_sample}/{ex_sample}_germline_matches.json
 metrics/batch/batch_recurrent_variant_metrics.json
 metrics/metrics_report.csv
 metrics/metrics_heatmap.png
