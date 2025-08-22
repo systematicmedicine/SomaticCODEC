@@ -75,13 +75,13 @@ rule ex_fastqc_raw_summary_metrics:
 
 
 """
-Generates a summary file with the Gini coefficient of demuxed sample read counts
+Generates a summary file with demuxed adaptor counts and Gini coefficient for inequality between adaptors
 """
-rule ex_demux_metrics_gini:
+rule ex_demux_counts_and_gini:
     input:
         demux_metrics = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
     output:
-        demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json"
+        demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
     params:
         sample = "{ex_lane}"
     log:
@@ -89,25 +89,28 @@ rule ex_demux_metrics_gini:
     benchmark:
         "logs/{ex_lane}/ex_demux_metrics_gini.benchmark.txt"
     script:
-        "../scripts/ex_demux_metrics_gini.py"
+        "../scripts/ex_demux_counts_and_gini.py"
     
 
 """
-Calculates the percentage of bases lost during ex_trim_fastq
+Calculates the count and percentage of bases lost during ex_trim_fastq
 """
 rule ex_bases_trimmed:
     input:
-        counts_json = "metrics/{ex_sample}/{ex_sample}_read_base_counts.json",
-        pre_files = ["tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz"],
-        post_files = ["tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz", "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"]
+        pre_r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
+        pre_r2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
+        post_r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
+        post_r2 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"
     output:
         json = "metrics/{ex_sample}/{ex_sample}_bases_trimmed.json"
+    params:
+        sample = "{ex_sample}"
     log:
         "logs/{ex_sample}/ex_bases_trimmed.log"
     benchmark:
         "logs/{ex_sample}/ex_bases_trimmed.benchmark.txt"
     script:
-        "../scripts/percent_reads_bases_lost.py"
+        "../scripts/ex_bases_trimmed.py"
 
 
 """
@@ -363,20 +366,17 @@ Calculate the total read loss between raw FASTQ, and DSC immediately before vari
 """
 rule ex_total_read_loss:
     input:
-        ex_samples = config["ex_samples_path"],
-        ex_lanes = config["ex_lanes_path"],
-        input_fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
-        input_fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
-        dsc_final = lambda wildcards: expand(
-            "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-            ex_sample = md.get_ex_lane_samples(config)[wildcards.ex_lane]
-        ),
+        input_fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
+        input_fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
+        dsc_final = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
     output:
-        file_path = "metrics/{ex_lane}/{ex_lane}_total_read_loss.json"
+        file_path = "metrics/{ex_sample}/{ex_sample}_total_read_loss.json"
+    params:
+        sample = "{ex_sample}"
     log:
-        "logs/{ex_lane}/ex_total_read_loss.log"
+        "logs/{ex_sample}/ex_total_read_loss.log"
     benchmark:
-        "logs/{ex_lane}/ex_total_read_loss.benchmark.txt"
+        "logs/{ex_sample}/ex_total_read_loss.benchmark.txt"
     script:
         "../scripts/ex_total_read_loss.py"
 
