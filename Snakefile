@@ -58,7 +58,7 @@ results = [
 # Define metrics for ex samples
 ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
@@ -71,7 +71,8 @@ ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_total_read_loss.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_lane}/{ex_lane}_read_counts.json", ex_lane = ex_lane_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_total_read_loss.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt", ex_sample = ex_sample_ids),
@@ -92,6 +93,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_read_counts.json", ex_sample = ex_sample_ids),
     "metrics/batch/batch_recurrent_variant_metrics.json"
 ]
 
@@ -117,7 +119,8 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json", ms_sample = ms_sample_ids)
+    expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_read_counts.json", ms_sample = ms_sample_ids)
 ]
 
 # Define other metrics

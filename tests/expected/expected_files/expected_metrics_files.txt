@@ -34,7 +34,7 @@ metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt
 metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json
 metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json
 metrics/{ex_lane}/{ex_lane}_demux_metrics.txt
-metrics/{ex_lane}/{ex_lane}_demux_metrics_gini.json
+metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json
 metrics/{ex_sample}/{ex_sample}_bases_trimmed.json
 metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json
@@ -43,7 +43,7 @@ metrics/{ex_sample}/{ex_sample}_filter_length.txt
 metrics/{ex_sample}/{ex_sample}_filter_quality.txt
 metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
 metrics/{ex_sample}/{ex_sample}_duplication_metrics.json
-metrics/{ex_lane}/{ex_lane}_total_read_loss.json
+metrics/{ex_sample}/{ex_sample}_total_read_loss.json
 metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html
 metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html
 metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.zip
@@ -64,9 +64,9 @@ metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json
 metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt
 metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json
 metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json
-metrics/{ex_lane}/{ex_lane}_read_base_counts.json
-metrics/{ex_sample}/{ex_sample}_read_base_counts.json
-metrics/{ms_sample}/{ms_sample}_read_base_counts.json
+metrics/{ex_lane}/{ex_lane}_read_counts.json
+metrics/{ex_sample}/{ex_sample}_read_counts.json
+metrics/{ms_sample}/{ms_sample}_read_counts.json
 metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json
 metrics/batch/batch_recurrent_variant_metrics.json
 metrics/metrics_report.csv
