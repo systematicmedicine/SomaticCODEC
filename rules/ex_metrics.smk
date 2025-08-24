@@ -114,6 +114,25 @@ rule ex_bases_trimmed:
 
 
 """
+Calculates the length of reads post trimming, outputs percentiles and zero-length reads
+"""
+rule ex_trimmed_read_length_metrics:
+    input:
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"
+    output:
+        json = "metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json"
+    params:
+        sample = "{ex_sample}"
+    log:
+        "logs/{ex_sample}/ex_trimmed_read_length_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt" 
+    script:
+        "../scripts/ex_trimmed_read_length_metrics.py"
+
+
+"""
 FastQC on demultiplexed, trimmed, filtered FASTQs 
 """
 rule ex_fastqcfilter_metrics:
@@ -320,24 +339,6 @@ rule ex_dsc_coverage_metrics:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
     script:
         "../scripts/ex_dsc_coverage_metrics.py"
-
-
-"""
-Calculate percent of positions with somatic SNV clustering
-    - ex_somatic_depth_per_position: Percent of somatic SNVs called that have >1x alt depth
-    - ex_somatic_clustered_or_mnv: Percent of somatic SNVs called that are within 150bp of another SNV
-"""
-rule ex_somatic_SNV_clustering_metrics:
-    input:
-        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf"
-    output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt"
-    log:
-        "logs/{ex_sample}/ex_somatic_SNV_clustering_metrics.log"
-    benchmark:
-        "logs/{ex_sample}/ex_somatic_SNV_clustering_metrics.benchmark.txt"
-    script:
-        "../scripts/ex_somatic_SNV_clustering_metrics.py"
 
 
 """
