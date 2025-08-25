@@ -44,7 +44,50 @@ rule bwamem_index_files:
         """
         bwa-mem2 index {input.reference} 2>> {log}
         """
+    
 
+# Checks that chromosomes designated for variant calling are present in reference and common BEDs
+rule check_variant_calling_chroms_present:
+    input:
+        fai = config["files"]["reference"] + ".fai",
+        common_masks = config["files"]["common_masks"]
+    output:
+        "logs/pipeline/check_variant_calling_chroms_present.done"
+    params:
+        variant_calling_chroms = config["chroms"]["variant_calling"]
+    log:
+        "logs/pipeline/check_variant_calling_chroms_present.log"
+    benchmark:
+        "logs/pipeline/check_variant_calling_chroms_present.benchmark.txt"
+    script:
+        "../scripts/check_variant_calling_chroms_present.py"
+
+
+# Creates a mask for chromosomes that will not be used in variant calling 
+    # e.g. chrUn, chr*_random, chrM, chrEBV
+rule mask_non_variant_calling_chroms:
+    input:
+        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
+        fai = config["files"]['reference'] + ".fai",
+    output:
+        bed = temp("tmp/downloads/non_variant_calling_chroms.bed")
+
+    params:
+        variant_calling_chroms = config["chroms"]["variant_calling"]
+    run:
+        # Define variant calling chromosomes
+        variant_calling_chroms = set(params.variant_calling_chroms)
+
+        # Load the .fai and filter
+        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
+            for line in fai_in:
+                chrom, length, *_ = line.strip().split("\t")
+                if chrom not in variant_calling_chroms:
+                    bed_out.write(f"{chrom}\t0\t{length}\n")
+
+
+# Creates reference .fai file
 rule samtools_index_files:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
@@ -60,9 +103,11 @@ rule samtools_index_files:
         samtools faidx {input.reference} 2>> {log}
         """
 
+# Creates reference .dict file
 rule picard_sequence_dict:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
         ref = config["files"]["reference"]
     output:
         dictf = config["files"]["reference"].replace(".fna", ".dict")
@@ -77,12 +122,12 @@ rule picard_sequence_dict:
             O={output.dictf} 2>> {log}
         """
 
-"""
-Generate adapter FASTA files for demultiplexing and trimming
-""" 
+
+# Generates adapter FASTA files for demultiplexing and trimming
 rule ex_generate_adapter_fastas:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
         ex_lanes = config["files"]["ex_lanes"],
         ex_samples = config["files"]["ex_samples"],
         ex_adapters = config["files"]["ex_adapters"]

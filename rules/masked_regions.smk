@@ -93,28 +93,6 @@ rule ms_germline_variants_mask:
         """
 
 
-# Creates a mask for chromosomes that will not be used in variant calling 
-    # e.g. chrUn, chr*_random, chrM, chrEBV
-rule mask_non_variant_calling_chroms:
-    input:
-        fai = config["files"]['reference'] + ".fai",
-    output:
-        bed = temp("tmp/downloads/non_variant_calling_chroms.bed")
-
-    params:
-        variant_calling_chroms = config["chroms"]["variant_calling"]
-    run:
-        # Define variant calling chromosomes
-        variant_calling_chroms = set(params.variant_calling_chroms)
-
-        # Load the .fai and filter
-        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
-            for line in fai_in:
-                chrom, length, *_ = line.strip().split("\t")
-                if chrom not in variant_calling_chroms:
-                    bed_out.write(f"{chrom}\t0\t{length}\n")
-
-
 # Combines all masks into a single BED file
 rule combine_masks:
     input:

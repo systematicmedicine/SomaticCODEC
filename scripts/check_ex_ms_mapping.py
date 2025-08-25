@@ -21,7 +21,7 @@ def main(snakemake):
     # Initiate logging
     sys.stdout = open(snakemake.log[0], "a")
     sys.stderr = open(snakemake.log[0], "a")
-    print("[INFO] Starting check_ex_ms_mapping.py")
+    print("[INFO] Starting check_ex_ms_mapping.py", flush=True)
 
     # Load config data
     config = snakemake.config
@@ -49,12 +49,12 @@ def main(snakemake):
     if errors:
         raise ValueError(f"Metadata mismatches found: {errors}")
     else:
-        print("✅ All donor_id, age, and sample_type values match in config files.")
+        print("✅ All donor_id values match in sample metadata files.", flush=True)
 
     with open(snakemake.output[0], "w") as f:
-        f.write("check_ex_ms_mapping completed successfully\n")
+        f.write("✅ All donor_id values match in sample metadata files.\n")
 
-    print("[INFO] Completed check_ex_ms_mapping.py")
+    print("[INFO] Completed check_ex_ms_mapping.py", flush=True)
 
 if __name__ == "__main__":
     main(snakemake)

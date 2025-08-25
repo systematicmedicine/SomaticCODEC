@@ -76,20 +76,25 @@ def lightweight_test_run():
     config = Path("config/config.yaml")
     with config.open("r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
+
     config_data["experiment"]["name"] = "lightweight_test_run"
+
     config_data["resources"]["memory"]["heavy"] = 4
     config_data["resources"]["memory"]["moderate"] = 4
     config_data["resources"]["memory"]["light"] = 4
     config_data["resources"]["threads"]["heavy"] = 4
     config_data["resources"]["threads"]["moderate"] = 4
     config_data["resources"]["threads"]["light"] = 4
-    config_data["rules"]["ms_low_depth_mask"]["threshold"] = 1
+
+    config_data["chroms"]["variant_calling"] = ["chr21"]
+
     config_data["files"]["reference"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
-    config_data["files"]["common_masks"] = [
-    "tmp/downloads/GRCh38_alldifficultregions_10lines.bed",
-    "tmp/downloads/gnomad_common_af01_merged_10lines.bed"]
+    config_data["files"]["common_masks"] = ["tmp/downloads/GRCh38_alldifficultregions_10lines.bed", 
+                                            "tmp/downloads/gnomad_common_af01_merged_10lines.bed"]
     config_data["files"]["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
     config_data["files"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
+
+    config_data["rules"]["ms_low_depth_mask"]["threshold"] = 1
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:

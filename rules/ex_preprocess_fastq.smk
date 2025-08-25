@@ -22,6 +22,7 @@ Moves the read pair UMI to readname
 rule ex_extract_fastq_umis:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
         ex_lanes = config["files"]["ex_lanes"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]
