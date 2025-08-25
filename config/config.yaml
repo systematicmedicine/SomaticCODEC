@@ -1,10 +1,14 @@
 ---
 # ------------------------------------------------------------------------------
-# Global parameters
+# Experiment metadata
 # ------------------------------------------------------------------------------
-experiment_name: experiment_1
+experiment:
+  name: experiment_1
 
-resource_allocation:
+# ------------------------------------------------------------------------------
+# Resources (memory/threads)
+# ------------------------------------------------------------------------------
+resources:
   memory: # in GB
     light: 16
     moderate: 64
@@ -15,109 +19,140 @@ resource_allocation:
     heavy: 32
 
 # ------------------------------------------------------------------------------
+# File paths
+# ------------------------------------------------------------------------------
+files:
+  reference: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
+  common_masks:
+    - "tmp/downloads/GRCh38_alldifficultregions.bed"
+    - "tmp/downloads/gnomad_common_af01_merged.bed"
+  ex_nanoseq_tri_contexts: tmp/downloads/nanoseq_trinucleotide_contexts.csv
+  known_germline_variants: gnomad_AF_0.001.vcf.bgz
+  ex_samples: config/ex_samples.csv
+  ex_lanes: config/ex_lanes.csv
+  ex_adapters: config/ex_adapters.csv
+  ms_samples: config/ms_samples.csv
+  component_metrics: config/component_level_metrics.xlsx
+  system_metrics: config/system_level_metrics.xlsx
+
+# ------------------------------------------------------------------------------
+# Global parameters
+# ------------------------------------------------------------------------------
+chroms: # Must be defined with UCSC naming
+  variant_calling: 
+    - "chr1"
+    - "chr2"
+    - "chr3"
+    - "chr4"
+    - "chr5"
+    - "chr6"
+    - "chr7"
+    - "chr8"
+    - "chr9"
+    - "chr10"
+    - "chr11"
+    - "chr12"
+    - "chr13"
+    - "chr14"
+    - "chr15"
+    - "chr16"
+    - "chr17"
+    - "chr18"
+    - "chr19"
+    - "chr20"
+    - "chr21"
+    - "chr22"
+    - "chrX"
+    - "chrY"
+
+# ------------------------------------------------------------------------------
 # Rule parameters
 # ------------------------------------------------------------------------------
+rules:
+  ex_annotate_map:
+    min_umi_length: 6
 
-ex_annotate_map:
-  min_umi_length: 6
+  ex_call_dsc:
+    max_duplex_disagreements: 3
+    min_read_pairs: 1
+    single_strand_qual: 2
 
-ex_call_dsc:
-  max_duplex_disagreements: 3
-  min_read_pairs: 1
-  single_strand_qual: 2
+  ex_call_somatic_snv:
+    max_base_quality: 150
+    min_base_quality: 70
 
-ex_call_somatic_snv:
-  max_base_quality: 150
-  min_base_quality: 70
+  ex_extract_fastq_umis:
+    umi_length: 3
 
-ex_extract_fastq_umis:
-  umi_length: 3
+  ex_filter_dsc:
+    min_mapq: 60
 
-ex_filter_dsc:
-  min_mapq: 60
+  ex_filter_fastq:
+    min_read_length: 80
+    average_quality_threshold: 30
 
-ex_filter_fastq:
-  min_read_length: 80
-  average_quality_threshold: 30
+  ex_map:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
 
-ex_map:
-  band_width: 100
-  gap_extension_penalty: 1
-  clipping_penalty: 5
-  gap_open_penalty: 6
-  matching_score: 1
-  mem_max_occurances: 10000
-  min_alignment_score_thresh: 30
-  min_seed_length: 19
-  mismatch_penalty: 4
-  reseed_factor: 1.5
-  unpaired_read_penalty: 9
-  z_dropoff: 100
+  ex_remap_dsc:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
 
-ex_remap_dsc:
-  band_width: 100
-  gap_extension_penalty: 1
-  clipping_penalty: 5
-  gap_open_penalty: 6
-  matching_score: 1
-  mem_max_occurances: 10000
-  min_alignment_score_thresh: 30
-  min_seed_length: 19
-  mismatch_penalty: 4
-  reseed_factor: 1.5
-  unpaired_read_penalty: 9
-  z_dropoff: 100
+  ex_trim_fastq:
+    max_adapter_errors: 2
+    min_adapter_overlap: 8
+    r1_cut_start: 3
+    r2_cut_start: 3
+    r1_cut_end: -9  # Must be negative
+    r2_cut_end: -9  # Must be negative
+    quality_cutoff: 20
 
-ex_trim_fastq:
-  max_adapter_errors: 2
-  min_adapter_overlap: 8
-  r1_cut_start: 3
-  r2_cut_start: 3
-  r1_cut_end: -9  # Must be negative
-  r2_cut_end: -9  # Must be negative
-  quality_cutoff: 20
+  ms_candidate_germ_variants:
+    memory_limit_gb: 32
 
-ms_candidate_germ_variants:
-  memory_limit_gb: 32
+  ms_low_depth_mask:
+    threshold: 40
 
-ms_low_depth_mask:
-  threshold: 40
+  ms_map:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
 
-ms_map:
-  band_width: 100
-  gap_extension_penalty: 1
-  clipping_penalty: 5
-  gap_open_penalty: 6
-  matching_score: 1
-  mem_max_occurances: 10000
-  min_alignment_score_thresh: 30
-  min_seed_length: 19
-  mismatch_penalty: 4
-  reseed_factor: 1.5
-  unpaired_read_penalty: 9
-  z_dropoff: 100
+  ms_filter_fastq:
+    min_read_length: 100
 
-ms_filter_fastq:
-  min_read_length: 100
-
-ms_trim_fastq:
-  adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
-  adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
-  spacer_length: 3
-  qual_trim_threshold: 20 # Trims low quality bases from 3' end of read
-
-# ------------------------------------------------------------------------------
-# File paths
-# -------------------------------------------------------------------------------
-
-reference_path: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
-difficult_regions_path: tmp/downloads/GRCh38_alldifficultregions.bed
-common_variants_path: tmp/downloads/gnomad_common_af01_merged.bed
-ex_nanoseq_tri_contexts: tmp/downloads/nanoseq_trinucleotide_contexts.csv
-known_germline_varaints: gnomad_AF_0.001.vcf.bgz
-ex_samples_path: config/ex_samples.csv
-ex_lanes_path: config/ex_lanes.csv
-ex_adapters_path: config/ex_adapters.csv
-ms_samples_path: config/ms_samples.csv
-component_metrics_path: config/component_level_metrics.xlsx
-system_metrics_path: config/system_level_metrics.xlsx
+  ms_trim_fastq:
+    adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+    adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+    spacer_length: 3
+    qual_trim_threshold: 20 # Trims low quality bases from 3' end of read

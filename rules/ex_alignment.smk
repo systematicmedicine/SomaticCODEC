@@ -18,34 +18,34 @@ rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
-        ref = config["reference_path"],
-        amb = config["reference_path"] + ".amb",
-        ann = config["reference_path"] + ".ann",
-        bwt = config["reference_path"] + ".bwt.2bit.64",
-        pac = config["reference_path"] + ".pac",
-        sa = config["reference_path"] + ".0123"
+        ref = config["files"]["reference"],
+        amb = config["files"]["reference"] + ".amb",
+        ann = config["files"]["reference"] + ".ann",
+        bwt = config["files"]["reference"] + ".bwt.2bit.64",
+        pac = config["files"]["reference"] + ".pac",
+        sa = config["files"]["reference"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
     params:
-        band_width = config["ex_map"]["band_width"],
-        clipping_penalty = config["ex_map"]["clipping_penalty"],
-        gap_extension_penalty = config["ex_map"]["gap_extension_penalty"],
-        gap_open_penalty = config["ex_map"]["gap_open_penalty"],
-        matching_score = config["ex_map"]["matching_score"],
-        mem_max_occurances = config["ex_map"]["mem_max_occurances"],
-        min_alignment_score_thresh = config["ex_map"]["min_alignment_score_thresh"],
-        min_seed_length = config["ex_map"]["min_seed_length"],
-        mismatch_penalty = config["ex_map"]["mismatch_penalty"],
-        reseed_factor = config["ex_map"]["reseed_factor"],
-        unpaired_read_penalty = config["ex_map"]["unpaired_read_penalty"],
-        z_dropoff = config["ex_map"]["z_dropoff"]
+        band_width = config["rules"]["ex_map"]["band_width"],
+        clipping_penalty = config["rules"]["ex_map"]["clipping_penalty"],
+        gap_extension_penalty = config["rules"]["ex_map"]["gap_extension_penalty"],
+        gap_open_penalty = config["rules"]["ex_map"]["gap_open_penalty"],
+        matching_score = config["rules"]["ex_map"]["matching_score"],
+        mem_max_occurances = config["rules"]["ex_map"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["rules"]["ex_map"]["min_alignment_score_thresh"],
+        min_seed_length = config["rules"]["ex_map"]["min_seed_length"],
+        mismatch_penalty = config["rules"]["ex_map"]["mismatch_penalty"],
+        reseed_factor = config["rules"]["ex_map"]["reseed_factor"],
+        unpaired_read_penalty = config["rules"]["ex_map"]["unpaired_read_penalty"],
+        z_dropoff = config["rules"]["ex_map"]["z_dropoff"]
     log:
         "logs/{ex_sample}/ex_map.log"
     benchmark:
         "logs/{ex_sample}/ex_map.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["heavy"]
+        config["resources"]["threads"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -85,7 +85,7 @@ rule ex_filter_map:
     benchmark:
         "logs/{ex_sample}/ex_filter_correct_product.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["light"]
+        config["resources"]["threads"]["light"]
     shell:
         """
         samtools view -b -f 0x2 {input.bam} > {output.bam} 2>> {log}
@@ -111,15 +111,15 @@ rule ex_annotate_map:
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam"),
         intermediate_anno_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_anno_unsorted.bam")
     params:
-        min_umi_length = config["ex_annotate_map"]["min_umi_length"]
+        min_umi_length = config["rules"]["ex_annotate_map"]["min_umi_length"]
     log:
         "logs/{ex_sample}/annotate_bam.log"
     benchmark:
         "logs/{ex_sample}/annotate_bam.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     resources:
-        memory = config["resource_allocation"]["memory"]["moderate"]
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \

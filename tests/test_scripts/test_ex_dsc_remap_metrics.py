@@ -64,7 +64,7 @@ def test_read_loss_cases(
         input = Input()
         output = type("Output", (), {"metrics": json_out_path})
         class Params:
-            min_mapq = config["ex_filter_dsc"]["min_mapq"]
+            min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"]
             sample = "TestSample"
         params = Params()
         log = ["logfile.log"]

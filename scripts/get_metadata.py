@@ -169,10 +169,10 @@ def load_metadata(config):
 
     metadata = {}
 
-    metadata["ex_samples"] = pd.read_csv(config["ex_samples_path"])
-    metadata["ms_samples"] = pd.read_csv(config["ms_samples_path"])
-    metadata["ex_lanes"] = pd.read_csv(config["ex_lanes_path"])
-    metadata["ex_adapters"] = pd.read_csv(config["ex_adapters_path"])
+    metadata["ex_samples"] = pd.read_csv(config["files"]["ex_samples"])
+    metadata["ms_samples"] = pd.read_csv(config["files"]["ms_samples"])
+    metadata["ex_lanes"] = pd.read_csv(config["files"]["ex_lanes"])
+    metadata["ex_adapters"] = pd.read_csv(config["files"]["ex_adapters"])
 
     return metadata
 

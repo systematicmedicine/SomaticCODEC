@@ -17,25 +17,28 @@ Author: Ben Barry
 rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
-        ref = config["reference_path"],
-        fai = config["reference_path"] + ".fai",
-        dictf = os.path.splitext(config["reference_path"])[0] + ".dict"
+        ref = config["files"]["reference"],
+        fai = config["files"]["reference"] + ".fai",
+        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
+    params:
+        variant_calling_chroms="-L " + " -L ".join(config["chroms"]["variant_calling"])
     resources:
-        memory = config["resource_allocation"]["memory"]["moderate"]
+        memory = config["resources"]["memory"]["moderate"]
     log:
         "logs/{ms_sample}/ms_candidate_germ_variants.log"
     benchmark:
         "logs/{ms_sample}/ms_candidate_germ_variants.benchmark.txt"
     threads:
-         config["resource_allocation"]["threads"]["moderate"]
+         config["resources"]["threads"]["moderate"]
     shell:
         """
         gatk --java-options "-Xmx{resources.memory}g" HaplotypeCaller  \
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
+            {params.variant_calling_chroms} \
             --native-pair-hmm-threads {threads} \
             --standard-min-confidence-threshold-for-calling 20 2>> {log}
         """

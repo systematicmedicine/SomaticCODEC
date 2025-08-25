@@ -63,8 +63,8 @@ def assert_combined_bed_order_matches_ref(ms_sample):
 
     # Load reference fai file and get chromosome order as a list
     config = load_config("config/config.yaml")
-    config["reference_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
-    fai_path = config["reference_path"] + ".fai"
+    config["files"]["reference"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
+    fai_path = config["files"]["reference"] + ".fai"
     fai_df = pd.read_csv(fai_path, sep="\t", header=None, usecols=[0], names=["chrom"])
     fai_chrom_order = fai_df["chrom"].tolist()
 

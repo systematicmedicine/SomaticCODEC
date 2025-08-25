@@ -41,7 +41,7 @@ def test_mapq_under_min_mapq_removed(lightweight_test_run):
     post_counts = {Path(f).name: count_bam_reads_under_min_mapq(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
     config = load_config("config/config.yaml")
-    min_mapq = config["ex_filter_dsc"]["min_mapq"]
+    min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"]
 
     # # Assert no reads with MAPQ < min_mapq after filtering
     assert total_post_reads == 0, (

@@ -11,8 +11,8 @@ Authors:
 # Checks mapping of MS and EX samples in ms_samples.csv and ex_samples.csv
 rule check_ex_ms_mapping:
     input:
-        ex_csv = config["ex_samples_path"],
-        ms_csv = config["ms_samples_path"]
+        ex_csv = config["files"]["ex_samples"],
+        ms_csv = config["files"]["ms_samples"]
     output:
         "logs/pipeline/check_ex_ms_mapping.done"
     log:
@@ -27,19 +27,19 @@ rule check_ex_ms_mapping:
 rule bwamem_index_files:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        reference = config["reference_path"]
+        reference = config["files"]["reference"]
     output:
-        amb = config["reference_path"] + ".amb",
-        ann = config["reference_path"] + ".ann",
-        bwt = config["reference_path"] + ".bwt.2bit.64",
-        pac = config["reference_path"] + ".pac",
-        sa = config["reference_path"] + ".0123"
+        amb = config["files"]["reference"] + ".amb",
+        ann = config["files"]["reference"] + ".ann",
+        bwt = config["files"]["reference"] + ".bwt.2bit.64",
+        pac = config["files"]["reference"] + ".pac",
+        sa = config["files"]["reference"] + ".0123"
     log:
         "logs/pipeline/bwamem_index_files.log"
     benchmark:
         "logs/pipeline/bwamem_index_files.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     shell:
         """
         bwa-mem2 index {input.reference} 2>> {log}
@@ -48,9 +48,9 @@ rule bwamem_index_files:
 rule samtools_index_files:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        reference = config["reference_path"]
+        reference = config["files"]["reference"]
     output:
-        fai = config["reference_path"] + ".fai"
+        fai = config["files"]["reference"] + ".fai"
     log:
         "logs/pipeline/samtools_index_files.log"
     benchmark:
@@ -63,9 +63,9 @@ rule samtools_index_files:
 rule picard_sequence_dict:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        ref = config["reference_path"]
+        ref = config["files"]["reference"]
     output:
-        dictf = config["reference_path"].replace(".fna", ".dict")
+        dictf = config["files"]["reference"].replace(".fna", ".dict")
     log:
         "logs/pipeline/picard_sequence_dict.log"
     benchmark:
@@ -83,9 +83,9 @@ Generate adapter FASTA files for demultiplexing and trimming
 rule ex_generate_adapter_fastas:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        ex_lanes = config["ex_lanes_path"],
-        ex_samples = config["ex_samples_path"],
-        ex_adapters = config["ex_adapters_path"]
+        ex_lanes = config["files"]["ex_lanes"],
+        ex_samples = config["files"]["ex_samples"],
+        ex_adapters = config["files"]["ex_adapters"]
     output:
         adapter_fasta_outputs = expand(
             "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
