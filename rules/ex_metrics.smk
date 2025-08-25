@@ -449,23 +449,5 @@ rule ex_germline_contamination:
         "logs/{ex_sample}/ex_germline_contamination.log"
     benchmark:
         "logs/{ex_sample}/ex_germline_contamination.benchmark.txt"
-    shell:
-        """
-        # Compress & index somatic VCF
-        bgzip -c {input.somatic_vcf} > {output.intermediate_somatic_bgz}
-        tabix -p vcf {output.intermediate_somatic_bgz}
-
-        # Determine intersect
-        bcftools isec -n=2 -w1 {output.intermediate_somatic_bgz} {input.germline_vcf} -o {output.germline_matches}
-
-        # Count number of germline matches
-        NUM_GERM_MATCHES=$(bcftools view -H {output.germline_matches} | wc -l)
-
-        # Create metrics file in JSON format
-        python3 -c 'import json; print(json.dumps({{
-        "description": "Number of called somatic variants overlapping known germline variants",
-        "somatic_vcf": "{input.somatic_vcf}",
-        "germline_vcf": "{input.germline_vcf}",
-        "germline_matches": int('"$NUM_GERM_MATCHES"')
-        }}, indent=2))' > {output.metrics_file}
-        """
+    script:
+        "../scripts/ex_germline_contamination.py"
