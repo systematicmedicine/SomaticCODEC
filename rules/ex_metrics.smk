@@ -18,7 +18,7 @@ FastQC on raw fastq files (before demultiplexing or any processing)
 """
 rule ex_fastqcraw_metrics:
     input:
-        ex_lanes = config["ex_lanes_path"],
+        ex_lanes = config["files"]["ex_lanes"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
@@ -33,7 +33,7 @@ rule ex_fastqcraw_metrics:
     benchmark:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["light"]
+        config["resources"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
@@ -151,7 +151,7 @@ rule ex_fastqcfilter_metrics:
     benchmark:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["light"]
+        config["resources"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
@@ -220,7 +220,7 @@ rule ex_insert_metrics:
         txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
         hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", 
     resources:
-        memory = config["resource_allocation"]["memory"]["light"]
+        memory = config["resources"]["memory"]["light"]
     log:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:
@@ -301,7 +301,7 @@ rule ex_dsc_remap_metrics:
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
     params:
-        min_mapq = config["ex_filter_dsc"]["min_mapq"],
+        min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"],
         sample = "{ex_sample}"
     log:
         "logs/{ex_sample}/ex_dsc_remap_metrics.log"
@@ -326,13 +326,13 @@ rule ex_dsc_coverage_metrics:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
         ),
-        fai = config["reference_path"] + ".fai"
+        fai = config["files"]["reference"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
-        quality_threshold = config["ex_call_somatic_snv"]["min_base_quality"],
+        quality_threshold = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
         sample = "{ex_sample}",
-        ms_depth_threshold = config["ms_low_depth_mask"]["threshold"]
+        ms_depth_threshold = config["rules"]["ms_low_depth_mask"]["threshold"]
     log:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
@@ -348,8 +348,8 @@ Calculate 96 trinucleotide contexts for called somatic mutations
 rule ex_trinucleotide_context_metrics:
     input:
         vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        nanoseq_contexts = config["ex_nanoseq_tri_contexts"],
-        ref = config["reference_path"]
+        nanoseq_contexts = config["files"]["ex_nanoseq_tri_contexts"],
+        ref = config["files"]["reference"]
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json"
     params:
@@ -404,7 +404,7 @@ Compares variant rate between chromosomes
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        fai = config["reference_path"] + ".fai"
+        fai = config["files"]["reference"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     log:
@@ -437,7 +437,7 @@ Determines how many called somatic variants are present in dataset of common ger
 rule ex_germline_contamination:
     input:
         somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        germline_vcf = config["known_germline_varaints"]
+        germline_vcf = config["files"]["known_germline_variants"]
     output:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
