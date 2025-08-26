@@ -5,7 +5,9 @@
 #   - To be used exclusively with Snakemake parent rule create_metrics_report
 #   - Recieves parameter injection from parent rule
 #
-# Author: Cameron Fraser
+# Authors: 
+#   - Cameron Fraser
+#   - Joshua Johnstone
 # ===========================================================================
 
 # ---------------------------------------------------------------------------
@@ -21,6 +23,7 @@ source("scripts/metrics_report_functions.R")
 
 if (!exists("snakemake")) {
   # Manual mode (for local testing)
+  CONFIG <- list(experiment = list(name = "local_test_experiment"))
   COMPONENT_METRICS_PATH <- "config/component_level_metrics.xlsx"
   SYSTEM_METRICS_PATH <- "config/system_level_metrics.xlsx"
   CSV_OUTPUT_PATH <- "metrics/metrics_report.csv"
@@ -28,6 +31,7 @@ if (!exists("snakemake")) {
   LOG_PATH <- "logs/metrics_report.log"
 } else {
   # Snakemake-injected paths
+  CONFIG <- snakemake@config
   COMPONENT_METRICS_PATH <- snakemake@input[["component_metrics_metadata"]]
   SYSTEM_METRICS_PATH <- snakemake@input[["system_metrics_metadata"]]
   CSV_OUTPUT_PATH <- snakemake@output[["csv_path"]]
