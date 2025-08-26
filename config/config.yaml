@@ -22,7 +22,7 @@ resources:
 # File paths
 # ------------------------------------------------------------------------------
 files:
-  reference: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
+  reference: tmp/downloads/UCSC-GCRh38-p14-filtered.fa # Must be uncompressed (.fa, .fna, .fasta)
   common_masks:
     - "tmp/downloads/GRCh38_alldifficultregions.bed"
     - "tmp/downloads/gnomad_common_af01_merged.bed"
