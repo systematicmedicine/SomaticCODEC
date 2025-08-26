@@ -27,6 +27,7 @@ def test_trinucleotide_metrics(tmp_path, vcf_path, ref_path, nanoseq_path, sampl
     tmp_vcf = tmp_path / "input.vcf"
     tmp_nanoseq = tmp_path / "nanoseq.csv"
     tmp_output = tmp_path / "metrics.json"
+    tmp_pdf = tmp_path / "histogram.pdf"
     tmp_log = tmp_path / "log.txt"
 
     shutil.copy(vcf_path, tmp_vcf)
@@ -40,7 +41,8 @@ def test_trinucleotide_metrics(tmp_path, vcf_path, ref_path, nanoseq_path, sampl
             "nanoseq_contexts": str(tmp_nanoseq),
         })
         output = type("output", (), {
-            "metrics": str(tmp_output)
+            "metrics": str(tmp_output),
+            "pdf": str(tmp_pdf)
         })
         params = type("params", (), {
             "sample": sample_name
