@@ -79,16 +79,19 @@ rule ex_filter_map:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam"),
+        intermediate_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_correct_unsorted.bam")
     log:
-        "logs/{ex_sample}/ex_filter_correct_product.log"
+        "logs/{ex_sample}/ex_filter_map.log"
     benchmark:
-        "logs/{ex_sample}/ex_filter_correct_product.benchmark.txt"
+        "logs/{ex_sample}/ex_filter_map.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["light"]
+        config["resources"]["threads"]["moderate"]
     shell:
         """
-        samtools view -b -f 0x2 {input.bam} > {output.bam} 2>> {log}
+        samtools view -b -f 0x2 {input.bam} > {output.intermediate_unsorted} 2>> {log}
+
+        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
         """
 
 
@@ -113,9 +116,9 @@ rule ex_annotate_map:
     params:
         min_umi_length = config["rules"]["ex_annotate_map"]["min_umi_length"]
     log:
-        "logs/{ex_sample}/annotate_bam.log"
+        "logs/{ex_sample}/ex_annotate_map.log"
     benchmark:
-        "logs/{ex_sample}/annotate_bam.benchmark.txt"
+        "logs/{ex_sample}/ex_annotate_map.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
     resources:

@@ -1,7 +1,7 @@
 """
 --- test_ex_germline_contamination.py
 
-Tests the rule ex_germline_contamination
+Tests the script ex_germline_contamination.py
 
 Authors:
     - Chat-GPT
