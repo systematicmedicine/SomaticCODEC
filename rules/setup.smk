@@ -110,7 +110,7 @@ rule picard_sequence_dict:
         variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
         ref = config["files"]["reference"]
     output:
-        dictf = config["files"]["reference"].replace(".fna", ".dict")
+        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
     log:
         "logs/pipeline/picard_sequence_dict.log"
     benchmark:

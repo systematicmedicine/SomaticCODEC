@@ -127,7 +127,7 @@ rule ex_annotate_dsc:
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
         ref = config["files"]["reference"],
         fai = config["files"]["reference"] + ".fai",
-        dictf = config["files"]["reference"].replace(".fna", ".dict")
+        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
