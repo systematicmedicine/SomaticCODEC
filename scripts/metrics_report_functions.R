@@ -4,7 +4,9 @@
 # Collate component level and system level metrics into a report
 #   - Component level metrics are defined in config/component_metrics.xlsx
 #
-# Author: Cameron Fraser
+# Authors: 
+#   - Cameron Fraser
+#   - Joshua Johnstone
 # ===========================================================================
 
 library(jsonlite)
@@ -228,6 +230,10 @@ plot_metric_heatmap <- function(df, title = "Metric Grades Heatmap") {
     stop("Data frame must contain columns: Sample, Metric, Grade")
   }
 
+  exp_name <- CONFIG$experiment$name
+  date <- format(Sys.Date(), "%Y-%m-%d")
+  subtitle <- paste0(exp_name, ", ", date)
+
   df <- df %>%
     mutate(
       Metric = factor(Metric, levels = rev(unique(Metric))),
@@ -263,6 +269,7 @@ plot_metric_heatmap <- function(df, title = "Metric Grades Heatmap") {
     ) +
     labs(
       title = title,
+      subtitle = subtitle,
       x = "Sample",
       y = "Metric",
       fill = "Grade"

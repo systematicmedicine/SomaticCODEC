@@ -15,8 +15,8 @@ from scripts.ms_masking_metrics import main
 @pytest.mark.parametrize("input_files, expected_percentages", [
     (
         {
-            "gnomAD_bed": "tests/data/test_ms_masking_metrics/gnomad.bed",
-            "GIAB_bed": "tests/data/test_ms_masking_metrics/giab.bed",
+            "common_masks": ["tests/data/test_ms_masking_metrics/gnomad.bed", 
+                             "tests/data/test_ms_masking_metrics/giab.bed"],
             "ms_lowdepth_bed": "tests/data/test_ms_masking_metrics/lowdepth.bed",
             "ms_germ_del_bed": "tests/data/test_ms_masking_metrics/germ_del.bed",
             "ms_germ_ins_bed": "tests/data/test_ms_masking_metrics/germ_ins.bed",
@@ -25,8 +25,8 @@ from scripts.ms_masking_metrics import main
             "ref_index": "tests/data/test_ms_masking_metrics/reference.fai",
         },
         {
-            "gnomAD": 2.5,
-            "GIAB": 5.0,
+            "gnomad": 2.5,
+            "giab": 5.0,
             "lowdepth": 0.25,
             "germ_deletions": 12.5,
             "germ_insertions": 17.5,

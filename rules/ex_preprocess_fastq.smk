@@ -22,20 +22,21 @@ Moves the read pair UMI to readname
 rule ex_extract_fastq_umis:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        ex_lanes = config["ex_lanes_path"],
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
+        ex_lanes = config["files"]["ex_lanes"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]
     output:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
     params:
-        umi_length = config["ex_extract_fastq_umis"]["umi_length"]
+        umi_length = config["rules"]["ex_extract_fastq_umis"]["umi_length"]
     log:
         "logs/{ex_lane}/ex_extract_umis.log"
     benchmark:
         "logs/{ex_lane}/ex_extract_umis.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     shell:
         """
         cutadapt \
@@ -56,8 +57,8 @@ Demultiplex each lane FASTQ into sample FASTQs
 """ 
 rule ex_demux_fastq:
     input:
-        ex_lanes = config["ex_lanes_path"],
-        ex_samples = config["ex_samples_path"],
+        ex_lanes = config["files"]["ex_lanes"],
+        ex_samples = config["files"]["ex_samples"],
         fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
         fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
         r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane = md.get_ex_lane_ids(config)),
@@ -71,7 +72,7 @@ rule ex_demux_fastq:
     benchmark:
         "logs/batch/ex_demux.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     script:
         "../scripts/ex_demux.py"
 
@@ -99,13 +100,13 @@ rule ex_trim_fastq:
         intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
         intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     params:
-        max_adapter_errors = config["ex_trim_fastq"]["max_adapter_errors"],
-        min_adapter_overlap = config["ex_trim_fastq"]["min_adapter_overlap"],
-        quality_cutoff = config["ex_trim_fastq"]["quality_cutoff"],
-        r1_cut_start = config["ex_trim_fastq"]["r1_cut_start"],
-        r2_cut_start = config["ex_trim_fastq"]["r2_cut_start"],
-        r1_cut_end = config["ex_trim_fastq"]["r1_cut_end"],
-        r2_cut_end = config["ex_trim_fastq"]["r2_cut_end"],
+        max_adapter_errors = config["rules"]["ex_trim_fastq"]["max_adapter_errors"],
+        min_adapter_overlap = config["rules"]["ex_trim_fastq"]["min_adapter_overlap"],
+        quality_cutoff = config["rules"]["ex_trim_fastq"]["quality_cutoff"],
+        r1_cut_start = config["rules"]["ex_trim_fastq"]["r1_cut_start"],
+        r2_cut_start = config["rules"]["ex_trim_fastq"]["r2_cut_start"],
+        r1_cut_end = config["rules"]["ex_trim_fastq"]["r1_cut_end"],
+        r2_cut_end = config["rules"]["ex_trim_fastq"]["r2_cut_end"],
         r1_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_start"],
         r1_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_end"],
         r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
@@ -115,7 +116,7 @@ rule ex_trim_fastq:
     benchmark:
         "logs/{ex_sample}/ex_trim.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     shell:
         """
         cutadapt \
@@ -176,14 +177,14 @@ rule ex_filter_fastq:
         r1_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r1_filter_intermediate.fastq.gz"),
         r2_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r2_filter_intermediate.fastq.gz")
     params:
-        average_quality_threshold = config["ex_filter_fastq"]["average_quality_threshold"],
-        min_read_length = config["ex_filter_fastq"]["min_read_length"]
+        average_quality_threshold = config["rules"]["ex_filter_fastq"]["average_quality_threshold"],
+        min_read_length = config["rules"]["ex_filter_fastq"]["min_read_length"]
     log:
         "logs/{ex_sample}/ex_filter.log"
     benchmark:
         "logs/{ex_sample}/ex_filter.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     shell:  
         """
         # Length filter

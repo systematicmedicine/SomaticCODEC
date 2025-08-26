@@ -15,7 +15,9 @@ import scripts.get_metadata as md
 # Generates a fastqc report for demuxed ms FASTQs
 rule ms_raw_fastq_metrics:
     input:
-        ms_samples = config["ms_samples_path"],
+        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
+        ms_samples = config["files"]["ms_samples"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
@@ -30,7 +32,7 @@ rule ms_raw_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["light"]
+        config["resources"]["threads"]["light"]
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)
@@ -70,7 +72,7 @@ rule ms_processed_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_processed_fastq_metrics.benchmark.txt"
     threads:
-        4
+        config["resources"]["threads"]["light"]
     shell:
         """        
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2} 2>> {log}
@@ -197,14 +199,13 @@ rule ms_het_hom_ratio:
 # Generates metrics for each mask BED file
 rule ms_masking_metrics:
     input:
-        gnomAD_bed = config['common_variants_path'],
-        GIAB_bed = config['difficult_regions_path'],
+        common_masks = expand("{mask}", mask=config["files"]["common_masks"]),
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
-        ref_index = config["reference_path"] + ".fai"
+        ref_index = config["files"]["reference"] + ".fai"
     output:
         mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json",
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),

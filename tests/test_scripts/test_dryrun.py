@@ -69,12 +69,13 @@ def test_snakemake_dryrun():
     config = project_root / "config/config.yaml"
     with config.open("r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
-    config_data["experiment_name"] = "dryrun"
-    config_data["reference_path"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
-    config_data["difficult_regions_path"] = "tmp/downloads/GRCh38_alldifficultregions_10lines.bed"
-    config_data["common_variants_path"] = "tmp/downloads/gnomad_common_af01_merged_10lines.bed"
-    config_data["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
-    config_data["known_germline_varaints"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
+    config_data["experiment"]["name"] = "dryrun"
+    config_data["files"]["reference"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fna"
+    config_data["files"]["common_masks"] = [
+    "tmp/downloads/GRCh38_alldifficultregions_10lines.bed",
+    "tmp/downloads/gnomad_common_af01_merged_10lines.bed"]
+    config_data["files"]["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
+    config_data["files"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:
