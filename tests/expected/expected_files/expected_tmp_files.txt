@@ -62,9 +62,11 @@ tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz
 tmp/{ex_sample}/{ex_sample}_map.bam
 tmp/{ex_sample}/{ex_sample}_map_tmp.sam
 tmp/{ex_sample}/{ex_sample}_map_correct.bam
+tmp/{ex_sample}/{ex_sample}_map_correct_unsorted.bam
 tmp/{ex_sample}/{ex_sample}_map_anno_unsorted.bam
 tmp/{ex_sample}/{ex_sample}_map_anno.bam
 tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam
+tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bai
 tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam

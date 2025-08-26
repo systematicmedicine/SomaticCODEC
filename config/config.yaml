@@ -85,7 +85,7 @@ rules:
     umi_length: 3
 
   ex_filter_dsc:
-    min_mapq: 60
+    min_mapq: 50
 
   ex_filter_fastq:
     min_read_length: 80
