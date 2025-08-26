@@ -18,7 +18,9 @@ FastQC on raw fastq files (before demultiplexing or any processing)
 """
 rule ex_fastqcraw_metrics:
     input:
-        ex_lanes = config["ex_lanes_path"],
+        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
+        ex_lanes = config["files"]["ex_lanes"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
@@ -33,7 +35,7 @@ rule ex_fastqcraw_metrics:
     benchmark:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["light"]
+        config["resources"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
@@ -114,6 +116,25 @@ rule ex_bases_trimmed:
 
 
 """
+Calculates the length of reads post trimming, outputs percentiles and zero-length reads
+"""
+rule ex_trimmed_read_length_metrics:
+    input:
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"
+    output:
+        json = "metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json"
+    params:
+        sample = "{ex_sample}"
+    log:
+        "logs/{ex_sample}/ex_trimmed_read_length_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt" 
+    script:
+        "../scripts/ex_trimmed_read_length_metrics.py"
+
+
+"""
 FastQC on demultiplexed, trimmed, filtered FASTQs 
 """
 rule ex_fastqcfilter_metrics:
@@ -132,7 +153,7 @@ rule ex_fastqcfilter_metrics:
     benchmark:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["light"]
+        config["resources"]["threads"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
@@ -201,7 +222,7 @@ rule ex_insert_metrics:
         txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
         hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", 
     resources:
-        memory = config["resource_allocation"]["memory"]["light"]
+        memory = config["resources"]["memory"]["light"]
     log:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:
@@ -282,7 +303,7 @@ rule ex_dsc_remap_metrics:
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
     params:
-        min_mapq = config["ex_filter_dsc"]["min_mapq"],
+        min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"],
         sample = "{ex_sample}"
     log:
         "logs/{ex_sample}/ex_dsc_remap_metrics.log"
@@ -307,13 +328,13 @@ rule ex_dsc_coverage_metrics:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
         ),
-        fai = config["reference_path"] + ".fai"
+        fai = config["files"]["reference"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
-        quality_threshold = config["ex_call_somatic_snv"]["min_base_quality"],
+        quality_threshold = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
         sample = "{ex_sample}",
-        ms_depth_threshold = config["ms_low_depth_mask"]["threshold"]
+        ms_depth_threshold = config["rules"]["ms_low_depth_mask"]["threshold"]
     log:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
@@ -323,21 +344,25 @@ rule ex_dsc_coverage_metrics:
 
 
 """
-Calculate percent of positions with somatic SNV clustering
-    - ex_somatic_depth_per_position: Percent of somatic SNVs called that have >1x alt depth
-    - ex_somatic_clustered_or_mnv: Percent of somatic SNVs called that are within 150bp of another SNV
+Calculate the number of N bases in bases eligible for variant calling (>0x duplex depth, unmasked, QUAL > min_base_quality)
 """
-rule ex_somatic_SNV_clustering_metrics:
+rule ex_percent_eligible_N_bases:
     input:
-        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf"
+        pre_dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam",
+        post_dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
+        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_somatic_clustering_metrics.txt"
+        json = "metrics/{ex_sample}/{ex_sample}_percent_eligible_N_bases.json"
+    params: 
+        min_base_quality_pre_dsc = config["rules"]["ex_trim_fastq"]["quality_cutoff"],
+        min_base_quality_post_dsc = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
+        sample = "{ex_sample}"
     log:
-        "logs/{ex_sample}/ex_somatic_SNV_clustering_metrics.log"
+        "logs/{ex_sample}/ex_percent_eligible_N_bases.log"
     benchmark:
-        "logs/{ex_sample}/ex_somatic_SNV_clustering_metrics.benchmark.txt"
+        "logs/{ex_sample}/ex_percent_eligible_N_bases.benchmark.txt"
     script:
-        "../scripts/ex_somatic_SNV_clustering_metrics.py"
+        "../scripts/ex_percent_eligible_N_bases.py"
 
 
 """
@@ -347,8 +372,8 @@ Calculate 96 trinucleotide contexts for called somatic mutations
 rule ex_trinucleotide_context_metrics:
     input:
         vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        nanoseq_contexts = config["ex_nanoseq_tri_contexts"],
-        ref = config["reference_path"]
+        nanoseq_contexts = config["files"]["ex_nanoseq_tri_contexts"],
+        ref = config["files"]["reference"]
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json"
     params:
@@ -403,7 +428,7 @@ Compares variant rate between chromosomes
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        fai = config["reference_path"] + ".fai"
+        fai = config["files"]["reference"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     log:
@@ -436,7 +461,7 @@ Determines how many called somatic variants are present in dataset of common ger
 rule ex_germline_contamination:
     input:
         somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        germline_vcf = config["known_germline_varaints"]
+        germline_vcf = config["files"]["known_germline_variants"]
     output:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
@@ -446,23 +471,5 @@ rule ex_germline_contamination:
         "logs/{ex_sample}/ex_germline_contamination.log"
     benchmark:
         "logs/{ex_sample}/ex_germline_contamination.benchmark.txt"
-    shell:
-        """
-        # Compress & index somatic VCF
-        bgzip -c {input.somatic_vcf} > {output.intermediate_somatic_bgz}
-        tabix -p vcf {output.intermediate_somatic_bgz}
-
-        # Determine intersect
-        bcftools isec -n=2 -w1 {output.intermediate_somatic_bgz} {input.germline_vcf} -o {output.germline_matches}
-
-        # Count number of germline matches
-        NUM_GERM_MATCHES=$(bcftools view -H {output.germline_matches} | wc -l)
-
-        # Create metrics file in JSON format
-        python3 -c 'import json; print(json.dumps({{
-        "description": "Number of called somatic variants overlapping known germline variants",
-        "somatic_vcf": "{input.somatic_vcf}",
-        "germline_vcf": "{input.germline_vcf}",
-        "germline_matches": int('"$NUM_GERM_MATCHES"')
-        }}, indent=2))' > {output.metrics_file}
-        """
+    script:
+        "../scripts/ex_germline_contamination.py"

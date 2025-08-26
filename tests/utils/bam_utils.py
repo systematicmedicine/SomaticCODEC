@@ -25,30 +25,32 @@ def count_bam_data_points(path):
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"samtools failed on {path} with error:\n{e.stderr}")
     
-# Counts the number of bases with quality of 2 in a BAM file
+# Counts the number of bases with quality designated to single-stranded bases in a BAM file
 def count_bam_ss_qual_bases(path):
     path = str(path)
     count = 0
     config = load_config("config/config.yaml")
-    ss_qual = config["ex_call_dsc"]["single_strand_qual"]
+    ss_qual = config["rules"]["ex_call_dsc"]["single_strand_qual"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
                 quals = read.query_qualities
                 if quals:
                     count += sum(1 for q in quals if q == ss_qual)
     return count
-    
+
+# Count the number of reads with MPAQ under the threshold set in config
 def count_bam_reads_under_min_mapq(path):
     path = str(path)
     count = 0
     config = load_config("config/config.yaml")
-    min_mapq = config["ex_filter_dsc"]["min_mapq"]
+    min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
             if not read.is_unmapped and read.mapping_quality < min_mapq:
                 count += 1
     return count
 
+# Count the number of reads marked as duplicates
 def count_marked_duplicates(bam_path):
     count = 0
     with pysam.AlignmentFile(bam_path, "rb") as bam:
@@ -57,6 +59,7 @@ def count_marked_duplicates(bam_path):
                 count += 1
     return count
 
+# Count the number of reads with read group information
 def count_reads_with_read_group(bam_path):
     reads_with_rg = 0
     with pysam.AlignmentFile(bam_path, "rb") as bam:

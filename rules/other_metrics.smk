@@ -37,7 +37,7 @@ rule count_reads:
                 md.get_ex_lane_ids(config)
                 )
         threads:
-            config["resource_allocation"]["threads"]["moderate"]
+            config["resources"]["threads"]["moderate"]
         log:
             "logs/batch/count_reads.log"
         benchmark:
@@ -49,8 +49,8 @@ rule count_reads:
 # Generates a pass/fail report for component & system level metrics
 rule create_metrics_report:
     input:
-        component_metrics_metadata = config["component_metrics_path"],
-        system_metrics_metadata = config["system_metrics_path"],
+        component_metrics_metadata = config["files"]["component_metrics"],
+        system_metrics_metadata = config["files"]["system_metrics"],
         ms_metrics = ms_metrics,
         ex_metrics = ex_metrics
     output:

@@ -11,15 +11,16 @@ Authors:
 import sys
 import subprocess
 import json
+from pathlib import Path
 
 def main(snakemake):
-    # Redirect stdout and stderr to log file
+    # Redirect stdout/stderr to log
     sys.stdout = open(snakemake.log[0], "a")
     sys.stderr = open(snakemake.log[0], "a")
     print("[INFO] Starting masking_metrics.py")
 
-    # Run shell command and return stdout
     def run_cmd(cmd):
+        """Run shell command and return stdout"""
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         if result.returncode != 0:
             print(f"[ERROR] Command failed: {cmd}")
@@ -27,35 +28,40 @@ def main(snakemake):
             sys.exit(1)
         return result.stdout.strip()
 
-    # Map logical mask names to bed file paths
-    mask_files = {
-        "gnomAD": snakemake.input.gnomAD_bed,
-        "GIAB": snakemake.input.GIAB_bed,
+    sample = snakemake.params.sample
+    ref_index = snakemake.input.ref_index
+    intermediate_sorted = snakemake.output.intermediate_sorted
+    intermediate_merged = snakemake.output.intermediate_merged
+    json_out_path = snakemake.output.mask_metrics
+
+    # Total genome size
+    total_genome_bp = int(run_cmd(f"awk '{{sum += $2}} END {{print sum}}' {ref_index}"))
+
+    # Map mask names to BED files
+    mask_files = {}
+
+    # Name common masks by file basename (without extension)
+    for bed_file in snakemake.input.common_masks:
+        name = Path(bed_file).stem
+        mask_files[name] = bed_file
+
+    # Add other masks
+    mask_files.update({
         "lowdepth": snakemake.input.ms_lowdepth_bed,
         "germ_deletions": snakemake.input.ms_germ_del_bed,
         "germ_insertions": snakemake.input.ms_germ_ins_bed,
         "germ_snvs": snakemake.input.ms_germ_snv_bed,
         "combined_mask": snakemake.input.combined_bed,
-    }
-
-    ref_index = snakemake.input.ref_index
-    sample = snakemake.params.sample
-
-    intermediate_sorted = snakemake.output.intermediate_sorted
-    intermediate_merged = snakemake.output.intermediate_merged
-    json_out_path = snakemake.output.mask_metrics
-
-    # Calculate total genome size
-    total_genome_bp = int(run_cmd(f"awk '{{sum += $2}} END {{print sum}}' {ref_index}"))
+    })
 
     results = {}
 
     for mask_name, bed_path in mask_files.items():
-        # Sort BED
+        # Sort and merge each BED
         run_cmd(f"bedtools sort -i {bed_path} > {intermediate_sorted}")
-        # Merge BED
         run_cmd(f"bedtools merge -i {intermediate_sorted} > {intermediate_merged}")
-        # Calculate masked bases
+
+        # Compute masked bases
         masked_bp = int(run_cmd(f"awk '{{sum += $3 - $2}} END {{print sum}}' {intermediate_merged}"))
         pct = (masked_bp / total_genome_bp) * 100 if total_genome_bp else 0.0
 
@@ -64,6 +70,7 @@ def main(snakemake):
             "percentage_of_ref_genome": round(pct, 2)
         }
 
+    # Write JSON output
     output_data = {
         "description": "Masking metrics per BED file.",
         "sample": sample,

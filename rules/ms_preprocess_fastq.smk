@@ -25,7 +25,8 @@ Trims FASTQ files
 rule ms_trim_fastq:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        ms_samples = config["ms_samples_path"],
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
+        ms_samples = config["files"]["ms_samples"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
@@ -35,16 +36,16 @@ rule ms_trim_fastq:
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.txt"
     params:
-        adaptor_1 = config["ms_trim_fastq"]["adaptor_1"],
-        adaptor_2 = config["ms_trim_fastq"]["adaptor_2"],
-        spacer_length = config["ms_trim_fastq"]["spacer_length"],
-        qual_trim_threshold = config["ms_trim_fastq"]["qual_trim_threshold"]
+        adaptor_1 = config["rules"]["ms_trim_fastq"]["adaptor_1"],
+        adaptor_2 = config["rules"]["ms_trim_fastq"]["adaptor_2"],
+        spacer_length = config["rules"]["ms_trim_fastq"]["spacer_length"],
+        qual_trim_threshold = config["rules"]["ms_trim_fastq"]["qual_trim_threshold"]
     log:
         "logs/{ms_sample}/ms_trim_fastq.log"
     benchmark:
         "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     shell:
         """
         cutadapt \
@@ -83,13 +84,13 @@ rule ms_filter_fastq:
         r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_filtered_fq_metrics.txt"
     params:
-        min_read_length = config["ms_filter_fastq"]["min_read_length"]
+        min_read_length = config["rules"]["ms_filter_fastq"]["min_read_length"]
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
         "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     shell:
         """
         cutadapt \

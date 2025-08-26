@@ -15,36 +15,36 @@ Author: Joshua Johnstone
 # Aligns reads to reference genome
 rule ms_map:
     input: 
-        ref = config['reference_path'],
-        amb = config["reference_path"] + ".amb",
-        ann = config["reference_path"] + ".ann",
-        bwt = config["reference_path"] + ".bwt.2bit.64",
-        pac = config["reference_path"] + ".pac",
-        sa = config['reference_path'] + ".0123",
+        ref = config["files"]['reference'],
+        amb = config["files"]['reference'] + ".amb",
+        ann = config["files"]['reference'] + ".ann",
+        bwt = config["files"]['reference'] + ".bwt.2bit.64",
+        pac = config["files"]['reference'] + ".pac",
+        sa = config["files"]['reference'] + ".0123",
         r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
         intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.sam")
     params:
-        band_width = config["ms_map"]["band_width"],
-        clipping_penalty = config["ms_map"]["clipping_penalty"],
-        gap_extension_penalty = config["ms_map"]["gap_extension_penalty"],
-        gap_open_penalty = config["ms_map"]["gap_open_penalty"],
-        matching_score = config["ms_map"]["matching_score"],
-        mem_max_occurances = config["ms_map"]["mem_max_occurances"],
-        min_alignment_score_thresh = config["ms_map"]["min_alignment_score_thresh"],
-        min_seed_length = config["ms_map"]["min_seed_length"],
-        mismatch_penalty = config["ms_map"]["mismatch_penalty"],
-        reseed_factor = config["ms_map"]["reseed_factor"],
-        unpaired_read_penalty = config["ms_map"]["unpaired_read_penalty"],
-        z_dropoff = config["ms_map"]["z_dropoff"]        
+        band_width = config["rules"]["ms_map"]["band_width"],
+        clipping_penalty = config["rules"]["ms_map"]["clipping_penalty"],
+        gap_extension_penalty = config["rules"]["ms_map"]["gap_extension_penalty"],
+        gap_open_penalty = config["rules"]["ms_map"]["gap_open_penalty"],
+        matching_score = config["rules"]["ms_map"]["matching_score"],
+        mem_max_occurances = config["rules"]["ms_map"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["rules"]["ms_map"]["min_alignment_score_thresh"],
+        min_seed_length = config["rules"]["ms_map"]["min_seed_length"],
+        mismatch_penalty = config["rules"]["ms_map"]["mismatch_penalty"],
+        reseed_factor = config["rules"]["ms_map"]["reseed_factor"],
+        unpaired_read_penalty = config["rules"]["ms_map"]["unpaired_read_penalty"],
+        z_dropoff = config["rules"]["ms_map"]["z_dropoff"]        
     log:
         "logs/{ms_sample}/ms_raw_alignment.log"
     benchmark:
         "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 
-        config["resource_allocation"]["threads"]["heavy"]
+        config["resources"]["threads"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -79,7 +79,7 @@ rule ms_annotate_map:
     benchmark:
         "logs/{ms_sample}/ms_add_read_groups.benchmark.txt"
     threads:
-        config["resource_allocation"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
     shell:
         """
         picard AddOrReplaceReadGroups \

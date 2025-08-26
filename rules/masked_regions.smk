@@ -38,7 +38,7 @@ rule ms_low_depth_mask:
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
-        threshold = config["ms_low_depth_mask"]["threshold"]
+        threshold = config["rules"]["ms_low_depth_mask"]["threshold"]
     shell:
         """
         samtools depth -aa {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
@@ -92,37 +92,17 @@ rule ms_germline_variants_mask:
         cut -f1-3 {output.intermediate_snv_unformatted} > {output.ms_germ_snv_bed} 2>> {log}  
         """
 
-# Creates a mask for-non canonical genomic locations 
-    # e.g. chrUn, chr*_random, chrM, chrEBV
-
-rule mask_noncanonical_chroms:
-    input:
-        fai = config['reference_path'] + ".fai"
-    output:
-        bed = temp("tmp/downloads/noncanonical_mask.bed")
-    run:
-        # Define canonical chromosomes
-        canonical = {f"chr{i}" for i in range(1, 23)} | {"chrX", "chrY"}
-
-        # Load the .fai and filter
-        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
-            for line in fai_in:
-                chrom, length, *_ = line.strip().split("\t")
-                if chrom not in canonical:
-                    bed_out.write(f"{chrom}\t0\t{length}\n")
-
 
 # Combines all masks into a single BED file
 rule combine_masks:
     input:
-        gnomAD_bed = config['common_variants_path'],
-        GIAB_bed = config['difficult_regions_path'],
-        noncanonical_bed = rules.mask_noncanonical_chroms.output.bed,
+        common_masks = expand("{mask}", mask=config["files"]["common_masks"]),
+        non_variant_calling_bed = rules.mask_non_variant_calling_chroms.output.bed,
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
-        fai = config['reference_path'] + ".fai" 
+        fai = config["files"]['reference'] + ".fai" 
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
         intermediate_cat = temp("tmp/{ms_sample}/{ms_sample}_masks_cat.bed"),
@@ -133,9 +113,8 @@ rule combine_masks:
         "logs/{ms_sample}/combine_masks.benchmark.txt"
     shell:
         """
-        cat {input.gnomAD_bed} \
-        {input.GIAB_bed} \
-        {input.noncanonical_bed} \
+        cat {input.common_masks} \
+        {input.non_variant_calling_bed} \
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \
         {input.ms_germ_ins_bed} \
@@ -149,12 +128,12 @@ rule combine_masks:
 # Generate an include regions bed file for variant calling (opposite of combined bed)
 rule generate_include_bed:
     input:
-        ms_samples = config["ms_samples_path"],
+        ms_samples = config["files"]["ms_samples"],
         mask_bed = lambda wc: (
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_combined_mask.bed"
         ),
-        fai = config["reference_path"] + ".fai"
+        fai = config["files"]["reference"] + ".fai"
     output:
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     log:
