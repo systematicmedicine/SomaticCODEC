@@ -6,8 +6,6 @@ tmp/downloads/GRCh38_Chr21_plus_stubs.fa.0123
 tmp/downloads/GRCh38_Chr21_plus_stubs.fa.fai
 tmp/downloads/GRCh38_Chr21_plus_stubs.dict
 tmp/downloads/non_variant_calling_chroms.bed
-tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz
-tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz
