@@ -43,7 +43,7 @@ metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_filter_length.txt
 metrics/{ex_sample}/{ex_sample}_filter_quality.txt
 metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
-metrics/{ex_sample}/{ex_sample}_duplication_metrics.json
+metrics/{ex_sample}/{ex_sample}_dedup_metrics.txt
 metrics/{ex_sample}/{ex_sample}_total_read_loss.json
 metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html
 metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html

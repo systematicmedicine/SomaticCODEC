@@ -127,27 +127,6 @@ rule ms_alignment_metrics:
         """ 
 
 
-# Generates ms duplicate metrics
-rule ms_duplication_metrics:
-    input:
-        bam_sorted = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
-    output:
-        bam_markdup = temp("tmp/{ms_sample}/{ms_sample}_markdup_map.bam"),
-        dup_metrics = "metrics/{ms_sample}/{ms_sample}_markdup_metrics.txt"
-    log:
-        "logs/{ms_sample}/ms_duplication_metrics.log"
-    benchmark:
-        "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
-    shell:
-        """
-        picard MarkDuplicates \
-        I={input.bam_sorted} \
-        O={output.bam_markdup} \
-        M={output.dup_metrics} \
-        CREATE_INDEX=false 2>> {log}
-        """
-
-
 # Generates metrics for candidate ms germline variants
 rule ms_candidate_variant_metrics:
     input: 
