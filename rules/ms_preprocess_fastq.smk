@@ -17,41 +17,6 @@ import scripts.get_metadata as md
 
 
 """
-Moves UMI from i7 index to end of read header
-""" 
-rule ms_extract_fastq_umis:
-    input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ms_samples = config["files"]["ms_samples"],
-        r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
-        r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
-    output:
-        r1 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz"),
-        r2 = temp("tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz")
-    log:
-        "logs/{ms_sample}/ms_extract_fastq_umis.log"
-    benchmark:
-        "logs/{ms_sample}/ms_extract_fastq_umis.benchmark.txt"
-    threads:
-        config["resources"]["threads"]["light"]
-    shell:
-        r"""
-        seqkit replace -j {threads} \
-            -p "^(\\S+)\\s+(\\d+:\\S+:\\S+):([ACGT]+)([ACGT]{{12}})\\+([ACGT]+)" \
-            -r '$1:$4 $2:$3+$5' \
-            {input.r1} -o {output.r1} 2>> {log} &
-
-        seqkit replace -j {threads} \
-            -p "^(\\S+)\\s+(\\d+:\\S+:\\S+):([ACGT]+)([ACGT]{{12}})\\+([ACGT]+)" \
-            -r '$1:$4 $2:$3+$5' \
-            {input.r2} -o {output.r2} 2>> {log} &
-
-        wait
-        """
-
-
-"""
 Trims FASTQ files
     - 3bp spacer from 5' end of reads
     - Adaptors
@@ -60,8 +25,11 @@ Trims FASTQ files
 """
 rule ms_trim_fastq:
     input:
-        r1 = "tmp/{ms_sample}/{ms_sample}_umi_extracted_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_umi_extracted_r2.fastq.gz"
+        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
+        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
+        ms_samples = config["files"]["ms_samples"],
+        r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
+        r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
         intermediate_spacer_removed_r1 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz"),
         intermediate_spacer_removed_r2 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz"),
