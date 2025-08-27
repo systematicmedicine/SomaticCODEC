@@ -39,12 +39,12 @@ rule ms_extract_fastq_umis:
         r"""
         seqkit replace -j 4 \
             -p "^(\\S+)\\s+(\\d+:\\S+:\\S+):([ACGT]+)([ACGT]{{12}})\\+([ACGT]+)" \
-            -r '$1 $2:$3+$5:$4' \
+            -r '$1:$4 $2:$3+$5' \
             {input.r1} -o {output.r1} 2>> {log} &
 
         seqkit replace -j 4 \
             -p "^(\\S+)\\s+(\\d+:\\S+:\\S+):([ACGT]+)([ACGT]{{12}})\\+([ACGT]+)" \
-            -r '$1 $2:$3+$5:$4' \
+            -r '$1:$4 $2:$3+$5' \
             {input.r2} -o {output.r2} 2>> {log} &
 
         wait

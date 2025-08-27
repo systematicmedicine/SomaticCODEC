@@ -21,7 +21,7 @@ tmp/{ms_sample}/{ms_sample}_read_group_map.bam
 tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai
 tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam
 tmp/{ms_sample}/{ms_sample}_deduped_map.bam
-tmp/{ms_sample}/{ms_sample}_deduped_map.bai
+tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai
 tmp/{ms_sample}/{ms_sample}_depth_per_base.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt
