@@ -375,7 +375,8 @@ rule ex_trinucleotide_context_metrics:
         nanoseq_contexts = config["files"]["ex_nanoseq_tri_contexts"],
         ref = config["files"]["reference"]
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json"
+        metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json",
+        pdf = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_histogram.pdf"
     params:
         sample = "{ex_sample}"
     log:

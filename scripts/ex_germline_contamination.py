@@ -37,6 +37,17 @@ def main(snakemake):
     with open(snakemake.log[0], "a") as log_file:
         subprocess.run(["tabix", "-p", "vcf", str(intermediate_bgz)], stderr=log_file, check=True)
 
+    # --- Count total number of somatic variants ---
+    with open(snakemake.log[0], "a") as log_file:
+        result = subprocess.run(
+            ["bcftools", "view", "-H", str(somatic_vcf)],
+            stdout=subprocess.PIPE,
+            text=True,
+            stderr=log_file,
+            check=True
+        )
+        total_variants = len(result.stdout.strip().splitlines()) if result.stdout.strip() else 0
+
     # --- Intersect with germline VCF ---
     germline_matches.parent.mkdir(parents=True, exist_ok=True)
     with open(snakemake.log[0], "a") as log_file:
@@ -59,6 +70,9 @@ def main(snakemake):
         )
         num_matches = len(result.stdout.strip().splitlines()) if result.stdout.strip() else 0
 
+    # --- Calculate percent germline contamination ---
+    percent_germline_contamination = round(100 * num_matches / total_variants, 2) 
+
     # --- Write metrics JSON ---
     metrics_file.parent.mkdir(parents=True, exist_ok=True)
     with open(metrics_file, "w") as f:
@@ -66,7 +80,9 @@ def main(snakemake):
             "description": "Number of called somatic variants overlapping known germline variants",
             "somatic_vcf": str(somatic_vcf),
             "germline_vcf": str(germline_vcf),
-            "germline_matches": num_matches
+            "total_variants": total_variants,
+            "germline_matches": num_matches,
+            "percent_germline_contamination": percent_germline_contamination
         }, f, indent=2)
 
     print(f"[INFO] Completed ex_germline_contamination.py")

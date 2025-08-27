@@ -15,7 +15,6 @@ Authors:
     - James Phie
     - Joshua Johnstone
 """
-
 # Load libraries
 import sys
 import os
@@ -24,6 +23,7 @@ import numpy as np
 import pysam
 from collections import Counter
 import json
+import matplotlib.pyplot as plt
 
 def main(snakemake):
     # Redirect stdout and stderr to Snakemake log file
@@ -37,6 +37,7 @@ def main(snakemake):
     nanoseq_contexts_path = snakemake.input.nanoseq_contexts
     sample = snakemake.params.sample
     json_out_path = snakemake.output.metrics
+    pdf_out_path = snakemake.output.pdf
 
     # Load reference genome
     ref = pysam.FastaFile(ref_path)
@@ -131,17 +132,48 @@ def main(snakemake):
 
     cosine_sim = round(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)), 3)
 
-    # Write cosine similarity results
+    # Prepare per-context output
+    context_list = []
+    for ctx in contexts_96:
+        sample_prop = float(sample_df.loc[sample_df["Context"]==ctx, "Proportion"].iloc[0])
+        ref_prop = float(nanoseq_df.loc[nanoseq_df["Context"]==ctx, "Proportion"].iloc[0])
+        context_list.append({
+            "context": ctx,
+            "sample_proportion": round(sample_prop, 6),
+            "nanoseq_proportion": round(ref_prop, 6),
+            "abs_diff": round(abs(sample_prop - ref_prop), 6)
+        })
+
+    # Sort list by absolute difference (descending)
+    context_list = sorted(context_list, key=lambda x: x["abs_diff"], reverse=True)
+
     output_data = {
         "description": (
-        "Cosine similarity for trinucleotide context compared to nanoseq granulocyte reference data."
+            "Cosine similarity for trinucleotide context compared to NanoSeq granulocyte reference data."
         ),
         "sample": sample,
-        "cosine_similarity_score": cosine_sim
+        "cosine_similarity_score": cosine_sim,
+        "contexts": context_list
     }
 
     with open(json_out_path, "w") as out_f:
         json.dump(output_data, out_f, indent=4)
+
+
+    # Plot histogram
+    x = np.arange(len(contexts_96))
+    width = 0.4
+    fig, ax = plt.subplots(figsize=(20,6))
+    ax.bar(x - width/2, sample_df["Proportion"], width, label=sample)
+    ax.bar(x + width/2, nanoseq_df["Proportion"], width, label="NanoSeq")
+    ax.set_xticks(x)
+    ax.set_xticklabels(contexts_96, rotation=90, fontsize=6)
+    ax.set_ylabel("Proportion")
+    ax.set_title(f"Trinucleotide Contexts for {sample}")
+    ax.legend()
+    plt.tight_layout()
+    plt.savefig(pdf_out_path)
+    plt.close()
 
     print("[INFO] Finished ex_trinucleotide_context_metrics.py")
 
