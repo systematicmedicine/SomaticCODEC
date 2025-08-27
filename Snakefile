@@ -116,6 +116,7 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_ids),

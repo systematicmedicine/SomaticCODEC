@@ -127,6 +127,22 @@ rule ms_alignment_metrics:
         """ 
 
 
+# Generates ms duplication metrics
+rule ms_duplication_metrics:
+    input:
+        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt"
+    output:
+        duplication_metrics = "metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json"
+    params:
+        sample = "{ms_sample}"
+    log:
+        "logs/{ms_sample}/ms_duplication_metrics.log"
+    benchmark:
+        "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
+    script:
+       "../scripts/ms_duplication_metrics.py"
+
+
 # Generates metrics for candidate ms germline variants
 rule ms_candidate_variant_metrics:
     input: 
