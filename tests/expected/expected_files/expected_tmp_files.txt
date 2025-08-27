@@ -1,9 +1,9 @@
-tmp/downloads/GRCh38_Chr21_plus_stubs.fna.amb
-tmp/downloads/GRCh38_Chr21_plus_stubs.fna.ann
-tmp/downloads/GRCh38_Chr21_plus_stubs.fna.bwt.2bit.64
-tmp/downloads/GRCh38_Chr21_plus_stubs.fna.pac
-tmp/downloads/GRCh38_Chr21_plus_stubs.fna.0123
-tmp/downloads/GRCh38_Chr21_plus_stubs.fna.fai
+tmp/downloads/GRCh38_Chr21_plus_stubs.fa.amb
+tmp/downloads/GRCh38_Chr21_plus_stubs.fa.ann
+tmp/downloads/GRCh38_Chr21_plus_stubs.fa.bwt.2bit.64
+tmp/downloads/GRCh38_Chr21_plus_stubs.fa.pac
+tmp/downloads/GRCh38_Chr21_plus_stubs.fa.0123
+tmp/downloads/GRCh38_Chr21_plus_stubs.fa.fai
 tmp/downloads/GRCh38_Chr21_plus_stubs.dict
 tmp/downloads/non_variant_calling_chroms.bed
 tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz
