@@ -95,3 +95,33 @@ rule ms_annotate_map:
 
         samtools index {output.bam} 2>> {log}
         """
+
+rule ms_remove_duplicates:
+    input:
+        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"
+    output:
+        bam = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam"),
+        bai = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"),
+        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt",
+        intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam")
+    log:
+        "logs/{ms_sample}/ms_remove_duplicates.log"
+    benchmark:
+        "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
+    threads:
+        config["resources"]["threads"]["moderate"]
+    shell:
+        """
+        umi_tools dedup \
+            --extract-umi-method=read_id \
+            --umi-separator=":" \
+            --paired \
+            --stdin {input.bam} \
+            --stdout {output.intermediate_unsorted} \
+            --log={output.dedup_metrics} 2>> {log}
+
+        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
+
+        samtools index {output.bam} 2>> {log}
+        """
