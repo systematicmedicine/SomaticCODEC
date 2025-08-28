@@ -18,10 +18,10 @@ import scripts.get_metadata as md
 
 """
 Trims FASTQ files
-    - 3bp spacer from 5' end of reads
+    - Spacer from 5' end of reads
     - Adaptors
     - Poly-G artifacts (>10 Gs at 3' end)
-    - Trims bases of quality <20 from read ends
+    - Bases of quality < qual_trim_threshold from read ends
 """
 rule ms_trim_fastq:
     input:
@@ -74,7 +74,7 @@ rule ms_trim_fastq:
 
 """
 Filters FASTQ files
-    - Reads < 100 base pairs
+    - Reads < min_read_length base pairs
 """
 rule ms_filter_fastq:
     input:

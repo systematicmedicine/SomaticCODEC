@@ -64,7 +64,7 @@ def main(snakemake):
 
         per_base_quality = round(float(modules["Per base sequence quality"]["Lower Quartile"].astype(float).min()), 2)
 
-        per_tile_quality = round(100 * modules["Per tile sequence quality"].assign(Mean=lambda df: df["Mean"].astype(float)).groupby("Tile")["Mean"].apply(lambda x: (x <= -4).any()).mean(), 2)
+        per_tile_quality = round(100 * modules["Per tile sequence quality"].assign(Mean=lambda df: df["Mean"].astype(float)).groupby("Tile")["Mean"].apply(lambda x: (x <= -5).any()).mean(), 2)
 
         read_length = int(modules["Sequence Length Distribution"].sort_values("Count", ascending=False)["Length"].iloc[0].split('-')[0])
 
@@ -83,7 +83,18 @@ def main(snakemake):
 
         result = {
         "description": (
-            "Summary of key metrics from fastqc report (see component metrics csv for definitions)"
+            "Summary of key metrics from fastqc report",
+            "Definitions:",
+            "total_reads: Total raw reads obtained from standard Illumina sequencing (x million reads)",
+            "per_sequence_quality: Peak in distribution of mean sequence quality across all reads (Phred score)",
+            "per_base_quality: Minimum IQR lower quartile for base quality at any position in reads (Phred score)",
+            "per_tile_quality: Percentage of flow cell tiles where mean quality score at any read position is >=5 less than the global mean quality for that position",
+            "read_length: Peak of read length distribution (bp)",
+            "overrepresented_sequences: Percentage of sequences made up by any one identical sequence",
+            "gc_deviation: Percentage of reads deviating from a normal distribution for mean GC content",
+            "per_base_content_diff: Percentage difference in the proportion of A/T or C/G at each position in reads",
+            "per_base_N_content: Maximum percentage of bases recorded as N at any one position in reads"
+
         ),
         "sample": sample,
         "fastqc_file": str(file_path),
