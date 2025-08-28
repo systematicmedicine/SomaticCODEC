@@ -16,7 +16,7 @@ Author: Ben Barry
 # Call candidate germline variants (no filtering)
 rule ms_candidate_germ_variants:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
         ref = config["files"]["reference"],
         fai = config["files"]["reference"] + ".fai",
         dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"

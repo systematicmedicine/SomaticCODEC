@@ -1,45 +1,34 @@
 """
---- test_ms_duplication_metrics.py
+--- test_ms_duplication_metrics.py ---
 
-Tests the rule ms_duplication_metrics
+Tests the script ms_duplication_metrics.py
 
-Authors:
-    - Chat-GPT
+Authors: 
     - Joshua Johnstone
+    - Chat-GPT
 """
-from pathlib import Path
-import glob
-from utils.bam_utils import count_bam_data_points, count_marked_duplicates
+import pytest
+import json
+from scripts.ms_duplication_metrics import main
 
-# Test that marking duplicates does not change read count
-def test_read_counts_preserved(lightweight_test_run):
-    # Locate all pre-markdup BAM files
-    pre_files = glob.glob("tmp/*/*_read_group_map.bam")
-    pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
-    total_pre_reads = sum(pre_counts.values())
+@pytest.mark.parametrize("dedup_metrics, expected_dedup_rate", [
+    ("tests/data/test_ms_duplication_metrics/dedup_metrics.txt", 0.05)
+])
+def test_duplication_rate_calculation(tmp_path, dedup_metrics, expected_dedup_rate):
+    output_json = tmp_path / "duplication_metrics.json"
+    sample = "TestSample"
+    log_path = tmp_path / "log.txt"
 
-    # Locate all post-markdup BAM files
-    post_files = glob.glob("tmp/*/*_markdup_map.bam")
-    post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
-    total_post_reads = sum(post_counts.values())
+    class MockSnakemake:
+        input = type("input", (), {"dedup_metrics": dedup_metrics})
 
-    # Assert total reads pre marking duplicates == total reads post marking duplicates
-    assert total_post_reads == total_pre_reads, (
-        f"Post-markdup reads ({total_post_reads}) not equal to pre-markdup group reads ({total_pre_reads})"
-    )
+        output = type("output", (), {"duplication_metrics": str(output_json)})
+        log = [str(log_path)]
+        params = type("params", (), {"sample": sample})
 
-def test_duplicates_marked(lightweight_test_run):
-    # Locate all pre-markdup BAM files
-    pre_files = glob.glob("tmp/*/*_read_group_map.bam")
-    pre_counts = {Path(f).name: count_marked_duplicates(f) for f in pre_files}
-    total_pre_reads = sum(pre_counts.values())
+    main(MockSnakemake)
 
-    # Locate all post-markdup BAM files
-    post_files = glob.glob("tmp/*/*_markdup_map.bam")
-    post_counts = {Path(f).name: count_marked_duplicates(f) for f in post_files}
-    total_post_reads = sum(post_counts.values())
+    with open(output_json) as f:
+        result = json.load(f)
 
-    # Assert marked duplicate reads post markdup > marked duplicate reads reads pre markdup
-    assert total_post_reads > total_pre_reads, (
-        f"Marked duplicate reads post markdup ({total_post_reads}) < marked duplicate reads pre-markdup ({total_pre_reads})"
-    )
+    assert result["duplication_rate"] == expected_dedup_rate
