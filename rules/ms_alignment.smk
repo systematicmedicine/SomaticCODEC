@@ -96,6 +96,8 @@ rule ms_annotate_map:
         samtools index {output.bam} 2>> {log}
         """
 
+
+# Removes duplicate reads based on alignment and UMIs
 rule ms_remove_duplicates:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
