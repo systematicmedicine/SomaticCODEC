@@ -59,9 +59,9 @@
 2025-08-27 04:48:14,496 INFO command: dedup --extract-umi-method=read_id --umi-separator=: --paired --stdin tmp/S004/S004_read_group_map.bam --stdout tmp/S004/S004_deduped_map_unsorted.bam --log=metrics/S004/S004_dedup_metrics.txt
 2025-08-27 04:48:15,300 INFO Searching for mates for 0 unmatched alignments
 2025-08-27 04:48:15,300 INFO 0 mates never found
-2025-08-27 04:48:21,055 INFO Reads: Input Reads: 10000, Read pairs: 10000, Read 1 unmapped: 17, Read 2 unmapped: 10
+2025-08-27 04:48:21,055 INFO Reads: Input Reads: 10010, Read pairs: 10010, Read 1 unmapped: 5, Read 2 unmapped: 5
 2025-08-27 04:48:21,055 INFO Number of reads out: 9500
-2025-08-27 04:48:21,055 INFO Total number of positions deduplicated: 10000
+2025-08-27 04:48:21,055 INFO Total number of positions deduplicated: 10010
 2025-08-27 04:48:21,055 INFO Mean number of unique UMIs per position: 1.00
 2025-08-27 04:48:21,055 INFO Max. number of unique UMIs per position: 1
 # job finished in 6 seconds at Wed Aug 27 04:48:21 2025 --  2.35  0.23  0.00  0.00 -- b525160b-6bd9-4830-9cb5-25551d67e2ca
