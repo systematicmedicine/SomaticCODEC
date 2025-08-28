@@ -29,17 +29,22 @@ def main(snakemake):
     with open(dedup_metrics) as f:
         content = f.read()
 
-    # Extract metrics
+    # Extract read counts
     input_reads = int(re.search(r'Input Reads: (\d+)', content).group(1))
-    reads_out = int(re.search(r'Number of reads out: (\d+)', content).group(1))
-    duplication_rate = round(1 - reads_out / input_reads, 4)
+    r1_unmapped = int(re.search(r'Read 1 unmapped: (\d+)', content).group(1))
+    r2_unmapped = int(re.search(r'Read 2 unmapped: (\d+)', content).group(1))
+    mapped_reads = input_reads - (r1_unmapped + r2_unmapped)
+    output_reads = int(re.search(r'Number of reads out: (\d+)', content).group(1))
+
+    duplication_rate = round(1 - output_reads / mapped_reads, 4)
 
     # Prepare JSON
     metrics_dict = {
         "Description:": "Duplication rate based on UMItools dedup metrics",
         "sample": sample,
         "input_reads": input_reads,
-        "deduplicated_reads": reads_out,
+        "mapped_input_reads": mapped_reads,
+        "deduplicated_reads": output_reads,
         "duplication_rate": duplication_rate
     }
 
