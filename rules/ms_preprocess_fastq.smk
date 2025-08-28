@@ -15,6 +15,7 @@ Authors:
 
 import scripts.get_metadata as md
 
+
 """
 Trims FASTQ files
     - 3bp spacer from 5' end of reads

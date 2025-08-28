@@ -20,7 +20,7 @@ def main(snakemake):
     sys.stderr = open(snakemake.log[0], "a")
     print("[INFO] Starting ms_candidate_variant_metrics_summary.py")
 
-    # Parses fastqc_data.txt into a dictionary of dataframes
+    # Parses bcftools stats output into a dictionary of dataframes
     def parse_bcftools_stats(file_path):
         sections = defaultdict(list)
 

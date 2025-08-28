@@ -54,10 +54,10 @@ def lightweight_test_run():
 
     files_to_copy = [
         "GRCh38_Chr21_plus_stubs.fa",
-        "S004_Chr21_10000reads_r1.fastq.gz",
-        "S004_Chr21_10000reads_r2.fastq.gz",
-        "S005_Chr21_10000reads_r1.fastq.gz",
-        "S005_Chr21_10000reads_r2.fastq.gz",
+        "S004_Chr21_10000reads_r1_umi.fastq.gz",
+        "S004_Chr21_10000reads_r2_umi.fastq.gz",
+        "S005_Chr21_10000reads_r1_umi.fastq.gz",
+        "S005_Chr21_10000reads_r2_umi.fastq.gz",
         "GRCh38_alldifficultregions_10lines.bed",
         "GRCh38-gnomad-variants-AF-0.01_10lines.bed",
         "GCRh38_repeat_masker_10lines.bed",
