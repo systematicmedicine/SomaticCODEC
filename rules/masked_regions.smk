@@ -23,11 +23,11 @@ import scripts.get_metadata as md
 # Creates a mask for genomic positions with low ms read depth
 rule ms_low_depth_mask:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"
     output:
         bed = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.bed"),
-        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram.txt",
+        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt",
         intermediate_depth_per_base = temp("tmp/{ms_sample}/{ms_sample}_depth_per_base.txt"),
         intermediate_lowdepth = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.txt"),
         intermediate_lowdepth_sorted = temp("tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt"),

@@ -24,7 +24,9 @@ metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf
 metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt
 metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt
 metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json
-metrics/{ms_sample}/{ms_sample}_depth_histogram.txt
+metrics/{ms_sample}/{ms_sample}_depth_summary.txt
+metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt
+metrics/{ms_sample}/{ms_sample}_depth_histogram_fractions.txt
 metrics/{ms_sample}/{ms_sample}_mask_metrics.json
 metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html
 metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html
