@@ -191,6 +191,34 @@ rule ms_het_hom_ratio:
         """
 
 
+rule ms_depth_metrics:
+    input:
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"
+    output:
+        depth_summary = "metrics/{ms_sample}/{ms_sample}_depth_summary.txt",
+        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_fractions.txt"
+    params:
+        file_prefix = "metrics/{ms_sample}/{ms_sample}"
+    log:
+        "logs/{ms_sample}/ms_depth_metrics.log"
+    benchmark:
+        "logs/{ms_sample}/ms_depth_metrics.benchmark.txt"
+    threads:
+        config["resources"]["threads"]["light"]
+    shell:
+        """
+        mosdepth \
+        --threads {threads} \
+        --no-per-base \
+        {params.file_prefix} \
+        {input.bam} 2>> {log} 
+
+        mv {params.file_prefix}.mosdepth.summary.txt {output.depth_summary} 2>> {log}
+        mv {params.file_prefix}.mosdepth.global.dist.txt {output.depth_histogram} 2>> {log}
+        """
+
+
 # Generates metrics for each mask BED file
 rule ms_masking_metrics:
     input:
@@ -220,7 +248,7 @@ rule ms_candidate_variant_metrics_summary:
     input: 
         variant_metrics = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt",
         ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt",
-        depth_hist = "metrics/{ms_sample}/{ms_sample}_depth_histogram.txt"
+        depth_hist = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt"
     output:
         summary = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json"
     params:
