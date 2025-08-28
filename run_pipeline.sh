@@ -10,6 +10,8 @@
 # Date: 27-Jun-2025
 #
 
+mkdir -p logs/pipeline
+
 snakemake \
     --snakefile Snakefile \
     --configfile config/config.yaml \
