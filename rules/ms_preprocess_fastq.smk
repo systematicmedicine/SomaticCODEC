@@ -47,6 +47,8 @@ rule ms_trim_fastq:
         "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
     threads: 
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         cutadapt \
@@ -92,6 +94,8 @@ rule ms_filter_fastq:
         "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         cutadapt \

@@ -15,6 +15,8 @@ rule check_ex_ms_mapping:
         ms_csv = config["files"]["ms_samples"]
     output:
         "logs/pipeline/check_ex_ms_mapping.done"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     log:
         "logs/pipeline/check_ex_ms_mapping.log"
     benchmark:
@@ -40,6 +42,8 @@ rule bwamem_index_files:
         "logs/pipeline/bwamem_index_files.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         bwa-mem2 index {input.reference} 2>> {log}
@@ -59,6 +63,8 @@ rule check_variant_calling_chroms_present:
         "logs/pipeline/check_variant_calling_chroms_present.log"
     benchmark:
         "logs/pipeline/check_variant_calling_chroms_present.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/check_variant_calling_chroms_present.py"
 
@@ -72,9 +78,10 @@ rule mask_non_variant_calling_chroms:
         fai = config["files"]['reference'] + ".fai",
     output:
         bed = temp("tmp/downloads/non_variant_calling_chroms.bed")
-
     params:
         variant_calling_chroms = config["chroms"]["variant_calling"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
     run:
         # Define variant calling chromosomes
         variant_calling_chroms = set(params.variant_calling_chroms)
@@ -98,6 +105,8 @@ rule samtools_index_files:
         "logs/pipeline/samtools_index_files.log"
     benchmark:
         "logs/pipeline/samtools_index_files.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         samtools faidx {input.reference} 2>> {log}
@@ -115,9 +124,11 @@ rule picard_sequence_dict:
         "logs/pipeline/picard_sequence_dict.log"
     benchmark:
         "logs/pipeline/picard_sequence_dict.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
-        picard CreateSequenceDictionary \
+        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp CreateSequenceDictionary \
             R={input.ref} \
             O={output.dictf} 2>> {log}
         """
@@ -141,5 +152,7 @@ rule ex_generate_adapter_fastas:
         "logs/pipeline/ex_generate_adapter_fastas.log"
     benchmark:
         "logs/pipeline/ex_generate_adapter_fastas.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_generate_adapter_fastas.py"

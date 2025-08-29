@@ -39,6 +39,8 @@ rule ms_low_depth_mask:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
         threshold = config["rules"]["ms_low_depth_mask"]["threshold"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         samtools depth -aa {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
@@ -75,6 +77,8 @@ rule ms_germline_variants_mask:
         "logs/{ms_sample}/ms_germline_variants_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         zcat {input.vcf} > {output.intermediate_uncompressed} 2>> {log}
@@ -111,6 +115,8 @@ rule combine_masks:
         "logs/{ms_sample}/combine_masks.log"
     benchmark:
         "logs/{ms_sample}/combine_masks.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         cat {input.common_masks} \
@@ -140,6 +146,8 @@ rule generate_include_bed:
         "logs/{ex_sample}/generate_include_bed.log"
     benchmark:
         "logs/{ex_sample}/generate_include_bed.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed} 2>> {log}

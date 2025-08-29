@@ -20,6 +20,8 @@ rule write_git_metadata:
         "logs/pipeline/write_git_metadata.log"
     benchmark:
         "logs/pipeline/write_git_metadata.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/write_git_metadata.py"
 
@@ -36,12 +38,14 @@ rule count_reads:
                 md.get_ms_sample_ids(config) + 
                 md.get_ex_lane_ids(config)
                 )
-        threads:
-            config["resources"]["threads"]["moderate"]
         log:
             "logs/batch/count_reads.log"
         benchmark:
             "logs/batch/count_reads.benchmark.txt"
+        threads:
+            config["resources"]["threads"]["moderate"]
+        resources:
+            memory = config["resources"]["memory"]["moderate"]
         shell:
              "python scripts/count_reads.py > {log} 2>&1"
 
@@ -60,6 +64,8 @@ rule create_metrics_report:
         "logs/pipeline/create_metrics_report.log"
     benchmark:
         "logs/pipeline/create_metrics_report.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/metrics_report.R"
 
@@ -74,6 +80,8 @@ rule collate_benchmarks:
         file_path = "logs/pipeline/combined_benchmarks.csv"
     log:
         "logs/pipeline/collate_benchmarks.log"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/collate_benchmarks.py"
 
@@ -84,6 +92,8 @@ rule log_disk_usage:
         rules.collate_benchmarks.output
     output:
         "logs/pipeline/disk_usage.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         echo "End of run disk usage at $(date):" > {output}

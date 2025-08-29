@@ -37,6 +37,8 @@ rule ex_extract_fastq_umis:
         "logs/{ex_lane}/ex_extract_umis.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         cutadapt \
@@ -73,6 +75,8 @@ rule ex_demux_fastq:
         "logs/batch/ex_demux.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     script:
         "../scripts/ex_demux.py"
 
@@ -117,6 +121,8 @@ rule ex_trim_fastq:
         "logs/{ex_sample}/ex_trim.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         cutadapt \
@@ -185,6 +191,8 @@ rule ex_filter_fastq:
         "logs/{ex_sample}/ex_filter.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]        
     shell:  
         """
         # Length filter
