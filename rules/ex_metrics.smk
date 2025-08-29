@@ -36,6 +36,8 @@ rule ex_fastqcraw_metrics:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
     threads: 
         config["resources"]["threads"]["light"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
@@ -72,6 +74,8 @@ rule ex_fastqc_raw_summary_metrics:
         "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.log"
     benchmark:
         "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/fastqc_summary_metrics.py"
 
@@ -90,6 +94,8 @@ rule ex_demux_counts_and_gini:
         "logs/{ex_lane}/ex_demux_metrics_gini.log"
     benchmark:
         "logs/{ex_lane}/ex_demux_metrics_gini.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_demux_counts_and_gini.py"
     
@@ -111,6 +117,8 @@ rule ex_bases_trimmed:
         "logs/{ex_sample}/ex_bases_trimmed.log"
     benchmark:
         "logs/{ex_sample}/ex_bases_trimmed.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_bases_trimmed.py"
 
@@ -130,6 +138,8 @@ rule ex_trimmed_read_length_metrics:
         "logs/{ex_sample}/ex_trimmed_read_length_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt" 
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_trimmed_read_length_metrics.py"
 
@@ -154,6 +164,8 @@ rule ex_fastqcfilter_metrics:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
     threads: 
         config["resources"]["threads"]["light"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
@@ -190,6 +202,8 @@ rule ex_fastqc_filter_summary_metrics:
         "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/fastqc_summary_metrics.py"
 
@@ -206,6 +220,8 @@ rule ex_map_metrics:
         "logs/{ex_sample}/ex_map_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_map_metrics.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         samtools flagstat {input.bam} > {output.txt} 2>> {log}
@@ -227,6 +243,8 @@ rule ex_insert_metrics:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_insert_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
@@ -254,6 +272,8 @@ rule ex_duplication_metrics:
         "logs/{ex_sample}/ex_duplication_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_duplication_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_duplication_metrics.py"
 
@@ -270,6 +290,8 @@ rule ex_somatic_variant_rate:
         "logs/{ex_sample}/ex_somatic_variant_rate.log"
     benchmark:
         "logs/{ex_sample}/ex_somatic_variant_rate.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_somatic_variant_rate.py"
 
@@ -289,6 +311,8 @@ rule ex_call_dsc_metrics:
         "logs/{ex_sample}/ex_call_dsc_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_call_dsc_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_call_dsc_metrics.py"
 
@@ -309,6 +333,8 @@ rule ex_dsc_remap_metrics:
         "logs/{ex_sample}/ex_dsc_remap_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_dsc_remap_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_dsc_remap_metrics.py"
 
@@ -339,6 +365,8 @@ rule ex_dsc_coverage_metrics:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_dsc_coverage_metrics.py"
 
@@ -361,6 +389,8 @@ rule ex_percent_eligible_N_bases:
         "logs/{ex_sample}/ex_percent_eligible_N_bases.log"
     benchmark:
         "logs/{ex_sample}/ex_percent_eligible_N_bases.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_percent_eligible_N_bases.py"
 
@@ -383,6 +413,8 @@ rule ex_trinucleotide_context_metrics:
         "logs/{ex_sample}/ex_trinucleotide_context_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_trinucleotide_context_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_trinucleotide_context_metrics.py"
 
@@ -403,6 +435,8 @@ rule ex_total_read_loss:
         "logs/{ex_sample}/ex_total_read_loss.log"
     benchmark:
         "logs/{ex_sample}/ex_total_read_loss.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_total_read_loss.py"
 
@@ -419,6 +453,8 @@ rule ex_softclipping_metrics:
         "logs/{ex_sample}/ex_softclipping_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_softclipping_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_softclipping_metrics.py"
 
@@ -436,6 +472,8 @@ rule ex_chromosomal_variant_rate_metrics:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_chromosomal_variant_rate_metrics.py"
 
@@ -452,6 +490,8 @@ rule ex_recurrent_variant_metrics:
         "logs/batch/batch_ex_recurrent_variant_metrics.log"
     benchmark:
         "logs/batch/batch_ex_recurrent_variant_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_recurrent_variant_metrics.py"
 
@@ -472,5 +512,7 @@ rule ex_germline_contamination:
         "logs/{ex_sample}/ex_germline_contamination.log"
     benchmark:
         "logs/{ex_sample}/ex_germline_contamination.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_germline_contamination.py"

@@ -46,6 +46,8 @@ rule ex_map:
         "logs/{ex_sample}/ex_map.benchmark.txt"
     threads:
         config["resources"]["threads"]["heavy"]
+    resources:
+        memory = config["resources"]["memory"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -87,6 +89,8 @@ rule ex_filter_map:
         "logs/{ex_sample}/ex_filter_map.benchmark.txt"
     threads: 
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         samtools view -b -f 0x2 {input.bam} > {output.intermediate_unsorted} 2>> {log}
@@ -149,7 +153,7 @@ rule ex_annotate_map:
             -m 0 \
             --strategy=adjacency 2>> {log}
 
-        picard AddOrReplaceReadGroups \
+        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
             I={output.intermediate_groupbyumi} \
             O={output.intermediate_anno_unsorted} \
             RGID={wildcards.ex_sample} \
