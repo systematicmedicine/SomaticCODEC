@@ -28,7 +28,7 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 config_path = os.path.join(root_dir, "config", "config.yaml")
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
-experiment_name = config["experiment_name"]
+experiment_name = config["experiment"]["name"]
 
 # Define archive path
 archive_path = os.path.join(root_dir, f"{experiment_name}.tar.gz")
