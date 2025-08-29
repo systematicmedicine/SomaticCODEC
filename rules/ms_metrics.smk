@@ -33,6 +33,8 @@ rule ms_raw_fastq_metrics:
         "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
     threads: 
         config["resources"]["threads"]["light"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)
@@ -73,6 +75,8 @@ rule ms_processed_fastq_metrics:
         "logs/{ms_sample}/ms_processed_fastq_metrics.benchmark.txt"
     threads:
         config["resources"]["threads"]["light"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """        
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2} 2>> {log}
@@ -100,6 +104,8 @@ rule ms_fastqc_summary_metrics:
         "logs/{ms_sample}/ms_fastqc_summary_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_fastqc_summary_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/fastqc_summary_metrics.py"
 
@@ -107,7 +113,7 @@ rule ms_fastqc_summary_metrics:
 # Generates ms alignment metrics
 rule ms_alignment_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam"
     output:
         stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt",
         insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
@@ -116,11 +122,13 @@ rule ms_alignment_metrics:
         "logs/{ms_sample}/ms_alignment_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_alignment_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         samtools flagstat {input.bam} > {output.stats} 2>> {log}
 
-        picard CollectInsertSizeMetrics \
+        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.insert_metrics} \
             H={output.insert_hist} 2>> {log}
@@ -139,6 +147,8 @@ rule ms_duplication_metrics:
         "logs/{ms_sample}/ms_duplication_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
        "../scripts/ms_duplication_metrics.py"
 
@@ -153,6 +163,8 @@ rule ms_candidate_variant_metrics:
         "logs/{ms_sample}/ms_candidate_variant_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_candidate_variant_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         bcftools stats -s - {input.vcf} > {output.stat} 2>> {log}
@@ -171,6 +183,8 @@ rule ms_het_hom_ratio:
         "logs/{ms_sample}/ms_het_hom_ratio.log"
     benchmark:
         "logs/{ms_sample}/ms_het_hom_ratio.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         bcftools query -f '[%GT\\n]' {input.vcf} > {output.intermediate_txt} 2>> {log}
@@ -206,6 +220,8 @@ rule ms_depth_metrics:
         "logs/{ms_sample}/ms_depth_metrics.benchmark.txt"
     threads:
         config["resources"]["threads"]["light"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
     shell:
         """
         mosdepth \
@@ -239,6 +255,8 @@ rule ms_masking_metrics:
         "logs/{ms_sample}/ms_masking_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_masking_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
        "../scripts/ms_masking_metrics.py"
 
@@ -257,6 +275,8 @@ rule ms_candidate_variant_metrics_summary:
         "logs/{ms_sample}/ms_candidate_variant_metrics_summary.log"
     benchmark:
         "logs/{ms_sample}/ms_candidate_variant_metrics_summary.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ms_candidate_variant_metrics_summary.py"
 

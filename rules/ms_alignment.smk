@@ -45,6 +45,8 @@ rule ms_map:
         "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 
         config["resources"]["threads"]["heavy"]
+    resources:
+        memory = config["resources"]["memory"]["heavy"]
     shell:
         """
         bwa-mem2 mem \
@@ -75,14 +77,16 @@ rule ms_annotate_map:
         bai = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"),
         intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_read_group_map_unsorted.bam")
     log:
-        "logs/{ms_sample}/ms_add_read_groups.log"
+        "logs/{ms_sample}/ms_annotate_map.log"
     benchmark:
-        "logs/{ms_sample}/ms_add_read_groups.benchmark.txt"
+        "logs/{ms_sample}/ms_annotate_map.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        picard AddOrReplaceReadGroups \
+        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
             I={input.bam} \
             O={output.intermediate_unsorted} \
             RGID={wildcards.ms_sample} \
@@ -113,6 +117,8 @@ rule ms_remove_duplicates:
         "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         umi_tools dedup \

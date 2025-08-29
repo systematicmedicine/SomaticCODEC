@@ -90,6 +90,8 @@ rule ex_remap_dsc:
         "logs/{ex_sample}/ex_remap_dsc.benchmark.txt"
     threads:
         config["resources"]["threads"]["heavy"]
+    resources:
+        memory = config["resources"]["memory"]["heavy"]
     shell:
         """
         samtools fastq -0 {output.intermediate_fastq} {input.bam} 2>> {log}
@@ -173,6 +175,8 @@ rule ex_filter_dsc:
         "logs/{ex_sample}/ex_filter_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         samtools view -b \

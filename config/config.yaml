@@ -40,7 +40,7 @@ files:
 # Global parameters
 # ------------------------------------------------------------------------------
 chroms: # Must be defined with UCSC naming
-  variant_calling: 
+  variant_calling:
     - "chr1"
     - "chr2"
     - "chr3"

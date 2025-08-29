@@ -38,7 +38,7 @@ snakemake \
     --snakefile Snakefile \
     --configfile config/config.yaml \
     --cores all \
-    --resources mem=370 \
+    --resources memory=370 \
     --notemp \
     --keep-going \
     --reason \
