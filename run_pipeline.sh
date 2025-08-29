@@ -29,7 +29,7 @@ echo "time,disk_used_GB,disk_avail_GB,mem_used_GB,mem_avail_GB,cpu_load,cpu_avai
         mem_avail_GB=$(free -g | awk '/Mem:/ {print $7}')
 
         cpu_load=$(uptime | awk -F'load average:' '{print $2}' | cut -d',' -f1 | xargs)
-        cpu_avail=$(echo "$(nproc) - $cpu_load" | bc)
+        cpu_avail=$(($(nproc) - ${cpu_load%.*}))
 
         echo "$now,$disk_used_GB,$disk_avail_GB,$mem_used_GB,$mem_avail_GB,$cpu_load,$cpu_avail" >> logs/pipeline/system_resource_usage.csv
         sleep 60
