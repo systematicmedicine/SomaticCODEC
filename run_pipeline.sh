@@ -16,22 +16,29 @@ set -e
 # Create directory for pipeline logs
 mkdir -p logs/pipeline
 
-# Start continuous system monitoring in the background
-echo "time,disk_used_GB,mem_used_GB,cpu_load" > logs/pipeline/system_usage.csv
+# Start continuous resource monitoring in the background
+echo "time,disk_used_GB,disk_avail_GB,mem_used_GB,mem_avail_GB,cpu_load,cpu_avail" > logs/pipeline/system_resource_usage.csv
 (
     while true; do
         now=$(date +"%Y-%m-%d %H:%M:%S")
+
         disk_used_GB=$(df -BG / | tail -1 | awk '{gsub("G","",$3); print $3}')
-        mem_used_GB=$(free -g | awk '/Mem:/ {print $2}')
+        disk_avail_GB=$(df -BG / | tail -1 | awk '{gsub("G","",$4); print $4}')
+
+        mem_used_GB=$(free -g | awk '/Mem:/ {print $3}')
+        mem_avail_GB=$(free -g | awk '/Mem:/ {print $7}')
+
         cpu_load=$(uptime | awk -F'load average:' '{print $2}' | cut -d',' -f1 | xargs)
-        echo "$now,$disk_used_GB,$mem_used_GB,$cpu_load" >> logs/pipeline/system_usage.csv
+        cpu_avail=$(echo "$(nproc) - $cpu_load" | bc)
+
+        echo "$now,$disk_used_GB,$disk_avail_GB,$mem_used_GB,$mem_avail_GB,$cpu_load,$cpu_avail" >> logs/pipeline/system_resource_usage.csv
         sleep 60
     done
 ) &
-MONITOR_PROCESS_ID=$!
+MONITOR_RESOURCES_PROCESS_ID=$!
 
 # Stop background monitoring when script exits (finishes or errors)
-trap "kill $MONITOR_PROCESS_ID" EXIT
+trap "kill $MONITOR_RESOURCES_PROCESS_ID" EXIT
 
 # Run Snakemake
 snakemake \
