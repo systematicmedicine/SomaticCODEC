@@ -31,7 +31,9 @@ rule ms_candidate_germ_variants:
     benchmark:
         "logs/{ms_sample}/ms_candidate_germ_variants.benchmark.txt"
     threads:
-         config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["moderate"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         gatk --java-options "-Xmx{resources.memory}g" HaplotypeCaller  \
