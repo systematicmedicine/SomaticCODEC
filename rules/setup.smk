@@ -28,7 +28,6 @@ rule check_ex_ms_mapping:
 # Creates index files from reference genome
 rule bwamem_index_files:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         reference = config["files"]["reference_genome"]
     output:
         amb = config["files"]["reference_genome"] + ".amb",
@@ -73,8 +72,6 @@ rule check_variant_calling_chroms_present:
     # e.g. chrUn, chr*_random, chrM, chrEBV
 rule mask_non_variant_calling_chroms:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
         fai = config["files"]["reference_genome"] + ".fai",
     output:
         bed = temp("tmp/downloads/non_variant_calling_chroms.bed")
@@ -97,7 +94,6 @@ rule mask_non_variant_calling_chroms:
 # Creates reference .fai file
 rule samtools_index_files:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         reference = config["files"]["reference_genome"]
     output:
         fai = config["files"]["reference_genome"] + ".fai"
@@ -115,8 +111,6 @@ rule samtools_index_files:
 # Creates reference .dict file
 rule picard_sequence_dict:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
         ref = config["files"]["reference_genome"]
     output:
         dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
@@ -137,8 +131,6 @@ rule picard_sequence_dict:
 # Generates adapter FASTA files for demultiplexing and trimming
 rule ex_generate_adapter_fastas:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
         ex_lanes = config["files"]["ex_lanes_metadata"],
         ex_samples = config["files"]["ex_samples_metadata"],
         ex_adapters = config["files"]["ex_adapters_metadata"]

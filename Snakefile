@@ -46,8 +46,20 @@ ex_sample_ids = md.get_ex_sample_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
 # Define setup files
-setup = [
-    "logs/pipeline/check_ex_ms_mapping.done"
+setup_files = [
+    "logs/pipeline/check_ex_ms_mapping.done",
+    config["files"]["reference_genome"] + ".amb",
+    config["files"]["reference_genome"] + ".ann",
+    config["files"]["reference_genome"] + ".bwt.2bit.64",
+    config["files"]["reference_genome"] + ".pac",
+    config["files"]["reference_genome"] + ".0123",
+    "logs/pipeline/check_variant_calling_chroms_present.done",
+    "tmp/downloads/non_variant_calling_chroms.bed",
+    config["files"]["reference_genome"] + ".fai",
+    os.path.splitext(config["files"]["reference_genome"])[0] + ".dict",
+    expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", 
+    ex_lane = md.get_ex_lane_ids(config), 
+    region = ["r1_start", "r1_end", "r2_start", "r2_end"])
 ]
 
 # Define results
@@ -141,7 +153,7 @@ other_metrics = [
 # Define rule all
 rule all:
     input:
-        setup + results + ex_metrics + ms_metrics + other_metrics
+        setup_files + results + ex_metrics + ms_metrics + other_metrics
 
 
 # ---------------------------------------------------------------------------------------------
