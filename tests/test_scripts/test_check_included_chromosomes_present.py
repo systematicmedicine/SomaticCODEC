@@ -1,7 +1,7 @@
 """
---- test_check_variant_calling_chroms_present.py ---
+--- test_check_included_chromosomes_present.py ---
 
-Test that the script check_variant_calling_chroms_present.py can detect missing chromosomes in FAI and BED files
+Test that the script check_included_chromosomes_present.py can detect missing chromosomes in FAI and BED files
 
 Authors:
     - Chat-GPT
@@ -16,15 +16,15 @@ from types import SimpleNamespace
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from scripts.check_variant_calling_chroms_present import main
+from scripts.check_included_chromosomes_present import main
 
 @pytest.mark.parametrize(
     "fai_path, bed_path, chroms, expect_exit, expect_done, expect_error_chrom",
     [
         # All chroms present
         (
-            "tests/data/test_check_variant_calling_chroms_present/chr1and2.fna.fai",
-            "tests/data/test_check_variant_calling_chroms_present/chr1and2.bed",
+            "tests/data/test_check_included_chromosomes_present/chr1and2.fna.fai",
+            "tests/data/test_check_included_chromosomes_present/chr1and2.bed",
             ["chr1", "chr2"],
             None,    # no exit
             True,    # done file created
@@ -32,8 +32,8 @@ from scripts.check_variant_calling_chroms_present import main
         ),
         # Missing chrom in FAI
         (
-            "tests/data/test_check_variant_calling_chroms_present/chr1and2.fna.fai",
-            "tests/data/test_check_variant_calling_chroms_present/chr1and2.bed",
+            "tests/data/test_check_included_chromosomes_present/chr1and2.fna.fai",
+            "tests/data/test_check_included_chromosomes_present/chr1and2.bed",
             ["chr1", "chr3"],
             1,       # exit code
             False,   # done file not created
@@ -41,8 +41,8 @@ from scripts.check_variant_calling_chroms_present import main
         ),
         # Missing chrom in BED
         (
-            "tests/data/test_check_variant_calling_chroms_present/chr1and2.fna.fai",
-            "tests/data/test_check_variant_calling_chroms_present/chr1and2.bed",
+            "tests/data/test_check_included_chromosomes_present/chr1and2.fna.fai",
+            "tests/data/test_check_included_chromosomes_present/chr1and2.bed",
             ["chr1", "chr4"],
             1,       # exit code
             False,   # done file not created
@@ -50,7 +50,7 @@ from scripts.check_variant_calling_chroms_present import main
         )
     ]
 )
-def test_check_variant_calling_chroms_present(tmp_path, fai_path, bed_path, chroms, expect_exit, expect_done, expect_error_chrom):
+def test_check_included_chromosomes_present(tmp_path, fai_path, bed_path, chroms, expect_exit, expect_done, expect_error_chrom):
     fai_file = Path(fai_path)
     bed_file = Path(bed_path)
 
@@ -65,7 +65,7 @@ def test_check_variant_calling_chroms_present(tmp_path, fai_path, bed_path, chro
         )
         output = [str(done_file)]
         params = SimpleNamespace(
-            variant_calling_chroms=chroms
+            included_chromosomes=chroms
         )
         log = [str(log_file)]
 
@@ -84,7 +84,7 @@ def test_check_variant_calling_chroms_present(tmp_path, fai_path, bed_path, chro
     log_text = log_file.read_text()
     if expect_error_chrom:
         assert expect_error_chrom in log_text
-        assert "Missing variant calling chromosomes" in log_text
+        assert " Missing chromosomes included for variant calling" in log_text
     else:
-        assert "All variant calling chromosomes are present" in log_text
+        assert "All chromosomes included for variant calling are present" in log_text
 

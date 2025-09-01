@@ -1,9 +1,9 @@
 """
---- check_variant_calling_chroms_present.py
+--- check_included_chromosomes_present.py
 
-Checks that chromosomes designated for variant calling are present in reference and common BEDs
+Checks that chromosomes included for variant calling are present in reference and common BEDs
 
-Designed to be used exclusively with the rule "check_variant_calling_chroms_present"
+Designed to be used exclusively with the rule "check_included_chromosomes_present"
 
 Authors:
     - Chat-GPT
@@ -16,22 +16,22 @@ def main(snakemake):
     # Initiate logging
     sys.stdout = open(snakemake.log[0], "a")
     sys.stderr = open(snakemake.log[0], "a")
-    print("[INFO] Starting check_variant_calling_chroms_present.py", flush=True)
+    print("[INFO] Starting check_included_chromosomes_present.py", flush=True)
 
     # Load inputs
     reference_fai = Path(snakemake.input.fai)
     precomputed_masks = [Path(p) for p in snakemake.input.precomputed_masks]
-    variant_calling_chroms = set(snakemake.params.variant_calling_chroms)
+    included_chromosomes = set(snakemake.params.included_chromosomes)
 
     errors = False
 
     # --- Check reference FAI ---
     with open(reference_fai) as f:
         ref_chroms = {line.split()[0] for line in f}
-    missing_in_ref = variant_calling_chroms - ref_chroms
+    missing_in_ref = included_chromosomes - ref_chroms
     if missing_in_ref:
         print(
-            f"[ERROR] Missing variant calling chromosomes in FAI file ({reference_fai}): "
+            f"[ERROR] Missing chromosomes included for variant calling in FAI file ({reference_fai}): "
             + ", ".join(sorted(missing_in_ref)),
             file=sys.stderr, flush=True
             )
@@ -41,10 +41,10 @@ def main(snakemake):
     for bed_file in precomputed_masks:
         with open(bed_file) as f:
             bed_chroms = {line.strip().split()[0] for line in f}
-        missing_in_bed = variant_calling_chroms - bed_chroms
+        missing_in_bed = included_chromosomes - bed_chroms
         if missing_in_bed:
             print(
-                f"[ERROR] Missing variant calling chromosomes in BED file ({bed_file}): "
+                f"[ERROR] Missing chromosomes included for variant calling in BED file ({bed_file}): "
                 + ", ".join(sorted(missing_in_bed)),
                 file=sys.stderr, flush=True
                 )
@@ -55,11 +55,11 @@ def main(snakemake):
 
     # --- All checks passed, create done file ---
     with open(snakemake.output[0], "w") as f:
-        f.write("✅ All variant calling chromosomes are present in reference FAI and common BEDs.\n")
+        f.write("✅ All chromosomes included for variant calling are present in reference FAI and common BEDs.\n")
 
-    print(f"✅ All variant calling chromosomes are present in reference FAI and common BEDs.", flush=True)
+    print(f"✅ All chromosomes included for variant calling are present in reference FAI and common BEDs.", flush=True)
 
-    print("[INFO] Completed check_variant_calling_chroms_present.py", flush=True)
+    print("[INFO] Completed check_included_chromosomes_present.py", flush=True)
 
 if __name__ == "__main__":
     main(snakemake)

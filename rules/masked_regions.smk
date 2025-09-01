@@ -101,7 +101,7 @@ rule ms_germline_variants_mask:
 rule combine_masks:
     input:
         precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
-        non_variant_calling_bed = rules.mask_non_variant_calling_chroms.output.bed,
+        excluded_chromosomes_bed = rules.mask_excluded_chromosomes.output.bed,
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
@@ -120,7 +120,7 @@ rule combine_masks:
     shell:
         """
         cat {input.precomputed_masks} \
-        {input.non_variant_calling_bed} \
+        {input.excluded_chromosomes_bed} \
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \
         {input.ms_germ_ins_bed} \

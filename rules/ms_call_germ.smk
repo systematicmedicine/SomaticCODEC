@@ -13,7 +13,8 @@ Author: Ben Barry
 
 """
 
-# Call candidate germline variants (no filtering)
+# Call candidate germline variants
+# - Germline variants are called only on chromosomes defined in config[chroms][included_chromosomes]
 rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
@@ -23,7 +24,7 @@ rule ms_candidate_germ_variants:
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
     params:
-        variant_calling_chroms="-L " + " -L ".join(config["chroms"]["variant_calling"])
+        included_chromosomes="-L " + " -L ".join(config["chroms"]["included_chromosomes"])
     resources:
         memory = config["resources"]["memory"]["moderate"]
     log:
@@ -40,7 +41,7 @@ rule ms_candidate_germ_variants:
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            {params.variant_calling_chroms} \
+            {params.included_chromosomes} \
             --native-pair-hmm-threads {threads} \
             --standard-min-confidence-threshold-for-calling 20 2>> {log}
         """
