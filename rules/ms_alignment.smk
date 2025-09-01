@@ -15,12 +15,12 @@ Author: Joshua Johnstone
 # Aligns reads to reference genome
 rule ms_map:
     input: 
-        ref = config["files"]['reference'],
-        amb = config["files"]['reference'] + ".amb",
-        ann = config["files"]['reference'] + ".ann",
-        bwt = config["files"]['reference'] + ".bwt.2bit.64",
-        pac = config["files"]['reference'] + ".pac",
-        sa = config["files"]['reference'] + ".0123",
+        ref = config["files"]["reference_genome"],
+        amb = config["files"]["reference_genome"] + ".amb",
+        ann = config["files"]["reference_genome"] + ".ann",
+        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["files"]["reference_genome"] + ".pac",
+        sa = config["files"]["reference_genome"] + ".0123",
         r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:

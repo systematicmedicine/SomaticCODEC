@@ -17,7 +17,7 @@ rule ms_raw_fastq_metrics:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ms_samples = config["files"]["ms_samples"],
+        ms_samples = config["files"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
@@ -244,7 +244,7 @@ rule ms_masking_metrics:
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
-        ref_index = config["files"]["reference"] + ".fai"
+        ref_index = config["files"]["reference_genome"] + ".fai"
     output:
         mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json",
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),

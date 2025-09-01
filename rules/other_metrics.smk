@@ -53,8 +53,8 @@ rule count_reads:
 # Generates a pass/fail report for component & system level metrics
 rule create_metrics_report:
     input:
-        component_metrics_metadata = config["files"]["component_metrics"],
-        system_metrics_metadata = config["files"]["system_metrics"],
+        component_metrics_metadata = config["files"]["component_metrics_metadata"],
+        system_metrics_metadata = config["files"]["system_metrics_metadata"],
         ms_metrics = ms_metrics,
         ex_metrics = ex_metrics
     output:

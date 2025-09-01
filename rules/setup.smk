@@ -11,8 +11,8 @@ Authors:
 # Checks mapping of MS and EX samples in ms_samples.csv and ex_samples.csv
 rule check_ex_ms_mapping:
     input:
-        ex_csv = config["files"]["ex_samples"],
-        ms_csv = config["files"]["ms_samples"]
+        ex_csv = config["files"]["ex_samples_metadata"],
+        ms_csv = config["files"]["ms_samples_metadata"]
     output:
         "logs/pipeline/check_ex_ms_mapping.done"
     resources:
@@ -29,13 +29,13 @@ rule check_ex_ms_mapping:
 rule bwamem_index_files:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        reference = config["files"]["reference"]
+        reference = config["files"]["reference_genome"]
     output:
-        amb = config["files"]["reference"] + ".amb",
-        ann = config["files"]["reference"] + ".ann",
-        bwt = config["files"]["reference"] + ".bwt.2bit.64",
-        pac = config["files"]["reference"] + ".pac",
-        sa = config["files"]["reference"] + ".0123"
+        amb = config["files"]["reference_genome"] + ".amb",
+        ann = config["files"]["reference_genome"] + ".ann",
+        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["files"]["reference_genome"] + ".pac",
+        sa = config["files"]["reference_genome"] + ".0123"
     log:
         "logs/pipeline/bwamem_index_files.log"
     benchmark:
@@ -53,7 +53,7 @@ rule bwamem_index_files:
 # Checks that chromosomes designated for variant calling are present in reference and precomputed BEDs
 rule check_variant_calling_chroms_present:
     input:
-        fai = config["files"]["reference"] + ".fai",
+        fai = config["files"]["reference_genome"] + ".fai",
         precomputed_masks = config["files"]["precomputed_masks"]
     output:
         "logs/pipeline/check_variant_calling_chroms_present.done"
@@ -75,7 +75,7 @@ rule mask_non_variant_calling_chroms:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        fai = config["files"]['reference'] + ".fai",
+        fai = config["files"]["reference_genome"] + ".fai",
     output:
         bed = temp("tmp/downloads/non_variant_calling_chroms.bed")
     params:
@@ -98,9 +98,9 @@ rule mask_non_variant_calling_chroms:
 rule samtools_index_files:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        reference = config["files"]["reference"]
+        reference = config["files"]["reference_genome"]
     output:
-        fai = config["files"]["reference"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai"
     log:
         "logs/pipeline/samtools_index_files.log"
     benchmark:
@@ -117,9 +117,9 @@ rule picard_sequence_dict:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ref = config["files"]["reference"]
+        ref = config["files"]["reference_genome"]
     output:
-        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
+        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
     log:
         "logs/pipeline/picard_sequence_dict.log"
     benchmark:
@@ -139,9 +139,9 @@ rule ex_generate_adapter_fastas:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ex_lanes = config["files"]["ex_lanes"],
-        ex_samples = config["files"]["ex_samples"],
-        ex_adapters = config["files"]["ex_adapters"]
+        ex_lanes = config["files"]["ex_lanes_metadata"],
+        ex_samples = config["files"]["ex_samples_metadata"],
+        ex_adapters = config["files"]["ex_adapters_metadata"]
     output:
         adapter_fasta_outputs = expand(
             "tmp/{ex_lane}/{ex_lane}_{region}.fasta",

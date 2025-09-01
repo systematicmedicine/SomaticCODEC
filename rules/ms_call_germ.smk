@@ -17,9 +17,9 @@ Author: Ben Barry
 rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
-        ref = config["files"]["reference"],
-        fai = config["files"]["reference"] + ".fai",
-        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
+        ref = config["files"]["reference_genome"],
+        fai = config["files"]["reference_genome"] + ".fai",
+        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
     params:

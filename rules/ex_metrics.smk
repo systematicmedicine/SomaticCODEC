@@ -20,7 +20,7 @@ rule ex_fastqcraw_metrics:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ex_lanes = config["files"]["ex_lanes"],
+        ex_lanes = config["files"]["ex_lanes_metadata"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
@@ -354,7 +354,7 @@ rule ex_dsc_coverage_metrics:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
         ),
-        fai = config["files"]["reference"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
@@ -403,7 +403,7 @@ rule ex_trinucleotide_context_metrics:
     input:
         vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
         reference_tri_contexts = config["files"]["reference_tri_contexts"],
-        ref = config["files"]["reference"]
+        ref = config["files"]["reference_genome"]
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json",
         pdf = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_histogram.pdf"
@@ -465,7 +465,7 @@ Compares variant rate between chromosomes
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        fai = config["files"]["reference"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     log:
