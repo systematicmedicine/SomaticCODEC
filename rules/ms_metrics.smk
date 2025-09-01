@@ -15,8 +15,7 @@ import scripts.get_metadata as md
 # Generates a fastqc report for demuxed ms FASTQs
 rule ms_raw_fastq_metrics:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
+        setup_files = setup_files,
         ms_samples = config["files"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
