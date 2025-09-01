@@ -87,7 +87,7 @@ def lightweight_test_run():
     config_data["resources"]["threads"]["moderate"] = 4
     config_data["resources"]["threads"]["light"] = 4
 
-    config_data["chroms"]["variant_calling"] = ["chr21"]
+    config_data["chroms"]["included_chromosomes"] = ["chr21"]
 
     config_data["files"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
     config_data["files"]["precomputed_masks"] = ["tmp/downloads/GRCh38_alldifficultregions_10lines.bed", 

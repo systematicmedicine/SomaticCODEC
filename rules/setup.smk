@@ -49,45 +49,45 @@ rule bwamem_index_files:
         """
     
 
-# Checks that chromosomes designated for variant calling are present in reference and precomputed BEDs
-rule check_variant_calling_chroms_present:
+# Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
+rule check_included_chromosomes_present:
     input:
         fai = config["files"]["reference_genome"] + ".fai",
         precomputed_masks = config["files"]["precomputed_masks"]
     output:
-        "logs/pipeline/check_variant_calling_chroms_present.done"
+        "logs/pipeline/check_included_chromosomes_present.done"
     params:
-        variant_calling_chroms = config["chroms"]["variant_calling"]
+        included_chromosomes = config["chroms"]["included_chromosomes"]
     log:
-        "logs/pipeline/check_variant_calling_chroms_present.log"
+        "logs/pipeline/check_included_chromosomes_present.log"
     benchmark:
-        "logs/pipeline/check_variant_calling_chroms_present.benchmark.txt"
+        "logs/pipeline/check_included_chromosomes_present.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     script:
-        "../scripts/check_variant_calling_chroms_present.py"
+        "../scripts/check_included_chromosomes_present.py"
 
 
 # Creates a mask for chromosomes that will not be used in variant calling 
     # e.g. chrUn, chr*_random, chrM, chrEBV
-rule mask_non_variant_calling_chroms:
+rule mask_excluded_chromosomes:
     input:
         fai = config["files"]["reference_genome"] + ".fai",
     output:
-        bed = temp("tmp/downloads/non_variant_calling_chroms.bed")
+        bed = temp("tmp/downloads/excluded_chromosomes.bed")
     params:
-        variant_calling_chroms = config["chroms"]["variant_calling"]
+        included_chromosomes = config["chroms"]["included_chromosomes"]
     resources:
         memory = config["resources"]["memory"]["light"]
     run:
-        # Define variant calling chromosomes
-        variant_calling_chroms = set(params.variant_calling_chroms)
+        # Define chromosomes included for variant calling
+        included_chromosomes = set(params.included_chromosomes)
 
         # Load the .fai and filter
         with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
             for line in fai_in:
                 chrom, length, *_ = line.strip().split("\t")
-                if chrom not in variant_calling_chroms:
+                if chrom not in included_chromosomes:
                     bed_out.write(f"{chrom}\t0\t{length}\n")
 
 

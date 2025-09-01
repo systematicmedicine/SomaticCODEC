@@ -169,7 +169,7 @@ rule ms_candidate_variant_metrics:
         bcftools stats -s - {input.vcf} > {output.stat} 2>> {log}
         """
 
-# calculate the het/hom ratio from ms vcf
+# Calculates the het/hom ratio from ms vcf
 rule ms_het_hom_ratio:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
@@ -204,6 +204,7 @@ rule ms_het_hom_ratio:
         """
 
 
+# Calculates depth summary metrics for final MS BAM
 rule ms_depth_metrics:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",

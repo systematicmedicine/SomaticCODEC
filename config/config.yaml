@@ -40,7 +40,7 @@ files:
 # Global parameters
 # ------------------------------------------------------------------------------
 chroms: # Must be defined with UCSC naming
-  variant_calling:
+  included_chromosomes: # Chromosomes included for variant calling
     - "chr1"
     - "chr2"
     - "chr3"
