@@ -27,7 +27,7 @@ rule ms_trim_fastq:
     input:
         mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
         variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ms_samples = config["files"]["ms_samples"],
+        ms_samples = config["files"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:

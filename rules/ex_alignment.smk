@@ -18,12 +18,12 @@ rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
-        ref = config["files"]["reference"],
-        amb = config["files"]["reference"] + ".amb",
-        ann = config["files"]["reference"] + ".ann",
-        bwt = config["files"]["reference"] + ".bwt.2bit.64",
-        pac = config["files"]["reference"] + ".pac",
-        sa = config["files"]["reference"] + ".0123"
+        ref = config["files"]["reference_genome"],
+        amb = config["files"]["reference_genome"] + ".amb",
+        ann = config["files"]["reference_genome"] + ".ann",
+        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["files"]["reference_genome"] + ".pac",
+        sa = config["files"]["reference_genome"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
