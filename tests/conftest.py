@@ -90,7 +90,7 @@ def lightweight_test_run():
     config_data["chroms"]["variant_calling"] = ["chr21"]
 
     config_data["files"]["reference"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    config_data["files"]["common_masks"] = ["tmp/downloads/GRCh38_alldifficultregions_10lines.bed", 
+    config_data["files"]["precomputed_masks"] = ["tmp/downloads/GRCh38_alldifficultregions_10lines.bed", 
                                             "tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed",
                                             "tmp/downloads/GCRh38_repeat_masker_10lines.bed"]
     config_data["files"]["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"

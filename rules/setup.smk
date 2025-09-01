@@ -50,11 +50,11 @@ rule bwamem_index_files:
         """
     
 
-# Checks that chromosomes designated for variant calling are present in reference and common BEDs
+# Checks that chromosomes designated for variant calling are present in reference and precomputed BEDs
 rule check_variant_calling_chroms_present:
     input:
         fai = config["files"]["reference"] + ".fai",
-        common_masks = config["files"]["common_masks"]
+        precomputed_masks = config["files"]["precomputed_masks"]
     output:
         "logs/pipeline/check_variant_calling_chroms_present.done"
     params:

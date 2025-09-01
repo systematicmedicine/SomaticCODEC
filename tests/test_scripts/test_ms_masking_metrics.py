@@ -15,7 +15,7 @@ from scripts.ms_masking_metrics import main
 @pytest.mark.parametrize("input_files, expected_percentages", [
     (
         {
-            "common_masks": ["tests/data/test_ms_masking_metrics/gnomad.bed", 
+            "precomputed_masks": ["tests/data/test_ms_masking_metrics/gnomad.bed", 
                              "tests/data/test_ms_masking_metrics/giab.bed"],
             "ms_lowdepth_bed": "tests/data/test_ms_masking_metrics/lowdepth.bed",
             "ms_germ_del_bed": "tests/data/test_ms_masking_metrics/germ_del.bed",

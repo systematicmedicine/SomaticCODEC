@@ -238,7 +238,7 @@ rule ms_depth_metrics:
 # Generates metrics for each mask BED file
 rule ms_masking_metrics:
     input:
-        common_masks = expand("{mask}", mask=config["files"]["common_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",

@@ -13,7 +13,7 @@ import shutil
 from scripts.ex_trinucleotide_context_metrics import main
 
 @pytest.mark.parametrize(
-    "vcf_path, ref_path, nanoseq_path, sample_name",
+    "vcf_path, ref_path, reference_tri_contexts_path, sample_name",
     [
         (
             "tests/data/test_ex_trinucleotide_context_metrics/test.vcf",
@@ -23,22 +23,22 @@ from scripts.ex_trinucleotide_context_metrics import main
         )
     ]
 )
-def test_trinucleotide_metrics(tmp_path, vcf_path, ref_path, nanoseq_path, sample_name):
+def test_trinucleotide_metrics(tmp_path, vcf_path, ref_path, reference_tri_contexts_path, sample_name):
     tmp_vcf = tmp_path / "input.vcf"
-    tmp_nanoseq = tmp_path / "nanoseq.csv"
+    tmp_reference_tri_contexts = tmp_path / "nanoseq.csv"
     tmp_output = tmp_path / "metrics.json"
     tmp_pdf = tmp_path / "histogram.pdf"
     tmp_log = tmp_path / "log.txt"
 
     shutil.copy(vcf_path, tmp_vcf)
-    shutil.copy(nanoseq_path, tmp_nanoseq)
+    shutil.copy(reference_tri_contexts_path, tmp_reference_tri_contexts)
 
 
     class MockSnakemake:
         input = type("input", (), {
             "vcf_snvs": str(tmp_vcf),
             "ref": ref_path,
-            "nanoseq_contexts": str(tmp_nanoseq),
+            "reference_tri_contexts": str(tmp_reference_tri_contexts),
         })
         output = type("output", (), {
             "metrics": str(tmp_output),

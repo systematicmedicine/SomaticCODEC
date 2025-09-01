@@ -23,11 +23,11 @@ resources:
 # ------------------------------------------------------------------------------
 files:
   reference: tmp/downloads/UCSC-GCRh38-p14-filtered.fa # Must be uncompressed (.fa, .fna, .fasta)
-  common_masks:
+  precomputed_masks:
     - "tmp/downloads/GRCh38_alldifficultregions.bed"
     - "tmp/downloads/GRCh38-gnomad-variants-AF-0.01.bed"
     - "tmp/downloads/GCRh38_repeat_masker.bed"
-  ex_nanoseq_tri_contexts: tmp/downloads/nanoseq_trinucleotide_contexts.csv
+  reference_tri_contexts: tmp/downloads/nanoseq_trinucleotide_contexts.csv
   known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz
   ex_samples: config/ex_samples.csv
   ex_lanes: config/ex_lanes.csv
