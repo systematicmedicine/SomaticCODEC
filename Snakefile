@@ -135,8 +135,7 @@ other_metrics = [
     "logs/pipeline/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
-    "logs/pipeline/combined_benchmarks.csv",
-    "logs/pipeline/disk_usage.txt"
+    "logs/pipeline/combined_benchmarks.csv"
 ]
 
 # Define rule all

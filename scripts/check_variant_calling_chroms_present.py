@@ -20,7 +20,7 @@ def main(snakemake):
 
     # Load inputs
     reference_fai = Path(snakemake.input.fai)
-    common_masks = [Path(p) for p in snakemake.input.common_masks]
+    precomputed_masks = [Path(p) for p in snakemake.input.precomputed_masks]
     variant_calling_chroms = set(snakemake.params.variant_calling_chroms)
 
     errors = False
@@ -38,7 +38,7 @@ def main(snakemake):
         errors = True
 
     # --- Check each BED file ---
-    for bed_file in common_masks:
+    for bed_file in precomputed_masks:
         with open(bed_file) as f:
             bed_chroms = {line.strip().split()[0] for line in f}
         missing_in_bed = variant_calling_chroms - bed_chroms

@@ -1,15 +1,7 @@
 """
 --- ex_trinucleotide_context_metrics.py ---
 
-Calculate 96 trinucleotide contexts for called somatic mutations
-    - ex_trinucleotide_cosine_similarity: Cosine similarity compared to nanoseq granulocyte reference data
-
-Nanoseq trinucleotide contexts were used as a reference for comparison. Nanoseq data show good agreement with Bae2023 trinucleotide contexts. 
-Average nanoseq granulocyte somatic trinucleotide contexts were obtained from 8 donor samples. 
-Donor characteristics for nanoseq reference trinucleotide contexts:
-    - Healthy
-    - Aged 20-80
-    - 6 Female 2 Male
+Calculates 96 trinucleotide contexts for called somatic mutations and compared to reference trinucleotide contexts (e.g. nanoseq granulocyte data).
 
 Authors: 
     - James Phie
@@ -34,7 +26,7 @@ def main(snakemake):
     # Inputs
     vcf_path = snakemake.input.vcf_snvs
     ref_path = snakemake.input.ref
-    nanoseq_contexts_path = snakemake.input.nanoseq_contexts
+    reference_tri_contexts_path = snakemake.input.reference_tri_contexts
     sample = snakemake.params.sample
     json_out_path = snakemake.output.metrics
     pdf_out_path = snakemake.output.pdf
@@ -91,28 +83,28 @@ def main(snakemake):
                     continue
         return counts, total
 
-    # Load and average NanoSeq contexts
+    # Load and average reference_tri_contexts contexts
     try:
-        nanoseq_df_all = pd.read_csv(nanoseq_contexts_path)
+        reference_tri_contexts_df_all = pd.read_csv(reference_tri_contexts_path)
     except Exception as e:
-        raise RuntimeError(f"[ERROR] Failed to load nanoseq CSV: {e}")
+        raise RuntimeError(f"[ERROR] Failed to load reference_tri_contexts CSV: {e}")
 
-    nanoseq_long_df = nanoseq_df_all.melt(id_vars="SampleID", var_name="Context", value_name="Mutations")
-    nanoseq_long_df["Mutations"] = pd.to_numeric(nanoseq_long_df["Mutations"], errors="coerce")
-    nanoseq_long_df = nanoseq_long_df.dropna()
+    reference_tri_contexts_long_df = reference_tri_contexts_df_all.melt(id_vars="SampleID", var_name="Context", value_name="Mutations")
+    reference_tri_contexts_long_df["Mutations"] = pd.to_numeric(reference_tri_contexts_long_df["Mutations"], errors="coerce")
+    reference_tri_contexts_long_df = reference_tri_contexts_long_df.dropna()
 
     # Step 1: Normalize within each sample
-    nanoseq_long_df["Total"] = nanoseq_long_df.groupby("SampleID")["Mutations"].transform("sum")
-    nanoseq_long_df["Proportion"] = nanoseq_long_df["Mutations"] / nanoseq_long_df["Total"]
+    reference_tri_contexts_long_df["Total"] = reference_tri_contexts_long_df.groupby("SampleID")["Mutations"].transform("sum")
+    reference_tri_contexts_long_df["Proportion"] = reference_tri_contexts_long_df["Mutations"] / reference_tri_contexts_long_df["Total"]
 
     # Step 2: Average proportions across samples
-    nanoseq_df = (
-        nanoseq_long_df
+    reference_tri_contexts_df = (
+        reference_tri_contexts_long_df
         .groupby("Context")["Proportion"]
         .mean()
         .reset_index()
     )
-    nanoseq_df = contexts_96.to_frame().merge(nanoseq_df, on="Context", how="left").fillna(0)
+    reference_tri_contexts_df = contexts_96.to_frame().merge(reference_tri_contexts_df, on="Context", how="left").fillna(0)
 
     # Count trinucleotide mutations, normalize to proportions and merge with full 96 trinucleotide context list
     sample_id = os.path.basename(vcf_path).split("_")[0]
@@ -126,9 +118,9 @@ def main(snakemake):
 
     sample_df = contexts_96.to_frame().merge(sample_df, on="Context", how="left").fillna(0)
 
-    # Compare sample's trinucleotide profile to NanoSeq reference using cosine similarity
+    # Compare sample's trinucleotide profile to reference_tri_contexts reference using cosine similarity
     v1 = sample_df["Proportion"].to_numpy()
-    v2 = nanoseq_df["Proportion"].to_numpy()
+    v2 = reference_tri_contexts_df["Proportion"].to_numpy()
 
     cosine_sim = round(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)), 3)
 
@@ -136,11 +128,11 @@ def main(snakemake):
     context_list = []
     for ctx in contexts_96:
         sample_prop = float(sample_df.loc[sample_df["Context"]==ctx, "Proportion"].iloc[0])
-        ref_prop = float(nanoseq_df.loc[nanoseq_df["Context"]==ctx, "Proportion"].iloc[0])
+        ref_prop = float(reference_tri_contexts_df.loc[reference_tri_contexts_df["Context"]==ctx, "Proportion"].iloc[0])
         context_list.append({
             "context": ctx,
             "sample_proportion": round(sample_prop, 6),
-            "nanoseq_proportion": round(ref_prop, 6),
+            "reference_tri_contexts_proportion": round(ref_prop, 6),
             "abs_diff": round(abs(sample_prop - ref_prop), 6)
         })
 
@@ -149,9 +141,10 @@ def main(snakemake):
 
     output_data = {
         "description": (
-            "Cosine similarity for trinucleotide context compared to NanoSeq granulocyte reference data."
+            "Cosine similarity for trinucleotide context compared to reference trinucleotide contexts."
         ),
         "sample": sample,
+        "reference_tri_contexts": str(reference_tri_contexts_path),
         "cosine_similarity_score": cosine_sim,
         "contexts": context_list
     }
@@ -165,7 +158,7 @@ def main(snakemake):
     width = 0.4
     fig, ax = plt.subplots(figsize=(20,6))
     ax.bar(x - width/2, sample_df["Proportion"], width, label=sample)
-    ax.bar(x + width/2, nanoseq_df["Proportion"], width, label="NanoSeq")
+    ax.bar(x + width/2, reference_tri_contexts_df["Proportion"], width, label="Reference contexts")
     ax.set_xticks(x)
     ax.set_xticklabels(contexts_96, rotation=90, fontsize=6)
     ax.set_ylabel("Proportion")

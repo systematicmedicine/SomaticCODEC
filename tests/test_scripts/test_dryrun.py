@@ -72,7 +72,7 @@ def test_snakemake_dryrun():
         config_data = yaml.safe_load(f)
     config_data["experiment"]["name"] = "dryrun"
     config_data["files"]["reference"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    config_data["files"]["common_masks"] = [
+    config_data["files"]["precomputed_masks"] = [
     "tmp/downloads/GRCh38_alldifficultregions_10lines.bed",
     "tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed",
     "tmp/downloads/GCRh38_repeat_masker_10lines.bed"]

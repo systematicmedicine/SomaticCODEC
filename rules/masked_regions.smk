@@ -100,7 +100,7 @@ rule ms_germline_variants_mask:
 # Combines all masks into a single BED file
 rule combine_masks:
     input:
-        common_masks = expand("{mask}", mask=config["files"]["common_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
         non_variant_calling_bed = rules.mask_non_variant_calling_chroms.output.bed,
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
@@ -119,7 +119,7 @@ rule combine_masks:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        cat {input.common_masks} \
+        cat {input.precomputed_masks} \
         {input.non_variant_calling_bed} \
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \

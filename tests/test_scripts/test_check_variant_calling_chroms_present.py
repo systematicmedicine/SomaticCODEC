@@ -61,7 +61,7 @@ def test_check_variant_calling_chroms_present(tmp_path, fai_path, bed_path, chro
     class FakeSnakemake:
         input = SimpleNamespace(
             fai=str(fai_file),
-            common_masks=[str(bed_file)]
+            precomputed_masks=[str(bed_file)]
         )
         output = [str(done_file)]
         params = SimpleNamespace(
