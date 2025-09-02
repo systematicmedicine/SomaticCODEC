@@ -19,21 +19,24 @@ import tempfile
 # Deletes all files from metrics, results, logs, tmp and .snakemake directories
 def clean_workspace():
     for folder in ["metrics", "results", "tmp", "logs", ".snakemake"]:
-        path = Path(folder)
-        # Skip if folder doesn't exist
-        if not path.exists():
+        root = Path(folder)
+        if not root.exists():
             continue
-        for item in path.rglob("*"):
-            try:
-                # Skip .gitkeep files
-                if item.is_file() and item.name != ".gitkeep":
-                    item.unlink()
-                elif item.is_dir():
-                    # Only remove directories if empty
-                    if not any(f.name != ".gitkeep" for f in item.iterdir()):
-                        item.rmdir()
-            except FileNotFoundError:
-                pass
+        # Delete all files except .gitkeep
+        for file in root.rglob("*"):
+            if file.is_file() and file.name != ".gitkeep":
+                try:
+                    file.unlink()
+                except FileNotFoundError:
+                    pass
+        # Remove directories that do not contain .gitkeep
+        for dir_path in sorted(root.rglob("*"), key=lambda p: len(p.parts), reverse=True):
+            if dir_path.is_dir():
+                if not any(f.name == ".gitkeep" for f in dir_path.iterdir()):
+                    try:
+                        shutil.rmtree(dir_path)
+                    except FileNotFoundError:
+                        pass
 
     # Delete .pytest_cache
     pytest_cache = Path(".pytest_cache")
