@@ -506,7 +506,7 @@ rule ex_germline_contamination:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
         germline_matches = "metrics/{ex_sample}/{ex_sample}_germline_matches.vcf",
-        metrics_file = "metrics/{ex_sample}/{ex_sample}_germline_matches.json"
+        metrics_file = "metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json"
     log:
         "logs/{ex_sample}/ex_germline_contamination.log"
     benchmark:

@@ -221,7 +221,7 @@ assess_metric <- function(metric) {
 # Create metrics heatmap
 # ---------------------------------------------------------------------------
 
-plot_metric_heatmap <- function(df, title = "Metric Grades Heatmap") {
+plot_metric_heatmap <- function(df, title) {
   library(ggplot2)
   library(dplyr)
 
@@ -232,7 +232,9 @@ plot_metric_heatmap <- function(df, title = "Metric Grades Heatmap") {
 
   exp_name <- CONFIG$experiment$name
   date <- format(Sys.Date(), "%Y-%m-%d")
-  subtitle <- paste0(exp_name, ", ", date)
+  pipeline_version <- fromJSON("logs/pipeline/git_metadata.json")$git_tag
+  title <- paste0(exp_name, "metrics")
+  subtitle <- paste0(date, ", ", pipeline_version)
 
   df <- df %>%
     mutate(
