@@ -130,7 +130,16 @@ rules:
     quality_cutoff: 20
 
   ms_candidate_germ_variants:
-    memory_limit_gb: 32
+    base_quality_score_threshold: 18
+    heterozygosity_rate: 0.001
+    heterozygosity_stdev: 0.01
+    indel_heterozygosity: 1.25e-4
+    min_base_quality_score: 10
+    max_alternate_alleles: 6
+    standard_min_confidence_threshold: 20 # Default is 30
+
+  ms_filter_fastq:
+    min_read_length: 100
 
   ms_low_depth_mask:
     threshold: 40
@@ -149,11 +158,16 @@ rules:
     unpaired_read_penalty: 9
     z_dropoff: 100
 
-  ms_filter_fastq:
-    min_read_length: 100
+  ms_remove_duplicates:
+    edit_distance_threshold: 1
+    method: directional
+    min_mapping_quality: 0
+    soft_clip_threshold: 4
 
   ms_trim_fastq:
     adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
     adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+    max_error_rate: 0.1
+    min_overlap: 3
     spacer_length: 3
     qual_trim_threshold: 20 # Trims low quality bases from 3' end of read

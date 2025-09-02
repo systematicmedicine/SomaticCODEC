@@ -110,7 +110,16 @@ rule ms_remove_duplicates:
         bam = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam"),
         bai = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"),
         dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt",
+        edit_distance_metrics = "metrics/{ms_sample}/{ms_sample}_umi_edit_distances.txt",
+        umi_counts = "metrics/{ms_sample}/{ms_sample}_umi_counts.txt",
+        umi_counts_per_position = "metrics/{ms_sample}/{ms_sample}_umi_counts_per_position.txt",
         intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam")
+    params:
+        prefix = "metrics/{ms_sample}/{ms_sample}",
+        edit_distance_threshold = config["rules"]["ms_remove_duplicates"]["edit_distance_threshold"],
+        method = config["rules"]["ms_remove_duplicates"]["method"],
+        min_mapping_quality = config["rules"]["ms_remove_duplicates"]["min_mapping_quality"],
+        soft_clip_threshold = config["rules"]["ms_remove_duplicates"]["soft_clip_threshold"]
     log:
         "logs/{ms_sample}/ms_remove_duplicates.log"
     benchmark:
@@ -125,9 +134,18 @@ rule ms_remove_duplicates:
             --extract-umi-method=read_id \
             --umi-separator=":" \
             --paired \
+            --edit-distance-threshold={params.edit_distance_threshold} \
+            --method={params.method} \
+            --mapping-quality={params.min_mapping_quality} \
+            --soft-clip-threshold={params.soft_clip_threshold} \
             --stdin {input.bam} \
             --stdout {output.intermediate_unsorted} \
-            --log={output.dedup_metrics} 2>> {log}
+            --log={output.dedup_metrics} \
+            --output-stats={params.prefix} 2>> {log}
+
+        mv {params.prefix}_edit_distance.tsv {output.edit_distance_metrics}
+        mv {params.prefix}_per_umi_per_position.tsv {output.umi_counts}
+        mv {params.prefix}_per_umi.tsv {output.umi_counts_per_position}
 
         samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
 

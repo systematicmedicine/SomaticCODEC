@@ -24,7 +24,14 @@ rule ms_candidate_germ_variants:
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
     params:
-        included_chromosomes="-L " + " -L ".join(config["chroms"]["included_chromosomes"])
+        included_chromosomes = " -L ".join(config["chroms"]["included_chromosomes"]),
+        base_quality_score_threshold = config["rules"]["ms_candidate_germ_variants"]["base_quality_score_threshold"],
+        heterozygosity_rate = config["rules"]["ms_candidate_germ_variants"]["heterozygosity_rate"],
+        heterozygosity_stdev = config["rules"]["ms_candidate_germ_variants"]["heterozygosity_stdev"],
+        indel_heterozygosity = config["rules"]["ms_candidate_germ_variants"]["indel_heterozygosity"],
+        min_base_quality_score = config["rules"]["ms_candidate_germ_variants"]["min_base_quality_score"],
+        max_alternate_alleles = config["rules"]["ms_candidate_germ_variants"]["max_alternate_alleles"],
+        standard_min_confidence_threshold = config["rules"]["ms_candidate_germ_variants"]["standard_min_confidence_threshold"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     log:
@@ -41,7 +48,13 @@ rule ms_candidate_germ_variants:
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            {params.included_chromosomes} \
+            -L {params.included_chromosomes} \
             --native-pair-hmm-threads {threads} \
-            --standard-min-confidence-threshold-for-calling 20 2>> {log}
+            --base-quality-score-threshold {params.base_quality_score_threshold} \
+            --heterozygosity {params.heterozygosity_rate} \
+            --heterozygosity-stdev {params.heterozygosity_stdev} \
+            --indel-heterozygosity {params.indel_heterozygosity} \
+            --min-base-quality-score {params.min_base_quality_score} \
+            --max-alternate-alleles {params.max_alternate_alleles} \
+            --stand-call-conf {params.standard_min_confidence_threshold} 2>> {log}
         """
