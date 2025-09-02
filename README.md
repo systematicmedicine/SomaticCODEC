@@ -44,7 +44,7 @@ python3 scripts/download_S3toEC2.py
 ```
 * Start background system resource monitoring (optional)
 ```
-./scripts/monitor_system_resources.sh
+./scripts/monitor_system_resources.sh &
 ``` 
 * Run pipeline
 ```
