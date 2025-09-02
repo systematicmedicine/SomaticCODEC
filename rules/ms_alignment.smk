@@ -143,9 +143,9 @@ rule ms_remove_duplicates:
             --log={output.dedup_metrics} \
             --output-stats={params.prefix} 2>> {log}
 
-        mv {params.prefix}_edit_distance.tsv {output.edit_distance_metrics}
-        mv {params.prefix}_per_umi_per_position.tsv {output.umi_counts}
-        mv {params.prefix}_per_umi.tsv {output.umi_counts_per_position}
+        mv {params.prefix}_edit_distance.tsv {output.edit_distance_metrics} 2>> {log}
+        mv {params.prefix}_per_umi_per_position.tsv {output.umi_counts} 2>> {log}
+        mv {params.prefix}_per_umi.tsv {output.umi_counts_per_position} 2>> {log}
 
         samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
 
