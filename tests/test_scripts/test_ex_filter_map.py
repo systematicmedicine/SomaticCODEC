@@ -13,8 +13,8 @@ import sys
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from scripts.get_metadata import load_config, get_ex_sample_ids
-from tests.utils.bam_utils import count_bam_data_points
+from helpers.get_metadata import load_config, get_ex_sample_ids
+from helpers.bam_helpers import count_bam_data_points
 
 # Test that filtered read count is not greater than aligned read count
 def test_filtered_reads_less_than_aligned_reads(lightweight_test_run):

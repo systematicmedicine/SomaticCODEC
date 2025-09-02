@@ -40,7 +40,7 @@ sudo docker run -it --name codec-container -v "$PWD":/work -w /work codec-image
 * Download FASTQ and reference files
 ```
 # If your files are stored elswhere, a different method may be used
-python3 utils/download_S3toEC2.py
+python3 scripts/download_S3toEC2.py
 ```
 
 * Run pipeline
@@ -61,7 +61,7 @@ snakemake --configfile config/config.yaml --report report.html
 
 * After pipeline has run sucessfully, create single file of outputs (optional)
 ```
-python3 utils/tar_output.py
+python3 scripts/tar_output.py
 ```
 * If using EC2, don't forget to shut down your instance
 

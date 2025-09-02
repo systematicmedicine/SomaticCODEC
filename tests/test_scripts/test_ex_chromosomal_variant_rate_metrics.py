@@ -8,9 +8,15 @@ Authors:
     - Joshua Johnstone
 """
 import json
-from scripts.ex_chromosomal_variant_rate_metrics import main
 import pytest
 import os
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from scripts.ex_chromosomal_variant_rate_metrics import main
 
 @pytest.mark.parametrize("vcf_path, expected_gini", [
     ("tests/data/test_ex_chromosomal_variant_rate_metrics/gini_0.vcf", 0.0),

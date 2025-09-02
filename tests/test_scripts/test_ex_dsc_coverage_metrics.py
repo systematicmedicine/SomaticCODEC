@@ -9,10 +9,16 @@ Authors:
 """
 import pytest
 import json
-from scripts.ex_dsc_coverage_metrics import main
 from types import SimpleNamespace
 from unittest.mock import patch, MagicMock
 import io
+from pathlib import Path
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from scripts.ex_dsc_coverage_metrics import main
 
 @pytest.mark.parametrize("ms_depth_path, include_bed_path, ex_dsc_depth_path, ref_fai_path, expected_values", [
     # Typical input

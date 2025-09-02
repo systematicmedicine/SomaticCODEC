@@ -18,7 +18,7 @@ Authors:
     - Cameron Fraser
 """
 
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 # Creates a mask for genomic positions with low ms read depth
 rule ms_low_depth_mask:

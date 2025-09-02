@@ -9,7 +9,7 @@ Authors:
 """
 import subprocess
 import pysam
-from scripts.get_metadata import load_config
+from helpers.get_metadata import load_config
 
 # Counts the number of reads in a BAM file
 def count_bam_data_points(path):
@@ -68,3 +68,13 @@ def count_reads_with_read_group(bam_path):
                 if read.has_tag("RG"):
                     reads_with_rg += 1
     return reads_with_rg
+
+# Returns the first n lines of a BAM file
+def print_bam_first_n_lines(path, n_lines):
+    lines = []
+    with pysam.AlignmentFile(path, "rb") as bam:
+        for i, read in enumerate(bam):
+            if i >= n_lines:
+                break
+            lines.append(str(read).rstrip())
+    return "\n".join(lines)

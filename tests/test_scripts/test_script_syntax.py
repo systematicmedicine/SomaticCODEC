@@ -30,7 +30,7 @@ EXEMPT_FILES = {".gitkeep"}
 project_root = Path(__file__).resolve().parent.parent.parent
 check_dirs = [
     project_root / "scripts",
-    project_root / "utils",
+    project_root / "helpers",
     project_root / "tests/test_scripts"
 ]
 

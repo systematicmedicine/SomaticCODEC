@@ -10,7 +10,7 @@ Authors:
 """
 
 # Import modules
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 
 """

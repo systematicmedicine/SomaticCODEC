@@ -10,6 +10,12 @@ Authors:
 import json
 import pytest
 import os
+from pathlib import Path
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 from scripts.ex_duplication_metrics import main
 
 @pytest.mark.parametrize("hist_path, expected_dup_rate, expected_pct_unique", [
