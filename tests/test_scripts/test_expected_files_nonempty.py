@@ -15,9 +15,12 @@ Authors:
 import sys
 import pytest
 from pathlib import Path
-from scripts.get_metadata import load_config, get_ms_sample_ids, get_ex_lane_ids, get_ex_sample_ids
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from utils.count_data_points import count_data_points
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from helpers.get_metadata import load_config, get_ms_sample_ids, get_ex_lane_ids, get_ex_sample_ids
+from helpers.count_data_points import count_data_points
 
 pytestmark = pytest.mark.order(7)
 

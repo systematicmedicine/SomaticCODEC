@@ -14,8 +14,8 @@ import sys
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from tests.utils.bam_utils import count_bam_data_points, count_bam_reads_under_min_mapq
-from scripts.get_metadata import load_config
+from helpers.bam_helpers import count_bam_data_points, count_bam_reads_under_min_mapq
+from helpers.get_metadata import load_config
 
 # Test that read count decreases due to filtering
 def test_reads_decrease(lightweight_test_run):

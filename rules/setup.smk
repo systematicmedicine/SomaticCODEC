@@ -25,6 +25,48 @@ rule check_ex_ms_mapping:
         "../scripts/check_ex_ms_mapping.py"
 
 
+# Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
+rule check_included_chromosomes_present:
+    input:
+        fai = config["files"]["reference_genome"] + ".fai",
+        precomputed_masks = config["files"]["precomputed_masks"]
+    output:
+        "logs/pipeline/check_included_chromosomes_present.done"
+    params:
+        included_chromosomes = config["chroms"]["included_chromosomes"]
+    log:
+        "logs/pipeline/check_included_chromosomes_present.log"
+    benchmark:
+        "logs/pipeline/check_included_chromosomes_present.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/check_included_chromosomes_present.py"
+
+
+# Creates a mask for chromosomes that will be excluded for variant calling 
+    # e.g. chrUn, chr*_random, chrM, chrEBV
+rule mask_excluded_chromosomes:
+    input:
+        fai = config["files"]["reference_genome"] + ".fai",
+    output:
+        bed = temp("tmp/downloads/excluded_chromosomes.bed")
+    params:
+        included_chromosomes = config["chroms"]["included_chromosomes"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    run:
+        # Define chromosomes included for variant calling
+        included_chromosomes = set(params.included_chromosomes)
+
+        # Load the .fai and filter
+        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
+            for line in fai_in:
+                chrom, length, *_ = line.strip().split("\t")
+                if chrom not in included_chromosomes:
+                    bed_out.write(f"{chrom}\t0\t{length}\n")
+
+
 # Creates index files from reference genome
 rule bwamem_index_files:
     input:
@@ -47,48 +89,6 @@ rule bwamem_index_files:
         """
         bwa-mem2 index {input.reference} 2>> {log}
         """
-    
-
-# Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
-rule check_included_chromosomes_present:
-    input:
-        fai = config["files"]["reference_genome"] + ".fai",
-        precomputed_masks = config["files"]["precomputed_masks"]
-    output:
-        "logs/pipeline/check_included_chromosomes_present.done"
-    params:
-        included_chromosomes = config["chroms"]["included_chromosomes"]
-    log:
-        "logs/pipeline/check_included_chromosomes_present.log"
-    benchmark:
-        "logs/pipeline/check_included_chromosomes_present.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    script:
-        "../scripts/check_included_chromosomes_present.py"
-
-
-# Creates a mask for chromosomes that will not be used in variant calling 
-    # e.g. chrUn, chr*_random, chrM, chrEBV
-rule mask_excluded_chromosomes:
-    input:
-        fai = config["files"]["reference_genome"] + ".fai",
-    output:
-        bed = temp("tmp/downloads/excluded_chromosomes.bed")
-    params:
-        included_chromosomes = config["chroms"]["included_chromosomes"]
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    run:
-        # Define chromosomes included for variant calling
-        included_chromosomes = set(params.included_chromosomes)
-
-        # Load the .fai and filter
-        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
-            for line in fai_in:
-                chrom, length, *_ = line.strip().split("\t")
-                if chrom not in included_chromosomes:
-                    bed_out.write(f"{chrom}\t0\t{length}\n")
 
 
 # Creates reference .fai file

@@ -13,8 +13,14 @@ from unittest.mock import patch, MagicMock
 import tempfile
 import json
 import os
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 from scripts.ex_dsc_remap_metrics import main
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 
 @pytest.mark.parametrize(

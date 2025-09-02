@@ -17,3 +17,13 @@ def count_tabular_data_points(path):
             if line and not line.startswith("#"):
                 count += 1
     return count
+
+# Prints the first n lines of a tabular file
+def print_tabular_first_n_lines(path, n_lines):
+    lines = []
+    with open(path, "r") as f:
+        for i, line in enumerate(f):
+            if i >= n_lines:
+                break
+            lines.append(line.rstrip())
+    return "\n".join(lines)

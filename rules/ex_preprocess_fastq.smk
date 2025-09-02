@@ -11,7 +11,7 @@ Authors:
     - Cameron Fraser
 """
 
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 """
 Moves the read pair UMI to readname
