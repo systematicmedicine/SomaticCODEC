@@ -22,16 +22,16 @@ def clean_workspace():
         path = Path(folder)
         # Skip if folder doesn't exist
         if not path.exists():
-            continue  
-        for item in path.iterdir():
-            if item.name == ".gitkeep":
-                continue
+            continue
+        for item in path.rglob("*"):
             try:
-                if item.is_dir():
-                    shutil.rmtree(item)
-                else:
+                # Skip .gitkeep files
+                if item.is_file() and item.name != ".gitkeep":
                     item.unlink()
-            # Skip if item already deleted or missing
+                elif item.is_dir():
+                    # Only remove directories if empty
+                    if not any(f.name != ".gitkeep" for f in item.iterdir()):
+                        item.rmdir()
             except FileNotFoundError:
                 pass
 
