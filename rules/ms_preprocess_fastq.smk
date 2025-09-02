@@ -38,7 +38,9 @@ rule ms_trim_fastq:
         adaptor_1 = config["rules"]["ms_trim_fastq"]["adaptor_1"],
         adaptor_2 = config["rules"]["ms_trim_fastq"]["adaptor_2"],
         spacer_length = config["rules"]["ms_trim_fastq"]["spacer_length"],
-        qual_trim_threshold = config["rules"]["ms_trim_fastq"]["qual_trim_threshold"]
+        qual_trim_threshold = config["rules"]["ms_trim_fastq"]["qual_trim_threshold"],
+        max_error_rate = config["rules"]["ms_trim_fastq"]["max_error_rate"],
+        min_overlap = config["rules"]["ms_trim_fastq"]["min_overlap"]
     log:
         "logs/{ms_sample}/ms_trim_fastq.log"
     benchmark:
@@ -66,6 +68,8 @@ rule ms_trim_fastq:
             -a "G{{10}}" \
             -A "G{{10}}" \
             --quality-cutoff {params.qual_trim_threshold} \
+            -e {params.max_error_rate} \
+            -O {params.min_overlap} \
             -o {output.r1} \
             -p {output.r2} \
             {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \

@@ -17,6 +17,9 @@ metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json
 metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json
 metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt
+metrics/{ms_sample}/{ms_sample}_umi_edit_distances.txt
+metrics/{ms_sample}/{ms_sample}_umi_counts.txt
+metrics/{ms_sample}/{ms_sample}_umi_counts_per_position.txt
 metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json
 metrics/{ms_sample}/{ms_sample}_alignment_stats.txt
 metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt
