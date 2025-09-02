@@ -8,9 +8,14 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-from scripts.get_metadata import load_config, get_ms_sample_ids
-from utils.bam_utils import count_bam_data_points
-from utils.fastq_utils import count_fastq_data_points
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from helpers.get_metadata import load_config, get_ms_sample_ids
+from helpers.bam_helpers import count_bam_data_points
+from helpers.fastq_helpers import count_fastq_data_points
 
 # Test that aligned read count is not greater than input read count
 def test_aligned_reads_less_than_input_reads(lightweight_test_run):

@@ -12,6 +12,12 @@ from unittest.mock import patch, MagicMock
 import tempfile
 import json
 import os
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 from scripts.ex_call_dsc_metrics import main
 
 @pytest.mark.parametrize("pre_out, post_out, expected, expect_error", [

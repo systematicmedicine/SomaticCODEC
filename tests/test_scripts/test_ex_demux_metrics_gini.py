@@ -8,9 +8,15 @@ Authors:
     - Joshua Johnstone
 """
 import json
-from scripts.ex_demux_counts_and_gini import main
 import pytest
 import os
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from scripts.ex_demux_counts_and_gini import main
 
 @pytest.mark.parametrize("demux_path, expected_gini", [
     ("tests/data/test_ex_demux_metrics_gini/demux_metrics_gini_0.txt", 0.0),

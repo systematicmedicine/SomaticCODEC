@@ -36,3 +36,13 @@ def merge_bed_intervals(df):
 def read_bed(path):
     df = pd.read_csv(path, sep="\t", header=None, usecols=[0, 1, 2], names=["chrom", "start", "end"])
     return df.reset_index(drop=True)
+
+# Returns the first n lines of a BED file
+def print_bed_first_n_lines(path, n_lines):
+    lines = []
+    with open(path, "r") as f:
+        for i, line in enumerate(f):
+            if i >= n_lines:
+                break
+            lines.append(line.rstrip())
+    return "\n".join(lines)

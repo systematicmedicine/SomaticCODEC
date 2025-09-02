@@ -10,6 +10,12 @@ Authors:
 import pytest
 import json
 from unittest.mock import patch
+from pathlib import Path
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 from scripts.ex_total_read_loss import main
 
 @pytest.mark.parametrize(

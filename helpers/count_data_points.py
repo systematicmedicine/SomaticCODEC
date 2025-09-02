@@ -9,14 +9,14 @@ Authors:
 
 """
 from pathlib import Path
-from tests.utils.fastq_utils import count_fastq_data_points
-from tests.utils.vcf_utils import count_vcf_data_points
-from tests.utils.bed_utils import count_bed_data_points
-from tests.utils.tabular_utils import count_tabular_data_points
-from tests.utils.bam_utils import count_bam_data_points
-from tests.utils.sam_utils import count_sam_data_points
-from tests.utils.bcf_utils import count_bcf_data_points
-from tests.utils.fasta_utils import count_fasta_data_points
+from helpers.fastq_helpers import count_fastq_data_points
+from helpers.vcf_helpers import count_vcf_data_points
+from helpers.bed_helpers import count_bed_data_points
+from helpers.tabular_helpers import count_tabular_data_points
+from helpers.bam_helpers import count_bam_data_points
+from helpers.sam_helpers import count_sam_data_points
+from helpers.bcf_helpers import count_bcf_data_points
+from helpers.fasta_helpers import count_fasta_data_points
 
 # Calls the appropriate data counting function based on file suffix
 def count_data_points(path):
@@ -49,4 +49,4 @@ def count_data_points(path):
         return count_fasta_data_points(path)
     
     else:
-        raise ValueError(f"Unsupported file type for data point counting: {path.suffix}")
+        return (f"Unsupported file type for data point counting: {path.suffix}")

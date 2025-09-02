@@ -31,7 +31,7 @@ Authors:
 
 # Load libraries
 import os
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 # Set working directory
 os.chdir(workflow.basedir)
@@ -46,8 +46,20 @@ ex_sample_ids = md.get_ex_sample_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
 # Define setup files
-setup = [
-    "logs/pipeline/check_ex_ms_mapping.done"
+setup_files = [
+    "logs/pipeline/check_ex_ms_mapping.done",
+    config["files"]["reference_genome"] + ".amb",
+    config["files"]["reference_genome"] + ".ann",
+    config["files"]["reference_genome"] + ".bwt.2bit.64",
+    config["files"]["reference_genome"] + ".pac",
+    config["files"]["reference_genome"] + ".0123",
+    "logs/pipeline/check_included_chromosomes_present.done",
+    "tmp/downloads/excluded_chromosomes.bed",
+    config["files"]["reference_genome"] + ".fai",
+    os.path.splitext(config["files"]["reference_genome"])[0] + ".dict",
+    expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", 
+    ex_lane = md.get_ex_lane_ids(config), 
+    region = ["r1_start", "r1_end", "r2_start", "r2_end"])
 ]
 
 # Define results
@@ -72,7 +84,6 @@ ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_read_counts.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_total_read_loss.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
@@ -95,9 +106,8 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trinucleotide_context_histogram.pdf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_read_counts.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_germline_matches.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
     "metrics/batch/batch_recurrent_variant_metrics.json"
 ]
 
@@ -116,6 +126,9 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_umi_edit_distances.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_umi_counts.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_umi_counts_per_position.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample_ids),
@@ -126,8 +139,7 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_read_counts.json", ms_sample = ms_sample_ids)
+    expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json", ms_sample = ms_sample_ids)
 ]
 
 # Define other metrics
@@ -135,14 +147,13 @@ other_metrics = [
     "logs/pipeline/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
-    "logs/pipeline/combined_benchmarks.csv",
-    "logs/pipeline/disk_usage.txt"
+    "logs/pipeline/combined_benchmarks.csv"
 ]
 
 # Define rule all
 rule all:
     input:
-        setup + results + ex_metrics + ms_metrics + other_metrics
+        setup_files + results + ex_metrics + ms_metrics + other_metrics
 
 
 # ---------------------------------------------------------------------------------------------

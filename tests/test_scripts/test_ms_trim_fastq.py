@@ -13,9 +13,12 @@ Authors:
 # Import modules
 from pathlib import Path
 import sys
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # Add PROJECT_ROOT to path
-from scripts.get_metadata import load_config, get_ms_sample_fastqs
-from utils.fastq_utils import count_fastq_data_points, sum_len_fastq
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from helpers.get_metadata import load_config, get_ms_sample_fastqs
+from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
 
 
 # Test that the total number of reads does not change

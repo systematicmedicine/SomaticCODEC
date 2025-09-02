@@ -40,16 +40,28 @@ sudo docker run -it --name codec-container -v "$PWD":/work -w /work codec-image
 * Download FASTQ and reference files
 ```
 # If your files are stored elswhere, a different method may be used
-python3 utils/download_S3toEC2.py
+python3 scripts/download_S3toEC2.py
 ```
-
+* Start background system resource monitoring (optional)
+```
+./scripts/monitor_system_resources.sh
+``` 
 * Run pipeline
 ```
 # Dry-run
 snakemake --configfile config/config.yaml --cores all --dryrun
 
 # Run pipeline
-./run_pipeline.sh
+snakemake \
+    --snakefile Snakefile \
+    --configfile config/config.yaml \
+    --cores all \
+    --resources memory=370 \
+    --notemp \
+    --keep-going \
+    --reason \
+    --stats logs/pipeline/pipeline_stats.json \
+    2>&1 | tee logs/pipeline/pipeline_run_$(date +%Y%m%d).log
 
 # Generate report
 snakemake --configfile config/config.yaml --report report.html
@@ -58,10 +70,11 @@ snakemake --configfile config/config.yaml --report report.html
     * Disconnect: Ctrl + b, d
     * List sessions: tmux ls
     * Reconnect: tmux attach -t <I>session name</I>
+    * Enable scrolling: Ctrl + b, Shift + :, set -g mouse on, Enter
 
 * After pipeline has run sucessfully, create single file of outputs (optional)
 ```
-python3 utils/tar_output.py
+python3 scripts/tar_output.py
 ```
 * If using EC2, don't forget to shut down your instance
 

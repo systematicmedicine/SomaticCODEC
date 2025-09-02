@@ -10,7 +10,7 @@ Authors:
 """
 
 # Import modules
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 
 """
@@ -18,9 +18,8 @@ FastQC on raw fastq files (before demultiplexing or any processing)
 """
 rule ex_fastqcraw_metrics:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ex_lanes = config["files"]["ex_lanes"],
+        setup_files = setup_files,
+        ex_lanes = config["files"]["ex_lanes_metadata"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
@@ -354,7 +353,7 @@ rule ex_dsc_coverage_metrics:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
         ),
-        fai = config["files"]["reference"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
@@ -402,8 +401,8 @@ Calculate 96 trinucleotide contexts for called somatic mutations
 rule ex_trinucleotide_context_metrics:
     input:
         vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        nanoseq_contexts = config["files"]["ex_nanoseq_tri_contexts"],
-        ref = config["files"]["reference"]
+        reference_tri_contexts = config["files"]["reference_tri_contexts"],
+        ref = config["files"]["reference_genome"]
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json",
         pdf = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_histogram.pdf"
@@ -465,7 +464,7 @@ Compares variant rate between chromosomes
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        fai = config["files"]["reference"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     log:
@@ -507,7 +506,7 @@ rule ex_germline_contamination:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
         germline_matches = "metrics/{ex_sample}/{ex_sample}_germline_matches.vcf",
-        metrics_file = "metrics/{ex_sample}/{ex_sample}_germline_matches.json"
+        metrics_file = "metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json"
     log:
         "logs/{ex_sample}/ex_germline_contamination.log"
     benchmark:

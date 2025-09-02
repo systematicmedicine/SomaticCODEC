@@ -16,8 +16,8 @@ project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from tests.test_scripts.test_generate_include_bed import read_bed
-from scripts.get_metadata import load_config, get_ms_sample_ids
-from tests.utils.bed_utils import merge_bed_intervals
+from helpers.get_metadata import load_config, get_ms_sample_ids
+from helpers.bed_helpers import merge_bed_intervals
 
 # Assert that combined BED matches expected merge of individual beds
 def assert_correctly_merged(ms_sample):
@@ -63,8 +63,8 @@ def assert_combined_bed_order_matches_ref(ms_sample):
 
     # Load reference fai file and get chromosome order as a list
     config = load_config("config/config.yaml")
-    config["files"]["reference"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    fai_path = config["files"]["reference"] + ".fai"
+    config["files"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
+    fai_path = config["files"]["reference_genome"] + ".fai"
     fai_df = pd.read_csv(fai_path, sep="\t", header=None, usecols=[0], names=["chrom"])
     fai_chrom_order = fai_df["chrom"].tolist()
 

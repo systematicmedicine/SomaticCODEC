@@ -17,7 +17,7 @@ Returns a list of ex sample ids
 """
 def get_ex_sample_ids(config):
     metadata = load_metadata(config)
-    return metadata["ex_samples"]["ex_sample"].dropna().unique().tolist()
+    return metadata["ex_samples_metadata"]["ex_sample"].dropna().unique().tolist()
 
 
 """ 
@@ -25,7 +25,7 @@ Returns a list of ex lane ids
 """
 def get_ex_lane_ids(config):
     metadata = load_metadata(config)
-    return metadata["ex_lanes"]["ex_lane"].dropna().unique().tolist()
+    return metadata["ex_lanes_metadata"]["ex_lane"].dropna().unique().tolist()
 
 
 """ 
@@ -33,7 +33,7 @@ Returns a list of ms sample ids
 """
 def get_ms_sample_ids(config):
     metadata = load_metadata(config)
-    return metadata["ms_samples"]["ms_sample"].dropna().unique().tolist()
+    return metadata["ms_samples_metadata"]["ms_sample"].dropna().unique().tolist()
 
 
 """ 
@@ -42,8 +42,8 @@ Returns a nested dictionary mapping ex_lane, ex_sample and region to an adapter 
 """
 def get_ex_lane_adapter_dict(config):
     metadata = load_metadata(config)
-    ex_samples = metadata["ex_samples"]
-    ex_adapters = metadata["ex_adapters"].set_index("ex_adapter")
+    ex_samples = metadata["ex_samples_metadata"]
+    ex_adapters = metadata["ex_adapters_metadata"].set_index("ex_adapter")
 
     nested_dict = {}
 
@@ -70,8 +70,8 @@ Returns a nested dictionary mapping ex_sample and region to an adapter sequence
 def get_ex_sample_adapter_dict(config):
     metadata = load_metadata(config)
 
-    ex_samples = metadata["ex_samples"]
-    ex_adapters = metadata["ex_adapters"]
+    ex_samples = metadata["ex_samples_metadata"]
+    ex_adapters = metadata["ex_adapters_metadata"]
 
     # Merge ex_samples with adapter sequences using the adapter name
     merged = ex_samples[["ex_sample", "ex_adapter"]].merge(
@@ -100,7 +100,7 @@ Returns a dictionary mapping ex_lane to FASTQ file paths
 """
 def get_ex_lane_fastqs(config):
     metadata = load_metadata(config)
-    df = metadata["ex_lanes"]
+    df = metadata["ex_lanes_metadata"]
     return {
         row["ex_lane"]: (row["fastq1"], row["fastq2"])
         for _, row in df.iterrows()
@@ -113,7 +113,7 @@ Returns a dictionary mapping ex_lane to ex_sample
 """
 def get_ex_lane_samples(config):
     metadata = load_metadata(config)
-    df = metadata["ex_samples"]
+    df = metadata["ex_samples_metadata"]
 
     return (
         df.groupby("ex_lane")["ex_sample"]
@@ -127,7 +127,7 @@ Returns a dictionary mapping ex_sample to its corresponding ms_sample
     dict[ex_sample] -> ms_sample
 """
 def get_ex_to_ms_sample_map(config):
-    df = load_metadata(config)["ex_samples"]
+    df = load_metadata(config)["ex_samples_metadata"]
     return dict(zip(df["ex_sample"], df["ms_sample"]))
 
 
@@ -136,7 +136,7 @@ Returns a dictionary mapping ex_sample to its corresponding donor_id
     dict[ex_sample] -> donor_id
 """
 def get_ex_to_donor_id_map(config):
-    df = load_metadata(config)["ex_samples"]
+    df = load_metadata(config)["ex_samples_metadata"]
     return dict(zip(df["ex_sample"], df["donor_id"]))
 
 
@@ -145,7 +145,7 @@ Returns a dictionary mapping ms_sample to its corresponding donor_id
     dict[ms_sample] -> donor_id
 """
 def get_ms_to_donor_id_map(config):
-    df = load_metadata(config)["ms_samples"]
+    df = load_metadata(config)["ms_samples_metadata"]
     return dict(zip(df["ms_sample"], df["donor_id"]))
 
 """
@@ -154,7 +154,7 @@ Returns a dictionary mapping ms_sample to its FASTQ file paths
 """
 def get_ms_sample_fastqs(config):
     metadata = load_metadata(config)
-    df = metadata["ms_samples"]
+    df = metadata["ms_samples_metadata"]
 
     return {
         row["ms_sample"]: (row["fastq1"], row["fastq2"])
@@ -169,10 +169,10 @@ def load_metadata(config):
 
     metadata = {}
 
-    metadata["ex_samples"] = pd.read_csv(config["files"]["ex_samples"])
-    metadata["ms_samples"] = pd.read_csv(config["files"]["ms_samples"])
-    metadata["ex_lanes"] = pd.read_csv(config["files"]["ex_lanes"])
-    metadata["ex_adapters"] = pd.read_csv(config["files"]["ex_adapters"])
+    metadata["ex_samples_metadata"] = pd.read_csv(config["files"]["ex_samples_metadata"])
+    metadata["ms_samples_metadata"] = pd.read_csv(config["files"]["ms_samples_metadata"])
+    metadata["ex_lanes_metadata"] = pd.read_csv(config["files"]["ex_lanes_metadata"])
+    metadata["ex_adapters_metadata"] = pd.read_csv(config["files"]["ex_adapters_metadata"])
 
     return metadata
 
