@@ -107,7 +107,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_trinucleotide_context_histogram.pdf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_germline_matches.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
     "metrics/batch/batch_recurrent_variant_metrics.json"
 ]
 
