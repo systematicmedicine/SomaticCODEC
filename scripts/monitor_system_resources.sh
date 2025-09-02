@@ -13,9 +13,6 @@ set -e
 # Define log file path
 LOG_FILE="${LOG_FILE:-logs/pipeline/system_resource_usage.csv}"
 
-# Ensure log file directory exists
-mkdir -p "$(dirname "$LOG_FILE")"
-
 # Define interval between logs
 SLEEP_INTERVAL="${SLEEP_INTERVAL:-60}"
 
@@ -37,8 +34,4 @@ echo "time,disk_used_GB,disk_avail_GB,mem_used_GB,mem_avail_GB,cpu_load,cpu_avai
         echo "$now,$disk_used_GB,$disk_avail_GB,$mem_used_GB,$mem_avail_GB,$cpu_load,$cpu_avail" >> "$LOG_FILE"
         sleep "$SLEEP_INTERVAL"
     done
-) &
-MONITOR_RESOURCES_PID=$!
-
-# Export the process ID so the caller can trap and kill it
-echo "$MONITOR_RESOURCES_PID"
+)
