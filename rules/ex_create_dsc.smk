@@ -60,12 +60,12 @@ Realign the DSC to the reference genome
 rule ex_remap_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["files"]["reference"],
-        amb = config["files"]["reference"] + ".amb",
-        ann = config["files"]["reference"] + ".ann",
-        bwt = config["files"]["reference"] + ".bwt.2bit.64",
-        pac = config["files"]["reference"] + ".pac",
-        sa = config["files"]["reference"] + ".0123"
+        ref = config["files"]["reference_genome"],
+        amb = config["files"]["reference_genome"] + ".amb",
+        ann = config["files"]["reference_genome"] + ".ann",
+        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["files"]["reference_genome"] + ".pac",
+        sa = config["files"]["reference_genome"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
@@ -127,9 +127,9 @@ rule ex_annotate_dsc:
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["files"]["reference"],
-        fai = config["files"]["reference"] + ".fai",
-        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
+        ref = config["files"]["reference_genome"],
+        fai = config["files"]["reference_genome"] + ".fai",
+        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),

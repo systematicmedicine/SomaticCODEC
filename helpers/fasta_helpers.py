@@ -46,3 +46,14 @@ def check_fasta_structure(path):
         invalid_chars = set(sequence) - valid_bases
         assert not invalid_chars, f"Invalid characters {invalid_chars} in sequence on line {line+2}: {sequence}"
         assert len(sequence) > 0, f"Empty sequence on line {line+2}."
+
+# Returns the first n lines of a FASTA file
+def print_fasta_first_n_lines(path, n_lines):
+    opener = gzip.open if str(path).endswith(".gz") else open
+    lines = []
+    with opener(path, "rt") as f:
+        for i, line in enumerate(f):
+            if i >= n_lines:
+                break
+            lines.append(line.rstrip())
+    return "\n".join(lines)

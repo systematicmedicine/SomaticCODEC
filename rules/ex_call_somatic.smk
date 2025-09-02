@@ -22,7 +22,7 @@ rule ex_call_somatic_snv:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
         bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
-        ref = config["files"]["reference"],
+        ref = config["files"]["reference_genome"],
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
         vcf_all = temp("tmp/{ex_sample}/{ex_sample}_all_positions.vcf"), # Pileup of every unmasked position (except positions where indels present)

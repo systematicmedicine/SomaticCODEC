@@ -15,7 +15,7 @@ import sys
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from tests.utils.fastq_utils import count_fastq_data_points
+from helpers.fastq_helpers import count_fastq_data_points
 
 # Test that filtering decreases the number of reads
 def test_filtering_decreases_reads(lightweight_test_run):

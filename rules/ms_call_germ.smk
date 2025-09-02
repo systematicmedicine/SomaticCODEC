@@ -13,17 +13,25 @@ Author: Ben Barry
 
 """
 
-# Call candidate germline variants (no filtering)
+# Call candidate germline variants
+# - Germline variants are called only on chromosomes defined in config[chroms][included_chromosomes]
 rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
-        ref = config["files"]["reference"],
-        fai = config["files"]["reference"] + ".fai",
-        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
+        ref = config["files"]["reference_genome"],
+        fai = config["files"]["reference_genome"] + ".fai",
+        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
     output:
         vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
     params:
-        variant_calling_chroms="-L " + " -L ".join(config["chroms"]["variant_calling"])
+        included_chromosomes = " -L ".join(config["chroms"]["included_chromosomes"]),
+        base_quality_score_threshold = config["rules"]["ms_candidate_germ_variants"]["base_quality_score_threshold"],
+        heterozygosity_rate = config["rules"]["ms_candidate_germ_variants"]["heterozygosity_rate"],
+        heterozygosity_stdev = config["rules"]["ms_candidate_germ_variants"]["heterozygosity_stdev"],
+        indel_heterozygosity = config["rules"]["ms_candidate_germ_variants"]["indel_heterozygosity"],
+        min_base_quality_score = config["rules"]["ms_candidate_germ_variants"]["min_base_quality_score"],
+        max_alternate_alleles = config["rules"]["ms_candidate_germ_variants"]["max_alternate_alleles"],
+        standard_min_confidence_threshold = config["rules"]["ms_candidate_germ_variants"]["standard_min_confidence_threshold"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     log:
@@ -40,7 +48,13 @@ rule ms_candidate_germ_variants:
             -R {input.ref} \
             -I {input.bam} \
             -O {output.vcf} \
-            {params.variant_calling_chroms} \
+            -L {params.included_chromosomes} \
             --native-pair-hmm-threads {threads} \
-            --standard-min-confidence-threshold-for-calling 20 2>> {log}
+            --base-quality-score-threshold {params.base_quality_score_threshold} \
+            --heterozygosity {params.heterozygosity_rate} \
+            --heterozygosity-stdev {params.heterozygosity_stdev} \
+            --indel-heterozygosity {params.indel_heterozygosity} \
+            --min-base-quality-score {params.min_base_quality_score} \
+            --max-alternate-alleles {params.max_alternate_alleles} \
+            --stand-call-conf {params.standard_min_confidence_threshold} 2>> {log}
         """

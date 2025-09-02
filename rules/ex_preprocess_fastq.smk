@@ -11,7 +11,7 @@ Authors:
     - Cameron Fraser
 """
 
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 """
 Moves the read pair UMI to readname
@@ -21,9 +21,8 @@ Moves the read pair UMI to readname
 """ 
 rule ex_extract_fastq_umis:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ex_lanes = config["files"]["ex_lanes"],
+        setup_files = setup_files,
+        ex_lanes = config["files"]["ex_lanes_metadata"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]
     output:
@@ -59,8 +58,8 @@ Demultiplex each lane FASTQ into sample FASTQs
 """ 
 rule ex_demux_fastq:
     input:
-        ex_lanes = config["files"]["ex_lanes"],
-        ex_samples = config["files"]["ex_samples"],
+        ex_lanes = config["files"]["ex_lanes_metadata"],
+        ex_samples = config["files"]["ex_samples_metadata"],
         fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
         fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
         r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane = md.get_ex_lane_ids(config)),

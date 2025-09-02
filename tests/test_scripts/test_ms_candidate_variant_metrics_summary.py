@@ -10,6 +10,12 @@ Authors:
 import pytest
 import json
 import shutil
+from pathlib import Path
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
 from scripts.ms_candidate_variant_metrics_summary import main
 
 @pytest.mark.parametrize(

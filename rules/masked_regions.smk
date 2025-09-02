@@ -18,7 +18,7 @@ Authors:
     - Cameron Fraser
 """
 
-import scripts.get_metadata as md
+import helpers.get_metadata as md
 
 # Creates a mask for genomic positions with low ms read depth
 rule ms_low_depth_mask:
@@ -100,13 +100,13 @@ rule ms_germline_variants_mask:
 # Combines all masks into a single BED file
 rule combine_masks:
     input:
-        common_masks = expand("{mask}", mask=config["files"]["common_masks"]),
-        non_variant_calling_bed = rules.mask_non_variant_calling_chroms.output.bed,
+        precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
+        excluded_chromosomes_bed = rules.mask_excluded_chromosomes.output.bed,
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
-        fai = config["files"]['reference'] + ".fai" 
+        fai = config["files"]["reference_genome"] + ".fai" 
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
         intermediate_cat = temp("tmp/{ms_sample}/{ms_sample}_masks_cat.bed"),
@@ -119,8 +119,8 @@ rule combine_masks:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        cat {input.common_masks} \
-        {input.non_variant_calling_bed} \
+        cat {input.precomputed_masks} \
+        {input.excluded_chromosomes_bed} \
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \
         {input.ms_germ_ins_bed} \
@@ -134,12 +134,12 @@ rule combine_masks:
 # Generate an include regions bed file for variant calling (opposite of combined bed)
 rule generate_include_bed:
     input:
-        ms_samples = config["files"]["ms_samples"],
+        ms_samples = config["files"]["ms_samples_metadata"],
         mask_bed = lambda wc: (
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_combined_mask.bed"
         ),
-        fai = config["files"]["reference"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai"
     output:
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     log:

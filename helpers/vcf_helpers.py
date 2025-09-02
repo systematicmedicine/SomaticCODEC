@@ -22,6 +22,7 @@ def count_vcf_data_points(path):
                 count += 1
     return count
 
+# Checks for correct VCF structure
 def check_vcf_structure(path):
     path = Path(path)
     open_func = gzip.open if path.suffix == '.gz' else open
@@ -59,3 +60,14 @@ def check_vcf_structure(path):
                 # Assertion 4: REF and ALT alleles are present
                 assert ref != '', f"Empty REF on line {linenum}: {line}"
                 assert alt != '', f"Empty ALT on line {linenum}: {line}"
+
+# Prints the first n lines of the VCF
+def print_vcf_first_n_lines(path, n_lines):
+    opener = gzip.open if str(path).endswith(".gz") else open
+    lines = []
+    with opener(path, "rt") as f:
+        for i, line in enumerate(f):
+            if i >= n_lines:
+                break
+            lines.append(line.rstrip())
+    return "\n".join(lines)

@@ -47,3 +47,14 @@ def first_n_headers(fastq_path, n=100):
                 if len(headers) >= n:
                     break
     return headers
+
+# Returns the first n lines of the FASTQ file
+def print_fastq_first_n_lines(path, n_lines):
+    opener = gzip.open if str(path).endswith(".gz") else open
+    lines = []
+    with opener(path, "rt") as f:
+        for i, line in enumerate(f):
+            if i >= n_lines:
+                break
+            lines.append(line.rstrip())
+    return "\n".join(lines)

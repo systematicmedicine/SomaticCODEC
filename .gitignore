@@ -16,6 +16,7 @@ metrics/*
 
 logs/*
 !logs/.gitkeep
+!logs/**/.gitkeep
 
 # Pycache generated when running pytest
 __pycache__/

@@ -13,8 +13,8 @@ import sys
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from tests.utils.vcf_utils import check_vcf_structure
-from scripts.get_metadata import load_config, get_ex_sample_ids
+from helpers.vcf_helpers import check_vcf_structure
+from helpers.get_metadata import load_config, get_ex_sample_ids
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):

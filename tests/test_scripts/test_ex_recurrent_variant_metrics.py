@@ -8,9 +8,15 @@ Authors:
     - Joshua Johnstone
 """
 import json
-from scripts.ex_recurrent_variant_metrics import main
 import glob
 import os
+from pathlib import Path
+import sys
+
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from scripts.ex_recurrent_variant_metrics import main
 
 def test_find_recurrent_variants(tmp_path):
     vcf_paths = glob.glob("tests/data/test_ex_recurrent_variant_metrics/*.vcf")

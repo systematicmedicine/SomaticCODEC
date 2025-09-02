@@ -16,3 +16,13 @@ def count_sam_data_points(path):
             if not line.startswith('@'):
                 count += 1
     return count
+
+# Returns the first n lines of a SAM file
+def print_sam_first_n_lines(path, n_lines):
+    lines = []
+    with open(path, "r") as f:
+        for i, line in enumerate(f):
+            if i >= n_lines:
+                break
+            lines.append(line.rstrip())
+    return "\n".join(lines)

@@ -21,9 +21,9 @@ import sys
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from tests.utils.bed_utils import read_bed
-from tests.utils.fai_utils import read_fai
-from scripts.get_metadata import load_config, get_ex_to_ms_sample_map
+from helpers.bed_helpers import read_bed
+from helpers.fai_helpers import read_fai
+from helpers.get_metadata import load_config, get_ex_to_ms_sample_map
 
 # Load input and output BEDs for a sample
 def get_mask_and_include_beds(ex_sample, ms_sample):
@@ -96,8 +96,8 @@ def test_beds_span_reference(lightweight_test_run):
 
     config = load_config("config/config.yaml")
     ex_to_ms = get_ex_to_ms_sample_map(config)
-    config["files"]["reference"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    fai_path = config["files"]["reference"] + ".fai"
+    config["files"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
+    fai_path = config["files"]["reference_genome"] + ".fai"
     fai_df = read_fai(fai_path)
 
     for ex_sample, ms_sample in ex_to_ms.items():

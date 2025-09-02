@@ -40,8 +40,8 @@ def main(snakemake):
     # Map mask names to BED files
     mask_files = {}
 
-    # Name common masks by file basename (without extension)
-    for bed_file in snakemake.input.common_masks:
+    # Name precomputed masks by file basename (without extension)
+    for bed_file in snakemake.input.precomputed_masks:
         name = Path(bed_file).stem
         mask_files[name] = bed_file
 

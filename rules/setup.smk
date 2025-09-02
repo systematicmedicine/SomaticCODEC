@@ -11,8 +11,8 @@ Authors:
 # Checks mapping of MS and EX samples in ms_samples.csv and ex_samples.csv
 rule check_ex_ms_mapping:
     input:
-        ex_csv = config["files"]["ex_samples"],
-        ms_csv = config["files"]["ms_samples"]
+        ex_csv = config["files"]["ex_samples_metadata"],
+        ms_csv = config["files"]["ms_samples_metadata"]
     output:
         "logs/pipeline/check_ex_ms_mapping.done"
     resources:
@@ -25,17 +25,58 @@ rule check_ex_ms_mapping:
         "../scripts/check_ex_ms_mapping.py"
 
 
+# Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
+rule check_included_chromosomes_present:
+    input:
+        fai = config["files"]["reference_genome"] + ".fai",
+        precomputed_masks = config["files"]["precomputed_masks"]
+    output:
+        "logs/pipeline/check_included_chromosomes_present.done"
+    params:
+        included_chromosomes = config["chroms"]["included_chromosomes"]
+    log:
+        "logs/pipeline/check_included_chromosomes_present.log"
+    benchmark:
+        "logs/pipeline/check_included_chromosomes_present.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/check_included_chromosomes_present.py"
+
+
+# Creates a mask for chromosomes that will be excluded for variant calling 
+    # e.g. chrUn, chr*_random, chrM, chrEBV
+rule mask_excluded_chromosomes:
+    input:
+        fai = config["files"]["reference_genome"] + ".fai",
+    output:
+        bed = temp("tmp/downloads/excluded_chromosomes.bed")
+    params:
+        included_chromosomes = config["chroms"]["included_chromosomes"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    run:
+        # Define chromosomes included for variant calling
+        included_chromosomes = set(params.included_chromosomes)
+
+        # Load the .fai and filter
+        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
+            for line in fai_in:
+                chrom, length, *_ = line.strip().split("\t")
+                if chrom not in included_chromosomes:
+                    bed_out.write(f"{chrom}\t0\t{length}\n")
+
+
 # Creates index files from reference genome
 rule bwamem_index_files:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        reference = config["files"]["reference"]
+        reference = config["files"]["reference_genome"]
     output:
-        amb = config["files"]["reference"] + ".amb",
-        ann = config["files"]["reference"] + ".ann",
-        bwt = config["files"]["reference"] + ".bwt.2bit.64",
-        pac = config["files"]["reference"] + ".pac",
-        sa = config["files"]["reference"] + ".0123"
+        amb = config["files"]["reference_genome"] + ".amb",
+        ann = config["files"]["reference_genome"] + ".ann",
+        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["files"]["reference_genome"] + ".pac",
+        sa = config["files"]["reference_genome"] + ".0123"
     log:
         "logs/pipeline/bwamem_index_files.log"
     benchmark:
@@ -48,59 +89,14 @@ rule bwamem_index_files:
         """
         bwa-mem2 index {input.reference} 2>> {log}
         """
-    
-
-# Checks that chromosomes designated for variant calling are present in reference and common BEDs
-rule check_variant_calling_chroms_present:
-    input:
-        fai = config["files"]["reference"] + ".fai",
-        common_masks = config["files"]["common_masks"]
-    output:
-        "logs/pipeline/check_variant_calling_chroms_present.done"
-    params:
-        variant_calling_chroms = config["chroms"]["variant_calling"]
-    log:
-        "logs/pipeline/check_variant_calling_chroms_present.log"
-    benchmark:
-        "logs/pipeline/check_variant_calling_chroms_present.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    script:
-        "../scripts/check_variant_calling_chroms_present.py"
-
-
-# Creates a mask for chromosomes that will not be used in variant calling 
-    # e.g. chrUn, chr*_random, chrM, chrEBV
-rule mask_non_variant_calling_chroms:
-    input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        fai = config["files"]['reference'] + ".fai",
-    output:
-        bed = temp("tmp/downloads/non_variant_calling_chroms.bed")
-    params:
-        variant_calling_chroms = config["chroms"]["variant_calling"]
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    run:
-        # Define variant calling chromosomes
-        variant_calling_chroms = set(params.variant_calling_chroms)
-
-        # Load the .fai and filter
-        with open(input.fai) as fai_in, open(output.bed, "w") as bed_out:
-            for line in fai_in:
-                chrom, length, *_ = line.strip().split("\t")
-                if chrom not in variant_calling_chroms:
-                    bed_out.write(f"{chrom}\t0\t{length}\n")
 
 
 # Creates reference .fai file
 rule samtools_index_files:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        reference = config["files"]["reference"]
+        reference = config["files"]["reference_genome"]
     output:
-        fai = config["files"]["reference"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai"
     log:
         "logs/pipeline/samtools_index_files.log"
     benchmark:
@@ -115,11 +111,9 @@ rule samtools_index_files:
 # Creates reference .dict file
 rule picard_sequence_dict:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ref = config["files"]["reference"]
+        ref = config["files"]["reference_genome"]
     output:
-        dictf = os.path.splitext(config["files"]["reference"])[0] + ".dict"
+        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
     log:
         "logs/pipeline/picard_sequence_dict.log"
     benchmark:
@@ -137,11 +131,9 @@ rule picard_sequence_dict:
 # Generates adapter FASTA files for demultiplexing and trimming
 rule ex_generate_adapter_fastas:
     input:
-        mapping_check = "logs/pipeline/check_ex_ms_mapping.done",
-        variant_chroms_check = "logs/pipeline/check_variant_calling_chroms_present.done",
-        ex_lanes = config["files"]["ex_lanes"],
-        ex_samples = config["files"]["ex_samples"],
-        ex_adapters = config["files"]["ex_adapters"]
+        ex_lanes = config["files"]["ex_lanes_metadata"],
+        ex_samples = config["files"]["ex_samples_metadata"],
+        ex_adapters = config["files"]["ex_adapters_metadata"]
     output:
         adapter_fasta_outputs = expand(
             "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
