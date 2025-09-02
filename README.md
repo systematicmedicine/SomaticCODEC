@@ -44,7 +44,7 @@ python3 scripts/download_S3toEC2.py
 ```
 * Start background system resource monitoring (optional)
 ```
-./monitor_system_resources.sh
+./scripts/monitor_system_resources.sh
 ``` 
 * Run pipeline
 ```
@@ -70,6 +70,7 @@ snakemake --configfile config/config.yaml --report report.html
     * Disconnect: Ctrl + b, d
     * List sessions: tmux ls
     * Reconnect: tmux attach -t <I>session name</I>
+    * Enable scrolling: Ctrl + b, Shift + :, set -g mouse on, Enter
 
 * After pipeline has run sucessfully, create single file of outputs (optional)
 ```
