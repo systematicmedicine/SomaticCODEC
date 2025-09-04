@@ -93,7 +93,7 @@ rule ex_filter_map:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        samtools view -b -f 0x2 {input.bam} > {output.intermediate_unsorted} 2>> {log}
+        samtools view -@ {threads} -b -f 0x2 {input.bam} > {output.intermediate_unsorted} 2>> {log}
 
         samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
         """

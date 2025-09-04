@@ -1,0 +1,18 @@
+{
+    "COMMAND": "samtools markdup -@ 4 -r --json -f metrics/S004/S004_dedup_metrics.json --barcode-name --mode t -d 2500 tmp/S004/S004_annotated_map.bam tmp/S004/S004_deduped_map_unsorted.bam",
+    "READ": 0,
+    "WRITTEN": 0,
+    "EXCLUDED": 0,
+    "EXAMINED": 900,
+    "PAIRED": 0,
+    "SINGLE": 0,
+    "DUPLICATE PAIR": 0,
+    "DUPLICATE SINGLE": 0,
+    "DUPLICATE PAIR OPTICAL": 0,
+    "DUPLICATE SINGLE OPTICAL": 0,
+    "DUPLICATE NON PRIMARY": 0,
+    "DUPLICATE NON PRIMARY OPTICAL": 0,
+    "DUPLICATE PRIMARY TOTAL": 0,
+    "DUPLICATE TOTAL": 45,
+    "ESTIMATED_LIBRARY_SIZE": 0
+}
