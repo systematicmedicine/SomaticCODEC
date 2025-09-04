@@ -180,6 +180,7 @@ rule ex_filter_dsc:
     shell:
         """
         samtools view -b \
+        -@ {threads} \
         --min-MQ {params.min_mapq} \
         {input.bam} > {output.intermediate_bam} 2>> {log}
         

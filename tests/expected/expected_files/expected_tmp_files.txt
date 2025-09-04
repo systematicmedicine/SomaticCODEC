@@ -14,9 +14,11 @@ tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_raw_map.sam
 tmp/{ms_sample}/{ms_sample}_raw_map.bam
-tmp/{ms_sample}/{ms_sample}_read_group_map_unsorted.bam
-tmp/{ms_sample}/{ms_sample}_read_group_map.bam
-tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai
+tmp/{ms_sample}/{ms_sample}_annotated_map_uncollated.bam
+tmp/{ms_sample}/{ms_sample}_annotated_map_collated.bam
+tmp/{ms_sample}/{ms_sample}_annotated_map_fixmate.bam
+tmp/{ms_sample}/{ms_sample}_annotated_map.bam
+tmp/{ms_sample}/{ms_sample}_annotated_map.bam.bai
 tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam
 tmp/{ms_sample}/{ms_sample}_deduped_map.bam
 tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai

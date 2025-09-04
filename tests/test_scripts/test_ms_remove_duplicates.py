@@ -19,7 +19,7 @@ from helpers.bam_helpers import count_bam_data_points
 # Test that removing duplicates decreases read count
 def test_read_counts_decrease(lightweight_test_run):
     # Locate all pre-dedup BAM files
-    pre_files = glob.glob("tmp/*/*_read_group_map.bam")
+    pre_files = glob.glob("tmp/*/*_annotated_map.bam")
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
     total_pre_reads = sum(pre_counts.values())
 

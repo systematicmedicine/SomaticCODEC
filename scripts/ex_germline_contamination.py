@@ -71,7 +71,7 @@ def main(snakemake):
         num_matches = len(result.stdout.strip().splitlines()) if result.stdout.strip() else 0
 
     # --- Calculate percent germline contamination ---
-    percent_germline_contamination = round(100 * num_matches / total_variants, 2) 
+    percent_germline_contamination = round(100 * num_matches / total_variants, 2) if total_variants > 0 else 0
 
     # --- Write metrics JSON ---
     metrics_file.parent.mkdir(parents=True, exist_ok=True)

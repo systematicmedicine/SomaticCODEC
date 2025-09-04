@@ -18,7 +18,7 @@ sys.path.insert(0, str(project_root))
 from scripts.ms_duplication_metrics import main
 
 @pytest.mark.parametrize("dedup_metrics, expected_dedup_rate", [
-    ("tests/data/test_ms_duplication_metrics/dedup_metrics.txt", 0.05)
+    ("tests/data/test_ms_duplication_metrics/dedup_metrics.json", 0.05)
 ])
 def test_duplication_rate_calculation(tmp_path, dedup_metrics, expected_dedup_rate):
     output_json = tmp_path / "duplication_metrics.json"
