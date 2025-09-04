@@ -1,15 +1,13 @@
 """
 --- ms_duplication_metrics.py ---
 
-Calculates duplication rate based on UMItools dedup metrics.
+Calculates duplication rate based on samtools markdup metrics.
 
 Authors: 
     - Joshua Johnstone
     - Chat-GPT
 """
-import re
 import sys
-from pathlib import Path
 import json
 
 def main(snakemake):
@@ -25,27 +23,30 @@ def main(snakemake):
     # Define output
     json_out = snakemake.output.duplication_metrics
 
-    # Read dedup metrics
+    # Load samtools markdup JSON metrics
     with open(dedup_metrics) as f:
-        content = f.read()
+        metrics = json.load(f)
 
-    # Extract read counts
-    input_reads = int(re.search(r'Input Reads: (\d+)', content).group(1))
-    r1_unmapped = int(re.search(r'Read 1 unmapped: (\d+)', content).group(1))
-    r2_unmapped = int(re.search(r'Read 2 unmapped: (\d+)', content).group(1))
-    mapped_reads = input_reads - (r1_unmapped + r2_unmapped)
-    output_reads = int(re.search(r'Number of reads out: (\d+)', content).group(1))
+    # Extract counts
+    input_reads = metrics["READ"]
+    excluded_reads = metrics["EXCLUDED"]
+    examined_reads = metrics["EXAMINED"]
+    duplicate_reads = metrics["DUPLICATE TOTAL"]
+    output_reads = metrics["WRITTEN"]
 
-    duplication_rate = round(1 - output_reads / mapped_reads, 4)
+    # Calculate duplication rate
+    duplication_rate = round(duplicate_reads / examined_reads, 4)
 
-    # Prepare JSON
+    # Prepare output JSON
     metrics_dict = {
-        "Description:": "Duplication rate based on UMItools dedup metrics",
+        "Description": "Duplication rate based on samtools markdup metrics",
         "sample": sample,
-        "input_reads": input_reads,
-        "mapped_input_reads": mapped_reads,
-        "deduplicated_reads": output_reads,
-        "duplication_rate": duplication_rate
+        "reads_before_dedup": input_reads,
+        "excluded_reads": excluded_reads,
+        "examined_reads": examined_reads,
+        "duplicate_reads": duplicate_reads,
+        "duplication_rate": duplication_rate,
+        "reads_after_dedup": output_reads
     }
 
     # Write JSON

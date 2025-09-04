@@ -24,7 +24,7 @@ def test_read_groups_added(lightweight_test_run):
     total_pre_reads = sum(pre_counts.values())
 
     # Get number of reads with RG tags after ms_annotate_map
-    post_files = glob.glob("tmp/*/*_read_group_map.bam")
+    post_files = glob.glob("tmp/*/*_annotated_map.bam")
     post_counts_RG = {Path(f).name: count_reads_with_read_group(f) for f in post_files}
     total_post_reads_with_RG = sum(post_counts_RG.values())
 
@@ -41,7 +41,7 @@ def test_read_counts_preserved(lightweight_test_run):
     total_pre_reads = sum(pre_counts.values())
 
     # Locate all post-read group BAM files
-    post_files = glob.glob("tmp/*/*_read_group_map.bam")
+    post_files = glob.glob("tmp/*/*_annotated_map.bam")
     post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
