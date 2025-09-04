@@ -159,10 +159,8 @@ rules:
     z_dropoff: 100
 
   ms_remove_duplicates:
-    edit_distance_threshold: 1
-    method: directional
-    min_mapping_quality: 0
-    soft_clip_threshold: 4
+    duplicate_decision_method: t # Measures positions based on template start/end
+    optical_duplicate_distance: 2500
 
   ms_trim_fastq:
     adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA

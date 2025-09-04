@@ -57,7 +57,6 @@ snakemake \
     --configfile config/config.yaml \
     --cores all \
     --resources memory=370 \
-    --notemp \
     --keep-going \
     --reason \
     --stats logs/pipeline/pipeline_stats.json \

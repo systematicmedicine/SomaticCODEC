@@ -65,17 +65,21 @@ rule ms_map:
         -T {params.min_alignment_score_thresh} \
         {input.ref} {input.r1_processed} {input.r2_processed} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -bS {output.intermediate_sam} > {output.bam} 2>> {log}
+        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
 
-# Adds read group information to aligned reads
+# Annotates aligned reads for downstream rules
+#   - Adds read group information for picard metrics
+#   - Adds ms and MC tags for samtools markdup
 rule ms_annotate_map:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam"),
-        bai = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"),
-        intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_read_group_map_unsorted.bam")
+        bam = temp("tmp/{ms_sample}/{ms_sample}_annotated_map.bam"),
+        bai = temp("tmp/{ms_sample}/{ms_sample}_annotated_map.bam.bai"),
+        intermediate_uncollated = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_uncollated.bam"),
+        intermediate_collated = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_collated.bam"),
+        intermediate_fixmate = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_fixmate.bam")
     log:
         "logs/{ms_sample}/ms_annotate_map.log"
     benchmark:
@@ -88,14 +92,18 @@ rule ms_annotate_map:
         """
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
             I={input.bam} \
-            O={output.intermediate_unsorted} \
+            O={output.intermediate_uncollated} \
             RGID={wildcards.ms_sample} \
             RGLB={wildcards.ms_sample}_lib \
             RGPL=ILLUMINA \
             RGPU={wildcards.ms_sample} \
             RGSM={wildcards.ms_sample} 2>> {log}
 
-        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
+        samtools collate -@ {threads} -o {output.intermediate_collated} {output.intermediate_uncollated} 2>> {log}
+
+        samtools fixmate -@ {threads} -m {output.intermediate_collated} {output.intermediate_fixmate} 2>> {log}
+
+        samtools sort -@ {threads} -o {output.bam} {output.intermediate_fixmate} 2>> {log}
 
         samtools index {output.bam} 2>> {log}
         """
@@ -104,22 +112,16 @@ rule ms_annotate_map:
 # Removes duplicate reads based on alignment and UMIs
 rule ms_remove_duplicates:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam.bai"
+        bam = "tmp/{ms_sample}/{ms_sample}_annotated_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_annotated_map.bam.bai"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam"),
         bai = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"),
-        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt",
-        edit_distance_metrics = "metrics/{ms_sample}/{ms_sample}_umi_edit_distances.txt",
-        umi_counts = "metrics/{ms_sample}/{ms_sample}_umi_counts.txt",
-        umi_counts_per_position = "metrics/{ms_sample}/{ms_sample}_umi_counts_per_position.txt",
+        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.json",
         intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam")
     params:
-        prefix = "metrics/{ms_sample}/{ms_sample}",
-        edit_distance_threshold = config["rules"]["ms_remove_duplicates"]["edit_distance_threshold"],
-        method = config["rules"]["ms_remove_duplicates"]["method"],
-        min_mapping_quality = config["rules"]["ms_remove_duplicates"]["min_mapping_quality"],
-        soft_clip_threshold = config["rules"]["ms_remove_duplicates"]["soft_clip_threshold"]
+        duplicate_decision_method = config["rules"]["ms_remove_duplicates"]["duplicate_decision_method"],
+        optical_duplicate_distance = config["rules"]["ms_remove_duplicates"]["optical_duplicate_distance"]
     log:
         "logs/{ms_sample}/ms_remove_duplicates.log"
     benchmark:
@@ -130,22 +132,16 @@ rule ms_remove_duplicates:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        umi_tools dedup \
-            --extract-umi-method=read_id \
-            --umi-separator=":" \
-            --paired \
-            --edit-distance-threshold={params.edit_distance_threshold} \
-            --method={params.method} \
-            --mapping-quality={params.min_mapping_quality} \
-            --soft-clip-threshold={params.soft_clip_threshold} \
-            --stdin {input.bam} \
-            --stdout {output.intermediate_unsorted} \
-            --log={output.dedup_metrics} \
-            --output-stats={params.prefix} 2>> {log}
-
-        mv {params.prefix}_edit_distance.tsv {output.edit_distance_metrics} 2>> {log}
-        mv {params.prefix}_per_umi_per_position.tsv {output.umi_counts} 2>> {log}
-        mv {params.prefix}_per_umi.tsv {output.umi_counts_per_position} 2>> {log}
+        samtools markdup \
+        -@ {threads} \
+        -r \
+        --json \
+        -f {output.dedup_metrics} \
+        --barcode-name \
+        --mode {params.duplicate_decision_method} \
+        -d {params.optical_duplicate_distance} \
+        {input.bam} \
+        {output.intermediate_unsorted} 2>> {log}
 
         samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
 

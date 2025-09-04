@@ -137,7 +137,7 @@ rule ms_alignment_metrics:
 # Generates ms duplication metrics
 rule ms_duplication_metrics:
     input:
-        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.txt"
+        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.json"
     output:
         duplication_metrics = "metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json"
     params:
