@@ -204,35 +204,22 @@ rule ms_het_hom_ratio:
         """
 
 
-# Calculates depth summary metrics for final MS BAM
-rule ms_depth_metrics:
+# Generates a summary of genome coverage by depth
+rule ms_coverage_by_depth_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"
+        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt"
     output:
-        depth_summary = "metrics/{ms_sample}/{ms_sample}_depth_summary.txt",
-        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_fractions.txt"
+        coverage_by_depth = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
     params:
-        file_prefix = "metrics/{ms_sample}/{ms_sample}"
+        sample = "{ms_sample}"
     log:
-        "logs/{ms_sample}/ms_depth_metrics.log"
+        "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
     benchmark:
-        "logs/{ms_sample}/ms_depth_metrics.benchmark.txt"
-    threads:
-        config["resources"]["threads"]["light"]
+        "logs/{ms_sample}/ms_coverage_by_depth_metrics.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
-    shell:
-        """
-        mosdepth \
-        --threads {threads} \
-        --no-per-base \
-        {params.file_prefix} \
-        {input.bam} 2>> {log} 
-
-        mv {params.file_prefix}.mosdepth.summary.txt {output.depth_summary} 2>> {log}
-        mv {params.file_prefix}.mosdepth.global.dist.txt {output.depth_histogram} 2>> {log}
-        """
+    script:
+       "../scripts/ms_coverage_by_depth_metrics.py"
 
 
 # Generates metrics for each mask BED file
