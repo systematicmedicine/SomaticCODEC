@@ -9,10 +9,16 @@ Authors:
     - Cameron Fraser
 """
 import pandas as pd
+import gzip
+from pathlib import Path
 
 # Counts the number of data rows in a BED file
 def count_bed_data_points(path):
-    with open(path, 'r') as file:
+    path = Path(path)
+    open_func = open
+    if str(path).endswith(".gz"):
+        open_func = gzip.open
+    with open_func(path, 'rt') as file:
         return sum(1 for _ in file)
 
 # Merge intervals of individual BED files

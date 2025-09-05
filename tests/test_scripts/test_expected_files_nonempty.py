@@ -58,7 +58,8 @@ def test_expected_outputs_have_datapoints(lightweight_test_run, expected_files_l
         ".tbi", 
         ".png",
         ".bgz",
-        ".tbi"
+        ".tbi",
+        ".csi"
         ]
     expected_files_list = [path for path in expected_files_list if not any(path.endswith(ext) for ext in file_exts_to_omit)]
 
