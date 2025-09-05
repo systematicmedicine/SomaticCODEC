@@ -21,7 +21,7 @@ Recommended:
 * Select <i>Launch instances</I>
 * Configure the instance
     * OS Image: Ubuntu 22.04 LTS
-    * Instance type: m6i.24xlarge
+    * Instance type: m6i.32xlarge
     * Key pair: A key you have access to (or create new key pair) 
     * Allow SSH traffic: My IP
     * Configure storage: 5000GiB gp3
