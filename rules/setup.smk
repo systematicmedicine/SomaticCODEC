@@ -148,3 +148,19 @@ rule ex_generate_adapter_fastas:
         memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_generate_adapter_fastas.py"
+
+rule tabix_index_files:
+    input:
+        germline_vcf = config["files"]["known_germline_variants"]
+    output:
+        germline_tbi = config["files"]["known_germline_variants"] + ".tbi"
+    log:
+        "logs/pipeline/tabix_index_files.log"
+    benchmark:
+        "logs/pipeline/tabix_index_files.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    shell:
+        """
+        tabix -p vcf {input.germline_vcf} 2>> {log}
+        """

@@ -501,7 +501,8 @@ Determines how many called somatic variants are present in dataset of common ger
 rule ex_germline_contamination:
     input:
         somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        germline_vcf = config["files"]["known_germline_variants"]
+        germline_vcf = config["files"]["known_germline_variants"],
+        germline_tbi = config["files"]["known_germline_variants"] + ".tbi"
     output:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
