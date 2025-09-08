@@ -59,8 +59,7 @@ def test_snakemake_dryrun():
         "ex_lane2_Chr21_5000reads_r1.fastq.gz",
         "ex_lane2_Chr21_5000reads_r2.fastq.gz",
         "nanoseq_trinucleotide_contexts.csv",
-        "gnomad-chr21-micro.vcf.bgz",
-        "gnomad-chr21-micro.vcf.bgz.tbi"
+        "gnomad-chr21-micro.vcf.bgz"
         ]
 
     for filename in files_to_copy:
