@@ -28,7 +28,7 @@ files:
     - "tmp/downloads/GRCh38-gnomad-variants-AF-0.01.bed"
     - "tmp/downloads/GCRh38_repeat_masker.bed"
   reference_tri_contexts: tmp/downloads/nanoseq_trinucleotide_contexts.csv
-  known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz
+  known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
   ex_samples_metadata: config/ex_samples.csv
   ex_lanes_metadata: config/ex_lanes.csv
   ex_adapters_metadata: config/ex_adapters.csv
