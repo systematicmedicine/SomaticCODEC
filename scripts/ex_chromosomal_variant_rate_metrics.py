@@ -28,15 +28,17 @@ def main(snakemake):
     # Get paths
     vcf_path = snakemake.input.vcf
     fai_path = snakemake.input.fai
+    included_chromosomes = snakemake.params.included_chromosomes
     json_out_path = snakemake.output.metrics
 
-    # Load chromosome lengths from FAI
+    # Load chromosome lengths for included chromsomes from FAI
     chrom_lengths = {}
     with open(fai_path, "r") as f:
         for line in f:
             fields = line.strip().split("\t")
             chrom, length = fields[0], int(fields[1])
-            chrom_lengths[chrom] = length
+            if chrom in included_chromosomes:
+                chrom_lengths[chrom] = length
 
     # Count variants per chromosome
     chrom_counts = defaultdict(int)
@@ -57,7 +59,7 @@ def main(snakemake):
             print(f"[WARN] Chromosome {chrom} has invalid length in FAI. Skipping rate calculation.")
             chrom_rates[chrom] = None
 
-    # Collate per-chromosome data (now guaranteed to include all chromosomes in FAI)
+    # Collate per-chromosome data
     chrom_data = {}
     for chrom in chrom_lengths.keys():
         chrom_data[chrom] = {
@@ -72,8 +74,8 @@ def main(snakemake):
     "description": (
         "Number/rate of somatic variants per chromosome, and Gini coefficient for inequality in variant rates."
     ),
-    "chromosomes": chrom_data,
-    "gini_coefficient": round(gini_coefficient(valid_rates), 3) if valid_rates else None
+    "gini_coefficient": round(gini_coefficient(valid_rates), 3) if valid_rates else None,
+    "chromosomes": chrom_data
     }
 
     # Write to JSON
