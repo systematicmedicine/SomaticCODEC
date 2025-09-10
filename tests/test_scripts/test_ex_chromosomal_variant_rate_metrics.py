@@ -26,13 +26,14 @@ from scripts.ex_chromosomal_variant_rate_metrics import main
 def test_gini_coeff_calculation(tmp_path, vcf_path, expected_gini):
     fai_path = "tests/data/test_ex_chromosomal_variant_rate_metrics/ref.fna.fai"
     output_json = tmp_path / "chrom_variants.json"
+    included_chroms = ["chr1", "chr2"]
 
     class MockSnakemake:
         input = type("input", (), {"vcf": vcf_path,
                                    "fai": fai_path})
         output = type("output", (), {"metrics": str(output_json)})
         log = ["log.txt"]
-        params = {}
+        params = type("params", (), {"included_chromosomes": included_chroms})
 
     main(MockSnakemake)
 
