@@ -467,6 +467,8 @@ rule ex_chromosomal_variant_rate_metrics:
         fai = config["files"]["reference_genome"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
+    params:
+        included_chromosomes = config["chroms"]["included_chromosomes"]
     log:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
     benchmark:
