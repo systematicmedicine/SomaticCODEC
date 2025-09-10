@@ -22,7 +22,7 @@ rule ms_candidate_germ_variants:
         fai = config["files"]["reference_genome"] + ".fai",
         dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
     output:
-        vcf = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
     params:
         included_chromosomes = " -L ".join(config["chroms"]["included_chromosomes"]),
         base_quality_score_threshold = config["rules"]["ms_candidate_germ_variants"]["base_quality_score_threshold"],
@@ -31,6 +31,7 @@ rule ms_candidate_germ_variants:
         indel_heterozygosity = config["rules"]["ms_candidate_germ_variants"]["indel_heterozygosity"],
         min_base_quality_score = config["rules"]["ms_candidate_germ_variants"]["min_base_quality_score"],
         max_alternate_alleles = config["rules"]["ms_candidate_germ_variants"]["max_alternate_alleles"],
+        pcr_indel_model = config["rules"]["ms_candidate_germ_variants"]["pcr_indel_model"],
         standard_min_confidence_threshold = config["rules"]["ms_candidate_germ_variants"]["standard_min_confidence_threshold"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
@@ -56,5 +57,6 @@ rule ms_candidate_germ_variants:
             --indel-heterozygosity {params.indel_heterozygosity} \
             --min-base-quality-score {params.min_base_quality_score} \
             --max-alternate-alleles {params.max_alternate_alleles} \
+            --pcr-indel-model {params.pcr_indel_model} \
             --stand-call-conf {params.standard_min_confidence_threshold} 2>> {log}
         """
