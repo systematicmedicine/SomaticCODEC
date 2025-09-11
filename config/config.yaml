@@ -10,13 +10,13 @@ experiment:
 # ------------------------------------------------------------------------------
 resources: # Optimised for running 12 samples on m6i.32xlarge (128 cores, 512GB memory)
   memory: # in GB
-    light: 16
-    moderate: 32
-    heavy: 64
+    light: 8
+    moderate: 16
+    heavy: 32
   threads:
-    light: 4
-    moderate: 8
-    heavy: 16
+    light: 2
+    moderate: 4
+    heavy: 8
 
 # ------------------------------------------------------------------------------
 # File paths
@@ -25,7 +25,7 @@ files:
   reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa # Must be uncompressed (.fa, .fna, .fasta)
   precomputed_masks:
     - "tmp/downloads/GRCh38_alldifficultregions.bed"
-    - "tmp/downloads/GRCh38-gnomad-variants-AF-0.01.bed"
+    #- "tmp/downloads/GRCh38-gnomad-variants-AF-0.01.bed" Temporarily removed while updating ms germline calling
     - "tmp/downloads/GCRh38_repeat_masker.bed"
   reference_tri_contexts: tmp/downloads/nanoseq_trinucleotide_contexts.csv
   known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
@@ -135,6 +135,7 @@ rules:
     heterozygosity_stdev: 0.01
     indel_heterozygosity: 1.25e-4
     min_base_quality_score: 10
+    minimum_mapping_quality: 20
     max_alternate_alleles: 6
     pcr_indel_model: NONE # For PCR-free data set to NONE
     standard_min_confidence_threshold: 20 # Default is 30
