@@ -38,7 +38,7 @@ rule ex_call_somatic_snv:
     benchmark:
         "logs/{ex_sample}/ex_call_somatic_snv.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["resources"]["memory"]["heavy"]
     shell:
         """
         bcftools mpileup \
