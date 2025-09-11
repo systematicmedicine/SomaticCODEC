@@ -5,9 +5,9 @@ Instuctions for setting up codec-opensource pipeline on a new device
 ## System requirements
 
 Recommended:
-* 96 CPU
-* 384 GB RAM
-* 5TB hard disk space
+* 128 CPU
+* 512 GB RAM
+* 16TB hard disk space
 * Ubuntu Linux 22.04 LTS
 * Git
 * Docker
