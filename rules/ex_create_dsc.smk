@@ -91,7 +91,7 @@ rule ex_remap_dsc:
     threads:
         config["resources"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["heavy"]
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         samtools fastq -0 {output.intermediate_fastq} {input.bam} 2>> {log}

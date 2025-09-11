@@ -46,7 +46,7 @@ rule ms_map:
     threads: 
         config["resources"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["heavy"]
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
         bwa-mem2 mem \
