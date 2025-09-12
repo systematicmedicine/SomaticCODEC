@@ -1,0 +1,7 @@
+{
+    "Description": "Het/hom ratio based on MS candidate variants VCF",
+    "sample": "S004",
+    "het_variants": 1200,
+    "hom_variants": 1000,
+    "het_hom_ratio": 1.20
+}

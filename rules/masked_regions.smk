@@ -38,7 +38,7 @@ rule ms_low_depth_mask:
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
-        threshold = config["rules"]["ms_low_depth_mask"]["threshold"]
+        threshold = config["rules"]["ms_candidate_germ_variants"]["min_depth"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
@@ -64,9 +64,8 @@ rule ms_low_depth_mask:
     # For insertions and SNV's, the BED region is length 1
 rule ms_germline_variants_mask:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
     output:
-        intermediate_uncompressed = temp("tmp/{ms_sample}/{ms_sample}_ms_candidate_variants_uncompressed.vcf"),
         intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
         intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
         intermediate_snv_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"),
@@ -80,14 +79,12 @@ rule ms_germline_variants_mask:
     resources:
         memory = config["resources"]["memory"]["light"]
     shell:
-        """
-        zcat {input.vcf} > {output.intermediate_uncompressed} 2>> {log}
-        
-        vcf2bed --deletions < {output.intermediate_uncompressed} > {output.intermediate_del_unformatted} 2>> {log}
+        """        
+        vcf2bed --deletions < {input.vcf} > {output.intermediate_del_unformatted} 2>> {log}
 
-        vcf2bed --insertions < {output.intermediate_uncompressed} > {output.intermediate_ins_unformatted} 2>> {log}
+        vcf2bed --insertions < {input.vcf} > {output.intermediate_ins_unformatted} 2>> {log}
 
-        vcf2bed --snvs < {output.intermediate_uncompressed} > {output.intermediate_snv_unformatted} 2>> {log}
+        vcf2bed --snvs < {input.vcf} > {output.intermediate_snv_unformatted} 2>> {log}
 
         cut -f1-3 {output.intermediate_del_unformatted} > {output.ms_germ_del_bed} 2>> {log}
 

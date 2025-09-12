@@ -1,2 +1,0 @@
-Heterozygous_count	Homozygous_count	Het/Hom_Ratio
-100	1000	0.10

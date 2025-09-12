@@ -23,7 +23,9 @@ def test_vcf_structure_correct(lightweight_test_run):
 
     for ms_sample in ms_samples:
         # Locate VCF file
-        vcf_file = Path(f"tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz")
+        vcf_file = Path(f"tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf")
 
         # Check for correct VCF structure
         check_vcf_structure(vcf_file)
+
+# Test that all variants in MS candidate VCF have alt VAF >= min_alt_vaf

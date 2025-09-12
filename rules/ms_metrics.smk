@@ -156,7 +156,7 @@ rule ms_duplication_metrics:
 # Generates metrics for candidate ms germline variants
 rule ms_candidate_variant_metrics:
     input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
     output:
         stat = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt"
     log:
@@ -170,39 +170,23 @@ rule ms_candidate_variant_metrics:
         bcftools stats -s - {input.vcf} > {output.stat} 2>> {log}
         """
 
-# Calculates the het/hom ratio from ms vcf
+# Calculates the het/hom ratio from MS candidate variants VCF
 rule ms_het_hom_ratio:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
     output:
-        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt",
-        intermediate_txt = temp("tmp/{ms_sample}/{ms_sample}_ms_genotypes.txt"),
-        intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_ms_genotypes_sorted.txt"),
-        intermediate_counts = temp("tmp/{ms_sample}/{ms_sample}_ms_genotype_counts.txt")
+        json = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.json",
+    params:
+        sample = "{ms_sample}",
+        het_threshold = config["rules"]["ms_candidate_germ_variants"]["min_alt_vaf"]
     log:
         "logs/{ms_sample}/ms_het_hom_ratio.log"
     benchmark:
         "logs/{ms_sample}/ms_het_hom_ratio.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
-    shell:
-        """
-        bcftools query -f '[%GT\\n]' {input.vcf} > {output.intermediate_txt} 2>> {log}
-        sort {output.intermediate_txt} > {output.intermediate_sorted} 2>> {log}
-        uniq -c {output.intermediate_sorted} > {output.intermediate_counts} 2>> {log}
-
-        awk '
-            {{
-                if ($2 == "0/1" || $2 == "1/0" || $2 == "1/2") het += $1;
-                else if ($2 == "1/1") hom += $1;
-            }}
-            END {{
-                print "Heterozygous_count", "Homozygous_count", "Het/Hom_Ratio";
-                het += 0; hom += 0;
-                print het, hom, (hom > 0 ? het / hom : "NA");
-            }}
-        ' OFS="\\t" {output.intermediate_counts} > {output.ms_het_hom_ratio} 2>> {log}
-        """
+    script:
+       "../scripts/ms_het_hom_ratio.py"
 
 
 # Generates a summary of genome coverage by depth
@@ -253,12 +237,13 @@ rule ms_masking_metrics:
 rule ms_candidate_variant_metrics_summary:
     input: 
         variant_metrics = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt",
-        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt",
+        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.json",
         depth_hist = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt"
     output:
         summary = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json"
     params:
-        sample = "{ms_sample}"
+        sample = "{ms_sample}",
+        min_depth = config["rules"]["ms_candidate_germ_variants"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_candidate_variant_metrics_summary.log"
     benchmark:

@@ -130,21 +130,15 @@ rules:
     quality_cutoff: 20
 
   ms_candidate_germ_variants:
-    base_quality_score_threshold: 18
-    heterozygosity_rate: 0.001
-    heterozygosity_stdev: 0.01
-    indel_heterozygosity: 1.25e-4
-    min_base_quality_score: 10
-    minimum_mapping_quality: 20
-    max_alternate_alleles: 6
-    pcr_indel_model: NONE # For PCR-free data set to NONE
-    standard_min_confidence_threshold: 20 # Default is 30
+    max_base_qual: 60
+    max_depth: 250
+    min_alt_vaf: 0.10
+    min_base_qual: 13
+    min_depth: 40
+    min_map_qual: 0
 
   ms_filter_fastq:
     min_read_length: 100
-
-  ms_low_depth_mask:
-    threshold: 40
 
   ms_map:
     band_width: 100

@@ -9,8 +9,10 @@ Input:
 Output: 
     - Filtered VCF file
 
-Author: Ben Barry
-
+Authors: 
+    - Ben Barry
+    - Joshua Johnstone
+    
 """
 
 # Call candidate germline variants
@@ -19,23 +21,18 @@ rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
         ref = config["files"]["reference_genome"],
-        fai = config["files"]["reference_genome"] + ".fai",
-        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
+        fai = config["files"]["reference_genome"] + ".fai"
     output:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf.gz"
+        intermediate_pileup = "tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf",
+        vcf_candidate = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
     params:
-        included_chromosomes = " -L ".join(config["chroms"]["included_chromosomes"]),
-        base_quality_score_threshold = config["rules"]["ms_candidate_germ_variants"]["base_quality_score_threshold"],
-        heterozygosity_rate = config["rules"]["ms_candidate_germ_variants"]["heterozygosity_rate"],
-        heterozygosity_stdev = config["rules"]["ms_candidate_germ_variants"]["heterozygosity_stdev"],
-        indel_heterozygosity = config["rules"]["ms_candidate_germ_variants"]["indel_heterozygosity"],
-        min_base_quality_score = config["rules"]["ms_candidate_germ_variants"]["min_base_quality_score"],
-        minimum_mapping_quality = config["rules"]["ms_candidate_germ_variants"]["minimum_mapping_quality"],
-        max_alternate_alleles = config["rules"]["ms_candidate_germ_variants"]["max_alternate_alleles"],
-        pcr_indel_model = config["rules"]["ms_candidate_germ_variants"]["pcr_indel_model"],
-        standard_min_confidence_threshold = config["rules"]["ms_candidate_germ_variants"]["standard_min_confidence_threshold"]
-    resources:
-        memory = config["resources"]["memory"]["moderate"]
+        included_chromosomes = config["chroms"]["included_chromosomes"],
+        max_base_qual = config["rules"]["ms_candidate_germ_variants"]["max_base_qual"],
+        max_depth = config["rules"]["ms_candidate_germ_variants"]["max_depth"],
+        min_alt_vaf = config["rules"]["ms_candidate_germ_variants"]["min_alt_vaf"],
+        min_base_qual = config["rules"]["ms_candidate_germ_variants"]["min_base_qual"],
+        min_depth = config["rules"]["ms_candidate_germ_variants"]["min_depth"],
+        min_map_qual = config["rules"]["ms_candidate_germ_variants"]["min_map_qual"]
     log:
         "logs/{ms_sample}/ms_candidate_germ_variants.log"
     benchmark:
@@ -43,22 +40,26 @@ rule ms_candidate_germ_variants:
     threads:
         config["resources"]["threads"]["moderate"]
     resources:
-        memory = config["resources"]["memory"]["heavy"]
+        memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        gatk --java-options "-Xmx{resources.memory}g" HaplotypeCaller  \
-            -R {input.ref} \
-            -I {input.bam} \
-            -O {output.vcf} \
-            -L {params.included_chromosomes} \
-            --native-pair-hmm-threads {threads} \
-            --base-quality-score-threshold {params.base_quality_score_threshold} \
-            --heterozygosity {params.heterozygosity_rate} \
-            --heterozygosity-stdev {params.heterozygosity_stdev} \
-            --indel-heterozygosity {params.indel_heterozygosity} \
-            --min-base-quality-score {params.min_base_quality_score} \
-            --minimum-mapping-quality {params.minimum_mapping_quality} \
-            --max-alternate-alleles {params.max_alternate_alleles} \
-            --pcr-indel-model {params.pcr_indel_model} \
-            --stand-call-conf {params.standard_min_confidence_threshold} 2>> {log}
+        bcftools mpileup \
+        --threads {threads} \
+        --fasta-ref {input.ref} \
+        --annotate AD,DP \
+        --min-MQ {params.min_map_qual} \
+        --min-BQ {params.min_base_qual} \
+        --max-BQ {params.max_base_qual} \
+        --max-depth {params.max_depth} \
+        --no-BAQ \
+        --regions {params.included_chromosomes} \
+        --output {output.intermediate_pileup} \
+        {input.bam} 2>> {log}
+
+        bcftools filter \
+        --threads {threads} \
+        --include 'FMT/DP >= {params.min_depth} && \
+        (SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf}' \
+        --output {output.vcf_candidate} \
+        {output.intermediate_pileup} 2>> {log}
         """
