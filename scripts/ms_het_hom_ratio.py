@@ -30,7 +30,7 @@ def main(snakemake):
         ad = vcf_sample.get("AD")
         dp = vcf_sample.get("DP")
 
-        alt_reads = sum(ad[1:len(record.alts)])
+        alt_reads = sum(ad[1:])
         vaf = alt_reads / dp
 
         if het_threshold <= vaf < (1 - het_threshold):
