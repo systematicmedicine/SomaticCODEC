@@ -396,27 +396,25 @@ rule ex_percent_eligible_N_bases:
 
 
 """
-Calculate 96 trinucleotide contexts for called somatic mutations
-    - ex_trinucleotide_cosine_similarity: Cosine similarity compared to nanoseq granulocyte data (which also matches closely with Bae 2023 trinucleotide contexts)
+Calculate trinucleotide contexts for called somatic mutations
+    - Compare to reference contexts using cosine similarity
 """
 rule ex_trinucleotide_context_metrics:
     input:
-        vcf_snvs = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        reference_tri_contexts = config["files"]["reference_tri_contexts"],
-        ref = config["files"]["reference_genome"]
+        vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        ref_fasta_path = config["files"]["reference_genome"],
+        context_csv_path = config["files"]["reference_tri_contexts"]
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_metrics.json",
-        pdf = "metrics/{ex_sample}/{ex_sample}_trinucleotide_context_histogram.pdf"
-    params:
-        sample = "{ex_sample}"
+        sample_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_context.csv",
+        similarities_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv"
     log:
-        "logs/{ex_sample}/ex_trinucleotide_context_metrics.log"
+        "logs/{ex_sample}/ex_trinuc_context.log"
     benchmark:
-        "logs/{ex_sample}/ex_trinucleotide_context_metrics.benchmark.txt"
+        "logs/{ex_sample}/ex_trinuc_context.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     script:
-        "../scripts/ex_trinucleotide_context_metrics.py"
+        "../scripts/ex_trinuc_contexts.py"
 
 
 """
