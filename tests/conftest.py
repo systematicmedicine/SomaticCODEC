@@ -55,25 +55,11 @@ def lightweight_test_run():
     dst_dir = Path("tmp/downloads")
     dst_dir.mkdir(exist_ok=True)
 
-    files_to_copy = [
-        "GRCh38_Chr21_plus_stubs.fa",
-        "S004_Chr21_10000reads_r1_umi.fastq.gz",
-        "S004_Chr21_10000reads_r2_umi.fastq.gz",
-        "S005_Chr21_10000reads_r1_umi.fastq.gz",
-        "S005_Chr21_10000reads_r2_umi.fastq.gz",
-        "GRCh38_alldifficultregions_10lines.bed",
-        "GRCh38-gnomad-variants-AF-0.01_10lines.bed",
-        "GCRh38_repeat_masker_10lines.bed",
-        "ex_lane1_Chr21_10000reads_r1.fastq.gz",
-        "ex_lane1_Chr21_10000reads_r2.fastq.gz",
-        "ex_lane2_Chr21_5000reads_r1.fastq.gz",
-        "ex_lane2_Chr21_5000reads_r2.fastq.gz",
-        "nanoseq_trinucleotide_contexts.csv",
-        "gnomad-chr21-micro.vcf.bgz"
-        ]
+    test_data_folder = Path("tests/data/lightweight_test_run")
+    files_to_copy = [f for f in test_data_folder.glob("*") if f.name != ".gitkeep"]
 
-    for filename in files_to_copy:
-        shutil.copy2(src_dir / filename, dst_dir / filename)
+    for file_path in files_to_copy:
+        shutil.copy2(src_dir / file_path.name, dst_dir / file_path.name)
 
     # Create modified config.yaml with test parameters and file paths
     config = Path("config/config.yaml")
@@ -98,7 +84,7 @@ def lightweight_test_run():
     config_data["files"]["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
     config_data["files"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
 
-    config_data["rules"]["ms_low_depth_mask"]["threshold"] = 1
+    config_data["rules"]["ms_candidate_germ_variants"]["min_depth"] = 1
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:
@@ -137,5 +123,5 @@ def lightweight_test_run():
     yield
 
     # Cleanup test environment
-    clean_workspace()
+    #clean_workspace()
 
