@@ -40,30 +40,16 @@ def test_snakemake_dryrun():
     # Configure parameters
     snakefile = project_root / "Snakefile"
 
-    # Copy test files to tmp/downloads
-    src_dir = Path("tests/data/dryrun")
+    # Create empty test files in tmp/downloads
     dst_dir = Path("tmp/downloads")
     dst_dir.mkdir(exist_ok=True)
 
-    files_to_copy = [
-        "GRCh38_Chr21_plus_stubs.fa",
-        "S004_Chr21_10000reads_r1_umi.fastq.gz",
-        "S004_Chr21_10000reads_r2_umi.fastq.gz",
-        "S005_Chr21_10000reads_r1_umi.fastq.gz",
-        "S005_Chr21_10000reads_r2_umi.fastq.gz",
-        "GRCh38_alldifficultregions_10lines.bed",
-        "GRCh38-gnomad-variants-AF-0.01_10lines.bed",
-        "GCRh38_repeat_masker_10lines.bed",
-        "ex_lane1_Chr21_10000reads_r1.fastq.gz",
-        "ex_lane1_Chr21_10000reads_r2.fastq.gz",
-        "ex_lane2_Chr21_5000reads_r1.fastq.gz",
-        "ex_lane2_Chr21_5000reads_r2.fastq.gz",
-        "nanoseq_trinucleotide_contexts.csv",
-        "gnomad-chr21-micro.vcf.bgz"
-        ]
+    test_data_folder = project_root / "tests/data/lightweight_test_run"
+    files_to_create = [f for f in test_data_folder.glob("*") if f.name != ".gitkeep"]
 
-    for filename in files_to_copy:
-        shutil.copy2(src_dir / filename, dst_dir / filename)
+    for file_path in files_to_create:
+        dest_file = dst_dir / file_path.name
+        dest_file.touch()
 
     # Create modified config.yaml with test parameters and file paths
     config = project_root / "config/config.yaml"
