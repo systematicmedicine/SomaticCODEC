@@ -135,7 +135,7 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json", ms_sample = ms_sample_ids)
 ]
 

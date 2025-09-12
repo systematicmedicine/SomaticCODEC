@@ -24,7 +24,7 @@ from scripts.ms_candidate_variant_metrics_summary import main
         (
             "tests/data/test_ms_candidate_variant_metrics_summary/mask_metrics.json",
             "tests/data/test_ms_candidate_variant_metrics_summary/variant_metrics.txt",
-            "tests/data/test_ms_candidate_variant_metrics_summary/ms_het_hom_ratio.txt",
+            "tests/data/test_ms_candidate_variant_metrics_summary/ms_het_hom_ratio.json",
             "tests/data/test_ms_candidate_variant_metrics_summary/depth_histogram.txt",
             "TestSample",
             {
@@ -35,7 +35,7 @@ from scripts.ms_candidate_variant_metrics_summary import main
                 "insertion_deletion_ratio": 0.92,
                 "MNP_other_variants": 3,
                 "transition_transversion_ratio": 1.82,
-                "het_hom_ratio": 0.10
+                "het_hom_ratio": 1.20
             }
         )
     ]
@@ -44,8 +44,10 @@ def test_ms_candidate_variant_metrics_summary(tmp_path, mask_metrics_path, varia
 
     mmp = tmp_path / "mask_metrics.json"
     vmp = tmp_path / "variant_metrics.txt"
-    hhp = tmp_path / "ms_het_hom_ratio.txt"
+    hhp = tmp_path / "ms_het_hom_ratio.json"
     dhp = tmp_path / "depth_histogram.txt"
+
+    min_depth = 1
 
     shutil.copy(mask_metrics_path, mmp)
     shutil.copy(variant_metrics_path, vmp)
@@ -59,7 +61,8 @@ def test_ms_candidate_variant_metrics_summary(tmp_path, mask_metrics_path, varia
             "mask_metrics": str(mmp),
             "depth_hist": str(dhp)
         })
-        params = type("params", (), {"sample": sample_name})
+        params = type("params", (), {"sample": sample_name,
+                                     "min_depth": min_depth})
         output = type("output", (), {"summary": str(tmp_path / "summary.json")})
         log = [str(tmp_path / "log.txt")]
 
