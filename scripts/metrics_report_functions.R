@@ -190,7 +190,7 @@ assess_metric <- function(metric) {
     # Decide which getter to use based on file extension
     if (grepl("\\.json$", file_path, ignore.case = TRUE)) {
       value <- get_metric_json(file_path, value_pattern)
-    } else if (grepl("\\.txt$", file_path, ignore.case = TRUE)) {
+    } else if (grepl("\\.(txt|csv)$", file_path, ignore.case = TRUE)) {
       value <- get_metric_txt(file_path, value_pattern)
     } else {
       message(sprintf("Unsupported file type: %s", file_path))
