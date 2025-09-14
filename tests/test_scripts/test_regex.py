@@ -78,7 +78,7 @@ def test_regex_matches_expected(metric, file_path, pattern, expected):
 
 def test_all_regexes_tested():
     # Filter config for metrics with file_path ending in '.txt'
-    txt_metrics = config_df[config_df['file_pattern'].str.endswith('.txt', na=False)]
+    txt_metrics = config_df[config_df['file_pattern'].str.endswith(('.txt', '.csv'), na=False)]
 
     # Get the set of metrics present in expected values CSV
     expected_metrics = set(expected_df['Metric'])
