@@ -27,18 +27,21 @@
 # Setup
 # ---------------------------------------------------------------------
 
-# Redirect stdout/stderr to Snakemake log
+import sys
 sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
 print("[INFO] Starting ex_trinuc_contexts.py")
 
-# Load libraries
 import pandas as pd
 import numpy as np
 from cyvcf2 import VCF
 from pyfaidx import Fasta
 from collections import Counter
 from Bio.Seq import Seq
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+import seaborn as sns
+import PyPDF2
 
 # Snakemake parameter injection
 vcf_path = snakemake.input.vcf_path
@@ -46,81 +49,96 @@ ref_fasta_path = snakemake.input.ref_fasta_path
 context_csv_path = snakemake.input.context_csv_path
 output_sample_csv = snakemake.output.sample_csv
 output_similarity_csv = snakemake.output.similarities_csv
+output_plot_pdf = snakemake.output.plot_pdf
+sample_name = snakemake.wildcards.ex_sample
 
 # ---------------------------------------------------------------------
-# Custom functions
+# Functions
 # ---------------------------------------------------------------------
+
 def cosine_similarity_np(u, v):
     """Compute cosine similarity between two 1D numpy arrays"""
     num = np.dot(u, v)
     denom = np.linalg.norm(u) * np.linalg.norm(v)
     return num / denom if denom != 0 else 0.0
 
+
+def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
+    """Extract trinucleotide contexts from a VCF and return normalized proportions."""
+    vcf = VCF(vcf_path)
+    sample_contexts = []
+
+    for variant in vcf:
+        # Validate variant
+        if not variant.ALT or len(variant.REF) != 1 or len(variant.ALT[0]) != 1:
+            continue  # Skip non-SNVs or malformed ALT
+
+        chrom = variant.CHROM
+        pos = variant.POS  # 1-based
+        ref_base = variant.REF.upper()
+        alt_base = variant.ALT[0].upper()
+
+        try:
+            left = ref_genome[chrom][pos - 2].seq.upper()
+            center = ref_base
+            right = ref_genome[chrom][pos].seq.upper()
+
+            if ref_base in ['C', 'T']:
+                context = f"{left}{ref_base}{right}>{alt_base}"
+            else:
+                trinuc = Seq(left + center + right).reverse_complement()
+                alt_rc = str(Seq(alt_base).reverse_complement())
+                context = f"{trinuc[0]}{trinuc[1]}{trinuc[2]}>{alt_rc}"
+
+            sample_contexts.append(context)
+
+        except (KeyError, IndexError):
+            continue  # Cannot fetch context
+
+    # Count and normalize
+    context_counts = Counter(sample_contexts)
+    total = sum(context_counts.get(c, 0) for c in contexts)
+    proportions = [
+        context_counts.get(c, 0) / total if total > 0 else 0.0
+        for c in contexts
+    ]
+
+    return pd.DataFrame({
+        "Context": contexts,
+        "Proportion": proportions
+    })
+
+
 # ---------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------
 
-# Load reference contexts (96 context rows per profile)
+# Load reference contexts
 ref_df = pd.read_csv(context_csv_path)
-contexts = sorted(ref_df["Context"].unique())  # Ensure consistent order
+contexts = sorted(ref_df["Context"].unique())
 profiles = ref_df["Profile"].unique()
 
-# Load reference genome FASTA
+# Load reference genome
 ref_genome = Fasta(ref_fasta_path, rebuild=False)
 
-# Parse VCF and extract trinucleotide contexts
-vcf = VCF(vcf_path)
-sample_contexts = []
-
-for variant in vcf:
-    if len(variant.REF) != 1 or len(variant.ALT[0]) != 1:
-        continue  # Skip non-SNVs
-
-    chrom = variant.CHROM
-    pos = variant.POS  # 1-based
-    ref_base = variant.REF.upper()
-    alt_base = variant.ALT[0].upper()
-
-    try:
-        left = ref_genome[chrom][pos - 2].seq.upper()
-        center = ref_base
-        right = ref_genome[chrom][pos].seq.upper()
-
-        if ref_base in ['C', 'T']:
-            context = f"{left}{ref_base}{right}>{alt_base}"
-        else:
-            trinuc = Seq(left + center + right).reverse_complement()
-            alt_rc = str(Seq(alt_base).reverse_complement())
-            context = f"{trinuc[0]}{trinuc[1]}{trinuc[2]}>{alt_rc}"
-
-        sample_contexts.append(context)
-
-    except (KeyError, IndexError):
-        continue  # Cannot fetch context
-
-# Normalize to proportions (to match reference profiles)
-context_counts = Counter(sample_contexts)
-total = sum(context_counts.get(c, 0) for c in contexts)
-sample_vector = [context_counts.get(c, 0) / total if total > 0 else 0.0 for c in contexts]
-
-sample_df = pd.DataFrame({
-    "Context": contexts,
-    "Proportion": sample_vector
-})
+# Get sample context proportions
+sample_df = get_sample_trinuc_context(vcf_path, ref_genome, contexts)
 sample_df.to_csv(output_sample_csv, index=False)
 
-
-# Cosine similarity with each reference profile
+# Calculate cosine similarities
+sample_vector = sample_df["Proportion"].values
 similarities = []
 
 for profile in profiles:
-    ref_profile = (
-        ref_df[ref_df["Profile"] == profile]
-        .set_index("Context")
-        .loc[contexts, "Proportion"]
-        .values
-    )
-    similarity = cosine_similarity_np(np.array(sample_vector), ref_profile)
+    ref_profile_df = ref_df[ref_df["Profile"] == profile].set_index("Context")
+
+    if not set(contexts).issubset(ref_profile_df.index):
+        print(f"[WARNING] Skipping profile '{profile}' — missing one or more contexts.")
+        continue
+
+    ref_vector = ref_profile_df.loc[contexts, "Proportion"].values
+    similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
+
     similarities.append({
         "Profile": profile,
         "CosineSimilarity": similarity
@@ -128,6 +146,63 @@ for profile in profiles:
 
 similarity_df = pd.DataFrame(similarities).sort_values("CosineSimilarity", ascending=False)
 similarity_df.to_csv(output_similarity_csv, index=False)
+sim_dict = similarity_df.set_index("Profile")["CosineSimilarity"].to_dict()
 
-# Log that script is finished
-print("[INFO] Starting ex_trinuc_contexts.py")
+# ---------------------------------------------------------------------
+# Generate comparison plots
+# ---------------------------------------------------------------------
+
+print(f"[INFO] Generating comparison plots to {output_plot_pdf}")
+pages = []
+
+with PdfPages(output_plot_pdf) as pdf:
+    for profile in sim_dict.keys():
+        ref_profile_df = ref_df[ref_df["Profile"] == profile]
+        similarity = sim_dict[profile]
+
+        merged = pd.merge(
+            sample_df.rename(columns={"Proportion": sample_name}),
+            ref_profile_df[["Context", "Proportion"]].rename(columns={"Proportion": profile}),
+            on="Context",
+            how="left"
+        )
+
+        long_df = pd.melt(
+            merged,
+            id_vars="Context",
+            value_vars=[sample_name, profile],
+            var_name="Source",
+            value_name="Proportion"
+        )
+
+        long_df["Context"] = pd.Categorical(long_df["Context"], categories=contexts, ordered=True)
+        long_df = long_df.sort_values("Context")
+
+        fig, ax = plt.subplots(figsize=(20, 6))
+        sns.barplot(data=long_df, x="Context", y="Proportion", hue="Source", ax=ax)
+
+        ax.set_title(f"{sample_name} vs {profile} (Cosine similarity: {similarity:.3f})", fontsize=12)
+
+        ax.set_xlabel("Context")
+        ax.set_ylabel("Proportion")
+        ax.tick_params(axis="x", rotation=90, labelsize=6)
+        plt.tight_layout()
+
+        pdf.savefig(fig)
+        plt.close()
+        pages.append(profile)
+
+print("[INFO] Plot generation complete. Adding bookmarks...")
+
+reader = PyPDF2.PdfReader(output_plot_pdf)
+writer = PyPDF2.PdfWriter()
+
+for i, page in enumerate(reader.pages):
+    writer.add_page(page)
+    writer.add_outline_item(pages[i], i)
+
+with open(output_plot_pdf, "wb") as f_out:
+    writer.write(f_out)
+
+print("[INFO] Bookmarks added successfully.")
+print("[INFO] Finished ex_trinuc_contexts.py")

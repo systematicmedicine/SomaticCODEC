@@ -68,6 +68,7 @@ metrics/{ex_sample}/{ex_sample}_percent_eligible_N_bases.json
 metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json
 metrics/{ex_sample}/{ex_sample}_trinuc_context.csv
 metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv
+metrics/{ex_sample}/{ex_sample}_trinuc_plots.pdf
 metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json
 metrics/{ex_sample}/{ex_sample}_germline_matches.vcf
 metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json
