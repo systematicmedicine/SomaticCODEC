@@ -52,6 +52,13 @@ output_similarity_csv = snakemake.output.similarities_csv
 output_plot_pdf = snakemake.output.plot_pdf
 sample_name = snakemake.wildcards.ex_sample
 
+CANONICAL_96_CONTEXTS = sorted([
+    f"{left}{mut[0]}{right}>{mut[2]}"
+    for mut in ["C>A", "C>G", "C>T", "T>A", "T>C", "T>G"]
+    for left in "ACGT"
+    for right in "ACGT"
+])
+
 # ---------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------
@@ -69,12 +76,11 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
     sample_contexts = []
 
     for variant in vcf:
-        # Validate variant
         if not variant.ALT or len(variant.REF) != 1 or len(variant.ALT[0]) != 1:
             continue  # Skip non-SNVs or malformed ALT
 
         chrom = variant.CHROM
-        pos = variant.POS  # 1-based
+        pos = variant.POS
         ref_base = variant.REF.upper()
         alt_base = variant.ALT[0].upper()
 
@@ -93,9 +99,8 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
             sample_contexts.append(context)
 
         except (KeyError, IndexError):
-            continue  # Cannot fetch context
+            continue
 
-    # Count and normalize
     context_counts = Counter(sample_contexts)
     total = sum(context_counts.get(c, 0) for c in contexts)
     proportions = [
@@ -108,37 +113,42 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
         "Proportion": proportions
     })
 
-
 # ---------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------
 
 # Load reference contexts
 ref_df = pd.read_csv(context_csv_path)
-contexts = sorted(ref_df["Context"].unique())
 profiles = ref_df["Profile"].unique()
+
+# Validate all profiles include exactly the 96 canonical contexts
+for profile in profiles:
+    sub = ref_df[ref_df["Profile"] == profile]
+    contexts_in_profile = set(sub["Context"])
+    missing = set(CANONICAL_96_CONTEXTS) - contexts_in_profile
+    extra = contexts_in_profile - set(CANONICAL_96_CONTEXTS)
+    if missing or extra:
+        raise ValueError(
+            f"[ERROR] Profile '{profile}' does not follow canonical 96-context schema.\n"
+            f"  Missing: {sorted(missing)}\n"
+            f"  Extra:   {sorted(extra)}"
+        )
 
 # Load reference genome
 ref_genome = Fasta(ref_fasta_path, rebuild=False)
 
-# Get sample context proportions
-sample_df = get_sample_trinuc_context(vcf_path, ref_genome, contexts)
+# Compute sample context proportions
+sample_df = get_sample_trinuc_context(vcf_path, ref_genome, CANONICAL_96_CONTEXTS)
 sample_df.to_csv(output_sample_csv, index=False)
 
-# Calculate cosine similarities
+# Compute cosine similarities
 sample_vector = sample_df["Proportion"].values
 similarities = []
 
 for profile in profiles:
     ref_profile_df = ref_df[ref_df["Profile"] == profile].set_index("Context")
-
-    if not set(contexts).issubset(ref_profile_df.index):
-        print(f"[WARNING] Skipping profile '{profile}' — missing one or more contexts.")
-        continue
-
-    ref_vector = ref_profile_df.loc[contexts, "Proportion"].values
+    ref_vector = ref_profile_df.loc[CANONICAL_96_CONTEXTS, "Proportion"].values
     similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
-
     similarities.append({
         "Profile": profile,
         "CosineSimilarity": similarity
@@ -170,19 +180,16 @@ with PdfPages(output_plot_pdf) as pdf:
         long_df = pd.melt(
             merged,
             id_vars="Context",
-            value_vars=[sample_name, profile],
             var_name="Source",
             value_name="Proportion"
         )
-
-        long_df["Context"] = pd.Categorical(long_df["Context"], categories=contexts, ordered=True)
+        long_df["Context"] = pd.Categorical(long_df["Context"], categories=CANONICAL_96_CONTEXTS, ordered=True)
         long_df = long_df.sort_values("Context")
 
         fig, ax = plt.subplots(figsize=(20, 6))
         sns.barplot(data=long_df, x="Context", y="Proportion", hue="Source", ax=ax)
 
         ax.set_title(f"{sample_name} vs {profile} (Cosine similarity: {similarity:.3f})", fontsize=12)
-
         ax.set_xlabel("Context")
         ax.set_ylabel("Proportion")
         ax.tick_params(axis="x", rotation=90, labelsize=6)
