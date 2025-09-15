@@ -36,7 +36,8 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 CSV_PATH = os.path.join(PROJECT_ROOT, 'tests', 'expected', 'test_regex', 'regex_expected_values.csv')
-XLSX_PATH = os.path.join(PROJECT_ROOT, 'config', 'component_level_metrics.xlsx')
+COMPONENT_XLSX = os.path.join(PROJECT_ROOT, 'config', 'component_level_metrics.xlsx')
+SYSTEM_XLSX = os.path.join(PROJECT_ROOT, 'config', 'system_level_metrics.xlsx')
 R_SCRIPT_PATH = os.path.join(PROJECT_ROOT, 'scripts', 'metrics_report_functions.R')
 
 # Load R script
@@ -45,7 +46,9 @@ get_metric_txt = robjects.globalenv['get_metric_txt']
 
 # Load expected values and config
 expected_df = pd.read_csv(CSV_PATH)
-config_df = pd.read_excel(XLSX_PATH)
+component_df = pd.read_excel(COMPONENT_XLSX)
+system_df = pd.read_excel(SYSTEM_XLSX)
+config_df = pd.concat([component_df, system_df], ignore_index=True)
 
 
 def build_test_cases():
@@ -78,7 +81,7 @@ def test_regex_matches_expected(metric, file_path, pattern, expected):
 
 def test_all_regexes_tested():
     # Filter config for metrics with file_path ending in '.txt'
-    txt_metrics = config_df[config_df['file_pattern'].str.endswith('.txt', na=False)]
+    txt_metrics = config_df[config_df['file_pattern'].str.endswith(('.txt', '.csv'), na=False)]
 
     # Get the set of metrics present in expected values CSV
     expected_metrics = set(expected_df['Metric'])
