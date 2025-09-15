@@ -196,7 +196,8 @@ rule ms_coverage_by_depth_metrics:
     output:
         coverage_by_depth = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
     params:
-        sample = "{ms_sample}"
+        sample = "{ms_sample}",
+        min_depth = config["rules"]["ms_candidate_germ_variants"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
     benchmark:
