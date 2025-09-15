@@ -52,16 +52,17 @@ output_similarity_csv = snakemake.output.similarities_csv
 output_plot_pdf = snakemake.output.plot_pdf
 sample_name = snakemake.wildcards.ex_sample
 
-CANONICAL_96_CONTEXTS = sorted([
-    f"{left}{mut[0]}{right}>{mut[2]}"
-    for mut in ["C>A", "C>G", "C>T", "T>A", "T>C", "T>G"]
-    for left in "ACGT"
-    for right in "ACGT"
-])
-
 # ---------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------
+def get_contexts():
+    """Generate 96 canoncial trinucleotide contexts""" 
+    return [
+        f"{left}{mut[0]}{right}>{mut[2]}"
+        for mut in ["C>A", "C>G", "C>T", "T>A", "T>C", "T>G"]
+        for left in "ACGT"
+        for right in "ACGT"
+    ]
 
 def cosine_similarity_np(u, v):
     """Compute cosine similarity between two 1D numpy arrays"""
@@ -117,6 +118,9 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
 # Main logic
 # ---------------------------------------------------------------------
 
+# Define contexts
+CONTEXTS = get_contexts()
+
 # Load reference contexts
 ref_df = pd.read_csv(context_csv_path)
 profiles = ref_df["Profile"].unique()
@@ -125,8 +129,8 @@ profiles = ref_df["Profile"].unique()
 for profile in profiles:
     sub = ref_df[ref_df["Profile"] == profile]
     contexts_in_profile = set(sub["Context"])
-    missing = set(CANONICAL_96_CONTEXTS) - contexts_in_profile
-    extra = contexts_in_profile - set(CANONICAL_96_CONTEXTS)
+    missing = set(CONTEXTS) - contexts_in_profile
+    extra = contexts_in_profile - set(CONTEXTS)
     if missing or extra:
         raise ValueError(
             f"[ERROR] Profile '{profile}' does not follow canonical 96-context schema.\n"
@@ -138,7 +142,7 @@ for profile in profiles:
 ref_genome = Fasta(ref_fasta_path, rebuild=False)
 
 # Compute sample context proportions
-sample_df = get_sample_trinuc_context(vcf_path, ref_genome, CANONICAL_96_CONTEXTS)
+sample_df = get_sample_trinuc_context(vcf_path, ref_genome, CONTEXTS)
 sample_df.to_csv(output_sample_csv, index=False)
 
 # Compute cosine similarities
@@ -147,7 +151,7 @@ similarities = []
 
 for profile in profiles:
     ref_profile_df = ref_df[ref_df["Profile"] == profile].set_index("Context")
-    ref_vector = ref_profile_df.loc[CANONICAL_96_CONTEXTS, "Proportion"].values
+    ref_vector = ref_profile_df.loc[CONTEXTS, "Proportion"].values
     similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
     similarities.append({
         "Profile": profile,
@@ -183,7 +187,7 @@ with PdfPages(output_plot_pdf) as pdf:
             var_name="Source",
             value_name="Proportion"
         )
-        long_df["Context"] = pd.Categorical(long_df["Context"], categories=CANONICAL_96_CONTEXTS, ordered=True)
+        long_df["Context"] = pd.Categorical(long_df["Context"], categories=CONTEXTS, ordered=True)
         long_df = long_df.sort_values("Context")
 
         fig, ax = plt.subplots(figsize=(20, 6))
