@@ -406,7 +406,8 @@ rule ex_trinucleotide_context_metrics:
         context_csv_path = config["files"]["reference_tri_contexts"]
     output:
         sample_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_context.csv",
-        similarities_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv"
+        similarities_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
+        plot_pdf = "metrics/{ex_sample}/{ex_sample}_trinuc_plots.pdf"
     log:
         "logs/{ex_sample}/ex_trinuc_context.log"
     benchmark:
