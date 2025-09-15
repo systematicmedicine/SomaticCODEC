@@ -22,7 +22,7 @@ dependencies:
   - scipy=1.13.1
   - seaborn=0.13.2
   - pyfaidx=0.9.0.3
-  - pypdf2=3.0.1  
+  - pypdf=6.0.0  
 
   # Bioinformatics tools
   - bcftools=1.22
