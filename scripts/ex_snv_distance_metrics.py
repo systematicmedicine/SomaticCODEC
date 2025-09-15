@@ -12,64 +12,55 @@
 # Load libraries
 import json
 import numpy as np
-import pandas as pd
-import sys
 from cyvcf2 import VCF
 
-# Logging
-sys.stdout = open(snakemake.log[0], "a")
-sys.stderr = open(snakemake.log[0], "a")
-print("[INFO] Starting ex_snv_distance_metrics.py")
+# Define hard coded variables
+PERCENTILES_TO_COMPUTE = [0, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 100]
 
-# Snakemake parameter injection
-vcf_path = snakemake.input.vcf
-output_path = snakemake.output.metrics_json
+# Given a VCF path, compute the distribution of distances to the nearest SNV
+def calculate_nearest_snv_percentiles(vcf_path):
 
-# Load SNVs from VCF
-positions_by_chrom = {}
-for variant in VCF(vcf_path):
-    if variant.is_snp:
-        chrom = variant.CHROM
-        pos = variant.POS
-        positions_by_chrom.setdefault(chrom, []).append(pos)
+    positions_by_chrom = {}
 
-# alculate nearest distances
-all_distances = []
+    for variant in VCF(vcf_path):
+        if variant.is_snp:
+            chrom = variant.CHROM
+            pos = variant.POS
+            positions_by_chrom.setdefault(chrom, []).append(pos)
 
-for chrom, positions in positions_by_chrom.items():
-    if len(positions) < 2:
-        continue  # Can't calculate distances if only one SNV on this chromosome
+    all_distances = []
 
-    sorted_pos = sorted(positions)
-    for i, pos in enumerate(sorted_pos):
-        if i == 0:
-            dist = abs(sorted_pos[i+1] - pos)
-        elif i == len(sorted_pos) - 1:
-            dist = abs(pos - sorted_pos[i-1])
-        else:
-            dist = min(abs(pos - sorted_pos[i-1]), abs(sorted_pos[i+1] - pos))
-        all_distances.append(dist)
+    for chrom, positions in positions_by_chrom.items():
+        if len(positions) < 2:
+            continue  # No distance to calculate if only one SNV on chromosome
 
-# Handle edge case: no distances
-if not all_distances:
+        sorted_pos = sorted(positions)
+        for i, pos in enumerate(sorted_pos):
+            if i == 0:
+                dist = abs(sorted_pos[i + 1] - pos)
+            elif i == len(sorted_pos) - 1:
+                dist = abs(pos - sorted_pos[i - 1])
+            else:
+                dist = min(abs(pos - sorted_pos[i - 1]), abs(sorted_pos[i + 1] - pos))
+            all_distances.append(dist)
+
+    if not all_distances:
+        return {str(p): None for p in PERCENTILES_TO_COMPUTE}
+    print(all_distances)
+    values = np.percentile(all_distances, PERCENTILES_TO_COMPUTE)
+    print(values)
+    return {str(p): round(v, 2) for p, v in zip(PERCENTILES_TO_COMPUTE, values)}
+
+
+# === Snakemake orchestration only ===
+if __name__ == "__main__":
+    vcf_path = snakemake.input.vcf
+    output_path = snakemake.output.metrics_json
+
     metrics = {
         "description": "Distance to nearest SNV (bp). Only calculated for SNVs that have at least one other SNV on the same chromosome.",
-        "percentiles": {str(p): None for p in [0, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 100]}
-    }
-else:
-    percentiles = [0, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 100]
-    values = np.percentile(all_distances, percentiles)
-
-    metrics = {
-        "description": "Distance to nearest SNV (bp). Only calculated for SNVs that have at least one other SNV on the same chromosome.",
-        "percentiles": {
-            f"{p}": round(v, 2) for p, v in zip(percentiles, values)
-        }
+        "percentiles": calculate_nearest_snv_percentiles(vcf_path)
     }
 
-# Write output
-with open(output_path, "w") as f:
-    json.dump(metrics, f, indent=2)
-
-# Finished script message
-print("[INFO] Finishing ex_snv_distance_metrics.py")
+    with open(output_path, "w") as f:
+        json.dump(metrics, f, indent=2)
