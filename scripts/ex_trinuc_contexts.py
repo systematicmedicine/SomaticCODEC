@@ -28,10 +28,6 @@
 # ---------------------------------------------------------------------
 
 import sys
-sys.stdout = open(snakemake.log[0], "a")
-sys.stderr = open(snakemake.log[0], "a")
-print("[INFO] Starting ex_trinuc_contexts.py")
-
 import pandas as pd
 import numpy as np
 from cyvcf2 import VCF
@@ -41,16 +37,7 @@ from Bio.Seq import Seq
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
-import PyPDF2
-
-# Snakemake parameter injection
-vcf_path = snakemake.input.vcf_path
-ref_fasta_path = snakemake.input.ref_fasta_path
-context_csv_path = snakemake.input.context_csv_path
-output_sample_csv = snakemake.output.sample_csv
-output_similarity_csv = snakemake.output.similarities_csv
-output_plot_pdf = snakemake.output.plot_pdf
-sample_name = snakemake.wildcards.ex_sample
+from pypdf import PdfReader, PdfWriter
 
 # ---------------------------------------------------------------------
 # Functions
@@ -117,103 +104,118 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
 # ---------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------
+if __name__ == "__main__":
 
-# Define contexts
-CONTEXTS = get_contexts()
+    # Start logging
+    sys.stdout = open(snakemake.log[0], "a")
+    sys.stderr = open(snakemake.log[0], "a")
+    print("[INFO] Starting ex_trinuc_contexts.py")
 
-# Load reference contexts
-ref_df = pd.read_csv(context_csv_path)
-profiles = ref_df["Profile"].unique()
+    # Snakemake parameter injection
+    vcf_path = snakemake.input.vcf_path
+    ref_fasta_path = snakemake.input.ref_fasta_path
+    context_csv_path = snakemake.input.context_csv_path
+    output_sample_csv = snakemake.output.sample_csv
+    output_similarity_csv = snakemake.output.similarities_csv
+    output_plot_pdf = snakemake.output.plot_pdf
+    sample_name = snakemake.wildcards.ex_sample
 
-# Validate all profiles include exactly the 96 canonical contexts
-for profile in profiles:
-    sub = ref_df[ref_df["Profile"] == profile]
-    contexts_in_profile = set(sub["Context"])
-    missing = set(CONTEXTS) - contexts_in_profile
-    extra = contexts_in_profile - set(CONTEXTS)
-    if missing or extra:
-        raise ValueError(
-            f"[ERROR] Profile '{profile}' does not follow canonical 96-context schema.\n"
-            f"  Missing: {sorted(missing)}\n"
-            f"  Extra:   {sorted(extra)}"
-        )
+    # Define contexts
+    CONTEXTS = get_contexts()
 
-# Load reference genome
-ref_genome = Fasta(ref_fasta_path, rebuild=False)
+    # Load reference contexts
+    ref_df = pd.read_csv(context_csv_path)
+    profiles = ref_df["Profile"].unique()
 
-# Compute sample context proportions
-sample_df = get_sample_trinuc_context(vcf_path, ref_genome, CONTEXTS)
-sample_df.to_csv(output_sample_csv, index=False)
+    # Validate all profiles include exactly the 96 canonical contexts
+    for profile in profiles:
+        sub = ref_df[ref_df["Profile"] == profile]
+        contexts_in_profile = set(sub["Context"])
+        missing = set(CONTEXTS) - contexts_in_profile
+        extra = contexts_in_profile - set(CONTEXTS)
+        if missing or extra:
+            raise ValueError(
+                f"[ERROR] Profile '{profile}' does not follow canonical 96-context schema.\n"
+                f"  Missing: {sorted(missing)}\n"
+                f"  Extra:   {sorted(extra)}"
+            )
 
-# Compute cosine similarities
-sample_vector = sample_df["Proportion"].values
-similarities = []
+    # Load reference genome
+    ref_genome = Fasta(ref_fasta_path, rebuild=False)
 
-for profile in profiles:
-    ref_profile_df = ref_df[ref_df["Profile"] == profile].set_index("Context")
-    ref_vector = ref_profile_df.loc[CONTEXTS, "Proportion"].values
-    similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
-    similarities.append({
-        "Profile": profile,
-        "CosineSimilarity": similarity
-    })
+    # Compute sample context proportions
+    sample_df = get_sample_trinuc_context(vcf_path, ref_genome, CONTEXTS)
+    sample_df.to_csv(output_sample_csv, index=False)
 
-similarity_df = pd.DataFrame(similarities).sort_values("CosineSimilarity", ascending=False)
-similarity_df.to_csv(output_similarity_csv, index=False)
-sim_dict = similarity_df.set_index("Profile")["CosineSimilarity"].to_dict()
+    # Compute cosine similarities
+    sample_vector = sample_df["Proportion"].values
+    similarities = []
 
-# ---------------------------------------------------------------------
-# Generate comparison plots
-# ---------------------------------------------------------------------
+    for profile in profiles:
+        ref_profile_df = ref_df[ref_df["Profile"] == profile].set_index("Context")
+        ref_vector = ref_profile_df.loc[CONTEXTS, "Proportion"].values
+        similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
+        similarities.append({
+            "Profile": profile,
+            "CosineSimilarity": similarity
+        })
 
-print(f"[INFO] Generating comparison plots to {output_plot_pdf}")
-pages = []
+    similarity_df = pd.DataFrame(similarities).sort_values("CosineSimilarity", ascending=False)
+    similarity_df.to_csv(output_similarity_csv, index=False)
+    sim_dict = similarity_df.set_index("Profile")["CosineSimilarity"].to_dict()
 
-with PdfPages(output_plot_pdf) as pdf:
-    for profile in sim_dict.keys():
-        ref_profile_df = ref_df[ref_df["Profile"] == profile]
-        similarity = sim_dict[profile]
+    # ---------------------------------------------------------------------
+    # Generate comparison plots
+    # ---------------------------------------------------------------------
 
-        merged = pd.merge(
-            sample_df.rename(columns={"Proportion": sample_name}),
-            ref_profile_df[["Context", "Proportion"]].rename(columns={"Proportion": profile}),
-            on="Context",
-            how="left"
-        )
+    print(f"[INFO] Generating comparison plots to {output_plot_pdf}")
+    pages = []
 
-        long_df = pd.melt(
-            merged,
-            id_vars="Context",
-            var_name="Source",
-            value_name="Proportion"
-        )
-        long_df["Context"] = pd.Categorical(long_df["Context"], categories=CONTEXTS, ordered=True)
-        long_df = long_df.sort_values("Context")
+    with PdfPages(output_plot_pdf) as pdf:
+        for profile in sim_dict.keys():
+            ref_profile_df = ref_df[ref_df["Profile"] == profile]
+            similarity = sim_dict[profile]
 
-        fig, ax = plt.subplots(figsize=(20, 6))
-        sns.barplot(data=long_df, x="Context", y="Proportion", hue="Source", ax=ax)
+            merged = pd.merge(
+                sample_df.rename(columns={"Proportion": sample_name}),
+                ref_profile_df[["Context", "Proportion"]].rename(columns={"Proportion": profile}),
+                on="Context",
+                how="left"
+            )
 
-        ax.set_title(f"{sample_name} vs {profile} (Cosine similarity: {similarity:.3f})", fontsize=12)
-        ax.set_xlabel("Context")
-        ax.set_ylabel("Proportion")
-        ax.tick_params(axis="x", rotation=90, labelsize=6)
-        plt.tight_layout()
+            long_df = pd.melt(
+                merged,
+                id_vars="Context",
+                var_name="Source",
+                value_name="Proportion"
+            )
+            long_df["Context"] = pd.Categorical(long_df["Context"], categories=CONTEXTS, ordered=True)
+            long_df = long_df.sort_values("Context")
 
-        pdf.savefig(fig)
-        plt.close()
-        pages.append(profile)
+            fig, ax = plt.subplots(figsize=(20, 6))
+            sns.barplot(data=long_df, x="Context", y="Proportion", hue="Source", ax=ax)
 
-print("[INFO] Plot generation complete. Adding bookmarks...")
+            ax.set_title(f"{sample_name} vs {profile} (Cosine similarity: {similarity:.3f})", fontsize=12)
+            ax.set_xlabel("Context")
+            ax.set_ylabel("Proportion")
+            ax.tick_params(axis="x", rotation=90, labelsize=6)
+            plt.tight_layout()
 
-reader = PyPDF2.PdfReader(output_plot_pdf)
-writer = PyPDF2.PdfWriter()
+            pdf.savefig(fig)
+            plt.close()
+            pages.append(profile)
 
-for i, page in enumerate(reader.pages):
-    writer.add_page(page)
-    writer.add_outline_item(pages[i], i)
+    print("[INFO] Plot generation complete. Adding bookmarks...")
 
-with open(output_plot_pdf, "wb") as f_out:
-    writer.write(f_out)
+    reader = PdfReader(output_plot_pdf)
+    writer = PdfWriter()
 
-print("[INFO] Bookmarks added successfully.")
-print("[INFO] Finished ex_trinuc_contexts.py")
+    for i, page in enumerate(reader.pages):
+        writer.add_page(page)
+        writer.add_outline_item(pages[i], i)
+
+    with open(output_plot_pdf, "wb") as f_out:
+        writer.write(f_out)
+
+    print("[INFO] Bookmarks added successfully.")
+    print("[INFO] Finished ex_trinuc_contexts.py")
