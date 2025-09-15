@@ -21,6 +21,7 @@ def main(snakemake):
     # Define inputs
     depth_histogram = snakemake.input.depth_histogram
     sample = snakemake.params.sample
+    min_depth = snakemake.params.min_depth
 
     # Define output
     json_out = snakemake.output.coverage_by_depth
@@ -42,11 +43,15 @@ def main(snakemake):
         positions_at_least_x = df[df['depth'] >= x]['count'].sum()
         coverage_dict[f"{x}X"] = round(positions_at_least_x / total_positions * 100, 2)
 
+    pct_coverage_min_depth = coverage_dict[f"{min_depth}X"]
+
     # Write to JSON
     output = {
     "description": "Percentage of genome covered at each depth threshold",
     "sample": sample,
-    "pct_coverage": coverage_dict
+    "pct_coverage": coverage_dict,
+    "defined_min_depth": min_depth,
+    "pct_coverage_min_depth": pct_coverage_min_depth
     }
 
     with open(json_out, "w") as f:
