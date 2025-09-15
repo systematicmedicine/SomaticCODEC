@@ -24,16 +24,18 @@ def test_coverage_by_depth_calculation(tmp_path, depth_histogram, expected_pct_d
     output_json = tmp_path / "coverage_by_depth_metrics.json"
     sample = "TestSample"
     log_path = tmp_path / "log.txt"
+    min_depth = 40
 
     class MockSnakemake:
         input = type("input", (), {"depth_histogram": depth_histogram})
         output = type("output", (), {"coverage_by_depth": str(output_json)})
         log = [str(log_path)]
-        params = type("params", (), {"sample": sample})
+        params = type("params", (), {"sample": sample,
+                                     "min_depth": min_depth})
 
     main(MockSnakemake)
 
     with open(output_json) as f:
         result = json.load(f)
 
-    assert result["pct_coverage"]["40X"] == expected_pct_depth_40X
+    assert result["pct_coverage_min_depth"] == expected_pct_depth_40X
