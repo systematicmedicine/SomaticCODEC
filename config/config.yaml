@@ -8,15 +8,15 @@ experiment:
 # ------------------------------------------------------------------------------
 # Resources (memory/threads)
 # ------------------------------------------------------------------------------
-resources: # Optimised for running 12 samples on m6i.32xlarge (128 cores, 512GB memory)
+resources: # Optimised for running 6 samples (3 EX, 3 MS) on m6i.32xlarge (128 cores, 512GB memory)
   memory: # in GB
     light: 8
     moderate: 16
     heavy: 32
   threads:
     light: 2
-    moderate: 4
-    heavy: 8
+    moderate: 8
+    heavy: 16
 
 # ------------------------------------------------------------------------------
 # File paths

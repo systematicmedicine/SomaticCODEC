@@ -15,8 +15,8 @@ Authors:
     
 """
 
-# Call candidate germline variants
-# - Germline variants are called only on chromosomes defined in config[chroms][included_chromosomes]
+# Identify candidate germline variants
+# - Germline variants are identified only on chromosomes defined in config[chroms][included_chromosomes]
 rule ms_candidate_germ_variants:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
@@ -26,7 +26,7 @@ rule ms_candidate_germ_variants:
         intermediate_pileup = "tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf",
         vcf_candidate = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
     params:
-        included_chromosomes = config["chroms"]["included_chromosomes"],
+        included_chromosomes = ",".join(config["chroms"]["included_chromosomes"]),
         max_base_qual = config["rules"]["ms_candidate_germ_variants"]["max_base_qual"],
         max_depth = config["rules"]["ms_candidate_germ_variants"]["max_depth"],
         min_alt_vaf = config["rules"]["ms_candidate_germ_variants"]["min_alt_vaf"],
@@ -38,7 +38,7 @@ rule ms_candidate_germ_variants:
     benchmark:
         "logs/{ms_sample}/ms_candidate_germ_variants.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
