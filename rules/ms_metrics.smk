@@ -5,7 +5,6 @@ Rules for creating metrics files that are not created during data processing ste
 
 Authors: 
     - Joshua Johnstone
-    - Ben Barry
     - Cameron Fraser
 
 """
@@ -153,42 +152,6 @@ rule ms_duplication_metrics:
        "../scripts/ms_duplication_metrics.py"
 
 
-# Generates metrics for candidate ms germline variants
-rule ms_candidate_variant_metrics:
-    input: 
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
-    output:
-        stat = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt"
-    log:
-        "logs/{ms_sample}/ms_candidate_variant_metrics.log"
-    benchmark:
-        "logs/{ms_sample}/ms_candidate_variant_metrics.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    shell:
-        """
-        bcftools stats -s - {input.vcf} > {output.stat} 2>> {log}
-        """
-
-# Calculates the het/hom ratio from MS candidate variants VCF
-rule ms_het_hom_ratio:
-    input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
-    output:
-        json = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.json",
-    params:
-        sample = "{ms_sample}",
-        het_threshold = config["rules"]["ms_candidate_germ_variants"]["min_alt_vaf"]
-    log:
-        "logs/{ms_sample}/ms_het_hom_ratio.log"
-    benchmark:
-        "logs/{ms_sample}/ms_het_hom_ratio.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    script:
-       "../scripts/ms_het_hom_ratio.py"
-
-
 # Generates a summary of genome coverage by depth
 rule ms_coverage_by_depth_metrics:
     input:
@@ -197,7 +160,7 @@ rule ms_coverage_by_depth_metrics:
         coverage_by_depth = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
     params:
         sample = "{ms_sample}",
-        min_depth = config["rules"]["ms_candidate_germ_variants"]["min_depth"]
+        min_depth = config["rules"]["ms_germline_risk"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
     benchmark:
@@ -232,25 +195,3 @@ rule ms_masking_metrics:
         memory = config["resources"]["memory"]["light"]
     script:
        "../scripts/ms_masking_metrics.py"
-
-
-# Generates a summary of key metrics for candidate ms germline variants
-rule ms_candidate_variant_metrics_summary:
-    input: 
-        variant_metrics = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics.txt",
-        ms_het_hom_ratio = "metrics/{ms_sample}/{ms_sample}_ms_het_hom_ratio.json",
-        depth_hist = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt"
-    output:
-        summary = "metrics/{ms_sample}/{ms_sample}_candidate_variant_metrics_summary.json"
-    params:
-        sample = "{ms_sample}",
-        min_depth = config["rules"]["ms_candidate_germ_variants"]["min_depth"]
-    log:
-        "logs/{ms_sample}/ms_candidate_variant_metrics_summary.log"
-    benchmark:
-        "logs/{ms_sample}/ms_candidate_variant_metrics_summary.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    script:
-        "../scripts/ms_candidate_variant_metrics_summary.py"
-
