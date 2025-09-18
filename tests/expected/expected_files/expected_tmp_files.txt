@@ -29,7 +29,7 @@ tmp/{ms_sample}/{ms_sample}_depth_values.txt
 tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth.bed
 tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf
-tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf
+tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf
 tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed
 tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed
 tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed

@@ -129,16 +129,16 @@ rules:
     r2_cut_end: -9  # Must be negative
     quality_cutoff: 20
 
-  ms_candidate_germ_variants:
+  ms_filter_fastq:
+    min_read_length: 100
+
+  ms_germline_risk:
     max_base_qual: 60
     max_depth: 250
     min_alt_vaf: 0.10
     min_base_qual: 13
     min_depth: 40
     min_map_qual: 0
-
-  ms_filter_fastq:
-    min_read_length: 100
 
   ms_map:
     band_width: 100

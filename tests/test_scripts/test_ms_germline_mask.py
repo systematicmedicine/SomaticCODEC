@@ -1,7 +1,7 @@
 """
---- test_ms_germline_variants_mask.py
+--- test_ms_germline_mask.py
 
-Tests the rule ms_germline_variants_mask
+Tests the rule ms_germline_mask
 
 Authors:
     - Chat-GPT
