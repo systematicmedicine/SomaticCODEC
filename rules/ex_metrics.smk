@@ -360,7 +360,7 @@ rule ex_dsc_coverage_metrics:
     params: 
         quality_threshold = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
         sample = "{ex_sample}",
-        ms_depth_threshold = config["rules"]["ms_candidate_germ_variants"]["min_depth"]
+        ms_depth_threshold = config["rules"]["ms_germline_risk"]["min_depth"]
     log:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
@@ -518,6 +518,7 @@ rule ex_germline_contamination:
         memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_germline_contamination.py"
+
 
 """
 Calculates the distance to nearest SNV, for each SNV
