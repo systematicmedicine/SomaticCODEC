@@ -1,5 +1,5 @@
 # ==============================================================================================
-#   masked_regions.smk
+#   ms_masked_regions.smk
 #
 #   Rules for masking genomic postions where somatic variants cannot be confidently called.
 #       - Positions that may contain germline variants (based on MS sample)
