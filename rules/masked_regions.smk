@@ -1,26 +1,125 @@
-"""
---- masked_regions.smk ---
+# ==============================================================================================
+#   masked_regions.smk
+#
+#   Rules for masking genomic postions where somatic variants cannot be confidently called.
+#       - Positions that may contain germline variants (based on MS sample)
+#       - Positions with low MS depth
+#       - Positions from precomputed masks (defined in config)
+#   
+#   Precomputed masks worth considering:
+#       - gnomAD common germline variants
+#       - Genome in a Bottle difficult genomic regions
+#       - RepBase RepeatMask
+#
+#   Authors:
+#       - Joshua Johnstone
+#       - James Phie
+#       - Cameron Fraser
+# ==============================================================================================
 
-Rules for masking genomic regions where somatic variant cannot be confidently called.
-
-Inputs:
-    - gnomAD common variants (1% VAF)
-    - GIAB all difficult regions
-    - Low depth regions from ms raw alignment (<30x)
-    - ms germline variant positions
-    
-Output: BED file containing all regions to mask
-
-Authors:
-    - Joshua Johnstone
-    - Benjamin Barry
-    - James Phie
-    - Cameron Fraser
-"""
 
 import helpers.get_metadata as md
 
-# Creates a mask for genomic positions with low ms read depth
+
+# ----------------------------------------------------------------------------------------------
+#   RULE ms_germline_risk
+#
+#   Uses matched sample BAM to identify positions that may contain germline variants. 
+# 
+#   Notes:
+#       - Designed to favour sensitivty over specificity
+# ----------------------------------------------------------------------------------------------
+rule ms_germline_risk:
+    input:
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
+        ref = config["files"]["reference_genome"],
+        fai = config["files"]["reference_genome"] + ".fai"
+    output:
+        intermediate_pileup = "tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf",
+        vcf_germ = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf"
+    params:
+        included_chromosomes = ",".join(config["chroms"]["included_chromosomes"]),
+        max_base_qual = config["rules"]["ms_germline_risk"]["max_base_qual"],
+        max_depth = config["rules"]["ms_germline_risk"]["max_depth"],
+        min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"],
+        min_base_qual = config["rules"]["ms_germline_risk"]["min_base_qual"],
+        min_depth = config["rules"]["ms_germline_risk"]["min_depth"],
+        min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"]
+    log:
+        "logs/{ms_sample}/ms_germline_risk.log"
+    benchmark:
+        "logs/{ms_sample}/ms_germline_risk.benchmark.txt"
+    threads:
+        config["resources"]["threads"]["heavy"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
+    shell:
+        """
+        bcftools mpileup \
+        --threads {threads} \
+        --fasta-ref {input.ref} \
+        --annotate AD,DP \
+        --min-MQ {params.min_map_qual} \
+        --min-BQ {params.min_base_qual} \
+        --max-BQ {params.max_base_qual} \
+        --max-depth {params.max_depth} \
+        --no-BAQ \
+        --regions {params.included_chromosomes} \
+        --output {output.intermediate_pileup} \
+        {input.bam} 2>> {log}
+
+        bcftools filter \
+        --threads {threads} \
+        --include 'FMT/DP >= {params.min_depth} && \
+        (SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf}' \
+        --output {output.vcf_germ} \
+        {output.intermediate_pileup} 2>> {log}
+        """
+
+
+# ----------------------------------------------------------------------------------------------
+#   RULE ms_germline_mask
+#
+#   Creates a BED file from germline risk VCF 
+# 
+#   Notes:
+#       - For deletions, the stop value of the BED region is determined by the length difference 
+#           between ALT and REF alleles. 
+#       - For insertions and SNV's, the BED region is length 1
+# ----------------------------------------------------------------------------------------------
+rule ms_germline_mask:
+    input:
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf"
+    output:
+        intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
+        intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
+        intermediate_snv_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"),
+        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
+        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
+        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
+    log:
+        "logs/{ms_sample}/ms_germline_variants_mask.log"
+    benchmark:
+        "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    shell:
+        """        
+        vcf2bed --deletions < {input.vcf} > {output.intermediate_del_unformatted} 2>> {log}
+        vcf2bed --insertions < {input.vcf} > {output.intermediate_ins_unformatted} 2>> {log}
+        vcf2bed --snvs < {input.vcf} > {output.intermediate_snv_unformatted} 2>> {log}
+
+        cut -f1-3 {output.intermediate_del_unformatted} > {output.ms_germ_del_bed} 2>> {log}
+        cut -f1-3 {output.intermediate_ins_unformatted} > {output.ms_germ_ins_bed} 2>> {log}
+        cut -f1-3 {output.intermediate_snv_unformatted} > {output.ms_germ_snv_bed} 2>> {log}  
+        """
+
+
+# ----------------------------------------------------------------------------------------------
+#   RULE ms_low_depth_mask
+#
+#   Creates a mask for genomic positions with low read depth in matched sample
+# ----------------------------------------------------------------------------------------------
 rule ms_low_depth_mask:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
@@ -38,7 +137,7 @@ rule ms_low_depth_mask:
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
-        threshold = config["rules"]["ms_candidate_germ_variants"]["min_depth"]
+        threshold = config["rules"]["ms_germline_risk"]["min_depth"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
@@ -59,42 +158,12 @@ rule ms_low_depth_mask:
         uniq -c {output.intermediate_depth_values_sorted} > {output.depth_histogram} 2>> {log}
         """
 
-# Creates a mask genomic positions where germline variants have been called in ms sample
-    # For deletions, the stop value of the BED region is determined by the length difference between ALT and REF alleles. 
-    # For insertions and SNV's, the BED region is length 1
-rule ms_germline_variants_mask:
-    input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_candidate_variants.vcf"
-    output:
-        intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
-        intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
-        intermediate_snv_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"),
-        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
-        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
-    log:
-        "logs/{ms_sample}/ms_germline_variants_mask.log"
-    benchmark:
-        "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    shell:
-        """        
-        vcf2bed --deletions < {input.vcf} > {output.intermediate_del_unformatted} 2>> {log}
 
-        vcf2bed --insertions < {input.vcf} > {output.intermediate_ins_unformatted} 2>> {log}
-
-        vcf2bed --snvs < {input.vcf} > {output.intermediate_snv_unformatted} 2>> {log}
-
-        cut -f1-3 {output.intermediate_del_unformatted} > {output.ms_germ_del_bed} 2>> {log}
-
-        cut -f1-3 {output.intermediate_ins_unformatted} > {output.ms_germ_ins_bed} 2>> {log}
-
-        cut -f1-3 {output.intermediate_snv_unformatted} > {output.ms_germ_snv_bed} 2>> {log}  
-        """
-
-
-# Combines all masks into a single BED file
+# ----------------------------------------------------------------------------------------------
+#   RULE combine_masks
+#
+#   Combines all masks into a single BED file
+# ----------------------------------------------------------------------------------------------
 rule combine_masks:
     input:
         precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
@@ -128,7 +197,14 @@ rule combine_masks:
         bedtools merge -i {output.intermediate_sorted} > {output.combined_bed} 2>> {log}
         """
 
-# Generate an include regions bed file for variant calling (opposite of combined bed)
+# ----------------------------------------------------------------------------------------------
+#   RULE generate_include_bed
+#
+#   Generate a BED file of regions eligible for variant calling
+# 
+#   Notes:
+#       - Inverse of combined mask
+# ----------------------------------------------------------------------------------------------
 rule generate_include_bed:
     input:
         ms_samples = config["files"]["ms_samples_metadata"],
