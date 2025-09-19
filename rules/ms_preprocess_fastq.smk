@@ -78,7 +78,8 @@ rule ms_trim_fastq:
 
 """
 Filters FASTQ files
-    - Reads < min_read_length base pairs
+    - Reads less than minimum length
+    - Reads with low average quality
 """
 rule ms_filter_fastq:
     input:
@@ -87,9 +88,13 @@ rule ms_filter_fastq:
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_filtered_fq_metrics.txt"
+        r1_intermediate = temp("tmp/{ms_sample}/{ms_sample}_filter_r2_intermediate.fastq.gz"),
+        r2_intermediate = temp("tmp/{ms_sample}/{ms_sample}_filter_r1_intermediate.fastq.gz"),
+        length_metrics = "metrics/{ms_sample}/{ms_sample}_length_filter_metrics.txt",
+        quality_metrics = "metrics/{ms_sample}/{ms_sample}_quality_filter_metrics.txt"
     params:
-        min_read_length = config["rules"]["ms_filter_fastq"]["min_read_length"]
+        min_read_length = config["rules"]["ms_filter_fastq"]["min_read_length"],
+        average_quality_threshold = config["rules"]["ms_filter_fastq"]["average_quality_threshold"]
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
@@ -100,11 +105,29 @@ rule ms_filter_fastq:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        cutadapt \
-            -j {threads} \
-            --minimum-length {params.min_read_length} \
-            -o {output.r1} \
-            -p {output.r2} \
-            {input.r1} {input.r2} \
-            --report=full > {output.report} 2>> {log}
+        # Length filter
+        trimmomatic PE \
+            -phred33 \
+            -threads {threads} \
+            -summary {output.length_metrics} \
+            {input.r1} \
+            {input.r2} \
+            {output.r1_intermediate} \
+            /dev/null \
+            {output.r2_intermediate} \
+            /dev/null \
+            MINLEN:{params.min_read_length} 2>> {log}
+
+        # Average quality filter
+        trimmomatic PE \
+            -phred33 \
+            -threads {threads} \
+            -summary {output.quality_metrics} \
+            {output.r1_intermediate} \
+            {output.r2_intermediate} \
+            {output.r1} \
+            /dev/null \
+            {output.r2} \
+            /dev/null \
+            AVGQUAL:{params.average_quality_threshold} 2>> {log}
         """

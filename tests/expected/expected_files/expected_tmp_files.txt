@@ -10,6 +10,8 @@ tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz
+tmp/{ms_sample}/{ms_sample}_filter_r2_intermediate.fastq.gz
+tmp/{ms_sample}/{ms_sample}_filter_r1_intermediate.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_raw_map.sam
