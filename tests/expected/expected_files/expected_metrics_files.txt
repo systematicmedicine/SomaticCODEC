@@ -7,7 +7,8 @@ metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt
 metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json
 metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json
 metrics/{ms_sample}/{ms_sample}_trim_metrics.txt
-metrics/{ms_sample}/{ms_sample}_filtered_fq_metrics.txt
+metrics/{ms_sample}/{ms_sample}_length_filter_metrics.txt
+metrics/{ms_sample}/{ms_sample}_quality_filter_metrics.txt
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip

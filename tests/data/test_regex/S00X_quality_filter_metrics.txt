@@ -1,0 +1,9 @@
+Input Read Pairs: 9501
+Both Surviving Reads: 9238
+Both Surviving Read Percent: 77.23
+Forward Only Surviving Reads: 151
+Forward Only Surviving Read Percent: 1.59
+Reverse Only Surviving Reads: 31
+Reverse Only Surviving Read Percent: 0.33
+Dropped Reads: 81
+Dropped Read Percent: 0.85
