@@ -8,11 +8,11 @@ experiment:
 # ------------------------------------------------------------------------------
 # Resources (memory/threads)
 # ------------------------------------------------------------------------------
-resources: # Optimised for running 6 samples (3 EX, 3 MS) on m6i.32xlarge (128 cores, 512GB memory)
+resources:
   memory: # in GB
     light: 8
-    moderate: 16
-    heavy: 32
+    moderate: 32
+    heavy: 64
   threads:
     light: 2
     moderate: 8
@@ -133,11 +133,15 @@ rules:
     average_quality_threshold: 30
     min_read_length: 100
 
+  ms_germline_mask:
+    indel_padding_bases: 5
+
+
   ms_germline_risk:
     max_base_qual: 60
     max_depth: 250
     min_alt_vaf: 0.10
-    min_base_qual: 13
+    min_base_qual: 20
     min_depth: 40
     min_map_qual: 0
 

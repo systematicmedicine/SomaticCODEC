@@ -28,7 +28,9 @@ def assert_correctly_merged(ms_sample):
         Path(f"tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
         Path(f"tmp/{ms_sample}/{ms_sample}_germ_snvs.bed"),
         Path("tmp/downloads/GRCh38_alldifficultregions_10lines.bed"),
-        Path("tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed")
+        Path("tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed"),
+        Path("tmp/downloads/GCRh38_repeat_masker_10lines.bed"),
+        Path("tmp/downloads/excluded_chromosomes.bed")
         ]
     pre_dfs = [read_bed(f) for f in pre_files]
 

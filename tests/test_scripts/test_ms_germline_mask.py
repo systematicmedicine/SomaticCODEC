@@ -9,6 +9,7 @@ Authors:
 """
 from pathlib import Path
 import sys
+import pandas as pd
 
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
@@ -36,4 +37,40 @@ def test_bed_structure_correct(lightweight_test_run):
                     end = int(cols[2])
 
                     # Assertion 2: Start position is before end position
-                    assert start < end, f"Start >= end on line {linenum}: {line}"    
+                    assert start < end, f"Start >= end on line {linenum}: {line}"
+
+def test_indel_padding_added(lightweight_test_run):
+    def read_bed(path):
+        return (
+            pd.read_csv(path, sep="\t", header=None, usecols=[0,1,2],
+                        names=["chrom","start","end"])
+            .sort_values(["chrom","start"])
+            .reset_index(drop=True))
+
+    config = load_config("config/config.yaml")
+    ms_samples = get_ms_sample_ids(config)
+    indel_padding_bases = config["rules"]["ms_germline_mask"]["indel_padding_bases"]
+
+    for ms_sample in ms_samples:
+        pre_padding_files = [
+            Path(f"tmp/{ms_sample}/{ms_sample}_germ_insertions_unpadded.bed"),
+            Path(f"tmp/{ms_sample}/{ms_sample}_germ_deletions_unpadded.bed"),
+        ]
+        post_padding_files = [
+            Path(f"tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
+            Path(f"tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
+        ]
+
+        for pre_path, post_path in zip(pre_padding_files, post_padding_files):
+            pre_df = read_bed(pre_path)
+            post_df = read_bed(post_path)
+
+            # Calculate expected padded start/end positions
+            expected_start = (pre_df["start"] - indel_padding_bases).clip(lower=0)
+            expected_end   = pre_df["end"] + indel_padding_bases
+
+            # assert both start and end match expected
+            assert (post_df["start"].values == expected_start.values).all(), \
+                f"Starts not padded/clamped correctly in {post_path}"
+            assert (post_df["end"].values == expected_end.values).all(), \
+                f"Ends not padded correctly in {post_path}"

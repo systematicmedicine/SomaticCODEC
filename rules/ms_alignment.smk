@@ -85,9 +85,9 @@ rule ms_annotate_map:
     benchmark:
         "logs/{ms_sample}/ms_annotate_map.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["resources"]["memory"]["heavy"]
     shell:
         """
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
@@ -127,7 +127,7 @@ rule ms_remove_duplicates:
     benchmark:
         "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
