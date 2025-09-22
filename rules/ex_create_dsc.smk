@@ -142,7 +142,7 @@ rule ex_annotate_dsc:
     resources:
         memory = config["resources"]["memory"]["moderate"]
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \

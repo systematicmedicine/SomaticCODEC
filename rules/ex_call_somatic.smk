@@ -37,11 +37,14 @@ rule ex_call_somatic_snv:
         "logs/{ex_sample}/ex_call_somatic_snv.log"
     benchmark:
         "logs/{ex_sample}/ex_call_somatic_snv.benchmark.txt"
+    threads:
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["heavy"]
     shell:
         """
         bcftools mpileup \
+            --threads {threads} \
             --fasta-ref {input.ref} \
             --output-type b \
             --count-orphans \
@@ -55,6 +58,7 @@ rule ex_call_somatic_snv:
             -o {output.intermediate_mpileup} 2>> {log}
 
         bcftools call \
+            --threads {threads} \
             --multiallelic-caller \
             --keep-alts \
             --output-type b \
@@ -62,18 +66,21 @@ rule ex_call_somatic_snv:
             {output.intermediate_mpileup} 2>> {log}
 
         bcftools view \
+            --threads {threads} \
             -e 'TYPE="indel" || TYPE="ref"' \
             -Ob \
             -o {output.intermediate_biallelic} \
             {output.intermediate_called} 2>> {log}
 
         bcftools norm \
+            --threads {threads} \
             -m -both \
             -Ov \
             -o {output.vcf_snvs} \
             {output.intermediate_biallelic} 2>> {log}
 
         bcftools view \
+            --threads {threads} \
             -e 'TYPE="indel"' \
             {output.intermediate_called} \
             -Ov -o {output.vcf_all} 2>> {log}
