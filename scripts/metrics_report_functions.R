@@ -14,6 +14,20 @@ library(ggplot2)
 library(dplyr)
 
 # ---------------------------------------------------------------------------
+# Format targets
+# ---------------------------------------------------------------------------
+format_targets <- function(nn_lower, nn_upper, ideal_lower, ideal_upper){
+  targets <- sprintf(
+    "Non-neg (%s; %s); ideal (%s; %s)",
+    as.character(nn_lower),
+    as.character(nn_upper),
+    as.character(ideal_lower),
+    as.character(ideal_upper)
+  )
+  return(targets)
+}
+
+# ---------------------------------------------------------------------------
 # Coerce dataframe columns to expected types
 # ---------------------------------------------------------------------------
 
@@ -203,13 +217,17 @@ assess_metric <- function(metric) {
     # Extract sample ID from filename (e.g., S001_metric.txt → S001)
     sample_id <- sub("^metrics/([^/]+)/.*$", "\\1", file_path)
 
+    # Create formatted targets string
+    targets <- format_targets(nn_lower, nn_upper, ideal_lower, ideal_upper)
+
     # Append a row to results list
     results_list[[length(results_list) + 1]] <- data.frame(
       Metric = metric_name,
       Stage = stage,
       Sample = sample_id,
       Value = value,
-      Grade = grade
+      Grade = grade,
+      Targets = targets
     )
   }
   
