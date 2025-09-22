@@ -75,6 +75,7 @@ metrics/{ex_sample}/{ex_sample}_snv_position_plot.pdf
 metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json
 metrics/{ex_sample}/{ex_sample}_germline_matches.vcf
 metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json
+metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf
 metrics/batch/batch_recurrent_variant_metrics.json
 metrics/metrics_report.csv
 metrics/metrics_heatmap.png

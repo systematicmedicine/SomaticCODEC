@@ -30,11 +30,14 @@ def test_vcf_structure_correct(lightweight_test_run):
         # Check for correct VCF structure
         check_vcf_structure(vcf_file)
 
-# Test that all variants in MS candidate VCF have alt VAF >= min_alt_vaf
-def test_variant_alt_vaf_over_min(lightweight_test_run):
-    config = load_config("config/config.yaml")
+# Test that all variants in MS candidate VCF have:
+# 1. alt VAF >= min_alt_vaf
+# 2. depth >= min_depth
+def test_germ_risk_variants_fit_criteria(lightweight_test_run):
+    config = load_config(lightweight_test_run["test_config_path"])
     ms_samples = get_ms_sample_ids(config)
     min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"]
+    min_depth = config["rules"]["ms_germline_risk"]["min_depth"]
 
     for ms_sample in ms_samples:
         # Locate VCF file
@@ -43,7 +46,7 @@ def test_variant_alt_vaf_over_min(lightweight_test_run):
         # Open VCF with pysam
         vcf_file = pysam.VariantFile(vcf_file_path)
 
-        # Get alt VAF for each variant
+        # Get alt VAF and depth for each variant
         for record in vcf_file:
             vcf_sample = next(iter(record.samples.values()))
             ad = vcf_sample.get("AD")
@@ -52,6 +55,6 @@ def test_variant_alt_vaf_over_min(lightweight_test_run):
             alt_reads = sum(ad[1:])
             vaf = alt_reads / dp
 
-            # Assert each VAF is >= min_alt_vaf
+            # Assert variants fit criteria
             assert vaf >= min_alt_vaf, f"Variant {record} has VAF {vaf} which is < min_alt_vaf ({min_alt_vaf})"
-        
+            assert dp >= min_depth, f"Variant {record} has depth {dp} which is < min_depth ({min_depth})"

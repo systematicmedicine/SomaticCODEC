@@ -33,12 +33,12 @@ rule ms_germline_risk:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
         ref = config["files"]["reference_genome"],
-        fai = config["files"]["reference_genome"] + ".fai"
+        fai = config["files"]["reference_genome"] + ".fai",
+        included_chromsomes_bed = "tmp/downloads/included_chromosomes.bed"
     output:
         intermediate_pileup = temp("tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf"),
         vcf_germ = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf"
     params:
-        included_chromosomes = ",".join(config["chroms"]["included_chromosomes"]),
         max_base_qual = config["rules"]["ms_germline_risk"]["max_base_qual"],
         max_depth = config["rules"]["ms_germline_risk"]["max_depth"],
         min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"],
@@ -64,7 +64,7 @@ rule ms_germline_risk:
         --max-BQ {params.max_base_qual} \
         --max-depth {params.max_depth} \
         --no-BAQ \
-        --regions {params.included_chromosomes} \
+        --regions-file {input.included_chromsomes_bed} \
         --output {output.intermediate_pileup} \
         {input.bam} 2>> {log}
 
@@ -137,28 +137,37 @@ rule ms_germline_mask:
 # ----------------------------------------------------------------------------------------------
 rule ms_low_depth_mask:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf"
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"
     output:
         bed = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.bed"),
-        intermediate_vcf = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.vcf"),
-        intermediate_unformatted = temp("tmp/{ms_sample}/{ms_sample}_lowdepth_unformatted.bed")
+        intermediate_depth_per_base = temp("tmp/{ms_sample}/{ms_sample}_depth_per_base.txt"),
+        intermediate_lowdepth = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.txt"),
+        intermediate_lowdepth_sorted = temp("tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt")
+    params:
+        min_base_qual = config["rules"]["ms_germline_risk"]["min_base_qual"],
+        min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"],
+        threshold = config["rules"]["ms_germline_risk"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_low_depth_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
-    params:
-        min_depth = config["rules"]["ms_germline_risk"]["min_depth"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        bcftools view \
-        --include 'FMT/DP < {params.min_depth}' \
-        {input.vcf} > {output.intermediate_vcf} 2>> {log}
+        samtools depth \
+        -aa \
+        --min-BQ {params.min_base_qual} \
+        --min-MQ {params.min_map_qual} \
+        {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
 
-        vcf2bed < {output.intermediate_vcf} > {output.intermediate_unformatted} 2>> {log}
-        
-        cut -f1-3 {output.intermediate_unformatted} > {output.bed} 2>> {log}
+        awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
+        {output.intermediate_depth_per_base} > {output.intermediate_lowdepth} 2>> {log}
+
+        sort {output.intermediate_lowdepth} -k1,1V -k2,2n > {output.intermediate_lowdepth_sorted} 2>> {log}
+
+        bedtools merge -i {output.intermediate_lowdepth_sorted} > {output.bed} 2>> {log}
         """
 
 
@@ -170,7 +179,7 @@ rule ms_low_depth_mask:
 rule combine_masks:
     input:
         precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
-        excluded_chromosomes_bed = rules.mask_excluded_chromosomes.output.bed,
+        excluded_chromosomes_bed = "tmp/downloads/excluded_chromosomes.bed",
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
