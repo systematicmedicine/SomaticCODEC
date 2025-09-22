@@ -37,8 +37,8 @@ tmp/{ms_sample}/{ms_sample}_germ_insertions_unpadded.bed
 tmp/{ms_sample}/{ms_sample}_germ_deletions.bed
 tmp/{ms_sample}/{ms_sample}_germ_insertions.bed
 tmp/{ms_sample}/{ms_sample}_germ_snvs.bed
-tmp/{ms_sample}/{ms_sample}_lowdepth.vcf
-tmp/{ms_sample}/{ms_sample}_lowdepth_unformatted.bed
+tmp/{ms_sample}/{ms_sample}_lowdepth.txt
+tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth.bed
 tmp/{ms_sample}/{ms_sample}_masks_cat.bed
 tmp/{ms_sample}/{ms_sample}_masks_sorted.bed

@@ -120,8 +120,8 @@ def lightweight_test_run():
     if result.returncode != 0:
         raise RuntimeError(f"Pipeline failed — see log: {log_file}")
 
-    # Yield control to the test
-    yield
+    # Run tests and pass test config path to test functions
+    yield {"test_config_path": test_config_file.name}
 
     # Cleanup test environment
     clean_workspace()

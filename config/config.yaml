@@ -136,7 +136,6 @@ rules:
   ms_germline_mask:
     indel_padding_bases: 5
 
-
   ms_germline_risk:
     max_base_qual: 60
     max_depth: 250
