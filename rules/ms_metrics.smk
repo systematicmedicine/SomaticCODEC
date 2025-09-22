@@ -152,13 +152,12 @@ rule ms_duplication_metrics:
        "../scripts/ms_duplication_metrics.py"
 
 
+# Calulcates the number of bases at each depth level
 rule ms_depth_histogram_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"
+        intermediate_depth_per_base = "tmp/{ms_sample}/{ms_sample}_depth_per_base.txt",
     output:
         depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt",
-        intermediate_depth_per_base = temp("tmp/{ms_sample}/{ms_sample}_depth_per_base.txt"),
         intermediate_depth_values = temp("tmp/{ms_sample}/{ms_sample}_depth_values.txt"),
         intermediate_depth_values_sorted = temp("tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt")
     log:
@@ -171,9 +170,7 @@ rule ms_depth_histogram_metrics:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        samtools depth -aa {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
-
-        awk '{{print $3}}' {output.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
+        awk '{{print $3}}' {input.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
 
         sort -n {output.intermediate_depth_values} > {output.intermediate_depth_values_sorted} 2>> {log}
 
