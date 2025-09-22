@@ -14,6 +14,20 @@ library(ggplot2)
 library(dplyr)
 
 # ---------------------------------------------------------------------------
+# Format targets
+# ---------------------------------------------------------------------------
+format_targets <- function(nn_lower, nn_upper, ideal_lower, ideal_upper){
+  targets <- sprintf(
+    "Non-neg (%s; %s); ideal (%s; %s)",
+    as.character(nn_lower),
+    as.character(nn_upper),
+    as.character(ideal_lower),
+    as.character(ideal_upper)
+  )
+  return(targets)
+}
+
+# ---------------------------------------------------------------------------
 # Coerce dataframe columns to expected types
 # ---------------------------------------------------------------------------
 
@@ -203,13 +217,17 @@ assess_metric <- function(metric) {
     # Extract sample ID from filename (e.g., S001_metric.txt → S001)
     sample_id <- sub("^metrics/([^/]+)/.*$", "\\1", file_path)
 
+    # Create formatted targets string
+    targets <- format_targets(nn_lower, nn_upper, ideal_lower, ideal_upper)
+
     # Append a row to results list
     results_list[[length(results_list) + 1]] <- data.frame(
       Metric = metric_name,
       Stage = stage,
       Sample = sample_id,
       Value = value,
-      Grade = grade
+      Grade = grade,
+      Targets = targets
     )
   }
   
@@ -244,11 +262,15 @@ plot_metric_heatmap <- function(df, title) {
         levels = c("pass_ideal", "pass_nn", "fail", NA),
         labels = c("pass_ideal", "pass_nn", "fail", "NA"),
         exclude = NULL
-      )
+      ),
+      Metric_pos = as.numeric(Metric),
+      Sample = as.factor(Sample)  
     )
 
   ggplot(df, aes(x = Sample, y = Metric, fill = Grade)) +
     geom_tile(color = "white", linewidth = 0.2) +
+    geom_hline(yintercept = seq(1.5, length(levels(df$Metric)) - 0.5, by = 1), color = "grey95", linewidth = 0.3) +
+    geom_vline(xintercept = seq(1.5, length(levels(df$Sample)) - 0.5, by = 1), color = "grey95", linewidth = 0.3) +
     scale_fill_manual(
       values = c(
         "pass_ideal" = "#2ecc71",
