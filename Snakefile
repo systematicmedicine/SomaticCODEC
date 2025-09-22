@@ -135,6 +135,8 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics.txt", ms_sample = ms_sample_ids),
+    expand("metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics_summary.json", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = ms_sample_ids)
 ]
 

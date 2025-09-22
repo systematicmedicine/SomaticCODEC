@@ -21,12 +21,12 @@ ID	0	tmp/S004/S004_ms_candidate_variants.vcf.gz
 # 
 # SN	[2]id	[3]key	[4]value
 SN	0	number of samples:	1
-SN	0	number of records:	5000
+SN	0	number of records:	3
 SN	0	number of no-ALTs:	0
-SN	0	number of SNPs:	4500
-SN	0	number of MNPs:	2
-SN	0	number of indels:	500
-SN	0	number of others:	1
+SN	0	number of SNPs:	2
+SN	0	number of MNPs:	0
+SN	0	number of indels:	1
+SN	0	number of others:	0
 SN	0	number of multiallelic sites:	4
 SN	0	number of multiallelic SNP sites:	1
 # TSTV, transitions/transversions
