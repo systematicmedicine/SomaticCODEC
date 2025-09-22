@@ -262,11 +262,15 @@ plot_metric_heatmap <- function(df, title) {
         levels = c("pass_ideal", "pass_nn", "fail", NA),
         labels = c("pass_ideal", "pass_nn", "fail", "NA"),
         exclude = NULL
-      )
+      ),
+      Metric_pos = as.numeric(Metric),
+      Sample = as.factor(Sample)  
     )
 
   ggplot(df, aes(x = Sample, y = Metric, fill = Grade)) +
     geom_tile(color = "white", linewidth = 0.2) +
+    geom_hline(yintercept = seq(1.5, length(levels(df$Metric)) - 0.5, by = 1), color = "grey95", linewidth = 0.3) +
+    geom_vline(xintercept = seq(1.5, length(levels(df$Sample)) - 0.5, by = 1), color = "grey95", linewidth = 0.3) +
     scale_fill_manual(
       values = c(
         "pass_ideal" = "#2ecc71",
