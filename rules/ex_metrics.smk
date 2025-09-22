@@ -536,3 +536,23 @@ rule ex_snv_distance_metrics:
         memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/ex_snv_distance_metrics.py"
+
+
+"""
+Positional distribution of called SNVs
+"""
+rule ex_snv_position_metrics:
+    input:
+        vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        index_path = config["files"]["reference_genome"] + ".fai"
+    output:
+        metrics_json = "metrics/{ex_sample}/{ex_sample}_snv_position_metrics.json",
+        metrics_plot = "metrics/{ex_sample}/{ex_sample}_snv_position_plot.pdf"
+    log:
+        "logs/{ex_sample}/ex_snv_position_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_snv_position_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/ex_snv_position.R"
