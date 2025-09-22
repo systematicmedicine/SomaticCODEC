@@ -31,7 +31,7 @@ def test_vcf_structure_correct(lightweight_test_run):
         check_vcf_structure(vcf_file)
 
 # Test that all variants in MS candidate VCF have alt VAF >= min_alt_vaf
-def test_variant_alt_vaf_over_min():
+def test_variant_alt_vaf_over_min(lightweight_test_run):
     config = load_config("config/config.yaml")
     ms_samples = get_ms_sample_ids(config)
     min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"]

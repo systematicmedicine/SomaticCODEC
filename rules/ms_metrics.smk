@@ -152,6 +152,35 @@ rule ms_duplication_metrics:
        "../scripts/ms_duplication_metrics.py"
 
 
+rule ms_depth_histogram_metrics:
+    input:
+        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"
+    output:
+        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt",
+        intermediate_depth_per_base = temp("tmp/{ms_sample}/{ms_sample}_depth_per_base.txt"),
+        intermediate_depth_values = temp("tmp/{ms_sample}/{ms_sample}_depth_values.txt"),
+        intermediate_depth_values_sorted = temp("tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt")
+    log:
+        "logs/{ms_sample}/ms_low_depth_mask.log"
+    benchmark:
+        "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
+    params:
+        threshold = config["rules"]["ms_germline_risk"]["min_depth"]
+    resources:
+        memory = config["resources"]["memory"]["moderate"]
+    shell:
+        """
+        samtools depth -aa {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
+
+        awk '{{print $3}}' {output.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
+
+        sort -n {output.intermediate_depth_values} > {output.intermediate_depth_values_sorted} 2>> {log}
+
+        uniq -c {output.intermediate_depth_values_sorted} > {output.depth_histogram} 2>> {log}
+        """
+
+
 # Generates a summary of genome coverage by depth
 rule ms_coverage_by_depth_metrics:
     input:
@@ -169,6 +198,42 @@ rule ms_coverage_by_depth_metrics:
         memory = config["resources"]["memory"]["light"]
     script:
        "../scripts/ms_coverage_by_depth_metrics.py"
+
+
+# Generates metrics for germline risk variants 
+rule ms_germ_risk_variant_metrics:
+    input: 
+        vcf = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf"
+    output:
+        stat = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics.txt"
+    log:
+        "logs/{ms_sample}/ms_germ_risk_variant_metrics.log"
+    benchmark:
+        "logs/{ms_sample}/ms_germ_risk_variant_metrics.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    shell:
+        """
+        bcftools stats -s - {input.vcf} > {output.stat} 2>> {log}
+        """
+
+rule ms_germ_risk_variant_metrics_summary:
+    input: 
+        variant_metrics = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics.txt",
+        pileup_vcf = "tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf"
+    output:
+        summary = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics_summary.json"
+    params:
+        sample = "{ms_sample}",
+        min_depth = config["rules"]["ms_germline_risk"]["min_depth"]
+    log:
+        "logs/{ms_sample}/ms_germ_risk_variant_metrics_summary.log"
+    benchmark:
+        "logs/{ms_sample}/ms_germ_risk_variant_metrics_summary.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/ms_germ_risk_variant_metrics_summary.py"
 
 
 # Generates metrics for each mask BED file

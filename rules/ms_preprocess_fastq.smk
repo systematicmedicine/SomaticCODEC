@@ -46,7 +46,7 @@ rule ms_trim_fastq:
     benchmark:
         "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
@@ -100,7 +100,7 @@ rule ms_filter_fastq:
     benchmark:
         "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:

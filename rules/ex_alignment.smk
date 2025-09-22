@@ -89,7 +89,7 @@ rule ex_filter_map:
     benchmark:
         "logs/{ex_sample}/ex_filter_map.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
@@ -125,9 +125,9 @@ rule ex_annotate_map:
     benchmark:
         "logs/{ex_sample}/ex_annotate_map.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["resources"]["memory"]["heavy"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \

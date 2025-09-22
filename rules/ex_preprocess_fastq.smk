@@ -35,7 +35,7 @@ rule ex_extract_fastq_umis:
     benchmark:
         "logs/{ex_lane}/ex_extract_umis.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
@@ -73,7 +73,7 @@ rule ex_demux_fastq:
     benchmark:
         "logs/batch/ex_demux.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     script:
@@ -119,7 +119,7 @@ rule ex_trim_fastq:
     benchmark:
         "logs/{ex_sample}/ex_trim.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
@@ -189,7 +189,7 @@ rule ex_filter_fastq:
     benchmark:
         "logs/{ex_sample}/ex_filter.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]        
     shell:  
