@@ -36,6 +36,7 @@ metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt
 metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json
 metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json
 metrics/{ex_lane}/{ex_lane}_demux_metrics.txt
+metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json
 metrics/{ex_sample}/{ex_sample}_bases_trimmed.json
 metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json
 metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json
