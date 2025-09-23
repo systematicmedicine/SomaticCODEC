@@ -17,6 +17,7 @@ files:
   reference_tri_contexts: tmp/downloads/2025-09-11_trinucleotide_contexts.csv
   known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
   ex_samples_metadata: config/ex_samples.csv
+  ex_technical_controls_metadata: config/ex_technical_controls.csv
   ex_lanes_metadata: config/ex_lanes.csv
   ex_adapters_metadata: config/ex_adapters.csv
   ms_samples_metadata: config/ms_samples.csv
