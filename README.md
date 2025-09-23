@@ -21,59 +21,64 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 * [Setup Instructions](docs/setup.md)
 
 ## Running the pipeline
-* Navigate to the codec-opensource directory
-* Upload [config files](docs/configs.md) for this run:
+
+All of the steps below must be run from the repositories root directory.
+
+1. Upload [config files](docs/configs.md):
     * `config.yaml`
     * `ex_samples.csv`
     * `ex_lanes.csv`
     * `ex_adapters.csv`
+    * `ex_technical_controls.csv`
     * `ms_samples.csv`
-    * `download_list.csv` (optional)
-* Create tmux session
+    * `download_list.csv`
+
+2. Create tmux session
 ```
 tmux new -s codec-session
 ```
-* Run docker container
+3. Run docker container
 ```
 sudo docker run -it --name codec-container -v "$PWD":/work -w /work codec-image
 ```
-* Download FASTQ and reference files
+
+4. Download FASTQ and reference files 
 ```
-# If your files are stored elswhere, a different method may be used
-python3 scripts/download_S3toEC2.py
+python3 bin/download_S3.py
 ```
-* Start background system resource monitoring (optional)
+
+5. Start background system resource monitoring (to be moved into pipeline)
 ```
-./scripts/monitor_system_resources.sh &
+bash bin/monitor_system_resources.sh &
 ``` 
-* Run pipeline
+
+6. Check pipeline
 ```
-# Dry-run
-snakemake --configfile config/config.yaml --cores all --dryrun
+bash bin/check_pipeline.sh
+```
 
-# Run pipeline
-snakemake \
-    --snakefile Snakefile \
-    --configfile config/config.yaml \
-    --cores all \
-    --resources memory=490 \
-    --keep-going \
-    --reason \
-    --stats logs/pipeline/pipeline_stats.json \
-    2>&1 | tee logs/pipeline/pipeline_run_$(date +%Y%m%d).log
-
-# Generate report
-snakemake --configfile config/config.yaml --report report.html
+7. Run pipeline
+```
+bash bin/run_pipeline.sh
 ``` 
-* Common tmux commands
-    * Disconnect: Ctrl + b, d
-    * List sessions: tmux ls
-    * Reconnect: tmux attach -t <I>session name</I>
-    * Enable scrolling: Ctrl + b, Shift + :, set -g mouse on, Enter
 
-* After pipeline has run sucessfully, create single file of outputs (optional)
+8. Package outputs
 ```
-python3 scripts/tar_output.py
+python3 bin/package_outputs.py
 ```
-* If using EC2, don't forget to shut down your instance
+
+9. Upload outputs to S3
+```
+bash upload_S3.sh
+```
+
+10. Email that run is complete
+```
+bash bin/send_email.sh "Pipeline completed sucessfully"
+```
+
+11. Shutdown EC2 instance
+```
+sudo shutdown -h +1
+```
 
