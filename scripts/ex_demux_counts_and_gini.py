@@ -40,7 +40,7 @@ def main(snakemake):
                 if total_match:
                     total_input_pairs = int(total_match.group(1).replace(",", ""))
                 
-                adapter_match = re.match(r"=== .* read: Adapter (S\d+) ===", line)
+                adapter_match = re.search(r"=== .* read: Adapter ([^=]+) ===", line)
                 if adapter_match:
                     current_adapter = adapter_match.group(1)
                     continue
