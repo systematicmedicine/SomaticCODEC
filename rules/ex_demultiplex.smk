@@ -79,28 +79,34 @@ rule ex_generate_demux_adaptors:
 """
 Demultiplex each lane FASTQ into sample FASTQs
     - Use the 18bp sample indices to match reads to samples
-    - Allowed error of 2 edit distance
 """ 
-rule ex_demux_fastq:
+rule ex_demultiplex_fastq:
     input:
         ex_lanes = config["files"]["ex_lanes_metadata"],
         ex_samples = config["files"]["ex_samples_metadata"],
-        fastq1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
-        fastq2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
+        raw_r1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
+        raw_r2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
         r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane = md.get_ex_lane_ids(config)),
         r2_start = expand("tmp/{ex_lane}/{ex_lane}_r2_start.fasta", ex_lane = md.get_ex_lane_ids(config))
     output:
         demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
         demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
-        txt = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = md.get_ex_lane_ids(config))
+        metrics = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = md.get_ex_lane_ids(config))
+    params:
+        max_error_rate = config["rules"]["ex_demultiplex_fastq"]["max_error_rate"],
+        min_adapter_overlap = config["rules"]["ex_demultiplex_fastq"]["min_adapter_overlap"],
+        lane_ids = md.get_ex_lane_ids(config),
+        suffix_r1 = "r1_demux.fastq.gz",
+        suffix_r2 = "r2_demux.fastq.gz",
+        out_dir = "tmp"
     log:
-        "logs/batch/ex_demux.log"
+        "logs/batch/ex_demultiplex_fastq.log"
     benchmark:
-        "logs/batch/ex_demux.benchmark.txt"
+        "logs/batch/ex_demultiplex_fastq.txt"
     threads:
         config["resources"]["threads"]["heavy"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     script:
-        "../scripts/ex_demux.py"
+        "../scripts/ex_demultiplex.py"
 

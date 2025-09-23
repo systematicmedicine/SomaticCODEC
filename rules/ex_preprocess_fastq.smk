@@ -37,7 +37,7 @@ rule ex_trim_fastq:
         intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
         intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     params:
-        max_adapter_errors = config["rules"]["ex_trim_fastq"]["max_adapter_errors"],
+        max_error_rate = config["rules"]["ex_trim_fastq"]["max_error_rate"],
         min_adapter_overlap = config["rules"]["ex_trim_fastq"]["min_adapter_overlap"],
         quality_cutoff = config["rules"]["ex_trim_fastq"]["quality_cutoff"],
         r1_cut_start = config["rules"]["ex_trim_fastq"]["r1_cut_start"],
@@ -60,7 +60,7 @@ rule ex_trim_fastq:
         """
         cutadapt \
           -j {threads} \
-          --error-rate {params.max_adapter_errors} \
+          --error-rate {params.max_error_rate} \
           -g ^{params.r1_start} \
           -G ^{params.r2_start} \
           -o {output.intermediate_r1_1} \
@@ -70,7 +70,7 @@ rule ex_trim_fastq:
 
         cutadapt \
           -j {threads} \
-          --error-rate {params.max_adapter_errors} \
+          --error-rate {params.max_error_rate} \
           --overlap {params.min_adapter_overlap} \
           -b {params.r1_end} \
           -o {output.intermediate_r1_2} \
@@ -79,7 +79,7 @@ rule ex_trim_fastq:
 
         cutadapt \
           -j {threads} \
-          --error-rate {params.max_adapter_errors} \
+          --error-rate {params.max_error_rate} \
           --overlap {params.min_adapter_overlap} \
           -b {params.r2_end} \
           -o {output.intermediate_r2_2} \
