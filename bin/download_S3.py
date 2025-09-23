@@ -1,5 +1,5 @@
 """
---- download_S3toEC2.py ---
+--- download_S3.py ---
 
 Downloads data from S3 to the local EC2 instance:
     * Downloads all data defined in /config/download_list.csv
