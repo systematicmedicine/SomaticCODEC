@@ -69,6 +69,10 @@ rules:
     max_base_quality: 150
     min_base_quality: 70
 
+  ex_demultiplex_fastq:
+    max_error_rate: 0.1
+    min_adapter_overlap: 3
+
   ex_extract_fastq_umis:
     umi_length: 3
 
@@ -108,7 +112,7 @@ rules:
     z_dropoff: 100
 
   ex_trim_fastq:
-    max_adapter_errors: 2
+    max_error_rate: 0.1
     min_adapter_overlap: 8
     r1_cut_start: 3
     r2_cut_start: 3
