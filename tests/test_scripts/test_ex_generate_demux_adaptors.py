@@ -1,7 +1,7 @@
 """
---- test_ex_generate_adapter_fastas.py
+--- test_ex_generate_demux_adaptors.py
 
-Tests the rule ex_generate_adapter_fastas
+Tests the rule ex_generate_demux_adaptors
 
 Authors:
     - Chat-GPT

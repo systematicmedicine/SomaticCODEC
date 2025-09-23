@@ -1,9 +1,9 @@
 """
---- ex_generate_adapter_fastas.py
+--- ex_generate_demux_adaptors.py
 
-Generate per-lane codec index adapter FASTA files for demultiplexing and trimming
+Generate per-lane codec index adapter FASTA files for demultiplexing
 
-To be used exclusively with rule ex_generate_adapter_fastas
+To be used exclusively with rule ex_generate_demux_adaptors
 
 Inputs:
   - Sample metadata (loaded via get_metadata.py)
