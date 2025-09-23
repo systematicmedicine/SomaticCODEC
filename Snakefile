@@ -86,7 +86,7 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = ms_sample_ids)
 ]
 
-# Define metrics for ex samples
+# Define metrics for ex samples and ex technical controls
 ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json", ex_lane = ex_lane_ids),
@@ -132,7 +132,8 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
-    "metrics/batch/batch_recurrent_variant_metrics.json"
+    "metrics/batch/batch_recurrent_variant_metrics.json",
+    "logs/pipeline/check_technical_controls_demuxed.done"
 ]
 
 # Define other metrics

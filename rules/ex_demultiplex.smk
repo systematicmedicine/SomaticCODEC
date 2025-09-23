@@ -89,8 +89,16 @@ rule ex_demultiplex_fastq:
         r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane = md.get_ex_lane_ids(config)),
         r2_start = expand("tmp/{ex_lane}/{ex_lane}_r2_start.fasta", ex_lane = md.get_ex_lane_ids(config))
     output:
-        demuxed_r1 = temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
-        demuxed_r2 = temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", ex_sample = md.get_ex_sample_ids(config))),
+        demuxed_r1 = 
+            temp(expand("tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz", 
+            ex_sample = md.get_ex_sample_ids(config))) + 
+            temp(expand("tmp/{ex_technical_control}/{ex_technical_control}_r1_demux.fastq.gz", 
+            ex_technical_control = md.get_ex_technical_control_ids(config))),
+        demuxed_r2 = 
+            temp(expand("tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz", 
+            ex_sample = md.get_ex_sample_ids(config))) + 
+            temp(expand("tmp/{ex_technical_control}/{ex_technical_control}_r2_demux.fastq.gz", 
+            ex_technical_control = md.get_ex_technical_control_ids(config))),
         metrics = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = md.get_ex_lane_ids(config))
     params:
         max_error_rate = config["rules"]["ex_demultiplex_fastq"]["max_error_rate"],
