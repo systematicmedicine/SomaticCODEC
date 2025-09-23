@@ -124,5 +124,5 @@ def lightweight_test_run():
     yield {"test_config_path": test_config_file.name}
 
     # Cleanup test environment
-    #clean_workspace()
+    clean_workspace()
 
