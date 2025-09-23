@@ -56,9 +56,6 @@ setup_files = [
     "tmp/downloads/excluded_chromosomes.bed",
     config["files"]["reference_genome"] + ".fai",
     os.path.splitext(config["files"]["reference_genome"])[0] + ".dict",
-    expand("tmp/{ex_lane}/{ex_lane}_{region}.fasta", 
-    ex_lane = md.get_ex_lane_ids(config), 
-    region = ["r1_start", "r1_end", "r2_start", "r2_end"]),
     config["files"]["known_germline_variants"] + ".tbi"
 ]
 
@@ -169,6 +166,7 @@ include: "rules/ms_preprocess_fastq.smk"
 include: "rules/ms_alignment.smk"
 include: "rules/ms_masked_regions.smk"
 include: "rules/ms_metrics.smk"
+include: "rules/ex_demultiplex.smk"
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_dsc.smk"
