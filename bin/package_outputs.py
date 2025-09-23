@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
--- tar_output.py --
+-- package_outputs.py --
 
 Create a tar file containing all key outputs of a successful pipeline run,
 structured as follows inside the archive:
