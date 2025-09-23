@@ -2,6 +2,8 @@
 --- setup.smk ---
 
 Rules for setting up the bioinformatics pipeline.
+    - Checking configs and inputs
+    - Generating index and BED files
 
 Authors: 
     - James Phie
@@ -138,28 +140,7 @@ rule picard_sequence_dict:
             O={output.dictf} 2>> {log}
         """
 
-
-# Generates adapter FASTA files for demultiplexing and trimming
-rule ex_generate_adapter_fastas:
-    input:
-        ex_lanes = config["files"]["ex_lanes_metadata"],
-        ex_samples = config["files"]["ex_samples_metadata"],
-        ex_adapters = config["files"]["ex_adapters_metadata"]
-    output:
-        adapter_fasta_outputs = expand(
-            "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
-            ex_lane = md.get_ex_lane_ids(config),
-            region = ["r1_start", "r1_end", "r2_start", "r2_end"]
-        )
-    log:
-        "logs/pipeline/ex_generate_adapter_fastas.log"
-    benchmark:
-        "logs/pipeline/ex_generate_adapter_fastas.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    script:
-        "../scripts/ex_generate_adapter_fastas.py"
-
+# Creates index files for input VCFs
 rule tabix_index_files:
     input:
         germline_vcf = config["files"]["known_germline_variants"]
