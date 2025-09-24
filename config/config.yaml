@@ -6,19 +6,6 @@ experiment:
   name: experiment_1
 
 # ------------------------------------------------------------------------------
-# Resources (memory/threads)
-# ------------------------------------------------------------------------------
-resources:
-  memory: # in GB
-    light: 8
-    moderate: 32
-    heavy: 64
-  threads:
-    light: 2
-    moderate: 8
-    heavy: 16
-
-# ------------------------------------------------------------------------------
 # File paths
 # ------------------------------------------------------------------------------
 files:
@@ -169,3 +156,29 @@ rules:
     min_overlap: 3
     spacer_length: 3
     qual_trim_threshold: 20 # Trims low quality bases from 3' end of read
+
+
+
+# ------------------------------------------------------------------------------
+# Resources (memory/threads)
+# ------------------------------------------------------------------------------
+# Memory units are expressed in gigabytes (GB) throughout pipeline
+
+resources:
+  memory:
+    light: 8
+    moderate: 32
+    heavy: 64
+    global_buffer: 16
+  threads:
+    light: 2
+    moderate: 12
+    heavy: 24
+    global_buffer: 4
+
+# ------------------------------------------------------------------------------
+# AWS parameters
+# ------------------------------------------------------------------------------
+aws:
+  s3_bucket: "arn:aws:s3:::sysmed-tmp-s3"
+  sns_arn: "arn:aws:sns:ap-southeast-2:554765025175:ec2-pipeline-complete"

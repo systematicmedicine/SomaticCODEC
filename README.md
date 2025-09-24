@@ -9,22 +9,20 @@ A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libra
 * Extensive range of QC metrics generated (e.g. `fastqc`)
 * Fully containerized docker workflow
 
-## Contribution guidleines
-* [Versions, branches & pull requests](docs/versions_and_branches.md)
-* [Logging](docs/logging.md)
-
 ## Library prep and sequencing
-* Prepare and sequence CODEC libraries as per `SOP0017 CODECseq library preparation`
-* Prepare and sequence matched samples as `\CODECseq\20250526 Sequencing for pipeline and metric tests\Methods`
+Prepare and sequence libraries as per: 
+
+* `SOP0017 CODECseq library preparation`
+* `SOP0029 CODECseq matched sample library preparation`
 
 ## Setup instructions
-* [Setup Instructions](docs/setup.md)
+* [Amazon EC2](docs/setup_EC2.md)
 
 ## Running the pipeline
 
 All of the steps below must be run from the repositories root directory.
 
-1. Upload [config files](docs/configs.md):
+1. Upload [config files](docs/configs.md) to config directory:
     * `config.yaml`
     * `ex_samples.csv`
     * `ex_lanes.csv`
@@ -42,43 +40,14 @@ tmux new -s codec-session
 sudo docker run -it --name codec-container -v "$PWD":/work -w /work codec-image
 ```
 
-4. Download FASTQ and reference files 
-```
-python3 bin/download_S3.py
-```
-
-5. Start background system resource monitoring (to be moved into pipeline)
+4. Start background system resource monitoring (optional)
 ```
 bash bin/monitor_system_resources.sh &
 ``` 
 
-6. Check pipeline
+5. Run pipeline
 ```
-bash bin/check_pipeline.sh
+bash bin_scripts/run_all.sh
 ```
-
-7. Run pipeline
-```
-bash bin/run_pipeline.sh
-``` 
-
-8. Package outputs
-```
-python3 bin/package_outputs.py
-```
-
-9. Upload outputs to S3
-```
-bash upload_S3.sh
-```
-
-10. Email that run is complete
-```
-bash bin/send_email.sh "Pipeline completed sucessfully"
-```
-
-11. Shutdown EC2 instance
-```
-sudo shutdown -h +1
-```
+This will automatically shut down the instance once the pipeline has exited (success or failure)
 
