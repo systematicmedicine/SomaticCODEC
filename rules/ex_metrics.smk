@@ -88,8 +88,6 @@ rule ex_demux_counts_and_gini:
         demux_metrics = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
     output:
         demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
-    params:
-        sample = "{ex_lane}"
     log:
         "logs/{ex_lane}/ex_demux_metrics_gini.log"
     benchmark:

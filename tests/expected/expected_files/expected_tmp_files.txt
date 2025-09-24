@@ -92,3 +92,5 @@ tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf
 tmp/{ex_sample}/{ex_sample}_all_positions.vcf
 tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz
 tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi
+tmp/{ex_technical_control}/{ex_technical_control}_r1_demux.fastq.gz
+tmp/{ex_technical_control}/{ex_technical_control}_r2_demux.fastq.gz

@@ -19,7 +19,7 @@ from pathlib import Path
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from helpers.get_metadata import load_config, get_ms_sample_ids, get_ex_lane_ids, get_ex_sample_ids
+from helpers.get_metadata import load_config, get_ms_sample_ids, get_ex_lane_ids, get_ex_sample_ids, get_ex_technical_control_ids
 from helpers.count_data_points import count_data_points
 
 pytestmark = pytest.mark.order(7)
@@ -116,6 +116,7 @@ def expected_files_list():
     ms_samples = get_ms_sample_ids(config)
     ex_lanes = get_ex_lane_ids(config)
     ex_samples = get_ex_sample_ids(config)
+    ex_technical_controls = get_ex_technical_control_ids(config)
 
     # Expand wildcards
     expected_files_expanded = []
@@ -126,6 +127,8 @@ def expected_files_list():
             expected_files_expanded += [path_str.format(ex_lane=s) for s in ex_lanes]
         elif "{ex_sample}" in path_str:
             expected_files_expanded += [path_str.format(ex_sample=s) for s in ex_samples]
+        elif "{ex_technical_control}" in path_str:
+            expected_files_expanded += [path_str.format(ex_technical_control=s) for s in ex_technical_controls]
         else:
             expected_files_expanded.append(path_str)
     

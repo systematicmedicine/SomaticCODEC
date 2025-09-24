@@ -14,6 +14,11 @@ import re
 from collections import defaultdict
 import json
 import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
+sys.path.insert(0, str(PROJECT_ROOT))
+import helpers.get_metadata as md
 
 def main(snakemake):
     # Initiate logging
@@ -50,7 +55,7 @@ def main(snakemake):
                     count = int(trimmed_match.group(1).replace(",", ""))
                     adaptor_counts[current_adapter] += count
 
-        # Calculate total trimmed reads
+    # Calculate total trimmed reads
     total_pairs_demuxed = sum(adaptor_counts.values()) / 2
 
     # Calculate percentage of reads lost to demux
@@ -66,17 +71,32 @@ def main(snakemake):
         for adapter in adaptor_counts.keys():
             adaptor_percentages[adapter] = 0.0
 
-    # Collate counts, percentages, and calculate Gini coefficient
+    # Calculate Gini coefficient for ex_samples
+    config = md.load_config("config/config.yaml")
+    ex_sample_ids = md.get_ex_sample_ids(config)
+    
+    ex_samples_set = set(ex_sample_ids)
+
+    ex_sample_counts = {
+        adapter: count
+        for adapter, count in adaptor_counts.items()
+        if adapter in ex_samples_set
+        } 
+    
+    gini_coefficient_ex_samples = round(gini_coefficient(list(ex_sample_counts.values())), 3)
+
+    # Collate counts, percentages, and Gini coefficient
     output_data = {
         "description": (
-            "Summary of adaptor counts and Gini coefficient for inequality between counts."
+            "Summary of adaptor counts for ex samples and ex technical controls.",
+            "Gini coefficient for inequality between ex_samples"
         ),
         "total_input_pairs": total_input_pairs,
         "total_pairs_demuxed": total_pairs_demuxed,
         "pct_reads_lost_demux": pct_reads_lost_demux,
         "adaptor_counts": dict(adaptor_counts),
         "adaptor_percentages": adaptor_percentages,
-        "gini_coefficient": round(gini_coefficient(list(adaptor_counts.values())), 3)
+        "gini_coefficient": gini_coefficient_ex_samples
     }
 
     # Write to JSON

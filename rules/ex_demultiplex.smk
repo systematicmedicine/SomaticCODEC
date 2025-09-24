@@ -59,6 +59,7 @@ rule ex_generate_demux_adaptors:
     input:
         ex_lanes = config["files"]["ex_lanes_metadata"],
         ex_samples = config["files"]["ex_samples_metadata"],
+        ex_technical_controls = config["files"]["ex_technical_controls_metadata"],
         ex_adapters = config["files"]["ex_adapters_metadata"]
     output:
         adapter_fasta_outputs = expand(
@@ -116,5 +117,5 @@ rule ex_demultiplex_fastq:
     resources:
         memory = config["resources"]["memory"]["moderate"]
     script:
-        "../scripts/ex_demultiplex.py"
+        "../scripts/ex_demultiplex_fastq.py"
 
