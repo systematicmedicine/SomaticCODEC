@@ -47,13 +47,13 @@ ms_sample_ids = md.get_ms_sample_ids(config)
 
 # Define setup files
 setup_files = [
-    "logs/pipeline/check_ex_ms_mapping.done",
+    "logs/global_rules/check_ex_ms_mapping.done",
     config["files"]["reference_genome"] + ".amb",
     config["files"]["reference_genome"] + ".ann",
     config["files"]["reference_genome"] + ".bwt.2bit.64",
     config["files"]["reference_genome"] + ".pac",
     config["files"]["reference_genome"] + ".0123",
-    "logs/pipeline/check_included_chromosomes_present.done",
+    "logs/global_rules/check_included_chromosomes_present.done",
     "tmp/downloads/excluded_chromosomes.bed",
     config["files"]["reference_genome"] + ".fai",
     os.path.splitext(config["files"]["reference_genome"])[0] + ".dict",
@@ -143,10 +143,10 @@ ex_tc_metrics = [
 
 # Define other metrics
 other_metrics = [
-    "logs/pipeline/git_metadata.json",
+    "logs/global_rules/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
-    "logs/pipeline/combined_benchmarks.csv"
+    "logs/global_rules/combined_benchmarks.csv"
 ]
 
 # Define results
