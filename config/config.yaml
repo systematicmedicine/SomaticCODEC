@@ -17,6 +17,7 @@ files:
   reference_tri_contexts: tmp/downloads/2025-09-11_trinucleotide_contexts.csv
   known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
   ex_samples_metadata: config/ex_samples.csv
+  ex_technical_controls_metadata: config/ex_technical_controls.csv
   ex_lanes_metadata: config/ex_lanes.csv
   ex_adapters_metadata: config/ex_adapters.csv
   ms_samples_metadata: config/ms_samples.csv
@@ -69,6 +70,10 @@ rules:
     max_base_quality: 150
     min_base_quality: 70
 
+  ex_demultiplex_fastq:
+    max_error_rate: 0.1
+    min_adapter_overlap: 8
+
   ex_extract_fastq_umis:
     umi_length: 3
 
@@ -108,13 +113,21 @@ rules:
     z_dropoff: 100
 
   ex_trim_fastq:
-    max_adapter_errors: 2
+    max_error_rate: 0.1
     min_adapter_overlap: 8
     r1_cut_start: 3
     r2_cut_start: 3
     r1_cut_end: -9  # Must be negative
     r2_cut_end: -9  # Must be negative
     quality_cutoff: 20
+
+  ex_tc_trim_fastq:
+    max_error_rate: 0.1
+    min_adapter_overlap: 8
+    r1_cut_start: 3
+    r2_cut_start: 3
+    r1_cut_end: -9  # Must be negative
+    r2_cut_end: -9  # Must be negative
 
   ms_filter_fastq:
     average_quality_threshold: 30

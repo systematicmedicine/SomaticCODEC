@@ -18,7 +18,6 @@ Author:
 
 # Import libraries
 import sys
-import json
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
@@ -30,7 +29,7 @@ sys.stdout = open(snakemake.log[0], "a")
 sys.stderr = open(snakemake.log[0], "a")
 
 # Load nested dictionary of ex adapter sequences
-  # Assumes format: dict[ex_lane][ex_sample][region] -> adapter sequence (str)
+  # Assumes format: dict[ex_lane][ex_sample or ex_technical_control][region] -> adapter sequence (str)
 adapter_dict = md.get_ex_lane_adapter_dict(snakemake.config)
 
 # Generate adapta FASTAS

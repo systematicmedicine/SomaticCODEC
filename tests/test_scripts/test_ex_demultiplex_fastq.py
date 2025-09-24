@@ -1,7 +1,7 @@
 """
---- test_ex_demux_fastq.py
+--- test_ex_demultiplex_fastq.py
 
-Tests the rule ex_demux_fastq
+Tests the rule ex_demultiplex_fastq
 
 Authors:
     - Chat-GPT
