@@ -31,7 +31,7 @@ sudo apt-get update
 # Install AWS-CLI
 sudo apt-get install -y git curl unzip vim awscli
 
-# Install docker
+# Install Docker
 curl -fsSL https://get.docker.com | sudo bash
 sudo usermod -aG docker "$USER"
 ```
@@ -42,11 +42,11 @@ aws s3 cp "s3://sysmed-ref-s3/keys/codec-opensource deploy key/ec2_github_deploy
 chmod 600 ~/.ssh/deploy_key
 ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-# Clone repo
+# Clone repository
 GIT_SSH_COMMAND='ssh -i ~/.ssh/deploy_key' git clone --branch dev git@github.com:systematicmedicine/codec-opensource.git
 ```
 
-### Build docker image
+### Build Docker image
 ```
 # Enter repoistory directory 
 cd codec-opensource
