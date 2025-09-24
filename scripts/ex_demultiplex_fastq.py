@@ -1,5 +1,5 @@
 """
---- ex_demultiplex.py ---
+--- ex_demultiplex_fastq.py ---
 
 Demultiplex each lane specific FASTQ pair into sample and technical control FASTQ pairs
 
