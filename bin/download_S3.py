@@ -17,6 +17,8 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CSV_PATH = PROJECT_ROOT / "config" / "download_list.csv"
 
+failed = False
+
 with open(CSV_PATH, newline='', encoding='utf-8-sig') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
@@ -34,7 +36,11 @@ with open(CSV_PATH, newline='', encoding='utf-8-sig') as csvfile:
         )
 
         if result.returncode != 0:
+            failed = True
             print(f"❌ Failed to download {file_name}")
             print(result.stderr)
         else:
             print(f"✅ Downloaded {file_name}")
+
+if failed:
+    exit(1)
