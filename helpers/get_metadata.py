@@ -103,6 +103,37 @@ def get_ex_sample_adapter_dict(config):
 
 
 """
+Returns a nested dictionary mapping ex_technical_controls and region to an adapter sequence
+    dict[ex_technical_control][region] -> adapter sequence
+"""
+def get_ex_technical_control_adapter_dict(config):
+    metadata = load_metadata(config)
+
+    ex_technical_controls = metadata["ex_technical_controls_metadata"]
+    ex_adapters = metadata["ex_adapters_metadata"]
+
+    # Merge ex_technical_controls with adapter sequences using the adapter name
+    merged = ex_technical_controls[["ex_technical_control", "ex_adapter"]].merge(
+        ex_adapters,
+        how="left",
+        on="ex_adapter"
+    )
+
+    # Build the nested dictionary
+    sample_adapter_dict = {}
+    for _, row in merged.iterrows():
+        sample = row["ex_technical_control"]
+        sample_adapter_dict[sample] = {
+            "r1_start": row["r1_start"],
+            "r1_end": row["r1_end"],
+            "r2_start": row["r2_start"],
+            "r2_end": row["r2_end"]
+        }
+
+    return sample_adapter_dict
+
+
+"""
 Returns a dictionary mapping ex_lane to FASTQ file paths
     dict[ex_lane] -> (fastq1_path, fastq2_path)
 """

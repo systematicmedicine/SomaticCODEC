@@ -42,6 +42,7 @@ os.chdir(workflow.basedir)
 # Get lists of sample ids
 ex_lane_ids = md.get_ex_lane_ids(config)
 ex_sample_ids = md.get_ex_sample_ids(config)
+ex_technical_control_ids = md.get_ex_technical_control_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
 # Define setup files
@@ -86,7 +87,7 @@ ms_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = ms_sample_ids)
 ]
 
-# Define metrics for ex samples and ex technical controls
+# Define metrics for ex samples
 ex_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json", ex_lane = ex_lane_ids),
@@ -133,7 +134,11 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
     "metrics/batch/batch_recurrent_variant_metrics.json",
-    "logs/pipeline/check_technical_controls_demuxed.done"
+]
+
+# Define metrics for ex technical controls
+ex_tc_metrics = [
+    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids),
 ]
 
 # Define other metrics
@@ -154,7 +159,8 @@ rule all:
     input:
         setup_files + 
         ms_metrics + 
-        ex_metrics + 
+        ex_metrics +
+        ex_tc_metrics + 
         other_metrics +
         results
 

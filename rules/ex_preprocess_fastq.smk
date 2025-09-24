@@ -18,9 +18,9 @@ import helpers.get_metadata as md
 Trim reads so that only inserts are remaining
     1. Trim 5' adapter sequences
     2. Trim 3' adapter sequences
-    3. Trim 3 additional bases from the 5' end (to account for short adapter sequences/A-tailing remnants)
-    4. Trim 8 additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
-    5. Remove any bases with a Q score of <20 from the 3' end
+    3. Trim additional bases from the 5' end (to account for short adapter sequences/A-tailing remnants)
+    4. Trim additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
+    5. Remove any bases with a Q score less than set cutoff from the 3' end
 """
 rule ex_trim_fastq:
     input:
@@ -49,9 +49,9 @@ rule ex_trim_fastq:
         r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
         r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"]
     log:
-        "logs/{ex_sample}/ex_trim.log"
+        "logs/{ex_sample}/ex_trim_fastq.log"
     benchmark:
-        "logs/{ex_sample}/ex_trim.benchmark.txt"
+        "logs/{ex_sample}/ex_trim_fastq.benchmark.txt"
     threads:
         config["resources"]["threads"]["heavy"]
     resources:
