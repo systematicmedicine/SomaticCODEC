@@ -1,7 +1,7 @@
 """
---- test_ex_trimmed_read_length_metrics.py ---
+--- test_ex_tc_trimmed_read_length_metrics.py ---
 
-Test that the script ex_trimmed_read_length_metrics.py works correctly for FASTQ files with known read lengths
+Test that the script ex_tc_trimmed_read_length_metrics.py works correctly for FASTQ files with known read lengths
 
 Authors:
     - Chat-GPT
@@ -21,8 +21,8 @@ from scripts.ex_trimmed_read_length_metrics import main
 
 @pytest.mark.parametrize(
     "r1_path, r2_path, expected_0th_percentile, expected_50th_percentile, expected_100th_percentile, expected_percent_zero_length",
-    [("tests/data/test_ex_trimmed_read_length_metrics/r1.fq", 
-      "tests/data/test_ex_trimmed_read_length_metrics/r2.fq",
+    [("tests/data/test_ex_tc_trimmed_read_length_metrics/r1.fq", 
+      "tests/data/test_ex_tc_trimmed_read_length_metrics/r2.fq",
        145,
        147,
        150,

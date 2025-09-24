@@ -19,6 +19,12 @@ def get_ex_sample_ids(config):
     metadata = load_metadata(config)
     return metadata["ex_samples_metadata"]["ex_sample"].dropna().unique().tolist()
 
+""" 
+Returns a list of ex technical control ids 
+"""
+def get_ex_technical_control_ids(config):
+    metadata = load_metadata(config)
+    return metadata["ex_technical_controls_metadata"]["ex_technical_control"].dropna().unique().tolist()
 
 """ 
 Returns a list of ex lane ids
@@ -38,18 +44,20 @@ def get_ms_sample_ids(config):
 
 """ 
 Returns a nested dictionary mapping ex_lane, ex_sample and region to an adapter sequence
-    dict[ex_lane][ex_sample][region] -> adapter sequence
+    dict[ex_lane][ex_sample or ex_technical_control][region] -> adapter sequence
 """
 def get_ex_lane_adapter_dict(config):
     metadata = load_metadata(config)
     ex_samples = metadata["ex_samples_metadata"]
+    ex_technical_controls = metadata["ex_technical_controls_metadata"]
+    ex_combined = pd.concat([ex_samples, ex_technical_controls], ignore_index=True)
     ex_adapters = metadata["ex_adapters_metadata"].set_index("ex_adapter")
 
     nested_dict = {}
 
-    for _, row in ex_samples.iterrows():
+    for _, row in ex_combined.iterrows():
         lane = row["ex_lane"]
-        sample = row["ex_sample"]
+        sample = row["ex_sample"] if pd.notna(row.get("ex_sample")) else row["ex_technical_control"]
         adapter = row["ex_adapter"]
 
         if lane not in nested_dict:
@@ -84,6 +92,37 @@ def get_ex_sample_adapter_dict(config):
     sample_adapter_dict = {}
     for _, row in merged.iterrows():
         sample = row["ex_sample"]
+        sample_adapter_dict[sample] = {
+            "r1_start": row["r1_start"],
+            "r1_end": row["r1_end"],
+            "r2_start": row["r2_start"],
+            "r2_end": row["r2_end"]
+        }
+
+    return sample_adapter_dict
+
+
+"""
+Returns a nested dictionary mapping ex_technical_controls and region to an adapter sequence
+    dict[ex_technical_control][region] -> adapter sequence
+"""
+def get_ex_technical_control_adapter_dict(config):
+    metadata = load_metadata(config)
+
+    ex_technical_controls = metadata["ex_technical_controls_metadata"]
+    ex_adapters = metadata["ex_adapters_metadata"]
+
+    # Merge ex_technical_controls with adapter sequences using the adapter name
+    merged = ex_technical_controls[["ex_technical_control", "ex_adapter"]].merge(
+        ex_adapters,
+        how="left",
+        on="ex_adapter"
+    )
+
+    # Build the nested dictionary
+    sample_adapter_dict = {}
+    for _, row in merged.iterrows():
+        sample = row["ex_technical_control"]
         sample_adapter_dict[sample] = {
             "r1_start": row["r1_start"],
             "r1_end": row["r1_end"],
@@ -170,6 +209,7 @@ def load_metadata(config):
     metadata = {}
 
     metadata["ex_samples_metadata"] = pd.read_csv(config["files"]["ex_samples_metadata"])
+    metadata["ex_technical_controls_metadata"] = pd.read_csv(config["files"]["ex_technical_controls_metadata"])
     metadata["ms_samples_metadata"] = pd.read_csv(config["files"]["ms_samples_metadata"])
     metadata["ex_lanes_metadata"] = pd.read_csv(config["files"]["ex_lanes_metadata"])
     metadata["ex_adapters_metadata"] = pd.read_csv(config["files"]["ex_adapters_metadata"])

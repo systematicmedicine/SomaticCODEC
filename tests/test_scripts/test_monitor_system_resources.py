@@ -21,7 +21,7 @@ def test_monitor_resources(tmp_path):
     
     # Run the script in the background
     proc = subprocess.Popen(
-        ["bash", "scripts/monitor_system_resources.sh"],
+        ["bash", "bin/monitor_system_resources.sh"],
         cwd=project_root,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

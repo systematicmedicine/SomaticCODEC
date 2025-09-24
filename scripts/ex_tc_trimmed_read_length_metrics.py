@@ -1,9 +1,9 @@
 """
---- ex_trimmed_read_length_metrics.py ---
+--- ex_tc_trimmed_read_length_metrics.py ---
 
 Calculates the length of reads post trimming and outputs a distribution of read lengths.
 
-This script is to be used exclusively with its parent rule ex_trimmed_read_length_metrics
+This script is to be used exclusively with its parent rule ex_tc_trimmed_read_length_metrics
 
 Authors:
     - Chat-GPT
@@ -44,7 +44,7 @@ def main(snakemake):
     # Redirect stdout/stderr
     sys.stdout = open(snakemake.log[0], "a")
     sys.stderr = open(snakemake.log[0], "a")
-    print("[INFO] Starting ex_trimmed_read_length_metrics.py")
+    print("[INFO] Starting ex_tc_trimmed_read_length_metrics.py")
 
     # Define inputs
     trimmed_r1 = snakemake.input.r1
@@ -79,7 +79,7 @@ def main(snakemake):
     # Output data to JSON
     output_data = {
         "description": "Read length percentiles after trimming",
-        "sample": sample,
+        "technical_control": sample,
         "length_percentiles_r1": pct_r1,
         "length_percentiles_r2": pct_r2,
         "zero_length_reads_r1": zero_length_r1,
@@ -90,7 +90,7 @@ def main(snakemake):
     with open(output_json, "w") as out:
         json.dump(output_data, out, indent=4)
 
-    print("[INFO] Completed ex_trimmed_read_length_metrics.py")
+    print("[INFO] Completed ex_tc_trimmed_read_length_metrics.py")
 
 
 if __name__ == "__main__":

@@ -42,6 +42,7 @@ os.chdir(workflow.basedir)
 # Get lists of sample ids
 ex_lane_ids = md.get_ex_lane_ids(config)
 ex_sample_ids = md.get_ex_sample_ids(config)
+ex_technical_control_ids = md.get_ex_technical_control_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
 # Define setup files
@@ -132,7 +133,12 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
-    "metrics/batch/batch_recurrent_variant_metrics.json"
+    "metrics/batch/batch_recurrent_variant_metrics.json",
+]
+
+# Define metrics for ex technical controls
+ex_tc_metrics = [
+    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids),
 ]
 
 # Define other metrics
@@ -153,7 +159,8 @@ rule all:
     input:
         setup_files + 
         ms_metrics + 
-        ex_metrics + 
+        ex_metrics +
+        ex_tc_metrics + 
         other_metrics +
         results
 
@@ -168,6 +175,7 @@ include: "rules/ms_alignment.smk"
 include: "rules/ms_masked_regions.smk"
 include: "rules/ms_metrics.smk"
 include: "rules/ex_demultiplex.smk"
+include: "rules/ex_technical_controls.smk"
 include: "rules/ex_preprocess_fastq.smk"
 include: "rules/ex_alignment.smk"
 include: "rules/ex_create_dsc.smk"
