@@ -14,11 +14,11 @@ import helpers.get_metadata as md
 # Write git metadata to file for version tracking
 rule write_git_metadata:
     output:
-        file_path = "logs/pipeline/git_metadata.json"
+        file_path = "logs/global_rules/git_metadata.json"
     log:
-        "logs/pipeline/write_git_metadata.log"
+        "logs/global_rules/write_git_metadata.log"
     benchmark:
-        "logs/pipeline/write_git_metadata.benchmark.txt"
+        "logs/global_rules/write_git_metadata.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     script:
@@ -36,9 +36,9 @@ rule create_metrics_report:
         csv_path = "metrics/metrics_report.csv",
         heatmap_path = "metrics/metrics_heatmap.png"
     log:
-        "logs/pipeline/create_metrics_report.log"
+        "logs/global_rules/create_metrics_report.log"
     benchmark:
-        "logs/pipeline/create_metrics_report.benchmark.txt"
+        "logs/global_rules/create_metrics_report.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     script:
@@ -51,9 +51,9 @@ rule collate_benchmarks:
         rules.write_git_metadata.output.file_path,
         rules.create_metrics_report.output
     output:
-        file_path = "logs/pipeline/combined_benchmarks.csv"
+        file_path = "logs/global_rules/combined_benchmarks.csv"
     log:
-        "logs/pipeline/collate_benchmarks.log"
+        "logs/global_rules/collate_benchmarks.log"
     resources:
         memory = config["resources"]["memory"]["light"]
     script:

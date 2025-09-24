@@ -68,9 +68,9 @@ rule ex_generate_demux_adaptors:
             region = ["r1_start", "r1_end", "r2_start", "r2_end"]
         )
     log:
-        "logs/pipeline/ex_generate_demux_adaptors.log"
+        "logs/global_rules/ex_generate_demux_adaptors.log"
     benchmark:
-        "logs/pipeline/ex_generate_demux_adaptors.benchmark.txt"
+        "logs/global_rules/ex_generate_demux_adaptors.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     script:
