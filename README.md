@@ -22,7 +22,7 @@ Prepare and sequence libraries as per:
 
 All of the steps below must be run from the repositories root directory.
 
-1. Upload [config files](docs/configs.md) to config directory:
+1. Upload config files to config directory:
     * `config.yaml`
     * `ex_samples.csv`
     * `ex_lanes.csv`
