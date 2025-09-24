@@ -250,7 +250,7 @@ plot_metric_heatmap <- function(df, title) {
 
   exp_name <- CONFIG$experiment$name
   date <- format(Sys.Date(), "%Y-%m-%d")
-  pipeline_version <- fromJSON("logs/pipeline/git_metadata.json")$git_tag
+  pipeline_version <- fromJSON("logs/global_rules/git_metadata.json")$git_tag
   title <- paste0(exp_name, " metrics")
   subtitle <- paste0(date, ", ", pipeline_version)
 

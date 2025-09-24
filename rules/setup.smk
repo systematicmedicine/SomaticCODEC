@@ -16,13 +16,13 @@ rule check_ex_ms_mapping:
         ex_csv = config["files"]["ex_samples_metadata"],
         ms_csv = config["files"]["ms_samples_metadata"]
     output:
-        "logs/pipeline/check_ex_ms_mapping.done"
+        "logs/global_rules/check_ex_ms_mapping.done"
     resources:
         memory = config["resources"]["memory"]["light"]
     log:
-        "logs/pipeline/check_ex_ms_mapping.log"
+        "logs/global_rules/check_ex_ms_mapping.log"
     benchmark:
-        "logs/pipeline/check_ex_ms_mapping.benchmark.txt"
+        "logs/global_rules/check_ex_ms_mapping.benchmark.txt"
     script:
         "../scripts/check_ex_ms_mapping.py"
 
@@ -33,13 +33,13 @@ rule check_included_chromosomes_present:
         fai = config["files"]["reference_genome"] + ".fai",
         precomputed_masks = config["files"]["precomputed_masks"]
     output:
-        "logs/pipeline/check_included_chromosomes_present.done"
+        "logs/global_rules/check_included_chromosomes_present.done"
     params:
         included_chromosomes = config["chroms"]["included_chromosomes"]
     log:
-        "logs/pipeline/check_included_chromosomes_present.log"
+        "logs/global_rules/check_included_chromosomes_present.log"
     benchmark:
-        "logs/pipeline/check_included_chromosomes_present.benchmark.txt"
+        "logs/global_rules/check_included_chromosomes_present.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     script:
@@ -57,9 +57,9 @@ rule included_excluded_chromosomes_beds:
     params:
         included_chromosomes = config["chroms"]["included_chromosomes"]
     log:
-        "logs/pipeline/included_excluded_chromosomes_beds.log"
+        "logs/global_rules/included_excluded_chromosomes_beds.log"
     benchmark:
-        "logs/pipeline/included_excluded_chromosomes_beds.benchmark.txt"
+        "logs/global_rules/included_excluded_chromosomes_beds.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     run:
@@ -91,9 +91,9 @@ rule bwamem_index_files:
         pac = config["files"]["reference_genome"] + ".pac",
         sa = config["files"]["reference_genome"] + ".0123"
     log:
-        "logs/pipeline/bwamem_index_files.log"
+        "logs/global_rules/bwamem_index_files.log"
     benchmark:
-        "logs/pipeline/bwamem_index_files.benchmark.txt"
+        "logs/global_rules/bwamem_index_files.benchmark.txt"
     threads:
         config["resources"]["threads"]["moderate"]
     resources:
@@ -111,9 +111,9 @@ rule samtools_index_files:
     output:
         fai = config["files"]["reference_genome"] + ".fai"
     log:
-        "logs/pipeline/samtools_index_files.log"
+        "logs/global_rules/samtools_index_files.log"
     benchmark:
-        "logs/pipeline/samtools_index_files.benchmark.txt"
+        "logs/global_rules/samtools_index_files.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     shell:
@@ -128,9 +128,9 @@ rule picard_sequence_dict:
     output:
         dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
     log:
-        "logs/pipeline/picard_sequence_dict.log"
+        "logs/global_rules/picard_sequence_dict.log"
     benchmark:
-        "logs/pipeline/picard_sequence_dict.benchmark.txt"
+        "logs/global_rules/picard_sequence_dict.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     shell:
@@ -147,9 +147,9 @@ rule tabix_index_files:
     output:
         germline_tbi = config["files"]["known_germline_variants"] + ".tbi"
     log:
-        "logs/pipeline/tabix_index_files.log"
+        "logs/global_rules/tabix_index_files.log"
     benchmark:
-        "logs/pipeline/tabix_index_files.benchmark.txt"
+        "logs/global_rules/tabix_index_files.benchmark.txt"
     resources:
         memory = config["resources"]["memory"]["light"]
     shell:
