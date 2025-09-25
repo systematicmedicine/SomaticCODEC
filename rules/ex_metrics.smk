@@ -572,6 +572,8 @@ rule ex_somatic_variant_germline_contexts:
         "logs/{ex_sample}/ex_somatic_variant_germline_context.log"
     benchmark:
         "logs/{ex_sample}/ex_somatic_variant_germline_context.benchmark.txt"
+    threads: 
+        config["resources"]["threads"]["light"]
     resources:
         memory = config["resources"]["memory"]["light"]
     script:
