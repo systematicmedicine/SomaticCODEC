@@ -55,7 +55,7 @@ function handle_exit {
 
 # Step 1
 echo "[INFO] Step 1: download_S3.py" | tee -a "$LOG_FILE"
-if ! python3 scripts/download_S3.py > logs/bin_scripts/download_S3.log 2>&1; then
+if ! python3 bin/download_S3.py > logs/bin_scripts/download_S3.log 2>&1; then
     handle_exit "FAILED" "download_S3.py failed"
 fi
 
@@ -79,7 +79,7 @@ fi
 
 # Step 5
 echo "[INFO] Step 5: upload_S3.sh" | tee -a "$LOG_FILE"
-if ! bash upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
+if ! bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
     handle_exit "FAILED" "upload_S3.sh failed"
 fi
 
