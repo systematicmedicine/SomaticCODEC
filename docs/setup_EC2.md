@@ -27,9 +27,10 @@ Instuctions for setting up codec-opensource pipeline on Amazon EC2
 ### Install required tools
 ```
 sudo apt-get update
+sudo apt-get install -y unzip
 
 # Install AWS-CLI
-sudo apt-get install -y git curl unzip vim awscli
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install
 
 # Install Docker
 curl -fsSL https://get.docker.com | sudo bash
@@ -38,12 +39,12 @@ sudo usermod -aG docker "$USER"
 ### Clone the codec-opensource repository
 ```
 # Download deploy key
-aws s3 cp "s3://sysmed-ref-s3/keys/codec-opensource deploy key/ec2_github_deploy_key" ~/.ssh/deploy_key
-chmod 600 ~/.ssh/deploy_key
-ssh-keyscan github.com >> ~/.ssh/known_hosts
+aws s3 cp s3://sysmed-ref-s3/keys/codec-opensource-deploy-key/codec-opensource-deploy-key ~/.ssh/codec-opensource-deploy-key
+chmod 600 ~/.ssh/codec-opensource-deploy-key
 
 # Clone repository
-GIT_SSH_COMMAND='ssh -i ~/.ssh/deploy_key' git clone --branch dev git@github.com:systematicmedicine/codec-opensource.git
+GIT_SSH_COMMAND='ssh -i ~/.ssh/codec-opensource-deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new' \
+git clone --branch dev git@github.com:systematicmedicine/codec-opensource.git
 ```
 
 ### Build Docker image
