@@ -43,7 +43,6 @@ rule ms_germline_risk:
         max_depth = config["rules"]["ms_germline_risk"]["max_depth"],
         min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"],
         min_base_qual = config["rules"]["ms_germline_risk"]["min_base_qual"],
-        min_depth = config["rules"]["ms_germline_risk"]["min_depth"],
         min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"]
     log:
         "logs/{ms_sample}/ms_germline_risk.log"
@@ -70,8 +69,7 @@ rule ms_germline_risk:
 
         bcftools view \
         --threads {threads} \
-        --include 'FMT/DP >= {params.min_depth} && \
-        (SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf}' \
+        --include '(SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf}' \
         --output {output.vcf_germ} \
         {output.intermediate_pileup} 2>> {log}
         """
@@ -134,6 +132,10 @@ rule ms_germline_mask:
 #   RULE ms_low_depth_mask
 #
 #   Creates a mask for genomic positions with low read depth in matched sample
+#
+#   Notes:
+#   - Deletions are counted towards depth (-J flag)   
+#   - Overlapping r1 and r2 reads are counted once only (-s flag)
 # ----------------------------------------------------------------------------------------------
 rule ms_low_depth_mask:
     input:
@@ -147,7 +149,7 @@ rule ms_low_depth_mask:
     params:
         min_base_qual = config["rules"]["ms_germline_risk"]["min_base_qual"],
         min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"],
-        threshold = config["rules"]["ms_germline_risk"]["min_depth"]
+        threshold = config["rules"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_low_depth_mask.log"
     benchmark:
@@ -160,6 +162,8 @@ rule ms_low_depth_mask:
         -aa \
         --min-BQ {params.min_base_qual} \
         --min-MQ {params.min_map_qual} \
+        -s \
+        -J \
         {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
 
         awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
