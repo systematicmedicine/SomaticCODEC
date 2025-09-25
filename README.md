@@ -47,7 +47,7 @@ bash bin/monitor_system_resources.sh &
 
 5. Run pipeline
 ```
-bash bin_scripts/run_all.sh
+bash bin/run_all.sh
 ```
 This will automatically shut down the instance once the pipeline has exited (success or failure)
 
