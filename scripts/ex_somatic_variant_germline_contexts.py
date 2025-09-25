@@ -24,6 +24,7 @@ def main(snakemake):
     # Inputs
     ms_pileup_vcf = Path(snakemake.input.ms_pileup_vcf)
     ex_somatic_vcf = Path(snakemake.input.ex_somatic_vcf)
+    threads = snakemake.threads
 
     # Outputs
     germline_context_vcf = Path(snakemake.output.vcf)
@@ -50,6 +51,7 @@ def main(snakemake):
         with open(snakemake.log[0], "a") as log_file:
             subprocess.run(
                 ["bcftools", "view",
+                "--threads", str(threads),
                 "-T", str(ex_intermediate_bgz),
                 str(ms_intermediate_bgz),
                 "-o", str(germline_context_vcf)],
