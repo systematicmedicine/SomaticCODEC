@@ -139,7 +139,7 @@ rules:
   ms_germline_risk:
     max_base_qual: 60
     max_depth: 250
-    min_alt_vaf: 0.125
+    min_alt_vaf: 0.10
     min_base_qual: 20
     min_map_qual: 0
 
