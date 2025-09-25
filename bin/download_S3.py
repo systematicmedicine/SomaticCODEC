@@ -10,6 +10,8 @@ Authors:
     * Cameron Fraser
 """
 
+print("[INFO] Starting download_s3.py")
+
 import csv
 import subprocess
 from pathlib import Path
@@ -44,3 +46,5 @@ with open(CSV_PATH, newline='', encoding='utf-8-sig') as csvfile:
 
 if failed:
     exit(1)
+
+print("[INFO] download_s3.py complete")
