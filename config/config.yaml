@@ -141,8 +141,10 @@ rules:
     max_depth: 250
     min_alt_vaf: 0.125
     min_base_qual: 20
-    min_depth: 40
     min_map_qual: 0
+
+  ms_low_depth_mask:
+    min_depth: 40
 
   ms_map:
     band_width: 100

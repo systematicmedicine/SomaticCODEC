@@ -85,7 +85,7 @@ def lightweight_test_run():
     config_data["files"]["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
     config_data["files"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
 
-    config_data["rules"]["ms_germline_risk"]["min_depth"] = 1
+    config_data["rules"]["ms_low_depth_mask"]["min_depth"] = 1
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:
