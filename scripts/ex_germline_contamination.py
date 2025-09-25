@@ -53,7 +53,7 @@ def main(snakemake):
     with open(snakemake.log[0], "a") as log_file:
         subprocess.run(
             ["bcftools", "isec", "-n=2", "-w1", "-O", "v",
-            str(intermediate_bgz), str(germline_vcf), "-o", str(germline_matches)],
+            str(germline_vcf), str(intermediate_bgz), "-o", str(germline_matches)],
             stdout=log_file,
             stderr=log_file,
             check=True
