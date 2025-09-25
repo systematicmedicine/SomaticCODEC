@@ -165,7 +165,7 @@ rule ms_depth_histogram_metrics:
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
-        threshold = config["rules"]["ms_germline_risk"]["min_depth"]
+        threshold = config["rules"]["ms_low_depth_mask"]["min_depth"]
     resources:
         memory = config["resources"]["memory"]["moderate"]
     shell:
@@ -186,7 +186,7 @@ rule ms_coverage_by_depth_metrics:
         coverage_by_depth = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
     params:
         sample = "{ms_sample}",
-        min_depth = config["rules"]["ms_germline_risk"]["min_depth"]
+        min_depth = config["rules"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
     benchmark:
@@ -222,7 +222,7 @@ rule ms_germ_risk_variant_metrics_summary:
         summary = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics_summary.json"
     params:
         sample = "{ms_sample}",
-        min_depth = config["rules"]["ms_germline_risk"]["min_depth"]
+        min_depth = config["rules"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_germ_risk_variant_metrics_summary.log"
     benchmark:

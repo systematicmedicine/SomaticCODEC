@@ -358,7 +358,7 @@ rule ex_dsc_coverage_metrics:
     params: 
         quality_threshold = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
         sample = "{ex_sample}",
-        ms_depth_threshold = config["rules"]["ms_germline_risk"]["min_depth"]
+        ms_depth_threshold = config["rules"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
