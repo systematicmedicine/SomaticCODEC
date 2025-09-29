@@ -47,7 +47,6 @@ rule ex_call_dsc:
             -i {input.bam} \
             -o {output.bam} \
             --max-duplex-disagreements {params.max_duplex_disagreements} \
-            --single-strand-qual {params.single_strand_qual} \
             --min-read-pairs {params.min_read_pairs} \
             --stats {output.metrics} 2>> {log}
         """
