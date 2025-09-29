@@ -19,13 +19,7 @@ tmux new -s codec-session
 ```
 sudo docker run -it --name codec-container -v "$PWD":/work -w /work codec-image
 ```
-
-4. Start background system resource monitoring (optional)
-```
-bash bin/monitor_system_resources.sh &
-```
-
-5. Run pipeline
+4. Run pipeline
 ```
 # Download script
 python3 bin/download_S3.py > logs/bin_scripts/download_S3.log 2>&1

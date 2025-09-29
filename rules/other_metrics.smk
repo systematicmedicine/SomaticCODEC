@@ -58,3 +58,18 @@ rule collate_benchmarks:
         memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/collate_benchmarks.py"
+
+
+# Creates a CSV of job start and finish times
+rule create_job_log:
+    input:
+        rules.collate_benchmarks.output,
+        log = ancient("logs/bin_scripts/run_pipeline.log")
+    output:
+        csv = "logs/global_rules/job_log.csv"
+    log:
+        "logs/global_rules/create_job_log.log"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/create_job_log.py"
