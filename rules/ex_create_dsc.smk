@@ -31,9 +31,12 @@ rule ex_call_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
         metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
     params:
-        max_duplex_disagreements = config["rules"]["ex_call_dsc"]["max_duplex_disagreements"],
+        error_rate_pre_umi = config["rules"]["ex_call_dsc"]["error_rate_pre_umi"],
+        error_rate_post_umi = config["rules"]["ex_call_dsc"]["error_rate_post_umi"],
+        min_input_base_quality = config["rules"]["ex_call_dsc"]["min_input_base_quality"],
         min_read_pairs = config["rules"]["ex_call_dsc"]["min_read_pairs"],
-        single_strand_qual = config["rules"]["ex_call_dsc"]["single_strand_qual"]
+        min_duplex_length = config["rules"]["ex_call_dsc"]["min_duplex_length"],
+        max_duplex_disagreement_rate = config["rules"]["ex_call_dsc"]["max_duplex_disagreement_rate"]
     log:
         "logs/{ex_sample}/ex_call_dsc.log"
     benchmark:
@@ -46,9 +49,12 @@ rule ex_call_dsc:
          CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
-            --max-duplex-disagreements {params.max_duplex_disagreements} \
-            --single-strand-qual {params.single_strand_qual} \
+            --error-rate-pre-umi {params.error_rate_pre_umi} \
+            --error-rate-post-umi {params.error_rate_post_umi} \
+            --min-input-base-quality {params.min_input_base_quality} \
             --min-read-pairs {params.min_read_pairs} \
+            --min-duplex-length {params.min_duplex_length} \
+            --max-duplex-disagreement-rate {params.max_duplex_disagreement_rate} \
             --stats {output.metrics} 2>> {log}
         """
 
