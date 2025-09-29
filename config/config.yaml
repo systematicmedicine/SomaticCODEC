@@ -64,7 +64,6 @@ rules:
   ex_call_dsc:
     max_duplex_disagreements: 3
     min_read_pairs: 1
-    single_strand_qual: 2
 
   ex_call_somatic_snv:
     max_base_quality: 150
