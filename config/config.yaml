@@ -62,9 +62,12 @@ rules:
     min_umi_length: 6
 
   ex_call_dsc:
-    max_duplex_disagreements: 3
+    error_rate_pre_umi: 45
+    error_rate_post_umi: 40
+    min_input_base_quality: 10
     min_read_pairs: 1
-    single_strand_qual: 2
+    min_duplex_length: 1
+    max_duplex_disagreement_rate: 0.04
 
   ex_call_somatic_snv:
     max_base_quality: 150
