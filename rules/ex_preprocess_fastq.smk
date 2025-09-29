@@ -119,9 +119,9 @@ rule ex_filter_fastq:
         average_quality_threshold = config["rules"]["ex_filter_fastq"]["average_quality_threshold"],
         min_read_length = config["rules"]["ex_filter_fastq"]["min_read_length"]
     log:
-        "logs/{ex_sample}/ex_filter.log"
+        "logs/{ex_sample}/ex_filter_fastq.log"
     benchmark:
-        "logs/{ex_sample}/ex_filter.benchmark.txt"
+        "logs/{ex_sample}/ex_filter_fastq.benchmark.txt"
     threads:
         config["resources"]["threads"]["heavy"]
     resources:
