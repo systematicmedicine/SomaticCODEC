@@ -8,7 +8,9 @@
 #   3. Run pipeline (Snakemake)
 #   4. Package outputs
 #   5. Upload results to S3
-#   6. Notify via SNS and shut down EC2 instance
+#   6. Notify via SNS
+#   
+#   TODO - add final step to automatically shut down instance
 #
 # Logs:
 #   - High-level: logs/bin_scripts/run_all.log
@@ -29,12 +31,19 @@ LOG_FILE="logs/bin_scripts/run_all.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 
-# Load SNS ARN from config
+# Load params from config
 SNS_ARN=$(python3 -c "
 import yaml
 with open('config/config.yaml') as f:
     cfg = yaml.safe_load(f)
 print(cfg['aws']['sns_arn'])
+")
+
+EXPERIMENT_NAME=$(python3 -c "
+import yaml
+with open('config/config.yaml') as f:
+    cfg = yaml.safe_load(f)
+print(cfg['experiment']['name'])
 ")
 
 # Define cleanup function
@@ -45,11 +54,10 @@ function handle_exit {
     echo "[INFO] $MSG" | tee -a "$LOG_FILE"
     aws sns publish \
         --topic-arn "$SNS_ARN" \
-        --subject "Pipeline $STATUS" \
-        --message "$MSG"
+        --subject "Pipeline $EXPERIMENT_NAME $STATUS" \
+        --message "$MSG at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
+        --region "ap-southeast-2"
 
-    echo "[INFO] Shutting down instance..." | tee -a "$LOG_FILE"
-    bash shutdown_instance.sh > logs/bin_scripts/shutdown_instance.log 2>&1
     exit 0
 }
 
