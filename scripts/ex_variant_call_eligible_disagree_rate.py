@@ -116,8 +116,7 @@ def sweep_bed_membership(chrom: str,
 # ---------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------
-if __name__ == "__main__":
-
+def main(snakemake):
     # Start logging
     sys.stdout = open(snakemake.log[0], "a")
     sys.stderr = open(snakemake.log[0], "a")
@@ -157,22 +156,20 @@ if __name__ == "__main__":
     # Stream and sample (by shuffled references), stop after NUMBER_OF_READS
     for r in refs:
         for aln in bam.fetch(r):
-            # Only primary mapped
             if aln.is_unmapped or aln.is_secondary or aln.is_supplementary:
                 continue
 
-            # pull required BAM tags
             try:
-                ac = aln.get_tag("ac") # Watson sequence
-                bc = aln.get_tag("bc") # Crick sequence
-                aq = aln.get_tag("aq") # Watson quality scores
-                bq = aln.get_tag("bq") # Crick quality scores
+                ac = aln.get_tag("ac")  # Watson sequence
+                bc = aln.get_tag("bc")  # Crick sequence
+                aq = aln.get_tag("aq")  # Watson quality scores
+                bq = aln.get_tag("bq")  # Crick quality scores
             except KeyError:
                 continue
             if not ac or not bc or not aq or not bq or aq == "*" or bq == "*":
                 continue
 
-            # Reverse qualities on reverse-strand reads so aq/bq order matches ac/bc if flag 0x10 (16) is set 
+            # Reverse qualities for reverse-strand
             if aln.is_reverse:
                 aq = revstr(aq)
                 bq = revstr(bq)
@@ -192,30 +189,29 @@ if __name__ == "__main__":
                     continue
                 if ref_positions[p] is None:
                     continue
-                # Check if a base (A, C, G, T) is present on both strands
+
                 a = ac[p]
                 b = bc[p]
                 if not (is_base(a) and is_base(b)):
                     continue
-                # Convert quality scores 
+
                 qa = phred_char_to_q(aq[p])
                 qb = phred_char_to_q(bq[p])
                 if qa < 0 or qb < 0:
                     continue
                 if qa + qb < REQUIRED_Q:
                     continue
-                # Increment total eligible sites
+
                 total_eligible_sites += 1
-                # Increment observed disagreements if Watson and Crick disagree
                 if a.upper() != b.upper():
                     observed_disagreements += 1
-            # At the end of the read, increment sampled reads and check if NUMBER_OF_READS has been reached
+
             sampled_reads += 1
             if sampled_reads >= NUMBER_OF_READS:
                 break
         if sampled_reads >= NUMBER_OF_READS:
             break
-    # Warn if NUMBER_OF_READS has not been reached
+
     if sampled_reads < NUMBER_OF_READS:
         print(f"[WARN] Requested {NUMBER_OF_READS} primaries but only sampled {sampled_reads}.")
 
@@ -227,28 +223,34 @@ if __name__ == "__main__":
     # Ensure output directory exists
     os.makedirs(os.path.dirname(out_json), exist_ok=True)
 
-# Write JSON with key metrics
-output_data = {
-    "description": (
-        "Summary of Watson/Crick disagreement rates at bases eligible for variant calling.",
-        "Definitions:",
-        "required_q: Minimum combined Phred quality (Watson + Crick) required for a base to be eligible.",
-        "number_of_reads_target: Target number of primary alignments to sample.",
-        "number_of_reads_sampled: Actual number of primary alignments sampled.",
-        "Total_eligible_sites: Bases passing filters (in masked regions include_bed, A/C/G/T on both strands, qa+qb ≥ required_q).",
-        "Observed_disagreements: Eligible bases where Watson and Crick base calls disagree.",
-        "Observed_disagreement_rate: Fraction of disagreements over eligible sites (Observed_disagreements/Total_eligible_sites)."
-    ),
-    "required_q": REQUIRED_Q,
-    "number_of_reads_target": NUMBER_OF_READS,
-    "number_of_reads_sampled": sampled_reads,
-    "total_eligible_sites": total_eligible_sites,
-    "observed_disagreements": observed_disagreements,
-    "observed_disagreement_rate": obs_disagree_rate,
-}
+    # Write JSON with key metrics
+    output_data = {
+        "description": (
+            "Summary of Watson/Crick disagreement rates at bases eligible for variant calling.",
+            "Definitions:",
+            "required_q: Minimum combined Phred quality (Watson + Crick) required for a base to be eligible.",
+            "number_of_reads_target: Target number of primary alignments to sample.",
+            "number_of_reads_sampled: Actual number of primary alignments sampled.",
+            "Total_eligible_sites: Bases passing filters (in masked regions include_bed, A/C/G/T on both strands, qa+qb ≥ required_q).",
+            "Observed_disagreements: Eligible bases where Watson and Crick base calls disagree.",
+            "Observed_disagreement_rate: Fraction of disagreements over eligible sites (Observed_disagreements/Total_eligible_sites)."
+        ),
+        "required_q": REQUIRED_Q,
+        "number_of_reads_target": NUMBER_OF_READS,
+        "number_of_reads_sampled": sampled_reads,
+        "total_eligible_sites": total_eligible_sites,
+        "observed_disagreements": observed_disagreements,
+        "observed_disagreement_rate": obs_disagree_rate,
+    }
 
-with open(out_json, "w") as fh:
-    json.dump(output_data, fh, indent=2)
+    with open(out_json, "w") as fh:
+        json.dump(output_data, fh, indent=2)
 
-print(f"[INFO] Wrote {out_json}")
-print("[INFO] Finished ex_variant_call_eligible_disagree_rate.py")
+    print(f"[INFO] Wrote {out_json}")
+    print("[INFO] Finished ex_variant_call_eligible_disagree_rate.py")
+
+if __name__ == "__main__":
+    if "snakemake" not in globals():
+        sys.stderr.write("[ERROR] This script is intended to be run via Snakemake 'script:'\n")
+        sys.exit(2)
+    main(snakemake)
