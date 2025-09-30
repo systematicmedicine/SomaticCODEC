@@ -132,6 +132,9 @@ rules:
     r1_cut_end: -9  # Must be negative
     r2_cut_end: -9  # Must be negative
 
+  log_system_resource_usage:
+    sleep_interval: 60 # In seconds
+
   ms_filter_fastq:
     average_quality_threshold: 30
     min_read_length: 100
