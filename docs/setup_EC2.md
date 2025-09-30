@@ -24,35 +24,30 @@ Instuctions for setting up codec-opensource pipeline on Amazon EC2
     * Use your prefered SSH client to connect (e.g. SSH in WSL/Linux, Putty in Windows)
 
 
-### Install required tools
+### Setup environment
 ```
+# Install required tools
+
 sudo apt-get update
 sudo apt-get install -y unzip
 
-# Install AWS-CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install
 
-# Install Docker
 curl -fsSL https://get.docker.com | sudo bash
 sudo usermod -aG docker "$USER"
-```
-### Clone the codec-opensource repository
-```
-# Download deploy key
+
+# Clone codec-opensource repository
+
 aws s3 cp s3://sysmed-ref-s3/keys/codec-opensource-deploy-key/codec-opensource-deploy-key ~/.ssh/codec-opensource-deploy-key
 chmod 600 ~/.ssh/codec-opensource-deploy-key
 
-# Clone repository
 GIT_SSH_COMMAND='ssh -i ~/.ssh/codec-opensource-deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new' \
 git clone --branch dev git@github.com:systematicmedicine/codec-opensource.git
-```
 
-### Build Docker image
-```
-# Enter repoistory directory 
+
+# Build Docker image
+
 cd codec-opensource
-
-# Build Docker image from Dockerfile
 sudo docker build -t codec-image .
 ```
 
