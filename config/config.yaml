@@ -12,7 +12,7 @@ files:
   reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa # Must be uncompressed (.fa, .fna, .fasta)
   precomputed_masks:
     - "tmp/downloads/GRCh38_alldifficultregions.bed"
-    #- "tmp/downloads/GRCh38-gnomad-variants-AF-0.01.bed" Temporarily removed while updating ms germline calling
+    - "tmp/downloads/gnomad_AF_0.1.bed"
     - "tmp/downloads/GCRh38_repeat_masker.bed"
   reference_tri_contexts: tmp/downloads/2025-09-11_trinucleotide_contexts.csv
   known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
