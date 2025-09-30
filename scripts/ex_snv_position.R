@@ -90,6 +90,8 @@ chr.mad <- snv.pos %>%
 metrics_json <- list(
   description = "For each SNV, genomic position percentiles were calculated (0 = start, 50 = middle, 100 = end). These percentiles were compared to a uniform distribution, and the mean absolute deviation calculated",
   chromosomes_MAD = setNames(as.list(chr.mad$MAD), chr.mad$Chrom),
+  mean_MAD = mean(chr.mad$MAD, na.rm = TRUE),
+  median_MAD = median(chr.mad$MAD, na.rm = TRUE),
   max_MAD = max(chr.mad$MAD, na.rm = TRUE)
 )
 
