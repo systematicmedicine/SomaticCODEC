@@ -51,10 +51,9 @@ echo "[INFO] Usable cores for Snakemake: ${USABLE_CORES}"
 snakemake \
     --snakefile Snakefile \
     --configfile config/config.yaml \
-    --cores all \
+    --cores $USABLE_CORES \
     --resources memory=$USABLE_MEM_GB \
     --keep-going \
-    --reason \
     --stats logs/bin_scripts/run_pipeline_stats.json
   
 echo "[INFO] Finished run_pipeline.sh: $(date)"
