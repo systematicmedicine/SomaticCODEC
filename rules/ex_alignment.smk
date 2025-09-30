@@ -144,7 +144,7 @@ rule ex_annotate_map:
             -o {output.intermediate_mateinfo} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression 1 --async-io \
+            --compression 1 \
             GroupReadsByUmi \
             --min-umi-length {params.min_umi_length} \
             -i {output.intermediate_mateinfo} \
