@@ -201,5 +201,5 @@ resources:
 # AWS parameters
 # ------------------------------------------------------------------------------
 aws:
-  s3_bucket: "arn:aws:s3:::sysmed-tmp-s3"
+  s3_bucket: "s3://sysmed-tmp-s3/codec-opensource-runs/"
   sns_arn: "arn:aws:sns:ap-southeast-2:554765025175:ec2-pipeline-complete"
