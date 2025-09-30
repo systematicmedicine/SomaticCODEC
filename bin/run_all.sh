@@ -46,10 +46,8 @@ function handle_exit {
     aws sns publish \
         --topic-arn "$SNS_ARN" \
         --subject "Pipeline $STATUS" \
-        --message "$MSG"
-
-    echo "[INFO] Shutting down instance..." | tee -a "$LOG_FILE"
-    bash shutdown_instance.sh > logs/bin_scripts/shutdown_instance.log 2>&1
+        --message "$MSG" \
+        --region "ap-southeast-2"
     exit 0
 }
 
