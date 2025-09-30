@@ -4,6 +4,7 @@
 Rules for setting up the bioinformatics pipeline.
     - Checking configs and inputs
     - Generating index and BED files
+    - Setting up log files
 
 Authors: 
     - James Phie
@@ -155,4 +156,43 @@ rule tabix_index_files:
     shell:
         """
         tabix -p vcf {input.germline_vcf} 2>> {log}
+        """
+
+
+# Logs disk space, memory, and cpu load at a defined interval
+rule log_system_resource_usage:
+    output:
+        log = "logs/global_rules/system_resource_usage.csv",
+        done_file = "logs/global_rules/log_system_resource_usage.done"
+    params:
+        sleep_interval = config["rules"]["log_system_resource_usage"]["sleep_interval"]
+    log:
+        "logs/global_rules/log_system_resource_usage.log"
+    benchmark:
+        "logs/global_rules/log_system_resource_usage.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    shell:
+        """
+        export SLEEP_INTERVAL={params.sleep_interval}
+        
+        bash scripts/monitor_system_resources.sh &
+
+        touch {output.done_file}
+        """
+
+
+# Ensures that run_pipeline.log has been created
+rule ensure_pipeline_log_exists:
+    output:
+        log = "logs/bin_scripts/run_pipeline.log"
+    log:
+        "logs/global_rules/ensure_pipeline_log_exists.log"
+    benchmark:
+        "logs/global_rules/ensure_pipeline_log_exists.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    shell:
+        """
+        touch {output.log}
         """

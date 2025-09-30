@@ -11,7 +11,7 @@
 set -e
 
 # Define log file path
-LOG_FILE="${LOG_FILE:-logs/bin_scripts/system_resource_usage.csv}"
+LOG_FILE="${LOG_FILE:-logs/global_rules/system_resource_usage.csv}"
 
 # Define interval between logs
 SLEEP_INTERVAL="${SLEEP_INTERVAL:-60}"

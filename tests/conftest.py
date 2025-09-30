@@ -92,9 +92,9 @@ def lightweight_test_run():
         yaml.safe_dump(config_data, f)
 
     # Log file setup
-    log_dir = Path("logs/global_rules")
+    log_dir = Path("logs/bin_scripts")
     log_dir.mkdir(exist_ok=True)
-    log_file = log_dir / f"pipeline_run_{datetime.now():%Y%m%d}.log"
+    log_file = log_dir / "run_pipeline.log"
     
     # Run snakemake
     snakemake_cmd = [

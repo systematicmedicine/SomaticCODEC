@@ -57,7 +57,9 @@ setup_files = [
     "tmp/downloads/excluded_chromosomes.bed",
     config["files"]["reference_genome"] + ".fai",
     os.path.splitext(config["files"]["reference_genome"])[0] + ".dict",
-    config["files"]["known_germline_variants"] + ".tbi"
+    config["files"]["known_germline_variants"] + ".tbi",
+    "logs/global_rules/log_system_resource_usage.done",
+    "logs/bin_scripts/run_pipeline.log"
 ]
 
 # Define metrics for ms samples
@@ -146,7 +148,9 @@ other_metrics = [
     "logs/global_rules/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
-    "logs/global_rules/combined_benchmarks.csv"
+    "logs/global_rules/combined_benchmarks.csv",
+    "logs/global_rules/system_resource_usage.csv",
+    "logs/global_rules/job_log.csv"
 ]
 
 # Define results
