@@ -579,3 +579,27 @@ rule ex_somatic_variant_germline_contexts:
     script:
         "../scripts/ex_somatic_variant_germline_contexts.py"
 
+"""
+Calculates the Watson vs Crick base disagreement rate at positions where somatic variants would be called
+"""
+
+rule ex_variant_call_disagree_metrics:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
+        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+    output:
+        metrics_json = "metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json"
+    params:
+        required_Q = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
+        number_of_reads = 2000000
+    log:
+        "logs/{ex_sample}/ex_variant_call_disagree_metrics.log"
+    benchmark:
+        "logs/{ex_sample}/ex_variant_call_disagree_metrics.benchmark.txt"
+    threads: 
+        config["resources"]["threads"]["light"]
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/ex_variant_call_eligible_disagree_rate.py"
