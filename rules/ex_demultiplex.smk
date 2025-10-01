@@ -114,7 +114,7 @@ rule ex_demultiplex_fastq:
     log:
         "logs/batch/ex_demultiplex_fastq.log"
     benchmark:
-        "logs/batch/ex_demultiplex_fastq.txt"
+        "logs/batch/ex_demultiplex_fastq.benchmark.txt"
     threads:
         config["resources"]["threads"]["heavy"]
     resources:
