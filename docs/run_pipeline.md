@@ -21,17 +21,6 @@ sudo docker run -it --name codec-container -v "$PWD":/work -w /work codec-image
 ```
 4. Run pipeline
 ```
-# Download script
-python3 bin/download_S3.py > logs/bin_scripts/download_S3.log 2>&1
-
-# Check pipeline
-bash bin/check_pipeline.sh > logs/bin_scripts/check_pipeline.log 2>&1
-
-# Run pipeline
-bash bin/run_pipeline.sh > logs/bin_scripts/run_pipeline.log 2>&1
-
-# Package outputs
-python3 bin/package_outputs.py > logs/bin_scripts/package_outputs.log 2>&1
-
-# Upload outputs to S3
-bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1
+bash bin/run_all.sh
+```
+5. Shutdown instance
