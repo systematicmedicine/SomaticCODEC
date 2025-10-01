@@ -257,3 +257,6 @@ def main(snakemake):
 
     print(f"[INFO] Wrote {out_json}")
     print("[INFO] Finished ex_variant_call_eligible_disagree_rate.py")
+
+if __name__ == "__main__":
+    main(snakemake)
