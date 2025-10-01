@@ -561,9 +561,9 @@ Obtains the germline contexts for positions where somatic variants were called
 """
 rule ex_somatic_variant_germline_contexts:
     input:
-        ms_pileup_vcf = lambda wc: (
+        ms_pileup_bcf = lambda wc: (
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_ms_pileup.vcf"
+            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_ms_pileup.bcf"
         ),
         ex_somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf"
     output:

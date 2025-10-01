@@ -47,8 +47,8 @@ rule ex_call_dsc:
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-         CallCodecConsensusReads \
             --compression={params.compression_level} \
+            CallCodecConsensusReads \
             -i {input.bam} \
             -o {output.bam} \
             --error-rate-pre-umi {params.error_rate_pre_umi} \
@@ -172,8 +172,8 @@ rule ex_annotate_dsc:
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            ZipperBams \
             --compression={params.compression_level} \
+            ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
             --ref {input.ref} \
@@ -203,7 +203,8 @@ rule ex_filter_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
     params:
-        min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"]
+        min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_filter_dsc.log"
     benchmark:

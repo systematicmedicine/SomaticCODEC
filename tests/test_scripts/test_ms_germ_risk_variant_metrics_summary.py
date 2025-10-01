@@ -23,7 +23,7 @@ from scripts.ms_germ_risk_variant_metrics_summary import main
     [
         (
             "tests/data/test_ms_germ_risk_variant_metrics_summary/variant_metrics.txt",
-            "tests/data/test_ms_germ_risk_variant_metrics_summary/pileup.vcf",
+            "tests/data/test_ms_germ_risk_variant_metrics_summary/pileup.bcf",
             "TestSample",
             {
                 "callable_bases": 4,
@@ -40,7 +40,7 @@ from scripts.ms_germ_risk_variant_metrics_summary import main
 def test_ms_germ_risk_variant_metrics_summary(tmp_path, variant_metrics_path, pileup_vcf_path, sample_name, expected_metrics):
 
     vmp = tmp_path / "variant_metrics.txt"
-    pup = tmp_path / "pileup.vcf"
+    pup = tmp_path / "pileup.bcf"
 
     min_depth = 3
 
@@ -50,7 +50,7 @@ def test_ms_germ_risk_variant_metrics_summary(tmp_path, variant_metrics_path, pi
     class MockSnakemake:
         input = type("input", (), {
             "variant_metrics": str(vmp),
-            "pileup_vcf": str(pup)
+            "pileup_bcf": str(pup)
         })
         params = type("params", (), {"sample": sample_name,
                                      "min_depth": min_depth})
