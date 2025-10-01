@@ -46,7 +46,8 @@ rule ex_tc_trim_fastq:
         r1_start = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r1_start"],
         r1_end = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r1_end"],
         r2_start = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r2_start"],
-        r2_end = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r2_end"]
+        r2_end = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r2_end"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_technical_control}/ex_tc_trim_fastq.log"
     benchmark:
@@ -64,6 +65,7 @@ rule ex_tc_trim_fastq:
           -G ^{params.r2_start} \
           -o {output.intermediate_r1_1} \
           -p {output.intermediate_r2_1} \
+          --compression-level {params.compression_level} \
           {input.r1} {input.r2} \
           --json={output.trim5primejson} 2>> {log}
 
@@ -73,6 +75,7 @@ rule ex_tc_trim_fastq:
           --overlap {params.min_adapter_overlap} \
           -b {params.r1_end} \
           -o {output.intermediate_r1_2} \
+          --compression-level {params.compression_level} \
           {output.intermediate_r1_1} \
           --json={output.r1_trim3primejson} 2>> {log}
 
@@ -82,8 +85,9 @@ rule ex_tc_trim_fastq:
           --overlap {params.min_adapter_overlap} \
           -b {params.r2_end} \
           -o {output.intermediate_r2_2} \
+          --compression-level {params.compression_level} \
           {output.intermediate_r2_1} \
-          --json={output.r2_trim3primejson}
+          --json={output.r2_trim3primejson} 2>> {log}
 
           cutadapt \
           -j {threads} \
@@ -93,7 +97,9 @@ rule ex_tc_trim_fastq:
           -U {params.r2_cut_end} \
           -o {output.r1} \
           -p {output.r2} \
-          {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
+          --compression-level {params.compression_level} \
+          {output.intermediate_r1_2} \
+          {output.intermediate_r2_2} 2>> {log}
         """ 
 
 rule ex_tc_trimmed_read_length_metrics:

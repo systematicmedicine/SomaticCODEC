@@ -68,23 +68,24 @@ def lightweight_test_run():
 
     config_data["experiment"]["name"] = "lightweight_test_run"
 
-    config_data["resources"]["memory"]["heavy"] = 4
-    config_data["resources"]["memory"]["moderate"] = 4
-    config_data["resources"]["memory"]["light"] = 4
-    config_data["resources"]["threads"]["heavy"] = 4
-    config_data["resources"]["threads"]["moderate"] = 4
-    config_data["resources"]["threads"]["light"] = 4
-
     config_data["files"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
     config_data["files"]["precomputed_masks"] = [
         "tmp/downloads/GRCh38_alldifficultregions_10lines.bed", 
         "tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed",
         "tmp/downloads/GCRh38_repeat_masker_10lines.bed"
         ]
-
     config_data["files"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
 
     config_data["rules"]["ms_low_depth_mask"]["min_depth"] = 1
+
+    config_data["resources"]["memory"]["heavy"] = 4
+    config_data["resources"]["memory"]["moderate"] = 4
+    config_data["resources"]["memory"]["light"] = 4
+    config_data["resources"]["threads"]["heavy"] = 4
+    config_data["resources"]["threads"]["moderate"] = 4
+    config_data["resources"]["threads"]["light"] = 4
+    config_data["file_compression"]["gzip_level"] = 5
+
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:

@@ -40,7 +40,8 @@ rule ex_map:
         mismatch_penalty = config["rules"]["ex_map"]["mismatch_penalty"],
         reseed_factor = config["rules"]["ex_map"]["reseed_factor"],
         unpaired_read_penalty = config["rules"]["ex_map"]["unpaired_read_penalty"],
-        z_dropoff = config["rules"]["ex_map"]["z_dropoff"]
+        z_dropoff = config["rules"]["ex_map"]["z_dropoff"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_map.log"
     benchmark:
@@ -66,9 +67,14 @@ rule ex_map:
         -U {params.unpaired_read_penalty} \
         -T {params.min_alignment_score_thresh} \
         -Y \
-        {input.ref} {input.fastq1} {input.fastq2} > {output.intermediate_sam} 2>> {log}
+        {input.ref} \
+        {input.fastq1} {input.fastq2} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
+        samtools view \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
 
 
@@ -84,6 +90,8 @@ rule ex_filter_map:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam"),
         intermediate_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_correct_unsorted.bam")
+    params:
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_filter_map.log"
     benchmark:
@@ -94,9 +102,20 @@ rule ex_filter_map:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        samtools view -@ {threads} -b -f 0x2 {input.bam} > {output.intermediate_unsorted} 2>> {log}
+        samtools view \
+        -@ {threads} \
+        -b \
+        -f 0x2 \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        {input.bam} > {output.intermediate_unsorted} 2>> {log}
 
-        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
+        samtools sort \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -o {output.bam} \
+        {output.intermediate_unsorted} 2>> {log}
         """
 
 
@@ -119,7 +138,8 @@ rule ex_annotate_map:
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam"),
         intermediate_anno_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_anno_unsorted.bam")
     params:
-        min_umi_length = config["rules"]["ex_annotate_map"]["min_umi_length"]
+        min_umi_length = config["rules"]["ex_annotate_map"]["min_umi_length"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_annotate_map.log"
     benchmark:
@@ -131,20 +151,28 @@ rule ex_annotate_map:
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression={params.compression_level} \
             CopyUmiFromReadName \
             -i {input.bam} \
             -o {output.intermediate_moveumi} \
             --remove-umi true 2>> {log}
 
-        samtools sort -n -@ {threads} -o {output.intermediate_sorted} {output.intermediate_moveumi} 2>> {log}
+        samtools sort \
+            -n \
+            -@ {threads} \
+            --output-fmt bam \
+            --output-fmt-option level={params.compression_level} \
+            -o {output.intermediate_sorted} \
+            {output.intermediate_moveumi} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression={params.compression_level} \
             SetMateInformation \
             -i {output.intermediate_sorted} \
             -o {output.intermediate_mateinfo} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression 1 \
+            --compression={params.compression_level} \
             GroupReadsByUmi \
             --min-umi-length {params.min_umi_length} \
             -i {output.intermediate_mateinfo} \
@@ -154,17 +182,20 @@ rule ex_annotate_map:
             -m 0 \
             --strategy=adjacency 2>> {log}
 
-        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
-            I={output.intermediate_groupbyumi} \
-            O={output.intermediate_anno_unsorted} \
-            RGID={wildcards.ex_sample} \
-            RGLB=lib1 \
-            RGPL=illumina \
-            RGPU=unit1 \
-            RGSM={wildcards.ex_sample} \
-            VALIDATION_STRINGENCY=LENIENT 2>> {log}
+        picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
+            AddOrReplaceReadGroups \
+            --COMPRESSION_LEVEL {params.compression_level} \
+            --INPUT {output.intermediate_groupbyumi} \
+            --OUTPUT {output.intermediate_anno_unsorted} \
+            --RGID {wildcards.ex_sample} \
+            --RGLB lib1 \
+            --RGPL illumina \
+            --RGPU unit1 \
+            --RGSM {wildcards.ex_sample} \
+            --VALIDATION_STRINGENCY LENIENT 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression={params.compression_level} \
             SortBam \
             -i {output.intermediate_anno_unsorted} \
             -o {output.bam} \

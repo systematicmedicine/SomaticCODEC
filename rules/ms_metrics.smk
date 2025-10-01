@@ -217,7 +217,7 @@ rule ms_germ_risk_variant_metrics:
 rule ms_germ_risk_variant_metrics_summary:
     input: 
         variant_metrics = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics.txt",
-        pileup_vcf = "tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf"
+        pileup_bcf = "tmp/{ms_sample}/{ms_sample}_ms_pileup.bcf"
     output:
         summary = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics_summary.json"
     params:
