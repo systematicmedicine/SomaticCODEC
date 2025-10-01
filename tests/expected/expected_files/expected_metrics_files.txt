@@ -7,8 +7,7 @@ metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt
 metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json
 metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json
 metrics/{ms_sample}/{ms_sample}_trim_metrics.txt
-metrics/{ms_sample}/{ms_sample}_length_filter_metrics.txt
-metrics/{ms_sample}/{ms_sample}_quality_filter_metrics.txt
+metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html
 metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip
@@ -42,8 +41,7 @@ metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json
 metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json
 metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json
-metrics/{ex_sample}/{ex_sample}_filter_length.txt
-metrics/{ex_sample}/{ex_sample}_filter_quality.txt
+metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt
 metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt
 metrics/{ex_sample}/{ex_sample}_duplication_metrics.json
 metrics/{ex_sample}/{ex_sample}_total_read_loss.json

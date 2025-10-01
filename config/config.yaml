@@ -178,15 +178,14 @@ rules:
     spacer_length: 3
     qual_trim_threshold: 20 # Trims low quality bases from 3' end of read
 
-
-
 # ------------------------------------------------------------------------------
 # Resources (memory/threads)
 # ------------------------------------------------------------------------------
-# Memory units are expressed in gigabytes (GB) throughout pipeline
+file_compression:
+  gzip_level: 1
 
 resources:
-  memory:
+  memory: # Memory units are expressed in gigabytes (GB) throughout pipeline
     light: 8
     moderate: 32
     heavy: 64

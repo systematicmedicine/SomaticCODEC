@@ -47,7 +47,8 @@ rule ex_trim_fastq:
         r1_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_start"],
         r1_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_end"],
         r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
-        r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"]
+        r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_trim_fastq.log"
     benchmark:
@@ -65,6 +66,7 @@ rule ex_trim_fastq:
           -G ^{params.r2_start} \
           -o {output.intermediate_r1_1} \
           -p {output.intermediate_r2_1} \
+          --compression-level {params.compression_level} \
           {input.r1} {input.r2} \
           --json={output.trim5primejson} 2>> {log}
 
@@ -74,6 +76,7 @@ rule ex_trim_fastq:
           --overlap {params.min_adapter_overlap} \
           -b {params.r1_end} \
           -o {output.intermediate_r1_2} \
+          --compression-level {params.compression_level} \
           {output.intermediate_r1_1} \
           --json={output.r1_trim3primejson} 2>> {log}
 
@@ -83,6 +86,7 @@ rule ex_trim_fastq:
           --overlap {params.min_adapter_overlap} \
           -b {params.r2_end} \
           -o {output.intermediate_r2_2} \
+          --compression-level {params.compression_level} \
           {output.intermediate_r2_1} \
           --json={output.r2_trim3primejson} 2>> {log}
 
@@ -95,6 +99,7 @@ rule ex_trim_fastq:
           --quality-cutoff {params.quality_cutoff} \
           -o {output.r1} \
           -p {output.r2} \
+          --compression-level {params.compression_level} \
           {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
         """ 
 
@@ -111,10 +116,7 @@ rule ex_filter_fastq:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
-        length_metrics = "metrics/{ex_sample}/{ex_sample}_filter_length.txt",
-        quality_metrics = "metrics/{ex_sample}/{ex_sample}_filter_quality.txt",
-        r1_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r1_filter_intermediate.fastq.gz"),
-        r2_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r2_filter_intermediate.fastq.gz")
+        filter_metrics = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
     params:
         average_quality_threshold = config["rules"]["ex_filter_fastq"]["average_quality_threshold"],
         min_read_length = config["rules"]["ex_filter_fastq"]["min_read_length"]
@@ -128,30 +130,17 @@ rule ex_filter_fastq:
         memory = config["resources"]["memory"]["moderate"]        
     shell:  
         """
-        # Length filter
         trimmomatic PE \
             -phred33 \
             -threads {threads} \
-            -summary {output.length_metrics} \
+            -summary {output.filter_metrics} \
             {input.r1} \
             {input.r2} \
-            {output.r1_intermediate} \
-            /dev/null \
-            {output.r2_intermediate} \
-            /dev/null \
-            MINLEN:{params.min_read_length} 2>> {log}
-
-        # Average quality filter
-        trimmomatic PE \
-            -phred33 \
-            -threads {threads} \
-            -summary {output.quality_metrics} \
-            {output.r1_intermediate} \
-            {output.r2_intermediate} \
             {output.r1} \
             /dev/null \
             {output.r2} \
             /dev/null \
+            MINLEN:{params.min_read_length} \
             AVGQUAL:{params.average_quality_threshold} 2>> {log}
         """
 

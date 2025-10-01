@@ -53,7 +53,7 @@ def main(snakemake):
 
     # Load metrics files
     variant_metrics_path = snakemake.input.variant_metrics
-    pileup_vcf = snakemake.input.pileup_vcf
+    pileup_bcf = snakemake.input.pileup_bcf
     min_depth = snakemake.params.min_depth
 
     # Define output path
@@ -65,7 +65,7 @@ def main(snakemake):
     # Calculate number of bases eligible for variant calling (depth > min_depth, quality > min_BQ)
     with open(snakemake.log[0], "a") as log_file:
         proc = subprocess.Popen(
-            ["bcftools", "view", "--include", f"FMT/DP>={min_depth}", str(pileup_vcf)],
+            ["bcftools", "view", "--include", f"FMT/DP>={min_depth}", str(pileup_bcf)],
             stdout=subprocess.PIPE,
             stderr=log_file,
             text=True)

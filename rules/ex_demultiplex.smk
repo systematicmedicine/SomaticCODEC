@@ -30,7 +30,8 @@ rule ex_extract_fastq_umis:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
     params:
-        umi_length = config["rules"]["ex_extract_fastq_umis"]["umi_length"]
+        umi_length = config["rules"]["ex_extract_fastq_umis"]["umi_length"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_lane}/ex_extract_umis.log"
     benchmark:
@@ -48,6 +49,7 @@ rule ex_extract_fastq_umis:
           --rename='{{id}}:{{r1.cut_prefix}}{{r2.cut_prefix}}' \
           -o {output.fastq1} \
           -p {output.fastq2} \
+          --compression-level {params.compression_level} \
           {input.fastq1} {input.fastq2} 2>> {log}
         """
 
@@ -107,7 +109,8 @@ rule ex_demultiplex_fastq:
         lane_ids = md.get_ex_lane_ids(config),
         suffix_r1 = "r1_demux.fastq.gz",
         suffix_r2 = "r2_demux.fastq.gz",
-        out_dir = "tmp"
+        out_dir = "tmp",
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/batch/ex_demultiplex_fastq.log"
     benchmark:
