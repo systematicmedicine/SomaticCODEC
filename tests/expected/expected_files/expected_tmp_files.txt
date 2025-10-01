@@ -25,7 +25,7 @@ tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai
 tmp/{ms_sample}/{ms_sample}_depth_per_base.txt
 tmp/{ms_sample}/{ms_sample}_depth_values.txt
 tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt
-tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf
+tmp/{ms_sample}/{ms_sample}_ms_pileup.bcf
 tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf
 tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed
 tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed

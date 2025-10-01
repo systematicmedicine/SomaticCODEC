@@ -44,6 +44,7 @@ def main(snakemake):
     suffix_r1 = snakemake.params.suffix_r1
     suffix_r2 = snakemake.params.suffix_r2
     out_dir = snakemake.params.out_dir
+    compression_level = snakemake.params.compression_level
     threads = snakemake.threads
 
     # Define outputs
@@ -70,6 +71,7 @@ def main(snakemake):
             "--discard-untrimmed",
             "-o", f"{out_dir}/{{name}}/{{name}}_{suffix_r1}",
             "-p", f"{out_dir}/{{name}}/{{name}}_{suffix_r2}",
+            "--compression-level", str(compression_level),
             raw_r1,
             raw_r2
         ]

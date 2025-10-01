@@ -40,7 +40,8 @@ rule ms_trim_fastq:
         spacer_length = config["rules"]["ms_trim_fastq"]["spacer_length"],
         qual_trim_threshold = config["rules"]["ms_trim_fastq"]["qual_trim_threshold"],
         max_error_rate = config["rules"]["ms_trim_fastq"]["max_error_rate"],
-        min_overlap = config["rules"]["ms_trim_fastq"]["min_overlap"]
+        min_overlap = config["rules"]["ms_trim_fastq"]["min_overlap"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_trim_fastq.log"
     benchmark:
@@ -57,6 +58,7 @@ rule ms_trim_fastq:
           -U {params.spacer_length} \
           -o {output.intermediate_spacer_removed_r1} \
           -p {output.intermediate_spacer_removed_r2} \
+          --compression-level {params.compression_level} \
           {input.r1} {input.r2} 2>> {log}
         
         cutadapt \
@@ -72,6 +74,7 @@ rule ms_trim_fastq:
             -O {params.min_overlap} \
             -o {output.r1} \
             -p {output.r2} \
+            --compression-level {params.compression_level} \
             {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \
             --report=full > {output.report} 2>> {log}
         """
@@ -91,7 +94,8 @@ rule ms_filter_fastq:
         filter_metrics = "metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt"
     params:
         min_read_length = config["rules"]["ms_filter_fastq"]["min_read_length"],
-        average_quality_threshold = config["rules"]["ms_filter_fastq"]["average_quality_threshold"]
+        average_quality_threshold = config["rules"]["ms_filter_fastq"]["average_quality_threshold"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
@@ -106,6 +110,7 @@ rule ms_filter_fastq:
             -phred33 \
             -threads {threads} \
             -summary {output.filter_metrics} \
+            -compressLevel {params.compression_level} \
             {input.r1} \
             {input.r2} \
             {output.r1} \
