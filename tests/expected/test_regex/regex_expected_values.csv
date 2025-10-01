@@ -1,8 +1,7 @@
 Metric,File_path,Expected
 ms_mapped_alignment,tests/data/test_regex/S00X_alignment_stats.txt,99.73
 ms_insert_size_alignment,tests/data/test_regex/S00X_insert_size_metrics.txt,53
-ms_reads_filtered_length,tests/data/test_regex/S00X_length_filter_metrics.txt,35.01
-ms_reads_filtered_quality,tests/data/test_regex/S00X_quality_filter_metrics.txt,77.23
+ms_reads_filtered_length_quality,tests/data/test_regex/S00X_filter_metrics_ms.txt,35.01
 ex_mapped_initial_alignment,tests/data/test_regex/S00X_map_metrics.txt,91.37
 ex_properly_paired_initial_alignment,tests/data/test_regex/S00X_map_metrics.txt,67.52
 ex_insert_size_initial_alignment,tests/data/test_regex/S00X_insert_metrics.txt,127
