@@ -121,7 +121,6 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_percent_eligible_N_bases.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trinuc_context.csv", ex_sample = ex_sample_ids),

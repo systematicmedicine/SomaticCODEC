@@ -40,7 +40,7 @@ EX_CALL_SOMATIC_PATH = Path("rules") / "ex_call_somatic.smk"
 BED = TEST_DATA / "include.bed"
 BAM = TEST_DATA / "test_map_dsc_anno_filtered.bam"
 BAI = TEST_DATA / "test_map_dsc_anno_filtered.bam.bai"
-EXPECTED_SHA256_CALL_SOMATIC = "78021e81417b37dee21cb43d17bb05591ecae892a141a1b9ad4502053835d677"
+EXPECTED_SHA256_CALL_SOMATIC = "334495ee1834d4f9e1bd7b8982736cf0df7d5f1bcdbf95515bbb9f91766eb3e1"
 REQUIRED_Q = 70
 
 
