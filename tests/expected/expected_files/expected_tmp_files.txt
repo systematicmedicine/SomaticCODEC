@@ -10,8 +10,6 @@ tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz
-tmp/{ms_sample}/{ms_sample}_filter_r2_intermediate.fastq.gz
-tmp/{ms_sample}/{ms_sample}_filter_r1_intermediate.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_raw_map.sam
@@ -59,8 +57,6 @@ tmp/{ex_sample}/{ex_sample}_r1_trim_adapters.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r2_trim_adapters.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz
-tmp/{ex_sample}/{ex_sample}_r1_filter_intermediate.fastq.gz
-tmp/{ex_sample}/{ex_sample}_r2_filter_intermediate.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz
 tmp/{ex_sample}/{ex_sample}_map.bam
