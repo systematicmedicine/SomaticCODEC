@@ -101,6 +101,9 @@ rules:
     unpaired_read_penalty: 9
     z_dropoff: 100
 
+  ex_metrics:
+    number_of_reads: 2000000
+
   ex_remap_dsc:
     band_width: 100
     gap_extension_penalty: 1

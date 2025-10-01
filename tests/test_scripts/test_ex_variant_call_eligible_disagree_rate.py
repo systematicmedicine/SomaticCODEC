@@ -22,12 +22,17 @@ from pathlib import Path
 
 import pysam
 import pytest
+import hashlib
 
 # Run pytest from repo root so these relative paths resolve.
 TEST_DATA = Path("tests/data/test_ex_variant_call_eligible_disagree_rate")
+EX_CALL_SOMATIC_PATH = Path("rules") / "ex_call_somatic.smk"
 BED = TEST_DATA / "include.bed"
 BAM = TEST_DATA / "test_map_dsc_anno_filtered.bam"
 BAI = TEST_DATA / "test_map_dsc_anno_filtered.bam.bai"
+EXPECTED_SHA256_CALL_SOMATIC = "78021e81417b37dee21cb43d17bb05591ecae892a141a1b9ad4502053835d677"
+REQUIRED_Q = 70
+
 
 # Import the script as a module without executing __main__
 SCRIPT_PATH = Path("scripts") / "ex_variant_call_eligible_disagree_rate.py"
@@ -126,122 +131,54 @@ def test_flag16_reverse_aligns_ns_with_bang_qualities(bam):
     if not found_reverse:
         pytest.skip("No reverse-strand primary read found in chr1 test window")
 
-
 # --------------------------------------------------------------------------------------
 # 2) BED masking integrity: only positions inside include.bed are ever assessed
 # --------------------------------------------------------------------------------------
 def test_only_bed_positions_are_eligible(bam, bed_idx):
-    """
-    Run the eligibility screen over the WHOLE BAM, but assert that any position that
-    would be 'assessed' (passes all filters) lies strictly within the two include.bed
-    intervals (chr1:633279-633472) or (chr21:5062720-5062866).
-    """
-    REQUIRED_Q = 70
-    assessed_positions = []  # (chrom, pos) 0-based ref positions
+    positions = []
+    for aln in bam.fetch():
+        positions.extend(mod.eligible_sites_from_alignment(aln, bed_idx, REQUIRED_Q))
 
-    # Iterate all references and reads to catch any accidental leakage
-    for rname in bam.references:
-        for aln in bam.fetch(rname):
-            if aln.is_unmapped or aln.is_secondary or aln.is_supplementary:
-                continue
+    assert positions, "No eligible positions found"
 
-            # Required tags
-            try:
-                ac = aln.get_tag("ac")
-                bc = aln.get_tag("bc")
-                aq = aln.get_tag("aq")
-                bq = aln.get_tag("bq")
-            except KeyError:
-                continue
-            if not ac or not bc or not aq or not bq or aq == "*" or bq == "*":
-                continue
+    # Build a quick lookup for allowed positions from the BED
+    allowed = {
+        chrom: set(range(start, end))
+        for chrom, (starts, ends) in bed_idx.items()
+        for start, end in zip(starts, ends)
+    }
 
-            # Align qualities to ac/bc for reverse strand
-            if aln.is_reverse:
-                aq = mod.revstr(aq)
-                bq = mod.revstr(bq)
+    # Collect any leaks (pos not in allowed BED set)
+    leaks = [(ch, p) for ch, p, _, _ in positions if ch not in allowed or p not in allowed[ch]]
 
-            ref_positions = aln.get_reference_positions(full_length=True)
-            chrom = aln.reference_name
-            in_bed_mask = mod.sweep_bed_membership(chrom, ref_positions, bed_idx)
-
-            L = min(len(ac), len(bc), len(aq), len(bq), len(ref_positions))
-            for p in range(L):
-                if not in_bed_mask[p]:
-                    continue
-                pos = ref_positions[p]
-                if pos is None:
-                    continue
-
-                a = ac[p]
-                b = bc[p]
-                if not (mod.is_base(a) and mod.is_base(b)):
-                    continue
-
-                qa = mod.phred_char_to_q(aq[p])
-                qb = mod.phred_char_to_q(bq[p])
-                if qa < 0 or qb < 0 or (qa + qb) < REQUIRED_Q:
-                    continue
-
-                assessed_positions.append((chrom, pos))
-
-    # Define the two allowed half-open intervals from include.bed
-    def _in_allowed(ch, pos):
-        return (
-            (ch == "chr1" and 633279 <= pos < 633472) or
-            (ch == "chr21" and 5062720 <= pos < 5062866)
-        )
-
-    # Nothing assessed outside the BED
-    assert assessed_positions, "No assessed positions found; fixture changed?"
-    assert all(_in_allowed(ch, pos) for ch, pos in assessed_positions), (
-        "Found assessed positions outside include.bed"
-    )
+    assert not leaks, f"Found assessed positions outside include.bed: {leaks}"
 
 # --------------------------------------------------------------------------------------
 # 3) At least one disagreement exists in the BAM within the BED
 # --------------------------------------------------------------------------------------
 def test_at_least_one_disagreement_found(bam, bed_idx):
-    """
-    Sanity check: ensure that the provided BAM+BED combination produces at least one
-    Watson/Crick disagreement at an eligible site.
-    """
-    REQUIRED_Q = 70
-    disagreements = 0
-
-    for chrom in ["chr1", "chr21"]:
-        for aln in bam.fetch(chrom):
-            if aln.is_unmapped or aln.is_secondary or aln.is_supplementary:
-                continue
-            try:
-                ac = aln.get_tag("ac")
-                bc = aln.get_tag("bc")
-                aq = aln.get_tag("aq")
-                bq = aln.get_tag("bq")
-            except KeyError:
-                continue
-            if not ac or not bc or not aq or not bq or aq == "*" or bq == "*":
-                continue
-
-            if aln.is_reverse:
-                aq = mod.revstr(aq)
-                bq = mod.revstr(bq)
-
-            ref_positions = aln.get_reference_positions(full_length=True)
-            in_bed = mod.sweep_bed_membership(chrom, ref_positions, bed_idx)
-            L = min(len(ac), len(bc), len(aq), len(bq), len(ref_positions))
-            for p in range(L):
-                if not in_bed[p] or ref_positions[p] is None:
-                    continue
-                a = ac[p]
-                b = bc[p]
-                if not (mod.is_base(a) and mod.is_base(b)):
-                    continue
-                qa = mod.phred_char_to_q(aq[p])
-                qb = mod.phred_char_to_q(bq[p])
-                if qa < 0 or qb < 0 or (qa + qb) < REQUIRED_Q:
-                    continue
-                if a.upper() != b.upper():
-                    disagreements += 1
-
+    _, disagreements, _ = mod.tally_disagreements(bam, bed_idx, REQUIRED_Q, 10000)
     assert disagreements == 1, f"Expected 1 disagreement, found {disagreements}"
+
+# --------------------------------------------------------------------------------------
+# 4) Guardrail: ex_call_somatic.smk checksum must not change (assumption lock)
+# --------------------------------------------------------------------------------------
+
+def _sha256sum(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+def test_ex_call_somatic_checksum_guardrail():
+    if not EX_CALL_SOMATIC_PATH.exists():
+        pytest.skip(f"{EX_CALL_SOMATIC_PATH} not found; skipping checksum guardrail.")
+    digest = _sha256sum(EX_CALL_SOMATIC_PATH)
+    assert digest == EXPECTED_SHA256_CALL_SOMATIC, (
+        f"Checksum for {EX_CALL_SOMATIC_PATH} changed.\n\n"
+        f"  Expected SHA256: {EXPECTED_SHA256_CALL_SOMATIC}\n"
+        f"  Found SHA256:    {digest}\n\n"
+        "If this change is intentional (logic changed but assumptions still hold), "
+        "update EXPECTED_SHA256 in this test."
+    )

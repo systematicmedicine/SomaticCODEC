@@ -113,6 +113,81 @@ def sweep_bed_membership(chrom: str,
             mask[i] = True
     return mask
 
+def eligible_sites_from_alignment(aln, bed_idx, required_q: int):
+    """
+    Yield (chrom, pos, a, b) tuples for bases that pass eligibility filters.
+    Eligibility: inside BED, ac/bc are A/C/G/T, qa+qb ≥ required_q.
+    """
+    try:
+        ac = aln.get_tag("ac")
+        bc = aln.get_tag("bc")
+        aq = aln.get_tag("aq")
+        bq = aln.get_tag("bq")
+    except KeyError:
+        return []
+
+    if not ac or not bc or not aq or not bq or aq == "*" or bq == "*":
+        return []
+
+    # Reverse qualities for reverse strand
+    if aln.is_reverse:
+        aq = revstr(aq)
+        bq = revstr(bq)
+
+    ref_positions = aln.get_reference_positions(full_length=True)
+    if not ref_positions:
+        return []
+
+    chrom = aln.reference_name
+    in_bed = sweep_bed_membership(chrom, ref_positions, bed_idx)
+
+    L = min(len(ac), len(bc), len(aq), len(bq), len(ref_positions))
+    results = []
+    for p in range(L):
+        if not in_bed[p] or ref_positions[p] is None:
+            continue
+        a = ac[p]
+        b = bc[p]
+        if not (is_base(a) and is_base(b)):
+            continue
+        qa = phred_char_to_q(aq[p])
+        qb = phred_char_to_q(bq[p])
+        if qa < 0 or qb < 0 or (qa + qb) < required_q:
+            continue
+        results.append((chrom, ref_positions[p], a, b))
+    return results
+
+
+def tally_disagreements(bam, bed_idx, required_q: int, number_of_reads: int):
+    """
+    Stream through BAM, tally eligible sites and disagreements.
+    Returns (total_eligible_sites, observed_disagreements, sampled_reads).
+    """
+    refs = list(bam.header.references)
+    random.shuffle(refs)
+
+    total = 0
+    disagreements = 0
+    sampled_reads = 0
+
+    for r in refs:
+        for aln in bam.fetch(r):
+            if aln.is_unmapped or aln.is_secondary or aln.is_supplementary:
+                continue
+
+            eligible = eligible_sites_from_alignment(aln, bed_idx, required_q)
+            total += len(eligible)
+            disagreements += sum(1 for _, _, a, b in eligible if a.upper() != b.upper())
+
+            sampled_reads += 1
+            if sampled_reads >= number_of_reads:
+                break
+        if sampled_reads >= number_of_reads:
+            break
+
+    return total, disagreements, sampled_reads
+
+
 # ---------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------
@@ -141,79 +216,13 @@ def main(snakemake):
     # Load include mask
     bed_idx = load_bed_as_index(bed_path)
 
-    # Open BAM (explicit index path in case it's not colocated)
+    # Open BAM
     bam = pysam.AlignmentFile(bam_path, "rb", threads=THREADS, index_filename=bai_path)
 
-    print("[INFO] Sampling mode: shuffle references, then take first N primary reads")
-    refs = list(bam.header.references)
-    random.shuffle(refs)
-
-    # Tally
-    total_eligible_sites = 0
-    observed_disagreements = 0
-    sampled_reads = 0
-
-    # Stream and sample (by shuffled references), stop after NUMBER_OF_READS
-    for r in refs:
-        for aln in bam.fetch(r):
-            if aln.is_unmapped or aln.is_secondary or aln.is_supplementary:
-                continue
-
-            try:
-                ac = aln.get_tag("ac")  # Watson sequence
-                bc = aln.get_tag("bc")  # Crick sequence
-                aq = aln.get_tag("aq")  # Watson quality scores
-                bq = aln.get_tag("bq")  # Crick quality scores
-            except KeyError:
-                continue
-            if not ac or not bc or not aq or not bq or aq == "*" or bq == "*":
-                continue
-
-            # Reverse qualities for reverse-strand
-            if aln.is_reverse:
-                aq = revstr(aq)
-                bq = revstr(bq)
-
-            # Map read indices to 0-based reference positions
-            ref_positions = aln.get_reference_positions(full_length=True)
-            if not ref_positions:
-                continue
-
-            # Precompute BED membership mask for this alignment
-            chrom = aln.reference_name
-            in_bed = sweep_bed_membership(chrom, ref_positions, bed_idx)
-
-            L = min(len(ac), len(bc), len(aq), len(bq), len(ref_positions))
-            for p in range(L):
-                if not in_bed[p]:
-                    continue
-                if ref_positions[p] is None:
-                    continue
-
-                a = ac[p]
-                b = bc[p]
-                if not (is_base(a) and is_base(b)):
-                    continue
-
-                qa = phred_char_to_q(aq[p])
-                qb = phred_char_to_q(bq[p])
-                if qa < 0 or qb < 0:
-                    continue
-                if qa + qb < REQUIRED_Q:
-                    continue
-
-                total_eligible_sites += 1
-                if a.upper() != b.upper():
-                    observed_disagreements += 1
-
-            sampled_reads += 1
-            if sampled_reads >= NUMBER_OF_READS:
-                break
-        if sampled_reads >= NUMBER_OF_READS:
-            break
-
-    if sampled_reads < NUMBER_OF_READS:
-        print(f"[WARN] Requested {NUMBER_OF_READS} primaries but only sampled {sampled_reads}.")
+    # Check number of Watson and Crick disagreements
+    total_eligible_sites, observed_disagreements, sampled_reads = tally_disagreements(
+        bam, bed_idx, REQUIRED_Q, NUMBER_OF_READS
+    )
 
     bam.close()
 
@@ -248,9 +257,3 @@ def main(snakemake):
 
     print(f"[INFO] Wrote {out_json}")
     print("[INFO] Finished ex_variant_call_eligible_disagree_rate.py")
-
-if __name__ == "__main__":
-    if "snakemake" not in globals():
-        sys.stderr.write("[ERROR] This script is intended to be run via Snakemake 'script:'\n")
-        sys.exit(2)
-    main(snakemake)
