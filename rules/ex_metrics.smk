@@ -368,31 +368,6 @@ rule ex_dsc_coverage_metrics:
     script:
         "../scripts/ex_dsc_coverage_metrics.py"
 
-
-"""
-Calculate the number of N bases in bases eligible for variant calling (>0x duplex depth, unmasked, QUAL > min_base_quality)
-"""
-rule ex_percent_eligible_N_bases:
-    input:
-        pre_dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam",
-        post_dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam",
-        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
-    output:
-        json = "metrics/{ex_sample}/{ex_sample}_percent_eligible_N_bases.json"
-    params: 
-        min_base_quality_pre_dsc = config["rules"]["ex_trim_fastq"]["quality_cutoff"],
-        min_base_quality_post_dsc = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
-        sample = "{ex_sample}"
-    log:
-        "logs/{ex_sample}/ex_percent_eligible_N_bases.log"
-    benchmark:
-        "logs/{ex_sample}/ex_percent_eligible_N_bases.benchmark.txt"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    script:
-        "../scripts/ex_percent_eligible_N_bases.py"
-
-
 """
 Calculate trinucleotide contexts for called somatic mutations
     - Compare to reference contexts using cosine similarity
@@ -592,7 +567,7 @@ rule ex_variant_call_disagree_metrics:
         metrics_json = "metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json"
     params:
         required_Q = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
-        config["rules"]["ex_metrics"]["number_of_reads"],
+        number_of_reads = config["rules"]["ex_metrics"]["number_of_reads"],
     log:
         "logs/{ex_sample}/ex_variant_call_disagree_metrics.log"
     benchmark:
