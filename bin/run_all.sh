@@ -9,9 +9,8 @@
 #   4. Package outputs
 #   5. Upload results to S3
 #   6. Notify via SNS
+#   7. Shutdown instance
 #   
-#   TODO - add final step to automatically shut down instance
-#
 # Logs:
 #   - High-level: logs/bin_scripts/run_all.log
 #   - Each step: logs/bin_scripts/<script>.log
@@ -24,6 +23,11 @@
 #   - Cameron Fraser
 #   - ChatGPT
 # ==============================================================================
+
+# -----------------------------------------------------------------------------
+# Setup
+# -----------------------------------------------------------------------------
+
 set -euo pipefail
 
 # Define log
@@ -46,6 +50,10 @@ with open('config/config.yaml') as f:
 print(cfg['experiment']['name'])
 ")
 
+# Ensure required environment variables are set
+: "${AWS_REGION:?AWS_REGION must be set}"
+: "${INSTANCE_ID:?INSTANCE_ID must be set}"
+
 # Define cleanup function
 function handle_exit {
     local STATUS=$1
@@ -55,40 +63,52 @@ function handle_exit {
     aws sns publish \
         --topic-arn "$SNS_ARN" \
         --subject "Pipeline $EXPERIMENT_NAME $STATUS" \
-        --message "$MSG at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" \
-        --region "ap-southeast-2"
+        --message "$MSG" \
+        --region $AWS_REGION
+
+    sleep 5
+
+    echo "[INFO] Triggering EC2 shutdown..." | tee -a "$LOG_FILE"
+    if ! bash bin/shutdown_instance.sh >> "$LOG_FILE" 2>&1; then
+        echo "[ERROR] Shutdown script failed. Instance will remain running." | tee -a "$LOG_FILE"
+        exit 1
+    fi
 
     exit 0
 }
 
+# -----------------------------------------------------------------------------
+# Run scripts
+# -----------------------------------------------------------------------------
+
 # Step 1
 echo "[INFO] Step 1: download_S3.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/download_S3.py > logs/bin_scripts/download_S3.log 2>&1; then
-    handle_exit "FAILED" "download_S3.py failed"
+    handle_exit "FAILED" "Pipeline failed at step 1: download_S3.py"
 fi
 
 # Step 2
 echo "[INFO] Step 2: check_pipeline.sh" | tee -a "$LOG_FILE"
 if ! bash bin/check_pipeline.sh > logs/bin_scripts/check_pipeline.log 2>&1; then
-    handle_exit "FAILED" "check_pipeline.sh failed"
+    handle_exit "FAILED" "Pipeline failed at step 2: check_pipeline.sh"
 fi
 
 # Step 3
 echo "[INFO] Step 3: run_pipeline.sh" | tee -a "$LOG_FILE"
 if ! bash bin/run_pipeline.sh > logs/bin_scripts/run_pipeline.log 2>&1; then
-    handle_exit "FAILED" "run_pipeline.sh failed"
+    handle_exit "FAILED" "Pipeline failed at step 3: run_pipeline.sh"
 fi
 
 # Step 4
 echo "[INFO] Step 4: package_outputs.py" | tee -a "$LOG_FILE"
 if ! python3 bin/package_outputs.py > logs/bin_scripts/package_outputs.log 2>&1; then
-    handle_exit "FAILED" "package_outputs.py failed"
+    handle_exit "FAILED" "Pipeline failed at step 4: package_outputs.py"
 fi
 
 # Step 5
 echo "[INFO] Step 5: upload_S3.sh" | tee -a "$LOG_FILE"
 if ! bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
-    handle_exit "FAILED" "upload_S3.sh failed"
+    handle_exit "FAILED" "Pipeline failed at step 5: upload_S3.sh"
 fi
 
 # ✅ Success case
