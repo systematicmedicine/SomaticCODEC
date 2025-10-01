@@ -12,9 +12,12 @@
 #   * JSON:  metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json
 #
 # What we do:
-#   * Shuffle references and take the first NUMBER_OF_READS primary alignments from BAM
-#   * Reverse aq:Z and bq:Z (Watson and Crick quality scores) on FLAG16 so qualities align to ac:Z / bc:Z (Watson and Crick sequences)
-#   * Per base, require: ac:Z:,bc:Z: ∈ {A,C,G,T}, qa+qb ≥ REQUIRED_Q, and position lies inside include BED
+#   * Shuffle references and take the first NUMBER_OF_READS primary alignments from the test BAM
+#   * Reverse aq:Z and bq:Z (Watson and Crick quality scores) on FLAG16 (reverse reads) so qualities align to ac:Z / bc:Z (Watson and Crick sequences)
+#   * Per base assessed for disagrement, require:
+#       * ac:Z:,bc:Z be either A,C,G,T
+#       * qa+qb ≥ REQUIRED_Q
+#       * Position lies inside include BED
 #   * Tally:
 #       - Total_eligible_sites
 #       - Observed_disagreements   (ac:Z: != bc:Z:)

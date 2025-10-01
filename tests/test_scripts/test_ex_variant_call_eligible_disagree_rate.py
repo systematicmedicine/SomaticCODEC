@@ -1,11 +1,21 @@
 # =======================================================================================
 # test_ex_variant_call_eligible_disagree_rate.py
 #
-# Targeted BAM-based checks:
-#   1) For FLAG 16 reads, after reversing qualities, leading/trailing n's in ac/bc
-#      line up with leading/trailing !'s in aq/bq (Watson/Crick respectively).
-#   2) Eligibility masking respects include.bed exactly: any assessed base must lie
-#      inside one of the two BED intervals (chr1:633279-633472, chr21:5062720-5062866).
+# Tests
+#   1) Reverse-strand quality alignment check
+#     * Quality tags for Watson and Crick strands are not reversed automatically, while Watson, Crick and duplex sequences are. 
+#     * This tests that the reverse script implemented during ex_variant_call_eligible_disagree_rate.py correctly reverses the required tags. 
+#   2) BED masking integrity: only positions inside include.bed are ever assessed
+#     * Tests that only positions inside the bed mask are assessed for Watson and Crick disagreement
+#   3) Exactly one disagreement exists in the test BAM at eligible positions
+#     * The test file contains only one Watson and Crick disagreement where the following are true:
+#       * The disagreeing Watson and Crick base quality scores add up to >= 70
+#       * The disagreeing Watson and Crick bases are within the bed mask
+#       * The disagreeing Watson and Crick bases are both either A, C, G or T
+#   4) Guardrail: ex_call_somatic.smk checksum must not change (assumption lock)
+#       * ex_variant_call_eligible_disagree_rate metrics make assumptions about how variant calling is done
+#       * This test flags if ex_call_somatic.smk has been changed
+#       * After any changes to ex_call_somatic.smk, this script must be checked to make sure the assumptions match the updated rule
 #
 # Authors:
 #   - ChatGPT
