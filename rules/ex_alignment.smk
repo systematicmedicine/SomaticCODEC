@@ -151,8 +151,8 @@ rule ex_annotate_map:
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            CopyUmiFromReadName \
             --compression={params.compression_level} \
+            CopyUmiFromReadName \
             -i {input.bam} \
             -o {output.intermediate_moveumi} \
             --remove-umi true 2>> {log}
@@ -166,15 +166,14 @@ rule ex_annotate_map:
             {output.intermediate_moveumi} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            SetMateInformation \
             --compression={params.compression_level} \
+            SetMateInformation \
             -i {output.intermediate_sorted} \
             -o {output.intermediate_mateinfo} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression 1 \
-            GroupReadsByUmi \
             --compression={params.compression_level} \
+            GroupReadsByUmi \
             --min-umi-length {params.min_umi_length} \
             -i {output.intermediate_mateinfo} \
             -o {output.intermediate_groupbyumi} \
@@ -185,19 +184,19 @@ rule ex_annotate_map:
 
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
             AddOrReplaceReadGroups \
-            --COMPRESSION_LEVEL={params.compression_level} \
-            I={output.intermediate_groupbyumi} \
-            O={output.intermediate_anno_unsorted} \
-            RGID={wildcards.ex_sample} \
-            RGLB=lib1 \
-            RGPL=illumina \
-            RGPU=unit1 \
-            RGSM={wildcards.ex_sample} \
-            VALIDATION_STRINGENCY=LENIENT 2>> {log}
+            --COMPRESSION_LEVEL {params.compression_level} \
+            --INPUT {output.intermediate_groupbyumi} \
+            --OUTPUT {output.intermediate_anno_unsorted} \
+            --RGID {wildcards.ex_sample} \
+            --RGLB lib1 \
+            --RGPL illumina \
+            --RGPU unit1 \
+            --RGSM {wildcards.ex_sample} \
+            --VALIDATION_STRINGENCY LENIENT 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            SortBam \
             --compression={params.compression_level} \
+            SortBam \
             -i {output.intermediate_anno_unsorted} \
             -o {output.bam} \
             -s TemplateCoordinate 2>> {log}

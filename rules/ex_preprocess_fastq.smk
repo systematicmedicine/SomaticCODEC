@@ -119,8 +119,7 @@ rule ex_filter_fastq:
         filter_metrics = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
     params:
         average_quality_threshold = config["rules"]["ex_filter_fastq"]["average_quality_threshold"],
-        min_read_length = config["rules"]["ex_filter_fastq"]["min_read_length"],
-        compression_level = config["file_compression"]["gzip_level"]
+        min_read_length = config["rules"]["ex_filter_fastq"]["min_read_length"]
     log:
         "logs/{ex_sample}/ex_filter_fastq.log"
     benchmark:
@@ -135,7 +134,6 @@ rule ex_filter_fastq:
             -phred33 \
             -threads {threads} \
             -summary {output.filter_metrics} \
-            -compressLevel {params.compression_level} \
             {input.r1} \
             {input.r2} \
             {output.r1} \

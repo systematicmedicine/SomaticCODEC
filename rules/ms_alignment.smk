@@ -98,14 +98,14 @@ rule ms_annotate_map:
     shell:
         """
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
-            I={input.bam} \
-            O={output.intermediate_uncollated} \
-            --COMPRESSION_LEVEL={params.compression_level} \
-            RGID={wildcards.ms_sample} \
-            RGLB={wildcards.ms_sample}_lib \
-            RGPL=ILLUMINA \
-            RGPU={wildcards.ms_sample} \
-            RGSM={wildcards.ms_sample} 2>> {log}
+            --INPUT {input.bam} \
+            --OUTPUT {output.intermediate_uncollated} \
+            --COMPRESSION_LEVEL {params.compression_level} \
+            --RGID {wildcards.ms_sample} \
+            --RGLB {wildcards.ms_sample}_lib \
+            --RGPL ILLUMINA \
+            --RGPU {wildcards.ms_sample} \
+            --RGSM {wildcards.ms_sample} 2>> {log}
 
         samtools collate \
         -@ {threads} \

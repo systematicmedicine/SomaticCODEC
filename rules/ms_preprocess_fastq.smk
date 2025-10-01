@@ -94,8 +94,7 @@ rule ms_filter_fastq:
         filter_metrics = "metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt"
     params:
         min_read_length = config["rules"]["ms_filter_fastq"]["min_read_length"],
-        average_quality_threshold = config["rules"]["ms_filter_fastq"]["average_quality_threshold"],
-        compression_level = config["file_compression"]["gzip_level"]
+        average_quality_threshold = config["rules"]["ms_filter_fastq"]["average_quality_threshold"]
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
@@ -110,7 +109,6 @@ rule ms_filter_fastq:
             -phred33 \
             -threads {threads} \
             -summary {output.filter_metrics} \
-            -compressLevel {params.compression_level} \
             {input.r1} \
             {input.r2} \
             {output.r1} \
