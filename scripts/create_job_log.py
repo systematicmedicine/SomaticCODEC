@@ -31,7 +31,9 @@ def main(snakemake):
 
     def parse_dt(dt_str):
         match = re.search(
-            r"([A-Za-z]{3} [A-Za-z]{3} \d{2} \d{2}:\d{2}:\d{2} \d{4})", dt_str)
+            r"([A-Za-z]{3} [A-Za-z]{3}\s+\d{1,2} \d{2}:\d{2}:\d{2} \d{4})",
+            dt_str
+        )
         if not match:
             raise ValueError(f"Cannot parse timestamp from: {dt_str}")
         timestamp_str = match.group(1)
