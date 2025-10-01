@@ -111,10 +111,7 @@ rule ex_filter_fastq:
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
-        length_metrics = "metrics/{ex_sample}/{ex_sample}_filter_length.txt",
-        quality_metrics = "metrics/{ex_sample}/{ex_sample}_filter_quality.txt",
-        r1_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r1_filter_intermediate.fastq.gz"),
-        r2_intermediate = temp("tmp/{ex_sample}/{ex_sample}_r2_filter_intermediate.fastq.gz")
+        filter_metrics = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
     params:
         average_quality_threshold = config["rules"]["ex_filter_fastq"]["average_quality_threshold"],
         min_read_length = config["rules"]["ex_filter_fastq"]["min_read_length"]
@@ -128,30 +125,17 @@ rule ex_filter_fastq:
         memory = config["resources"]["memory"]["moderate"]        
     shell:  
         """
-        # Length filter
         trimmomatic PE \
             -phred33 \
             -threads {threads} \
-            -summary {output.length_metrics} \
+            -summary {output.filter_metrics} \
             {input.r1} \
             {input.r2} \
-            {output.r1_intermediate} \
-            /dev/null \
-            {output.r2_intermediate} \
-            /dev/null \
-            MINLEN:{params.min_read_length} 2>> {log}
-
-        # Average quality filter
-        trimmomatic PE \
-            -phred33 \
-            -threads {threads} \
-            -summary {output.quality_metrics} \
-            {output.r1_intermediate} \
-            {output.r2_intermediate} \
             {output.r1} \
             /dev/null \
             {output.r2} \
             /dev/null \
+            MINLEN:{params.min_read_length} \
             AVGQUAL:{params.average_quality_threshold} 2>> {log}
         """
 

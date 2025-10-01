@@ -88,10 +88,7 @@ rule ms_filter_fastq:
     output:
         r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
         r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
-        r1_intermediate = temp("tmp/{ms_sample}/{ms_sample}_filter_r2_intermediate.fastq.gz"),
-        r2_intermediate = temp("tmp/{ms_sample}/{ms_sample}_filter_r1_intermediate.fastq.gz"),
-        length_metrics = "metrics/{ms_sample}/{ms_sample}_length_filter_metrics.txt",
-        quality_metrics = "metrics/{ms_sample}/{ms_sample}_quality_filter_metrics.txt"
+        filter_metrics = "metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt"
     params:
         min_read_length = config["rules"]["ms_filter_fastq"]["min_read_length"],
         average_quality_threshold = config["rules"]["ms_filter_fastq"]["average_quality_threshold"]
@@ -105,29 +102,16 @@ rule ms_filter_fastq:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        # Length filter
         trimmomatic PE \
             -phred33 \
             -threads {threads} \
-            -summary {output.length_metrics} \
+            -summary {output.filter_metrics} \
             {input.r1} \
             {input.r2} \
-            {output.r1_intermediate} \
-            /dev/null \
-            {output.r2_intermediate} \
-            /dev/null \
-            MINLEN:{params.min_read_length} 2>> {log}
-
-        # Average quality filter
-        trimmomatic PE \
-            -phred33 \
-            -threads {threads} \
-            -summary {output.quality_metrics} \
-            {output.r1_intermediate} \
-            {output.r2_intermediate} \
             {output.r1} \
             /dev/null \
             {output.r2} \
             /dev/null \
+            MINLEN:{params.min_read_length} \
             AVGQUAL:{params.average_quality_threshold} 2>> {log}
         """
