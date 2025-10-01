@@ -38,7 +38,8 @@ rule ms_map:
         mismatch_penalty = config["rules"]["ms_map"]["mismatch_penalty"],
         reseed_factor = config["rules"]["ms_map"]["reseed_factor"],
         unpaired_read_penalty = config["rules"]["ms_map"]["unpaired_read_penalty"],
-        z_dropoff = config["rules"]["ms_map"]["z_dropoff"]        
+        z_dropoff = config["rules"]["ms_map"]["z_dropoff"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_raw_alignment.log"
     benchmark:
@@ -65,7 +66,11 @@ rule ms_map:
         -T {params.min_alignment_score_thresh} \
         {input.ref} {input.r1_processed} {input.r2_processed} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.bam} 2>> {log}
+        samtools view \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -bS {output.intermediate_sam} > {output.bam} 2>> {log}
         """
 
 # Annotates aligned reads for downstream rules
@@ -80,6 +85,8 @@ rule ms_annotate_map:
         intermediate_uncollated = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_uncollated.bam"),
         intermediate_collated = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_collated.bam"),
         intermediate_fixmate = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_fixmate.bam")
+    params:
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_annotate_map.log"
     benchmark:
@@ -93,17 +100,33 @@ rule ms_annotate_map:
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
             I={input.bam} \
             O={output.intermediate_uncollated} \
+            --COMPRESSION_LEVEL={params.compression_level} \
             RGID={wildcards.ms_sample} \
             RGLB={wildcards.ms_sample}_lib \
             RGPL=ILLUMINA \
             RGPU={wildcards.ms_sample} \
             RGSM={wildcards.ms_sample} 2>> {log}
 
-        samtools collate -@ {threads} -o {output.intermediate_collated} {output.intermediate_uncollated} 2>> {log}
+        samtools collate \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -o {output.intermediate_collated} \
+        {output.intermediate_uncollated} 2>> {log}
 
-        samtools fixmate -@ {threads} -m {output.intermediate_collated} {output.intermediate_fixmate} 2>> {log}
+        samtools fixmate \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -m {output.intermediate_collated} \
+        {output.intermediate_fixmate} 2>> {log}
 
-        samtools sort -@ {threads} -o {output.bam} {output.intermediate_fixmate} 2>> {log}
+        samtools sort \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -o {output.bam} \
+        {output.intermediate_fixmate} 2>> {log}
 
         samtools index {output.bam} 2>> {log}
         """
@@ -121,7 +144,8 @@ rule ms_remove_duplicates:
         intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam")
     params:
         duplicate_decision_method = config["rules"]["ms_remove_duplicates"]["duplicate_decision_method"],
-        optical_duplicate_distance = config["rules"]["ms_remove_duplicates"]["optical_duplicate_distance"]
+        optical_duplicate_distance = config["rules"]["ms_remove_duplicates"]["optical_duplicate_distance"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_remove_duplicates.log"
     benchmark:
@@ -134,6 +158,8 @@ rule ms_remove_duplicates:
         """
         samtools markdup \
         -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
         -r \
         --json \
         -f {output.dedup_metrics} \
@@ -143,7 +169,12 @@ rule ms_remove_duplicates:
         {input.bam} \
         {output.intermediate_unsorted} 2>> {log}
 
-        samtools sort -@ {threads} -o {output.bam} {output.intermediate_unsorted} 2>> {log}
+        samtools sort \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -o {output.bam} \
+        {output.intermediate_unsorted} 2>> {log}
 
         samtools index {output.bam} 2>> {log}
         """

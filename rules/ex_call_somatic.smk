@@ -32,7 +32,8 @@ rule ex_call_somatic_snv:
         intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
     params:
         max_base_quality = config["rules"]["ex_call_somatic_snv"]["max_base_quality"],
-        min_base_quality = config["rules"]["ex_call_somatic_snv"]["min_base_quality"]
+        min_base_quality = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_call_somatic_snv.log"
     benchmark:
@@ -54,6 +55,7 @@ rule ex_call_somatic_snv:
             --no-BAQ \
             --annotate AD,DP \
             --regions-file {input.include_bed} \
+            --output-type b{params.compression_level} \
             {input.bam} \
             -o {output.intermediate_mpileup} 2>> {log}
 
@@ -61,14 +63,20 @@ rule ex_call_somatic_snv:
             --threads {threads} \
             --multiallelic-caller \
             --keep-alts \
-            --output-type b \
+            --output-type b{params.compression_level} \
             -o {output.intermediate_called} \
             {output.intermediate_mpileup} 2>> {log}
 
         bcftools view \
             --threads {threads} \
+            -e 'TYPE="indel"' \
+            {output.intermediate_called} \
+            -Ov -o {output.vcf_all} 2>> {log}
+
+        bcftools view \
+            --threads {threads} \
             -e 'TYPE="indel" || TYPE="ref"' \
-            -Ob \
+            --output-type b{params.compression_level} \
             -o {output.intermediate_biallelic} \
             {output.intermediate_called} 2>> {log}
 
@@ -78,10 +86,4 @@ rule ex_call_somatic_snv:
             -Ov \
             -o {output.vcf_snvs} \
             {output.intermediate_biallelic} 2>> {log}
-
-        bcftools view \
-            --threads {threads} \
-            -e 'TYPE="indel"' \
-            {output.intermediate_called} \
-            -Ov -o {output.vcf_all} 2>> {log}
         """

@@ -36,14 +36,15 @@ rule ms_germline_risk:
         fai = config["files"]["reference_genome"] + ".fai",
         included_chromsomes_bed = "tmp/downloads/included_chromosomes.bed"
     output:
-        intermediate_pileup = temp("tmp/{ms_sample}/{ms_sample}_ms_pileup.vcf"),
+        intermediate_pileup = temp("tmp/{ms_sample}/{ms_sample}_ms_pileup.bcf"),
         vcf_germ = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf"
     params:
         max_base_qual = config["rules"]["ms_germline_risk"]["max_base_qual"],
         max_depth = config["rules"]["ms_germline_risk"]["max_depth"],
         min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"],
         min_base_qual = config["rules"]["ms_germline_risk"]["min_base_qual"],
-        min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"]
+        min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_germline_risk.log"
     benchmark:
@@ -64,6 +65,7 @@ rule ms_germline_risk:
         --max-depth {params.max_depth} \
         --no-BAQ \
         --regions-file {input.included_chromsomes_bed} \
+        --output-type b{params.compression_level} \
         --output {output.intermediate_pileup} \
         {input.bam} 2>> {log}
 

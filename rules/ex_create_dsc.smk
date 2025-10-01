@@ -36,7 +36,8 @@ rule ex_call_dsc:
         min_input_base_quality = config["rules"]["ex_call_dsc"]["min_input_base_quality"],
         min_read_pairs = config["rules"]["ex_call_dsc"]["min_read_pairs"],
         min_duplex_length = config["rules"]["ex_call_dsc"]["min_duplex_length"],
-        max_duplex_disagreement_rate = config["rules"]["ex_call_dsc"]["max_duplex_disagreement_rate"]
+        max_duplex_disagreement_rate = config["rules"]["ex_call_dsc"]["max_duplex_disagreement_rate"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_call_dsc.log"
     benchmark:
@@ -47,6 +48,7 @@ rule ex_call_dsc:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
          CallCodecConsensusReads \
+            --compression={params.compression_level} \
             -i {input.bam} \
             -o {output.bam} \
             --error-rate-pre-umi {params.error_rate_pre_umi} \
@@ -90,7 +92,8 @@ rule ex_remap_dsc:
         mismatch_penalty = config["rules"]["ex_remap_dsc"]["mismatch_penalty"],
         reseed_factor = config["rules"]["ex_remap_dsc"]["reseed_factor"],
         unpaired_read_penalty = config["rules"]["ex_remap_dsc"]["unpaired_read_penalty"],
-        z_dropoff = config["rules"]["ex_remap_dsc"]["z_dropoff"]
+        z_dropoff = config["rules"]["ex_remap_dsc"]["z_dropoff"],
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_remap_dsc.log"
     benchmark:
@@ -101,7 +104,10 @@ rule ex_remap_dsc:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        samtools fastq -0 {output.intermediate_fastq} {input.bam} 2>> {log}
+        samtools fastq \
+        -0 \
+        {output.intermediate_fastq} \
+        {input.bam} 2>> {log}
 
         bwa-mem2 mem \
         -t {threads} \
@@ -118,11 +124,23 @@ rule ex_remap_dsc:
         -U {params.unpaired_read_penalty} \
         -T {params.min_alignment_score_thresh} \
         -Y \
-        {input.ref} {output.intermediate_fastq} > {output.intermediate_sam} 2>> {log}
+        {input.ref} \
+        {output.intermediate_fastq} > {output.intermediate_sam} 2>> {log}
 
-        samtools view -@ {threads} -bS {output.intermediate_sam} > {output.unsorted_bam} 2>> {log}
+        samtools view \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -@ {threads} \
+        -bS \
+        {output.intermediate_sam} > {output.unsorted_bam} 2>> {log}
 
-        samtools sort -n -@ {threads} -o {output.bam} {output.unsorted_bam} 2>> {log}
+        samtools sort \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -n \
+        -@ {threads} \
+        -o {output.bam} \
+        {output.unsorted_bam} 2>> {log}
         """
 
 
@@ -141,6 +159,8 @@ rule ex_annotate_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
         intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
+    params:
+        compression_level = config["file_compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_annotate_dsc.log"
     benchmark:
@@ -153,13 +173,19 @@ rule ex_annotate_dsc:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             ZipperBams \
+            --compression={params.compression_level} \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
             --ref {input.ref} \
             --tags-to-revcomp Consensus \
             -o {output.intermediate_anno} 2>> {log}
 
-        samtools sort -@ {threads} -o {output.bam} {output.intermediate_anno} 2>> {log}
+        samtools sort \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -@ {threads} \
+        -o {output.bam} \
+        {output.intermediate_anno} 2>> {log}
 
         samtools index -@ {threads} {output.bam} 2>> {log}
         """
@@ -186,12 +212,19 @@ rule ex_filter_dsc:
         memory = config["resources"]["memory"]["moderate"]
     shell:
         """
-        samtools view -b \
+        samtools view \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -b \
         -@ {threads} \
         --min-MQ {params.min_mapq} \
         {input.bam} > {output.intermediate_bam} 2>> {log}
         
-        samtools sort -o {output.bam} {output.intermediate_bam} 2>> {log}
+        samtools sort \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -o {output.bam} \
+        {output.intermediate_bam} 2>> {log}
         
         samtools index {output.bam} 2>> {log}
         """
