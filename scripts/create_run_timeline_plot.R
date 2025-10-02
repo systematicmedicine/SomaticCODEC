@@ -65,7 +65,7 @@ job_labels <- job_log %>%
 jobs_plot <- job_log %>%
   ggplot() +
   geom_segment(aes(x = start_time, xend = finish_time, y = rule_jobid, yend = rule_jobid),
-             size = 1, color = "steelblue") +
+             linewidth = 1, color = "steelblue") +
   geom_text(data = job_labels, aes(x = mid_time, y = rule_jobid, label = rule_jobid),
             size = 2, vjust = -0.7) +
   scale_x_datetime(limits = as.POSIXct(c(min(job_log$start_time), 
@@ -82,7 +82,8 @@ jobs_plot <- job_log %>%
 
 # Create resources plot
 resources_utilised <- resources_log %>% 
-  mutate(disk_space = disk_used_GB / (disk_used_GB + disk_avail_GB) * 100,
+  mutate(time = as.POSIXct(time, tz = "UTC"),
+         disk_space = disk_used_GB / (disk_used_GB + disk_avail_GB) * 100,
          disk_IOPS = (disk_IOPS / max_iops) * 100,
          mem = mem_used_GB / (mem_used_GB + mem_avail_GB) * 100,
          cpu = cpu_load / (cpu_load + cpu_avail) * 100) %>% 
