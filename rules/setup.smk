@@ -165,7 +165,8 @@ rule log_system_resource_usage:
         log = "logs/global_rules/system_resource_usage.csv",
         done_file = "logs/global_rules/log_system_resource_usage.done"
     params:
-        sleep_interval = config["rules"]["log_system_resource_usage"]["sleep_interval"]
+        sleep_interval = config["rules"]["log_system_resource_usage"]["sleep_interval"],
+        total_cores = int(os.popen("nproc").read().strip()) - config["resources"]["threads"]["global_buffer"]
     log:
         "logs/global_rules/log_system_resource_usage.log"
     benchmark:
@@ -175,6 +176,7 @@ rule log_system_resource_usage:
     shell:
         """
         export SLEEP_INTERVAL={params.sleep_interval}
+        export TOTAL_CORES={params.total_cores}
         
         bash scripts/monitor_system_resources.sh &
 

@@ -41,6 +41,7 @@ dependencies:
   - trimmomatic=0.39
   - umi_tools=1.1.6
   - pigz=2.8
+  - sysstat=12.7.6
 
   # R packages
   - r-dplyr=1.1.4
