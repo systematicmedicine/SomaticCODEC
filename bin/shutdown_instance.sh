@@ -13,12 +13,9 @@ if [[ -z "${INSTANCE_ID:-}" || -z "${AWS_REGION:-}" ]]; then
   exit 1
 fi
 
-# Sleep for 60 seconds
-echo "[INFO] Waiting 60 seconds before making shutdown request"
-sleep 60
-
 # Request shutdown
 echo "[INFO] Requesting EC2 instance stop..."
+sleep 5
 aws ec2 stop-instances \
   --instance-ids "$INSTANCE_ID" \
   --region "$AWS_REGION"
