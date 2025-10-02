@@ -54,20 +54,28 @@ print(cfg['experiment']['name'])
 : "${AWS_REGION:?AWS_REGION must be set}"
 : "${INSTANCE_ID:?INSTANCE_ID must be set}"
 
-# Define cleanup function
+# -----------------------------------------------------------------------------
+# Cleanup function
+# -----------------------------------------------------------------------------
 function handle_exit {
     local STATUS=$1
     local MSG=$2
 
+    # Log exit message
     echo "[INFO] $MSG" | tee -a "$LOG_FILE"
+
+    # Message via SNS
     aws sns publish \
         --topic-arn "$SNS_ARN" \
         --subject "Pipeline $EXPERIMENT_NAME $STATUS" \
         --message "$MSG" \
         --region $AWS_REGION
 
-    sleep 5
+    # Wait 2 miutes before shutting down
+    echo "[INFO] Instance shutdown in 2 minutes" | tee -a "$LOG_FILE"
+    sleep 120
 
+    # Request shutdown
     echo "[INFO] Triggering EC2 shutdown..." | tee -a "$LOG_FILE"
     if ! bash bin/shutdown_instance.sh >> "$LOG_FILE" 2>&1; then
         echo "[ERROR] Shutdown script failed. Instance will remain running." | tee -a "$LOG_FILE"
