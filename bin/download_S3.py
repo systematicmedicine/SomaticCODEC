@@ -28,6 +28,7 @@ with open(CSV_PATH, newline='', encoding='utf-8-sig') as csvfile:
         source = row["source_dir"].rstrip("/") + "/" + file_name
         destination_dir = PROJECT_ROOT / row["destination_dir"].rstrip("/")
         destination_path = destination_dir / file_name
+        expected_md5sum = row["expected_md5sum"]
 
         destination_dir.mkdir(parents=True, exist_ok=True)
 
@@ -41,8 +42,22 @@ with open(CSV_PATH, newline='', encoding='utf-8-sig') as csvfile:
             failed = True
             print(f"❌ Failed to download {file_name}")
             print(result.stderr)
+            continue
         else:
             print(f"✅ Downloaded {file_name}")
+
+        downloaded_md5sum = subprocess.run(
+            ["md5sum", str(destination_path)],
+            capture_output=True, text=True, check=True
+        ).stdout.split()[0].strip()
+
+        if downloaded_md5sum != expected_md5sum:
+            failed = True
+            print(f"❌ md5sum of {file_name} does not match expected md5sum")
+            print(f"expected: {expected_md5sum}")
+            print(f"got: {downloaded_md5sum}")
+        else:
+            print(f"✅ md5sum of {file_name} matches expected md5sum")
 
 if failed:
     exit(1)
