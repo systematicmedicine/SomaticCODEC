@@ -48,5 +48,5 @@ def test_monitor_resources(tmp_path):
         lines = f.read().strip().splitlines()
 
     # Assertions
-    assert lines[0] == "time,disk_used_GB,disk_avail_GB,disk_tps,mem_used_GB,mem_avail_GB,cpu_load,cpu_avail", "Header missing or malformed"
+    assert lines[0] == "time,disk_used_GB,disk_avail_GB,disk_IOPS,mem_used_GB,mem_avail_GB,cpu_load,cpu_avail", "Header missing or malformed"
     assert len(lines) >= 2, "No data lines written"

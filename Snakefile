@@ -148,7 +148,8 @@ other_metrics = [
     "metrics/metrics_heatmap.png",
     "logs/global_rules/combined_benchmarks.csv",
     "logs/global_rules/system_resource_usage.csv",
-    "logs/global_rules/job_log.csv"
+    "logs/global_rules/job_log.csv",
+    "logs/global_rules/create_run_timeline_plot.log"
 ]
 
 # Define results
