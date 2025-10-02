@@ -198,6 +198,7 @@ resources:
     moderate: 12
     heavy: 24
     global_buffer: 4
+  disk_iops: 3000 # Default for AWS EC2 gp3 volumes
 
 # ------------------------------------------------------------------------------
 # AWS parameters

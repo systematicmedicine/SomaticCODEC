@@ -45,11 +45,48 @@ rule create_metrics_report:
         "../scripts/metrics_report.R"
 
 
+# Creates a CSV of job start and finish times
+rule create_job_log:
+    input:
+        rules.create_metrics_report.output,
+        log = ancient("logs/bin_scripts/run_pipeline.log")
+    output:
+        csv = "logs/global_rules/job_log.csv"
+    log:
+        "logs/global_rules/create_job_log.log"
+    benchmark:
+        "logs/global_rules/create_job_log.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/create_job_log.py"
+
+
+# Creates a plot of jobs and resource usage during the run
+rule create_run_timeline_plot:
+    input:
+        job_log = "logs/global_rules/job_log.csv",
+        resources_log = "logs/global_rules/system_resource_usage.csv",
+        git_metadata = "logs/global_rules/git_metadata.json"
+    output:
+        plot = "logs/global_rules/run_timeline.pdf"
+    params:
+        max_iops = config["resources"]["disk_iops"]
+    log:
+        "logs/global_rules/create_run_timeline_plot.log"
+    benchmark:
+        "logs/global_rules/create_run_timeline_plot.benchmark.txt"
+    resources:
+        memory = config["resources"]["memory"]["light"]
+    script:
+        "../scripts/create_run_timeline_plot.R"
+
+
 # Collates all benchmarks into a single CSV
 rule collate_benchmarks:
     input:
         rules.write_git_metadata.output.file_path,
-        rules.create_metrics_report.output
+        rules.create_run_timeline_plot.output
     output:
         file_path = "logs/global_rules/combined_benchmarks.csv"
     log:
@@ -58,18 +95,3 @@ rule collate_benchmarks:
         memory = config["resources"]["memory"]["light"]
     script:
         "../scripts/collate_benchmarks.py"
-
-
-# Creates a CSV of job start and finish times
-rule create_job_log:
-    input:
-        rules.collate_benchmarks.output,
-        log = ancient("logs/bin_scripts/run_pipeline.log")
-    output:
-        csv = "logs/global_rules/job_log.csv"
-    log:
-        "logs/global_rules/create_job_log.log"
-    resources:
-        memory = config["resources"]["memory"]["light"]
-    script:
-        "../scripts/create_job_log.py"
