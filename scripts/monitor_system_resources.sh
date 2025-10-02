@@ -10,14 +10,13 @@
 #
 set -e
 
-# Define log file path
+# Define parameters
 LOG_FILE="${LOG_FILE:-logs/global_rules/system_resource_usage.csv}"
-
-# Define interval between logs
 SLEEP_INTERVAL="${SLEEP_INTERVAL:-60}"
+TOTAL_CORES="${TOTAL_CORES:?TOTAL_CORES must be set}"
 
 # Write header if file does not exist
-echo "time,disk_used_GB,disk_avail_GB,mem_used_GB,mem_avail_GB,cpu_load,cpu_avail" > "$LOG_FILE"
+echo "time,disk_used_GB,disk_avail_GB,disk_tps,mem_used_GB,mem_avail_GB,cpu_load,cpu_avail" > "$LOG_FILE"
 (
     while true; do
         now=$(date +"%Y-%m-%d %H:%M:%S")
@@ -29,9 +28,14 @@ echo "time,disk_used_GB,disk_avail_GB,mem_used_GB,mem_avail_GB,cpu_load,cpu_avai
         mem_avail_GB=$(free -g | awk '/Mem:/ {print $7}')
 
         cpu_load=$(uptime | awk -F'load average:' '{print $2}' | cut -d',' -f1 | xargs)
-        cpu_avail=$(($(nproc) - ${cpu_load%.*}))
+        cpu_avail=$((TOTAL_CORES - ${cpu_load%.*}))
 
-        echo "$now,$disk_used_GB,$disk_avail_GB,$mem_used_GB,$mem_avail_GB,$cpu_load,$cpu_avail" >> "$LOG_FILE"
+        disk_tps=$(iostat -d 1 2 | awk '
+            /^Device/ {header_count++} 
+            header_count == 2 && $1 !~ /^Device/ {sum += $2} 
+            END {print sum}')
+
+        echo "$now,$disk_used_GB,$disk_avail_GB,$disk_tps,$mem_used_GB,$mem_avail_GB,$cpu_load,$cpu_avail" >> "$LOG_FILE"
         sleep "$SLEEP_INTERVAL"
     done
 )
