@@ -41,12 +41,15 @@ dependencies:
   - trimmomatic=0.39
   - umi_tools=1.1.6
   - pigz=2.8
+  - sysstat=12.7.6
 
   # R packages
   - r-dplyr=1.1.4
   - r-ggplot2=3.5.2
   - r-jsonlite=2.0.0
   - r-openxlsx=4.2.8
+  - r-ggpubr=0.6.1
+  - r-tidyr=1.3.1
 
   # System utilities
   - click=8.1.8
