@@ -131,14 +131,16 @@ rule ex_annotate_map:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
-        histogram = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
+        umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
+        intermediate_readgroup = temp("tmp/{ex_sample}/{ex_sample}_map_readgroup_tmp.bam"),
         intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
-        intermediate_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_sorted_tmp.bam"),
-        intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
+        intermediate_moveumi_index = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam.bai"),
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam"),
-        intermediate_anno_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_anno_unsorted.bam")
+        intermediate_groupbyumi_primary = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_primary_tmp.bam"),
+        intermediate_groupbyumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_sorted_tmp.bam"),
+        intermediate_groupbyumi_MI_tag = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_MI_tag_tmp.bam"),
+        intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
     params:
-        min_umi_length = config["sci_params"]["ex_annotate_map"]["min_umi_length"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_annotate_map.log"
@@ -150,54 +152,70 @@ rule ex_annotate_map:
         memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """
-        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression={params.compression_level} \
-            CopyUmiFromReadName \
-            -i {input.bam} \
-            -o {output.intermediate_moveumi} \
-            --remove-umi true 2>> {log}
-
-        samtools sort \
-            -n \
-            -@ {threads} \
-            --output-fmt bam \
-            --output-fmt-option level={params.compression_level} \
-            -o {output.intermediate_sorted} \
-            {output.intermediate_moveumi} 2>> {log}
-
-        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression={params.compression_level} \
-            SetMateInformation \
-            -i {output.intermediate_sorted} \
-            -o {output.intermediate_mateinfo} 2>> {log}
-
-        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression={params.compression_level} \
-            GroupReadsByUmi \
-            --min-umi-length {params.min_umi_length} \
-            -i {output.intermediate_mateinfo} \
-            -o {output.intermediate_groupbyumi} \
-            -f {output.histogram} \
-            -@ {threads} \
-            -m 0 \
-            --strategy=adjacency 2>> {log}
-
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
             AddOrReplaceReadGroups \
             --COMPRESSION_LEVEL {params.compression_level} \
-            --INPUT {output.intermediate_groupbyumi} \
-            --OUTPUT {output.intermediate_anno_unsorted} \
+            --INPUT {input.bam} \
+            --OUTPUT {output.intermediate_readgroup} \
             --RGID {wildcards.ex_sample} \
             --RGLB lib1 \
             --RGPL illumina \
             --RGPU unit1 \
             --RGSM {wildcards.ex_sample} \
             --VALIDATION_STRINGENCY LENIENT 2>> {log}
+        
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression={params.compression_level} \
+            CopyUmiFromReadName \
+            -i {output.intermediate_readgroup} \
+            -o {output.intermediate_moveumi} \
+            --remove-umi true 2>> {log}
+
+        samtools index {output.intermediate_moveumi} 2>> {log}
+        
+        umi_tools group \
+            --stdin={output.intermediate_moveumi} \
+            --output-bam \
+            --compresslevel={params.compression_level} \
+            --no-sort-output \
+            --stdout={output.intermediate_groupbyumi} \
+            --group-out={output.umi_metrics} \
+            --extract-umi-method=tag \
+            --umi-tag=RX \
+            --paired \
+            --unmapped-reads=use \
+            --method=directional 2>> {log}
+
+        samtools view \
+            -@ {threads} \
+            --output-fmt bam \
+            --output-fmt-option level={params.compression_level} \
+            -F 0x900 \
+            {output.intermediate_groupbyumi} > \
+            {output.intermediate_groupbyumi_primary} 2>> {log}
+
+        samtools sort \
+            -n \
+            -@ {threads} \
+            --output-fmt bam \
+            --output-fmt-option level={params.compression_level} \
+            -o {output.intermediate_groupbyumi_sorted} \
+            {output.intermediate_groupbyumi_primary} 2>> {log}
+
+        python scripts/ex_rename_umi_bam_tag.py \
+            --input {output.intermediate_groupbyumi_sorted} \
+            --output {output.intermediate_groupbyumi_MI_tag} 2>> {log}
+
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression={params.compression_level} \
+            SetMateInformation \
+            -i {output.intermediate_groupbyumi_MI_tag} \
+            -o {output.intermediate_mateinfo} 2>> {log}
 
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
             SortBam \
-            -i {output.intermediate_anno_unsorted} \
+            -i {output.intermediate_mateinfo} \
             -o {output.bam} \
             -s TemplateCoordinate 2>> {log}
         """
