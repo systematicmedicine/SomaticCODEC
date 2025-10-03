@@ -24,7 +24,7 @@ import yaml
 try:
     with open('config/config.yaml') as f:
         cfg = yaml.safe_load(f)
-    print(cfg["infrastructure"]['aws']['s3_bucket'].rstrip('/'))
+    print(cfg['infrastructure']['aws']['s3_bucket'].rstrip('/'))
 except Exception as e:
     import sys
     print(f'[ERROR] Failed to read upload.s3_bucket from config.yaml: {e}', file=sys.stderr)
