@@ -26,7 +26,7 @@ GLOBAL_BUFFER_GB=$(python3 -c "
 import yaml
 with open('config/config.yaml') as f:
     cfg = yaml.safe_load(f)
-print(cfg['resources']['memory']['global_buffer'])
+print(cfg['infrastructure']['memory']['global_buffer'])
 ")
 TOTAL_MEM_GB=$(awk '/MemTotal/ {printf "%.0f", $2 / 1024 / 1024}' /proc/meminfo)
 USABLE_MEM_GB=$((TOTAL_MEM_GB - GLOBAL_BUFFER_GB))
@@ -38,7 +38,7 @@ GLOBAL_CORE_BUFFER=$(python3 -c "
 import yaml
 with open('config/config.yaml') as f:
     cfg = yaml.safe_load(f)
-print(cfg['resources']['threads']['global_buffer'])
+print(cfg['infrastructure']['threads']['global_buffer'])
 ")
 
 TOTAL_CORES=$(nproc)

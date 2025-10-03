@@ -55,15 +55,14 @@ def test_snakemake_dryrun():
     config = project_root / "config/config.yaml"
     with config.open("r", encoding="utf-8") as f:
         config_data = yaml.safe_load(f)
-    config_data["experiment"]["name"] = "dryrun"
-    config_data["files"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    config_data["files"]["precomputed_masks"] = [
-    "tmp/downloads/GRCh38_alldifficultregions_10lines.bed",
-    "tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed",
-    "tmp/downloads/GCRh38_repeat_masker_10lines.bed"
-    ]
-    config_data["files"]["ex_nanoseq_tri_contexts"] = "tmp/downloads/nanoseq_trinucleotide_contexts.csv"
-    config_data["files"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
+        config_data["run_name"] = "dryrun"
+        config_data["sci_params"]["global"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
+        config_data["sci_params"]["global"]["precomputed_masks"] = [
+            "tmp/downloads/GRCh38_alldifficultregions_10lines.bed",
+            "tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed",
+            "tmp/downloads/GCRh38_repeat_masker_10lines.bed"
+            ]
+        config_data["sci_params"]["global"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:

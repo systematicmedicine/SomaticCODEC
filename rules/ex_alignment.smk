@@ -19,37 +19,37 @@ rule ex_map:
     input:
         fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
         fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
-        ref = config["files"]["reference_genome"],
-        amb = config["files"]["reference_genome"] + ".amb",
-        ann = config["files"]["reference_genome"] + ".ann",
-        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
-        pac = config["files"]["reference_genome"] + ".pac",
-        sa = config["files"]["reference_genome"] + ".0123"
+        ref = config["sci_params"]["global"]["reference_genome"],
+        amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
+        ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
+        bwt = config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["global"]["reference_genome"] + ".pac",
+        sa = config["sci_params"]["global"]["reference_genome"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
     params:
-        band_width = config["rules"]["ex_map"]["band_width"],
-        clipping_penalty = config["rules"]["ex_map"]["clipping_penalty"],
-        gap_extension_penalty = config["rules"]["ex_map"]["gap_extension_penalty"],
-        gap_open_penalty = config["rules"]["ex_map"]["gap_open_penalty"],
-        matching_score = config["rules"]["ex_map"]["matching_score"],
-        mem_max_occurances = config["rules"]["ex_map"]["mem_max_occurances"],
-        min_alignment_score_thresh = config["rules"]["ex_map"]["min_alignment_score_thresh"],
-        min_seed_length = config["rules"]["ex_map"]["min_seed_length"],
-        mismatch_penalty = config["rules"]["ex_map"]["mismatch_penalty"],
-        reseed_factor = config["rules"]["ex_map"]["reseed_factor"],
-        unpaired_read_penalty = config["rules"]["ex_map"]["unpaired_read_penalty"],
-        z_dropoff = config["rules"]["ex_map"]["z_dropoff"],
-        compression_level = config["file_compression"]["gzip_level"]
+        band_width = config["sci_params"]["ex_map"]["band_width"],
+        clipping_penalty = config["sci_params"]["ex_map"]["clipping_penalty"],
+        gap_extension_penalty = config["sci_params"]["ex_map"]["gap_extension_penalty"],
+        gap_open_penalty = config["sci_params"]["ex_map"]["gap_open_penalty"],
+        matching_score = config["sci_params"]["ex_map"]["matching_score"],
+        mem_max_occurances = config["sci_params"]["ex_map"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["sci_params"]["ex_map"]["min_alignment_score_thresh"],
+        min_seed_length = config["sci_params"]["ex_map"]["min_seed_length"],
+        mismatch_penalty = config["sci_params"]["ex_map"]["mismatch_penalty"],
+        reseed_factor = config["sci_params"]["ex_map"]["reseed_factor"],
+        unpaired_read_penalty = config["sci_params"]["ex_map"]["unpaired_read_penalty"],
+        z_dropoff = config["sci_params"]["ex_map"]["z_dropoff"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_map.log"
     benchmark:
         "logs/{ex_sample}/ex_map.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         bwa-mem2 mem \
@@ -91,15 +91,15 @@ rule ex_filter_map:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam"),
         intermediate_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_correct_unsorted.bam")
     params:
-        compression_level = config["file_compression"]["gzip_level"]
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_filter_map.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_map.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         samtools view \
@@ -138,16 +138,16 @@ rule ex_annotate_map:
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam"),
         intermediate_anno_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_anno_unsorted.bam")
     params:
-        min_umi_length = config["rules"]["ex_annotate_map"]["min_umi_length"],
-        compression_level = config["file_compression"]["gzip_level"]
+        min_umi_length = config["sci_params"]["ex_annotate_map"]["min_umi_length"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_annotate_map.log"
     benchmark:
         "logs/{ex_sample}/ex_annotate_map.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["heavy"]
+        memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \

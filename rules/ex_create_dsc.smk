@@ -31,19 +31,19 @@ rule ex_call_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
         metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
     params:
-        error_rate_pre_umi = config["rules"]["ex_call_dsc"]["error_rate_pre_umi"],
-        error_rate_post_umi = config["rules"]["ex_call_dsc"]["error_rate_post_umi"],
-        min_input_base_quality = config["rules"]["ex_call_dsc"]["min_input_base_quality"],
-        min_read_pairs = config["rules"]["ex_call_dsc"]["min_read_pairs"],
-        min_duplex_length = config["rules"]["ex_call_dsc"]["min_duplex_length"],
-        max_duplex_disagreement_rate = config["rules"]["ex_call_dsc"]["max_duplex_disagreement_rate"],
-        compression_level = config["file_compression"]["gzip_level"]
+        error_rate_pre_umi = config["sci_params"]["ex_call_dsc"]["error_rate_pre_umi"],
+        error_rate_post_umi = config["sci_params"]["ex_call_dsc"]["error_rate_post_umi"],
+        min_input_base_quality = config["sci_params"]["ex_call_dsc"]["min_input_base_quality"],
+        min_read_pairs = config["sci_params"]["ex_call_dsc"]["min_read_pairs"],
+        min_duplex_length = config["sci_params"]["ex_call_dsc"]["min_duplex_length"],
+        max_duplex_disagreement_rate = config["sci_params"]["ex_call_dsc"]["max_duplex_disagreement_rate"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_call_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_call_dsc.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
@@ -69,39 +69,39 @@ Realign the DSC to the reference genome
 rule ex_remap_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["files"]["reference_genome"],
-        amb = config["files"]["reference_genome"] + ".amb",
-        ann = config["files"]["reference_genome"] + ".ann",
-        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
-        pac = config["files"]["reference_genome"] + ".pac",
-        sa = config["files"]["reference_genome"] + ".0123"
+        ref = config["sci_params"]["global"]["reference_genome"],
+        amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
+        ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
+        bwt = config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["global"]["reference_genome"] + ".pac",
+        sa = config["sci_params"]["global"]["reference_genome"] + ".0123"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam"),
         unsorted_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam")
     params:
-        band_width = config["rules"]["ex_remap_dsc"]["band_width"],
-        clipping_penalty = config["rules"]["ex_remap_dsc"]["clipping_penalty"],
-        gap_extension_penalty = config["rules"]["ex_remap_dsc"]["gap_extension_penalty"],
-        gap_open_penalty = config["rules"]["ex_remap_dsc"]["gap_open_penalty"],
-        matching_score = config["rules"]["ex_remap_dsc"]["matching_score"],
-        mem_max_occurances = config["rules"]["ex_remap_dsc"]["mem_max_occurances"],
-        min_alignment_score_thresh = config["rules"]["ex_remap_dsc"]["min_alignment_score_thresh"],
-        min_seed_length = config["rules"]["ex_remap_dsc"]["min_seed_length"],
-        mismatch_penalty = config["rules"]["ex_remap_dsc"]["mismatch_penalty"],
-        reseed_factor = config["rules"]["ex_remap_dsc"]["reseed_factor"],
-        unpaired_read_penalty = config["rules"]["ex_remap_dsc"]["unpaired_read_penalty"],
-        z_dropoff = config["rules"]["ex_remap_dsc"]["z_dropoff"],
-        compression_level = config["file_compression"]["gzip_level"]
+        band_width = config["sci_params"]["ex_remap_dsc"]["band_width"],
+        clipping_penalty = config["sci_params"]["ex_remap_dsc"]["clipping_penalty"],
+        gap_extension_penalty = config["sci_params"]["ex_remap_dsc"]["gap_extension_penalty"],
+        gap_open_penalty = config["sci_params"]["ex_remap_dsc"]["gap_open_penalty"],
+        matching_score = config["sci_params"]["ex_remap_dsc"]["matching_score"],
+        mem_max_occurances = config["sci_params"]["ex_remap_dsc"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["sci_params"]["ex_remap_dsc"]["min_alignment_score_thresh"],
+        min_seed_length = config["sci_params"]["ex_remap_dsc"]["min_seed_length"],
+        mismatch_penalty = config["sci_params"]["ex_remap_dsc"]["mismatch_penalty"],
+        reseed_factor = config["sci_params"]["ex_remap_dsc"]["reseed_factor"],
+        unpaired_read_penalty = config["sci_params"]["ex_remap_dsc"]["unpaired_read_penalty"],
+        z_dropoff = config["sci_params"]["ex_remap_dsc"]["z_dropoff"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_remap_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_remap_dsc.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         samtools fastq \
@@ -152,23 +152,23 @@ rule ex_annotate_dsc:
     input:
         mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
         unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
-        ref = config["files"]["reference_genome"],
-        fai = config["files"]["reference_genome"] + ".fai",
-        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
+        ref = config["sci_params"]["global"]["reference_genome"],
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
+        dictf = os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
         intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
     params:
-        compression_level = config["file_compression"]["gzip_level"]
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_annotate_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_annotate_dsc.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     shell:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
@@ -203,14 +203,14 @@ rule ex_filter_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
     params:
-        min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"],
-        compression_level = config["file_compression"]["gzip_level"]
+        min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_filter_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         samtools view \

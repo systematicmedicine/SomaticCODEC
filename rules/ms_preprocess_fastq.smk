@@ -25,7 +25,7 @@ Trims FASTQ files
 rule ms_trim_fastq:
     input:
         setup_files = setup_files,
-        ms_samples = config["files"]["ms_samples_metadata"],
+        ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
@@ -35,21 +35,21 @@ rule ms_trim_fastq:
         r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
         report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.txt"
     params:
-        adaptor_1 = config["rules"]["ms_trim_fastq"]["adaptor_1"],
-        adaptor_2 = config["rules"]["ms_trim_fastq"]["adaptor_2"],
-        spacer_length = config["rules"]["ms_trim_fastq"]["spacer_length"],
-        qual_trim_threshold = config["rules"]["ms_trim_fastq"]["qual_trim_threshold"],
-        max_error_rate = config["rules"]["ms_trim_fastq"]["max_error_rate"],
-        min_overlap = config["rules"]["ms_trim_fastq"]["min_overlap"],
-        compression_level = config["file_compression"]["gzip_level"]
+        adaptor_1 = config["sci_params"]["ms_trim_fastq"]["adaptor_1"],
+        adaptor_2 = config["sci_params"]["ms_trim_fastq"]["adaptor_2"],
+        spacer_length = config["sci_params"]["ms_trim_fastq"]["spacer_length"],
+        qual_trim_threshold = config["sci_params"]["ms_trim_fastq"]["qual_trim_threshold"],
+        max_error_rate = config["sci_params"]["ms_trim_fastq"]["max_error_rate"],
+        min_overlap = config["sci_params"]["ms_trim_fastq"]["min_overlap"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_trim_fastq.log"
     benchmark:
         "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         cutadapt \
@@ -93,16 +93,16 @@ rule ms_filter_fastq:
         r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
         filter_metrics = "metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt"
     params:
-        min_read_length = config["rules"]["ms_filter_fastq"]["min_read_length"],
-        average_quality_threshold = config["rules"]["ms_filter_fastq"]["average_quality_threshold"]
+        min_read_length = config["sci_params"]["ms_filter_fastq"]["min_read_length"],
+        average_quality_threshold = config["sci_params"]["ms_filter_fastq"]["average_quality_threshold"]
     log:
         "logs/{ms_sample}/ms_filter_fastq.log"
     benchmark:
         "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         trimmomatic PE \

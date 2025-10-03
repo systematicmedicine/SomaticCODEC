@@ -236,10 +236,21 @@ assess_metric <- function(metric) {
 }
 
 # ---------------------------------------------------------------------------
+# Get pipeline version
+# ---------------------------------------------------------------------------
+get_pipeline_version <- function(version_metadata_path) {
+  tryCatch({
+    jsonlite::fromJSON(version_metadata_path)$git_tag
+  }, error = function(e) {
+    "unknown version"
+  })
+}
+
+# ---------------------------------------------------------------------------
 # Create metrics heatmap
 # ---------------------------------------------------------------------------
 
-plot_metric_heatmap <- function(df, title) {
+plot_metric_heatmap <- function(df, exp_name, pipeline_version) {
   library(ggplot2)
   library(dplyr)
 
@@ -248,9 +259,7 @@ plot_metric_heatmap <- function(df, title) {
     stop("Data frame must contain columns: Sample, Metric, Grade")
   }
 
-  exp_name <- CONFIG$experiment$name
   date <- format(Sys.Date(), "%Y-%m-%d")
-  pipeline_version <- fromJSON("logs/global_rules/git_metadata.json")$git_tag
   title <- paste0(exp_name, " metrics")
   subtitle <- paste0(date, ", ", pipeline_version)
 

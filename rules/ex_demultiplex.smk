@@ -23,23 +23,23 @@ Moves the read pair UMI to readname
 rule ex_extract_fastq_umis:
     input:
         setup_files = setup_files,
-        ex_lanes = config["files"]["ex_lanes_metadata"],
+        ex_lanes = config["metadata"]["ex_lanes_metadata"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]
     output:
         fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
         fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
     params:
-        umi_length = config["rules"]["ex_extract_fastq_umis"]["umi_length"],
-        compression_level = config["file_compression"]["gzip_level"]
+        umi_length = config["sci_params"]["ex_extract_fastq_umis"]["umi_length"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_lane}/ex_extract_umis.log"
     benchmark:
         "logs/{ex_lane}/ex_extract_umis.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         cutadapt \
@@ -59,10 +59,10 @@ Generates adapter FASTA files for demultiplexing
 """
 rule ex_generate_demux_adaptors:
     input:
-        ex_lanes = config["files"]["ex_lanes_metadata"],
-        ex_samples = config["files"]["ex_samples_metadata"],
-        ex_technical_controls = config["files"]["ex_technical_controls_metadata"],
-        ex_adapters = config["files"]["ex_adapters_metadata"]
+        ex_lanes = config["metadata"]["ex_lanes_metadata"],
+        ex_samples = config["metadata"]["ex_samples_metadata"],
+        ex_technical_controls = config["metadata"]["ex_technical_controls_metadata"],
+        ex_adapters = config["metadata"]["ex_adapters_metadata"]
     output:
         adapter_fasta_outputs = expand(
             "tmp/{ex_lane}/{ex_lane}_{region}.fasta",
@@ -74,7 +74,7 @@ rule ex_generate_demux_adaptors:
     benchmark:
         "logs/global_rules/ex_generate_demux_adaptors.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_generate_demux_adaptors.py"
 
@@ -85,8 +85,8 @@ Demultiplex each lane FASTQ into sample FASTQs
 """ 
 rule ex_demultiplex_fastq:
     input:
-        ex_lanes = config["files"]["ex_lanes_metadata"],
-        ex_samples = config["files"]["ex_samples_metadata"],
+        ex_lanes = config["metadata"]["ex_lanes_metadata"],
+        ex_samples = config["metadata"]["ex_samples_metadata"],
         raw_r1 = expand("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
         raw_r2 = expand("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz", ex_lane = md.get_ex_lane_ids(config)),
         r1_start = expand("tmp/{ex_lane}/{ex_lane}_r1_start.fasta", ex_lane = md.get_ex_lane_ids(config)),
@@ -104,21 +104,21 @@ rule ex_demultiplex_fastq:
             ex_technical_control = md.get_ex_technical_control_ids(config))),
         metrics = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = md.get_ex_lane_ids(config))
     params:
-        max_error_rate = config["rules"]["ex_demultiplex_fastq"]["max_error_rate"],
-        min_adapter_overlap = config["rules"]["ex_demultiplex_fastq"]["min_adapter_overlap"],
+        max_error_rate = config["sci_params"]["ex_demultiplex_fastq"]["max_error_rate"],
+        min_adapter_overlap = config["sci_params"]["ex_demultiplex_fastq"]["min_adapter_overlap"],
         lane_ids = md.get_ex_lane_ids(config),
         suffix_r1 = "r1_demux.fastq.gz",
         suffix_r2 = "r2_demux.fastq.gz",
         out_dir = "tmp",
-        compression_level = config["file_compression"]["gzip_level"]
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/batch/ex_demultiplex_fastq.log"
     benchmark:
         "logs/batch/ex_demultiplex_fastq.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     script:
         "../scripts/ex_demultiplex_fastq.py"
 

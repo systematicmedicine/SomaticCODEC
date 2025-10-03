@@ -37,26 +37,26 @@ rule ex_trim_fastq:
         intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
         intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
     params:
-        max_error_rate = config["rules"]["ex_trim_fastq"]["max_error_rate"],
-        min_adapter_overlap = config["rules"]["ex_trim_fastq"]["min_adapter_overlap"],
-        quality_cutoff = config["rules"]["ex_trim_fastq"]["quality_cutoff"],
-        r1_cut_start = config["rules"]["ex_trim_fastq"]["r1_cut_start"],
-        r2_cut_start = config["rules"]["ex_trim_fastq"]["r2_cut_start"],
-        r1_cut_end = config["rules"]["ex_trim_fastq"]["r1_cut_end"],
-        r2_cut_end = config["rules"]["ex_trim_fastq"]["r2_cut_end"],
+        max_error_rate = config["sci_params"]["ex_trim_fastq"]["max_error_rate"],
+        min_adapter_overlap = config["sci_params"]["ex_trim_fastq"]["min_adapter_overlap"],
+        quality_cutoff = config["sci_params"]["ex_trim_fastq"]["quality_cutoff"],
+        r1_cut_start = config["sci_params"]["ex_trim_fastq"]["r1_cut_start"],
+        r2_cut_start = config["sci_params"]["ex_trim_fastq"]["r2_cut_start"],
+        r1_cut_end = config["sci_params"]["ex_trim_fastq"]["r1_cut_end"],
+        r2_cut_end = config["sci_params"]["ex_trim_fastq"]["r2_cut_end"],
         r1_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_start"],
         r1_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_end"],
         r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
         r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"],
-        compression_level = config["file_compression"]["gzip_level"]
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_trim_fastq.log"
     benchmark:
         "logs/{ex_sample}/ex_trim_fastq.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         cutadapt \
@@ -118,16 +118,16 @@ rule ex_filter_fastq:
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
         filter_metrics = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
     params:
-        average_quality_threshold = config["rules"]["ex_filter_fastq"]["average_quality_threshold"],
-        min_read_length = config["rules"]["ex_filter_fastq"]["min_read_length"]
+        average_quality_threshold = config["sci_params"]["ex_filter_fastq"]["average_quality_threshold"],
+        min_read_length = config["sci_params"]["ex_filter_fastq"]["min_read_length"]
     log:
         "logs/{ex_sample}/ex_filter_fastq.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_fastq.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]        
+        memory = config["infrastructure"]["memory"]["moderate"]        
     shell:  
         """
         trimmomatic PE \
