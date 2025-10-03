@@ -30,7 +30,7 @@ def count_bam_ss_qual_bases(path):
     path = str(path)
     count = 0
     config = load_config("config/config.yaml")
-    ss_qual = config["rules"]["ex_call_dsc"]["single_strand_qual"]
+    ss_qual = config["sci_params"]["ex_call_dsc"]["single_strand_qual"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
                 quals = read.query_qualities
@@ -43,7 +43,7 @@ def count_bam_reads_under_min_mapq(path):
     path = str(path)
     count = 0
     config = load_config("config/config.yaml")
-    min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"]
+    min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
             if not read.is_unmapped and read.mapping_quality < min_mapq:

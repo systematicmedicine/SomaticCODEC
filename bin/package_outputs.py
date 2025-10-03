@@ -27,7 +27,7 @@ def main():
         config_path = os.path.join(root_dir, "config", "config.yaml")
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
-        experiment_name = config["experiment"]["name"]
+        experiment_name = config["run_name"]
         print(f"[INFO] Experiment name: {experiment_name}")
     except Exception as e:
         print(f"[ERROR] Failed to read experiment name from config: {e}")

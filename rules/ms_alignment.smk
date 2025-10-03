@@ -15,39 +15,39 @@ Author: Joshua Johnstone
 # Aligns reads to reference genome
 rule ms_map:
     input: 
-        ref = config["files"]["reference_genome"],
-        amb = config["files"]["reference_genome"] + ".amb",
-        ann = config["files"]["reference_genome"] + ".ann",
-        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
-        pac = config["files"]["reference_genome"] + ".pac",
-        sa = config["files"]["reference_genome"] + ".0123",
+        ref = config["sci_params"]["global"]["reference_genome"],
+        amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
+        ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
+        bwt = config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["global"]["reference_genome"]+ ".pac",
+        sa = config["sci_params"]["global"]["reference_genome"] + ".0123",
         r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
         r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
     output:
         bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
         intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.sam")
     params:
-        band_width = config["rules"]["ms_map"]["band_width"],
-        clipping_penalty = config["rules"]["ms_map"]["clipping_penalty"],
-        gap_extension_penalty = config["rules"]["ms_map"]["gap_extension_penalty"],
-        gap_open_penalty = config["rules"]["ms_map"]["gap_open_penalty"],
-        matching_score = config["rules"]["ms_map"]["matching_score"],
-        mem_max_occurances = config["rules"]["ms_map"]["mem_max_occurances"],
-        min_alignment_score_thresh = config["rules"]["ms_map"]["min_alignment_score_thresh"],
-        min_seed_length = config["rules"]["ms_map"]["min_seed_length"],
-        mismatch_penalty = config["rules"]["ms_map"]["mismatch_penalty"],
-        reseed_factor = config["rules"]["ms_map"]["reseed_factor"],
-        unpaired_read_penalty = config["rules"]["ms_map"]["unpaired_read_penalty"],
-        z_dropoff = config["rules"]["ms_map"]["z_dropoff"],
-        compression_level = config["file_compression"]["gzip_level"]
+        band_width = config["sci_params"]["ms_map"]["band_width"],
+        clipping_penalty = config["sci_params"]["ms_map"]["clipping_penalty"],
+        gap_extension_penalty = config["sci_params"]["ms_map"]["gap_extension_penalty"],
+        gap_open_penalty = config["sci_params"]["ms_map"]["gap_open_penalty"],
+        matching_score = config["sci_params"]["ms_map"]["matching_score"],
+        mem_max_occurances = config["sci_params"]["ms_map"]["mem_max_occurances"],
+        min_alignment_score_thresh = config["sci_params"]["ms_map"]["min_alignment_score_thresh"],
+        min_seed_length = config["sci_params"]["ms_map"]["min_seed_length"],
+        mismatch_penalty = config["sci_params"]["ms_map"]["mismatch_penalty"],
+        reseed_factor = config["sci_params"]["ms_map"]["reseed_factor"],
+        unpaired_read_penalty = config["sci_params"]["ms_map"]["unpaired_read_penalty"],
+        z_dropoff = config["sci_params"]["ms_map"]["z_dropoff"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_raw_alignment.log"
     benchmark:
         "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         bwa-mem2 mem \
@@ -86,15 +86,15 @@ rule ms_annotate_map:
         intermediate_collated = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_collated.bam"),
         intermediate_fixmate = temp("tmp/{ms_sample}/{ms_sample}_annotated_map_fixmate.bam")
     params:
-        compression_level = config["file_compression"]["gzip_level"]
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_annotate_map.log"
     benchmark:
         "logs/{ms_sample}/ms_annotate_map.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["heavy"]
+        memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp AddOrReplaceReadGroups \
@@ -143,17 +143,17 @@ rule ms_remove_duplicates:
         dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.json",
         intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam")
     params:
-        duplicate_decision_method = config["rules"]["ms_remove_duplicates"]["duplicate_decision_method"],
-        optical_duplicate_distance = config["rules"]["ms_remove_duplicates"]["optical_duplicate_distance"],
-        compression_level = config["file_compression"]["gzip_level"]
+        duplicate_decision_method = config["sci_params"]["ms_remove_duplicates"]["duplicate_decision_method"],
+        optical_duplicate_distance = config["sci_params"]["ms_remove_duplicates"]["optical_duplicate_distance"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_remove_duplicates.log"
     benchmark:
         "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         samtools markdup \

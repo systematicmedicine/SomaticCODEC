@@ -40,14 +40,14 @@ SNS_ARN=$(python3 -c "
 import yaml
 with open('config/config.yaml') as f:
     cfg = yaml.safe_load(f)
-print(cfg['aws']['sns_arn'])
+print(cfg['infrastructure']['aws']['sns_arn'])
 ")
 
 EXPERIMENT_NAME=$(python3 -c "
 import yaml
 with open('config/config.yaml') as f:
     cfg = yaml.safe_load(f)
-print(cfg['experiment']['name'])
+print(cfg['run_name'])
 ")
 
 # Ensure required environment variables are set

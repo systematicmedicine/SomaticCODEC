@@ -20,7 +20,7 @@ rule write_git_metadata:
     benchmark:
         "logs/global_rules/write_git_metadata.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/write_git_metadata.py"
 
@@ -28,19 +28,22 @@ rule write_git_metadata:
 # Generates a pass/fail report for component & system level metrics
 rule create_metrics_report:
     input:
-        component_metrics_metadata = config["files"]["component_metrics_metadata"],
-        system_metrics_metadata = config["files"]["system_metrics_metadata"],
+        component_metrics_metadata = config["metadata"]["component_metrics_metadata"],
+        system_metrics_metadata = config["metadata"]["system_metrics_metadata"],
+        version_metadata = "logs/global_rules/git_metadata.json",
         ms_metrics = ms_metrics,
         ex_metrics = ex_metrics
     output:
         csv_path = "metrics/metrics_report.csv",
         heatmap_path = "metrics/metrics_heatmap.png"
+    params:
+        run_name = config["run_name"]
     log:
         "logs/global_rules/create_metrics_report.log"
     benchmark:
         "logs/global_rules/create_metrics_report.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/metrics_report.R"
 
@@ -57,7 +60,7 @@ rule create_job_log:
     benchmark:
         "logs/global_rules/create_job_log.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/create_job_log.py"
 
@@ -71,13 +74,14 @@ rule create_run_timeline_plot:
     output:
         plot = "logs/global_rules/run_timeline.pdf"
     params:
-        max_iops = config["resources"]["disk_iops"]
+        run_name = config["run_name"],
+        max_iops = config["infrastructure"]["disk"]["iops"]
     log:
         "logs/global_rules/create_run_timeline_plot.log"
     benchmark:
         "logs/global_rules/create_run_timeline_plot.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/create_run_timeline_plot.R"
 
@@ -92,6 +96,6 @@ rule collate_benchmarks:
     log:
         "logs/global_rules/collate_benchmarks.log"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/collate_benchmarks.py"

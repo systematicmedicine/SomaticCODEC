@@ -1,21 +1,14 @@
 ---
 # ------------------------------------------------------------------------------
-# Experiment metadata
+# Run name
 # ------------------------------------------------------------------------------
-experiment:
-  name: experiment_1
+run_name: experiment_1
 
 # ------------------------------------------------------------------------------
-# File paths
+# Metadata
 # ------------------------------------------------------------------------------
-files:
-  reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa # Must be uncompressed (.fa, .fna, .fasta)
-  precomputed_masks:
-    - "tmp/downloads/GRCh38_alldifficultregions.bed"
-    - "tmp/downloads/gnomad_AF_0.1.bed"
-    - "tmp/downloads/GCRh38_repeat_masker.bed"
-  reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
-  known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
+metadata:
+
   ex_samples_metadata: config/ex_samples.csv
   ex_technical_controls_metadata: config/ex_technical_controls.csv
   ex_lanes_metadata: config/ex_lanes.csv
@@ -25,39 +18,24 @@ files:
   system_metrics_metadata: config/system_level_metrics.xlsx
 
 # ------------------------------------------------------------------------------
-# Global parameters
+# Scientific parameters
 # ------------------------------------------------------------------------------
-chroms: # Must be defined with UCSC naming
-  included_chromosomes: # Chromosomes included for variant calling
-    - "chr1"
-    - "chr2"
-    - "chr3"
-    - "chr4"
-    - "chr5"
-    - "chr6"
-    - "chr7"
-    - "chr8"
-    - "chr9"
-    - "chr10"
-    - "chr11"
-    - "chr12"
-    - "chr13"
-    - "chr14"
-    - "chr15"
-    - "chr16"
-    - "chr17"
-    - "chr18"
-    - "chr19"
-    - "chr20"
-    - "chr21"
-    - "chr22"
-    - "chrX"
-    - "chrY"
+sci_params:
+  
+  global:
+    reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
+    reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
+    known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
+    precomputed_masks:
+      - "tmp/downloads/GRCh38_alldifficultregions.bed"
+      - "tmp/downloads/gnomad_AF_0.1.bed"
+      - "tmp/downloads/GCRh38_repeat_masker.bed"
+    included_chromosomes: [
+      "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10",
+      "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", 
+      "chr20", "chr21", "chr22", "chrX", "chrY"
+      ]
 
-# ------------------------------------------------------------------------------
-# Rule parameters
-# ------------------------------------------------------------------------------
-rules:
   ex_annotate_map:
     min_umi_length: 6
 
@@ -101,9 +79,6 @@ rules:
     unpaired_read_penalty: 9
     z_dropoff: 100
 
-  ex_metrics:
-    number_of_reads: 2000000
-
   ex_remap_dsc:
     band_width: 100
     gap_extension_penalty: 1
@@ -134,9 +109,9 @@ rules:
     r2_cut_start: 3
     r1_cut_end: -9  # Must be negative
     r2_cut_end: -9  # Must be negative
-
-  log_system_resource_usage:
-    sleep_interval: 60 # In seconds
+    
+  ex_variant_call_disagree_metrics:
+    number_of_reads: 2000000
 
   ms_filter_fastq:
     average_quality_threshold: 30
@@ -182,27 +157,31 @@ rules:
     qual_trim_threshold: 20 # Trims low quality bases from 3' end of read
 
 # ------------------------------------------------------------------------------
-# Resources (memory/threads)
+# Infrastructure
 # ------------------------------------------------------------------------------
-file_compression:
-  gzip_level: 1
-
-resources:
+infrastructure:
+    
   memory: # Memory units are expressed in gigabytes (GB) throughout pipeline
     light: 8
     moderate: 32
     heavy: 64
     global_buffer: 16
+    
   threads:
     light: 2
     moderate: 12
     heavy: 24
     global_buffer: 4
-  disk_iops: 3000 # Default for AWS EC2 gp3 volumes
-
-# ------------------------------------------------------------------------------
-# AWS parameters
-# ------------------------------------------------------------------------------
-aws:
-  s3_bucket: "s3://sysmed-tmp-s3/codec-opensource-runs/"
-  sns_arn: "arn:aws:sns:ap-southeast-2:554765025175:ec2-pipeline-complete"
+      
+  disk:
+    iops: 3000 # Default for AWS EC2 gp3 volumes
+    
+  compression:
+    gzip_level: 1
+    
+  log_system_resource_usage:
+      sleep_interval: 60
+    
+  aws:
+    s3_bucket: "s3://sysmed-tmp-s3/codec-opensource-runs/"
+    sns_arn: "arn:aws:sns:ap-southeast-2:554765025175:ec2-pipeline-complete"

@@ -49,7 +49,7 @@ def test_indel_padding_added(lightweight_test_run):
 
     config = load_config("config/config.yaml")
     ms_samples = get_ms_sample_ids(config)
-    indel_padding_bases = config["rules"]["ms_germline_mask"]["indel_padding_bases"]
+    indel_padding_bases = config["sci_params"]["ms_germline_mask"]["indel_padding_bases"]
 
     for ms_sample in ms_samples:
         pre_padding_files = [
