@@ -29,7 +29,8 @@ rule ex_call_dsc:
         bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
-        metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
+        metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt",
+        intermediate_unsorted = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_unsorted.bam"),
     params:
         error_rate_pre_umi = config["sci_params"]["ex_call_dsc"]["error_rate_pre_umi"],
         error_rate_post_umi = config["sci_params"]["ex_call_dsc"]["error_rate_post_umi"],
@@ -42,6 +43,8 @@ rule ex_call_dsc:
         "logs/{ex_sample}/ex_call_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_call_dsc.benchmark.txt"
+    threads:
+        config["infrastructure"]["threads"]["heavy"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
@@ -50,7 +53,7 @@ rule ex_call_dsc:
             --compression={params.compression_level} \
             CallCodecConsensusReads \
             -i {input.bam} \
-            -o {output.bam} \
+            -o {output.intermediate_unsorted} \
             --error-rate-pre-umi {params.error_rate_pre_umi} \
             --error-rate-post-umi {params.error_rate_post_umi} \
             --min-input-base-quality {params.min_input_base_quality} \
@@ -58,6 +61,15 @@ rule ex_call_dsc:
             --min-duplex-length {params.min_duplex_length} \
             --max-duplex-disagreement-rate {params.max_duplex_disagreement_rate} \
             --stats {output.metrics} 2>> {log}
+
+        samtools sort \
+            --output-fmt bam \
+            --output-fmt-option level={params.compression_level} \
+            -n \
+            -@ {threads} \
+            --no-PG \
+            -o {output.bam} \
+            {output.intermediate_unsorted} 2>> {log}
         """
 
 
