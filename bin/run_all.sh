@@ -82,41 +82,52 @@ function handle_exit {
         exit 1
     fi
 
-    exit 0
+    if [ "$STATUS" = "FAILED" ]; then
+        exit 1
+    else
+        exit 0
+    fi
 }
 
 # -----------------------------------------------------------------------------
 # Run scripts
 # -----------------------------------------------------------------------------
 
-# Step 1
-echo "[INFO] Step 1: download_S3.py" | tee -a "$LOG_FILE"
+# Step 1: check_configs.py
+echo "[INFO] Step 1: check_configs.py" | tee -a "$LOG_FILE"
+if ! python3 -u bin/check_configs.py > logs/bin_scripts/check_configs.log 2>&1; then
+    echo "[ERROR] check_configs.py failed. See logs/bin_scripts/check_configs.log" | tee -a "$LOG_FILE"
+    exit 1
+fi
+
+# Step 2: download_S3.py
+echo "[INFO] Step 2: download_S3.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/download_S3.py > logs/bin_scripts/download_S3.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 1: download_S3.py"
+    handle_exit "FAILED" "Pipeline failed at step 2: download_S3.py"
 fi
 
-# Step 2
-echo "[INFO] Step 2: check_pipeline.sh" | tee -a "$LOG_FILE"
-if ! bash bin/check_pipeline.sh > logs/bin_scripts/check_pipeline.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 2: check_pipeline.sh"
+# Step 3: dryrun.sh
+echo "[INFO] Step 2: dryrun.sh" | tee -a "$LOG_FILE"
+if ! bash bin/dryrun.sh > logs/bin_scripts/dryrun.log 2>&1; then
+    handle_exit "FAILED" "Pipeline failed at step 2: dryrun.sh"
 fi
 
-# Step 3
-echo "[INFO] Step 3: run_pipeline.sh" | tee -a "$LOG_FILE"
+# Step 4: run_pipeline.sh
+echo "[INFO] Step 4: run_pipeline.sh" | tee -a "$LOG_FILE"
 if ! bash bin/run_pipeline.sh > logs/bin_scripts/run_pipeline.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 3: run_pipeline.sh"
+    handle_exit "FAILED" "Pipeline failed at step 4: run_pipeline.sh"
 fi
 
-# Step 4
-echo "[INFO] Step 4: package_outputs.py" | tee -a "$LOG_FILE"
+# Step 5: package_outputs.py
+echo "[INFO] Step 5: package_outputs.py" | tee -a "$LOG_FILE"
 if ! python3 bin/package_outputs.py > logs/bin_scripts/package_outputs.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 4: package_outputs.py"
+    handle_exit "FAILED" "Pipeline failed at step 5: package_outputs.py"
 fi
 
-# Step 5
-echo "[INFO] Step 5: upload_S3.sh" | tee -a "$LOG_FILE"
+# Step 6: upload_S3.sh
+echo "[INFO] Step 6: upload_S3.sh" | tee -a "$LOG_FILE"
 if ! bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 5: upload_S3.sh"
+    handle_exit "FAILED" "Pipeline failed at step 6: upload_S3.sh"
 fi
 
 # ✅ Success case
