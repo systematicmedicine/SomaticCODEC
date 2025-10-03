@@ -34,8 +34,8 @@ bash bin/run_all.sh
 ```
 5. Wait for config check
 
-  * The config check (step 1) should only take a few seconds
-  * Once it is sucessful, you can leave the pipeline unattended
+    * The config check (step 1) should only take a few seconds
+    * Once it is sucessful, you can leave the pipeline unattended
 
 6. Cleanup
     
