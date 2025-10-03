@@ -15,11 +15,13 @@ The calculation is 1 - (unique reads/total reads). Unique reads are the number o
 Authors: 
     - James Phie
     - Joshua Johnstone
+    - Chat-GPT
 """
 
-import pandas as pd
 import sys
+import pandas as pd
 import json
+import numpy as np
 
 def main(snakemake):
     # Redirect stdout and stderr to the Snakemake log file
@@ -28,34 +30,37 @@ def main(snakemake):
     print("[INFO] Starting ex_duplication_metrics.py")
 
     # Define inputs
-    hist_file = snakemake.input.umi_metrics
+    umi_metrics_path = snakemake.input.umi_metrics
     sample = snakemake.params.sample
 
     # Define output
     output_json = snakemake.output.json
 
-    rows = []
-    df = pd.read_csv(hist_file, sep="\t")
-    unique_reads = int(df.loc[df['family_size'] == 1, 'count'].sum())
-    total_reads = int((df['family_size'] * df['count']).sum())
+    # Read umi_tools group output
+    umi_groups = pd.read_csv(umi_metrics_path, sep="\t")
+
+    # Build histogram of family sizes
+    family_hist = umi_groups['final_umi_count'].value_counts().sort_index()
+
+    unique_reads = int(family_hist.get(1, 0))
+    total_reads = int((np.array(family_hist.index) * family_hist.values).sum())
+
     duplication_rate = round(100 * (1 - unique_reads / total_reads), 2) if unique_reads else 100
     pct_unique_reads = round(100 * (unique_reads / total_reads), 2) if unique_reads else 0
 
-    # Create output JSON object
     output_data = {
-        "description": "Duplication rates calculated from umihistogram data",
+        "description": "Duplication rates calculated from umi_tools group output",
         "sample": sample,
         "unique_reads": unique_reads,
         "total_reads": total_reads,
         "duplication_rate": duplication_rate,
         "pct_unique_reads": pct_unique_reads
-        }
+    }
 
     # Write JSON output
     with open(output_json, "w") as out_f:
         json.dump(output_data, out_f, indent=4)
 
-    # Print script completion message to log
     print("[INFO] Completed ex_duplication_metrics.py")
 
 if __name__ == "__main__":
