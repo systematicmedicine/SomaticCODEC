@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# check_pipeline.sh
+# dryrun.sh
 #
 # Checks the pipeline using Snakemake dryrun
 #
@@ -16,7 +16,7 @@ if [[ ! -f "config/config.yaml" || ! -f "Snakefile" ]]; then
   exit 1
 fi
 
-echo "[INFO] Starting check_pipeline.sh: $(date)"
+echo "[INFO] Starting dryrun.sh: $(date)"
 
 # Run snakemake dryrun
 snakemake \
@@ -24,4 +24,4 @@ snakemake \
     --cores all \
     --dryrun
 
-echo "[INFO] Finished check_pipeline.sh: $(date)"
+echo "[INFO] Finished dryrun.sh: $(date)"

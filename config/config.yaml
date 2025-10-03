@@ -16,6 +16,7 @@ metadata:
   ms_samples_metadata: config/ms_samples.csv
   component_metrics_metadata: config/component_level_metrics.xlsx
   system_metrics_metadata: config/system_level_metrics.xlsx
+  download_list: config/download_list.csv
 
 # ------------------------------------------------------------------------------
 # Scientific parameters
