@@ -96,8 +96,8 @@ def test_beds_span_reference(lightweight_test_run):
 
     config = load_config("config/config.yaml")
     ex_to_ms = get_ex_to_ms_sample_map(config)
-    config["files"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    fai_path = config["files"]["reference_genome"] + ".fai"
+    config["sci_params"]["global"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
+    fai_path = config["sci_params"]["global"]["reference_genome"] + ".fai"
     fai_df = read_fai(fai_path)
 
     for ex_sample, ms_sample in ex_to_ms.items():

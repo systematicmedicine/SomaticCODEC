@@ -37,25 +37,25 @@ rule ex_tc_trim_fastq:
         intermediate_r1_2 = temp("tmp/{ex_technical_control}/{ex_technical_control}_r1_trim_adapters2_tc.fastq.gz"),
         intermediate_r2_2 = temp("tmp/{ex_technical_control}/{ex_technical_control}_r2_trim_adapters2_tc.fastq.gz")
     params:
-        max_error_rate = config["rules"]["ex_tc_trim_fastq"]["max_error_rate"],
-        min_adapter_overlap = config["rules"]["ex_tc_trim_fastq"]["min_adapter_overlap"],
-        r1_cut_start = config["rules"]["ex_tc_trim_fastq"]["r1_cut_start"],
-        r2_cut_start = config["rules"]["ex_tc_trim_fastq"]["r2_cut_start"],
-        r1_cut_end = config["rules"]["ex_tc_trim_fastq"]["r1_cut_end"],
-        r2_cut_end = config["rules"]["ex_tc_trim_fastq"]["r2_cut_end"],
+        max_error_rate = config["sci_params"]["ex_tc_trim_fastq"]["max_error_rate"],
+        min_adapter_overlap = config["sci_params"]["ex_tc_trim_fastq"]["min_adapter_overlap"],
+        r1_cut_start = config["sci_params"]["ex_tc_trim_fastq"]["r1_cut_start"],
+        r2_cut_start = config["sci_params"]["ex_tc_trim_fastq"]["r2_cut_start"],
+        r1_cut_end = config["sci_params"]["ex_tc_trim_fastq"]["r1_cut_end"],
+        r2_cut_end = config["sci_params"]["ex_tc_trim_fastq"]["r2_cut_end"],
         r1_start = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r1_start"],
         r1_end = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r1_end"],
         r2_start = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r2_start"],
         r2_end = lambda wc: md.get_ex_technical_control_adapter_dict(config)[wc.ex_technical_control]["r2_end"],
-        compression_level = config["file_compression"]["gzip_level"]
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_technical_control}/ex_tc_trim_fastq.log"
     benchmark:
         "logs/{ex_technical_control}/ex_tc_trim_fastq.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         cutadapt \
@@ -115,6 +115,6 @@ rule ex_tc_trimmed_read_length_metrics:
     benchmark:
         "logs/{ex_technical_control}/ex_tc_trimmed_read_length_metrics.benchmark.txt" 
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_tc_trimmed_read_length_metrics.py"

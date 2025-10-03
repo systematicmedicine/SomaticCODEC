@@ -20,7 +20,7 @@ FastQC on raw fastq files (before demultiplexing or any processing)
 rule ex_fastqcraw_metrics:
     input:
         setup_files = setup_files,
-        ex_lanes = config["files"]["ex_lanes_metadata"],
+        ex_lanes = config["metadata"]["ex_lanes_metadata"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
@@ -35,9 +35,9 @@ rule ex_fastqcraw_metrics:
     benchmark:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["light"]
+        config["infrastructure"]["threads"]["light"]
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
@@ -75,7 +75,7 @@ rule ex_fastqc_raw_summary_metrics:
     benchmark:
         "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/fastqc_summary_metrics.py"
 
@@ -93,7 +93,7 @@ rule ex_demux_counts_and_gini:
     benchmark:
         "logs/{ex_lane}/ex_demux_metrics_gini.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_demux_counts_and_gini.py"
     
@@ -116,7 +116,7 @@ rule ex_bases_trimmed:
     benchmark:
         "logs/{ex_sample}/ex_bases_trimmed.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_bases_trimmed.py"
 
@@ -137,7 +137,7 @@ rule ex_trimmed_read_length_metrics:
     benchmark:
         "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt" 
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_trimmed_read_length_metrics.py"
 
@@ -161,9 +161,9 @@ rule ex_fastqcfilter_metrics:
     benchmark:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["light"]
+        config["infrastructure"]["threads"]["light"]
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
@@ -201,7 +201,7 @@ rule ex_fastqc_filter_summary_metrics:
     benchmark:
         "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/fastqc_summary_metrics.py"
 
@@ -219,7 +219,7 @@ rule ex_map_metrics:
     benchmark:
         "logs/{ex_sample}/ex_map_metrics.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         samtools flagstat {input.bam} > {output.txt} 2>> {log}
@@ -234,15 +234,13 @@ rule ex_insert_metrics:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam",
     output:
         txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
-        hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", 
-    resources:
-        memory = config["resources"]["memory"]["light"]
+        hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf"
     log:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_insert_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
@@ -271,7 +269,7 @@ rule ex_duplication_metrics:
     benchmark:
         "logs/{ex_sample}/ex_duplication_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_duplication_metrics.py"
 
@@ -289,7 +287,7 @@ rule ex_somatic_variant_rate:
     benchmark:
         "logs/{ex_sample}/ex_somatic_variant_rate.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_somatic_variant_rate.py"
 
@@ -310,7 +308,7 @@ rule ex_call_dsc_metrics:
     benchmark:
         "logs/{ex_sample}/ex_call_dsc_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_call_dsc_metrics.py"
 
@@ -325,14 +323,14 @@ rule ex_dsc_remap_metrics:
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
     params:
-        min_mapq = config["rules"]["ex_filter_dsc"]["min_mapq"],
+        min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"],
         sample = "{ex_sample}"
     log:
         "logs/{ex_sample}/ex_dsc_remap_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_dsc_remap_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_dsc_remap_metrics.py"
 
@@ -352,19 +350,19 @@ rule ex_dsc_coverage_metrics:
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
         ),
-        fai = config["files"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
-        quality_threshold = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
+        quality_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
         sample = "{ex_sample}",
-        ms_depth_threshold = config["rules"]["ms_low_depth_mask"]["min_depth"]
+        ms_depth_threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_dsc_coverage_metrics.py"
 
@@ -375,8 +373,8 @@ Calculate trinucleotide contexts for called somatic mutations
 rule ex_trinucleotide_context_metrics:
     input:
         vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        ref_fasta_path = config["files"]["reference_genome"],
-        context_csv_path = config["files"]["reference_tri_contexts"]
+        ref_fasta_path = config["sci_params"]["global"]["reference_genome"],
+        context_csv_path = config["sci_params"]["global"]["reference_tri_contexts"]
     output:
         sample_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_context.csv",
         similarities_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
@@ -386,7 +384,7 @@ rule ex_trinucleotide_context_metrics:
     benchmark:
         "logs/{ex_sample}/ex_trinuc_context.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_trinuc_contexts.py"
 
@@ -408,7 +406,7 @@ rule ex_total_read_loss:
     benchmark:
         "logs/{ex_sample}/ex_total_read_loss.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_total_read_loss.py"
 
@@ -426,7 +424,7 @@ rule ex_softclipping_metrics:
     benchmark:
         "logs/{ex_sample}/ex_softclipping_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_softclipping_metrics.py"
 
@@ -437,17 +435,17 @@ Compares variant rate between chromosomes
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        fai = config["files"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     params:
-        included_chromosomes = config["chroms"]["included_chromosomes"]
+        included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
     log:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_chromosomal_variant_rate_metrics.py"
 
@@ -465,7 +463,7 @@ rule ex_recurrent_variant_metrics:
     benchmark:
         "logs/batch/batch_ex_recurrent_variant_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_recurrent_variant_metrics.py"
 
@@ -476,8 +474,8 @@ Determines how many called somatic variants are present in dataset of common ger
 rule ex_germline_contamination:
     input:
         somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        germline_vcf = config["files"]["known_germline_variants"],
-        germline_tbi = config["files"]["known_germline_variants"] + ".tbi"
+        germline_vcf = config["sci_params"]["global"]["known_germline_variants"],
+        germline_tbi = config["sci_params"]["global"]["known_germline_variants"] + ".tbi"
     output:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
@@ -488,7 +486,7 @@ rule ex_germline_contamination:
     benchmark:
         "logs/{ex_sample}/ex_germline_contamination.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_germline_contamination.py"
 
@@ -506,7 +504,7 @@ rule ex_snv_distance_metrics:
     benchmark:
         "logs/{ex_sample}/ex_snv_distance_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_snv_distance_metrics.py"
 
@@ -517,16 +515,19 @@ Positional distribution of called SNVs
 rule ex_snv_position_metrics:
     input:
         vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        index_path = config["files"]["reference_genome"] + ".fai"
+        index_path = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
         metrics_json = "metrics/{ex_sample}/{ex_sample}_snv_position_metrics.json",
         metrics_plot = "metrics/{ex_sample}/{ex_sample}_snv_position_plot.pdf"
+    params:
+        included_chroms = config["sci_params"]["global"]["included_chromosomes"],
+        run_name = config["run_name"]
     log:
         "logs/{ex_sample}/ex_snv_position_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_snv_position_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_snv_position.R"
 
@@ -548,9 +549,9 @@ rule ex_somatic_variant_germline_contexts:
     benchmark:
         "logs/{ex_sample}/ex_somatic_variant_germline_context.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["light"]
+        config["infrastructure"]["threads"]["light"]
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_somatic_variant_germline_contexts.py"
 
@@ -566,13 +567,13 @@ rule ex_variant_call_disagree_metrics:
     output:
         metrics_json = "metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json"
     params:
-        required_Q = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
-        number_of_reads = config["rules"]["ex_metrics"]["number_of_reads"],
+        required_Q = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
+        number_of_reads = config["sci_params"]["ex_variant_call_disagree_metrics"]["number_of_reads"],
     log:
         "logs/{ex_sample}/ex_variant_call_disagree_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_variant_call_disagree_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ex_variant_call_eligible_disagree_rate.py"

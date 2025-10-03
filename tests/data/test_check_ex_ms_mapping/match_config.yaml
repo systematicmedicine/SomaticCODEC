@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # File paths
 # ------------------------------------------------------------------------------
-files:
+metadata:
   ex_samples_metadata: tests/data/test_check_ex_ms_mapping/ex_samples_match.csv
   ms_samples_metadata: tests/data/test_check_ex_ms_mapping/ms_samples_match.csv
   ex_lanes_metadata: config/ex_lanes.csv

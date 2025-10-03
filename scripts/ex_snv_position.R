@@ -22,8 +22,10 @@ VCF_PATH <- snakemake@input[["vcf_path"]]
 FAI_PATH <- snakemake@input[["index_path"]]
 METRICS_PATH <- snakemake@output[["metrics_json"]]
 PLOT_PATH <- snakemake@output[["metrics_plot"]]
+INCLUDED_CHROMS <- snakemake@params[["included_chroms"]]
+RUN_NAME <- snakemake@params[["run_name"]]
+
 LOG_PATH <- snakemake@log[[1]]
-CONFIG <- snakemake@config
 
 # Start logging
 log_con <- file(LOG_PATH, open = "wt")
@@ -41,7 +43,7 @@ genomic_percentiles <- function(fai_path, vcf_path){
     fai <- read.table(fai_path, header = FALSE, sep = "\t", stringsAsFactors = FALSE) %>%
     rename(Chrom = V1, Length = V2) %>%
     select(Chrom, Length) %>%
-    filter(Chrom %in% CONFIG$chroms$included_chromosomes)
+    filter(Chrom %in% INCLUDED_CHROMS)
 
     # Load SNV VCF
     vcf.header.line <- max(grep("^#CHROM", readLines(VCF_PATH)))
@@ -107,7 +109,7 @@ plt <- ggplot(data = snv.pos, aes(x = Chrom, y = Percentile, colour = Chrom)) +
     scale_y_continuous(limits = c(0, 100.0)) +
     ggtitle(
         "Positional distribution of called SNVs", 
-        paste(Sys.Date(), CONFIG$experiment$name)
+        paste(Sys.Date(), RUN_NAME)
         ) +
     xlab("") +
     ylab("Genomic percentile") +

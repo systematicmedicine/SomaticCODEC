@@ -32,27 +32,27 @@ import helpers.get_metadata as md
 rule ms_germline_risk:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
-        ref = config["files"]["reference_genome"],
-        fai = config["files"]["reference_genome"] + ".fai",
+        ref = config["sci_params"]["global"]["reference_genome"],
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
         included_chromsomes_bed = "tmp/downloads/included_chromosomes.bed"
     output:
         intermediate_pileup = temp("tmp/{ms_sample}/{ms_sample}_ms_pileup.bcf"),
         vcf_germ = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf"
     params:
-        max_base_qual = config["rules"]["ms_germline_risk"]["max_base_qual"],
-        max_depth = config["rules"]["ms_germline_risk"]["max_depth"],
-        min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"],
-        min_base_qual = config["rules"]["ms_germline_risk"]["min_base_qual"],
-        min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"],
-        compression_level = config["file_compression"]["gzip_level"]
+        max_base_qual = config["sci_params"]["ms_germline_risk"]["max_base_qual"],
+        max_depth = config["sci_params"]["ms_germline_risk"]["max_depth"],
+        min_alt_vaf = config["sci_params"]["ms_germline_risk"]["min_alt_vaf"],
+        min_base_qual = config["sci_params"]["ms_germline_risk"]["min_base_qual"],
+        min_map_qual = config["sci_params"]["ms_germline_risk"]["min_map_qual"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ms_sample}/ms_germline_risk.log"
     benchmark:
         "logs/{ms_sample}/ms_germline_risk.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         bcftools mpileup \
@@ -90,7 +90,7 @@ rule ms_germline_risk:
 rule ms_germline_mask:
     input:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf",
-        ref_fai = config["files"]["reference_genome"] + ".fai"
+        ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
         intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
         intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
@@ -101,13 +101,13 @@ rule ms_germline_mask:
         ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
         ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
     params:
-        indel_padding_bases = config["rules"]["ms_germline_mask"]["indel_padding_bases"]
+        indel_padding_bases = config["sci_params"]["ms_germline_mask"]["indel_padding_bases"]
     log:
         "logs/{ms_sample}/ms_germline_variants_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """        
         vcf2bed --deletions < {input.vcf} > {output.intermediate_del_unformatted} 2>> {log}
@@ -149,15 +149,15 @@ rule ms_low_depth_mask:
         intermediate_lowdepth = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.txt"),
         intermediate_lowdepth_sorted = temp("tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt")
     params:
-        min_base_qual = config["rules"]["ms_germline_risk"]["min_base_qual"],
-        min_map_qual = config["rules"]["ms_germline_risk"]["min_map_qual"],
-        threshold = config["rules"]["ms_low_depth_mask"]["min_depth"]
+        min_base_qual = config["sci_params"]["ms_germline_risk"]["min_base_qual"],
+        min_map_qual = config["sci_params"]["ms_germline_risk"]["min_map_qual"],
+        threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_low_depth_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         samtools depth \
@@ -184,13 +184,13 @@ rule ms_low_depth_mask:
 # ----------------------------------------------------------------------------------------------
 rule combine_masks:
     input:
-        precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
         excluded_chromosomes_bed = "tmp/downloads/excluded_chromosomes.bed",
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
-        fai = config["files"]["reference_genome"] + ".fai" 
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai" 
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
         intermediate_cat = temp("tmp/{ms_sample}/{ms_sample}_masks_cat.bed"),
@@ -200,7 +200,7 @@ rule combine_masks:
     benchmark:
         "logs/{ms_sample}/combine_masks.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         cat {input.precomputed_masks} \
@@ -225,12 +225,12 @@ rule combine_masks:
 # ----------------------------------------------------------------------------------------------
 rule generate_include_bed:
     input:
-        ms_samples = config["files"]["ms_samples_metadata"],
+        ms_samples = config["metadata"]["ms_samples_metadata"],
         mask_bed = lambda wc: (
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
             f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_combined_mask.bed"
         ),
-        fai = config["files"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     log:
@@ -238,7 +238,7 @@ rule generate_include_bed:
     benchmark:
         "logs/{ex_sample}/generate_include_bed.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed} 2>> {log}

@@ -36,8 +36,8 @@ def test_vcf_structure_correct(lightweight_test_run):
 def test_germ_risk_variants_fit_criteria(lightweight_test_run):
     config = load_config(lightweight_test_run["test_config_path"])
     ms_samples = get_ms_sample_ids(config)
-    min_alt_vaf = config["rules"]["ms_germline_risk"]["min_alt_vaf"]
-    min_depth = config["rules"]["ms_low_depth_mask"]["min_depth"]
+    min_alt_vaf = config["sci_params"]["ms_germline_risk"]["min_alt_vaf"]
+    min_depth = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
 
     for ms_sample in ms_samples:
         # Locate VCF file

@@ -47,18 +47,18 @@ ms_sample_ids = md.get_ms_sample_ids(config)
 
 # Define setup files
 setup_files = [
-    "logs/global_rules/check_ex_ms_mapping.done",
-    config["files"]["reference_genome"] + ".amb",
-    config["files"]["reference_genome"] + ".ann",
-    config["files"]["reference_genome"] + ".bwt.2bit.64",
-    config["files"]["reference_genome"] + ".pac",
-    config["files"]["reference_genome"] + ".0123",
-    "logs/global_rules/check_included_chromosomes_present.done",
+    config["sci_params"]["global"]["reference_genome"] + ".amb",
+    config["sci_params"]["global"]["reference_genome"] + ".ann",
+    config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
+    config["sci_params"]["global"]["reference_genome"] + ".pac",
+    config["sci_params"]["global"]["reference_genome"] + ".0123",
+    config["sci_params"]["global"]["reference_genome"] + ".fai",
+    os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict",
+    config["sci_params"]["global"]["known_germline_variants"] + ".tbi",
     "tmp/downloads/excluded_chromosomes.bed",
-    config["files"]["reference_genome"] + ".fai",
-    os.path.splitext(config["files"]["reference_genome"])[0] + ".dict",
-    config["files"]["known_germline_variants"] + ".tbi",
+    "logs/global_rules/check_included_chromosomes_present.done",
     "logs/global_rules/log_system_resource_usage.done",
+    "logs/global_rules/check_ex_ms_mapping.done",
     "logs/bin_scripts/run_pipeline.log"
 ]
 

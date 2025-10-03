@@ -22,7 +22,7 @@ rule ex_call_somatic_snv:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
         bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
-        ref = config["files"]["reference_genome"],
+        ref = config["sci_params"]["global"]["reference_genome"],
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
     output:
         vcf_all = temp("tmp/{ex_sample}/{ex_sample}_all_positions.vcf"), # Pileup of every unmasked position (except positions where indels present)
@@ -31,17 +31,17 @@ rule ex_call_somatic_snv:
         intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
         intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
     params:
-        max_base_quality = config["rules"]["ex_call_somatic_snv"]["max_base_quality"],
-        min_base_quality = config["rules"]["ex_call_somatic_snv"]["min_base_quality"],
-        compression_level = config["file_compression"]["gzip_level"]
+        max_base_quality = config["sci_params"]["ex_call_somatic_snv"]["max_base_quality"],
+        min_base_quality = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_call_somatic_snv.log"
     benchmark:
         "logs/{ex_sample}/ex_call_somatic_snv.benchmark.txt"
     threads:
-        config["resources"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["resources"]["memory"]["heavy"]
+        memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """
         bcftools mpileup \

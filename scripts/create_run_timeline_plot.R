@@ -18,7 +18,7 @@ library(jsonlite)
 # Define hard coded variables
 if (!exists("snakemake")) {
   # Manual mode (for local testing)
-  config <- list(experiment = list(name = "local_test_experiment"))
+  exp_name <- "local_test_experiment"
   git_metadata <- "logs/global_rules/git_metadata.json"
   job_log_path <- "logs/global_rules/job_log.csv"
   resources_log_path <- "logs/global_rules/system_resource_usage.csv"
@@ -27,7 +27,7 @@ if (!exists("snakemake")) {
   output_plot_path <- "logs/global_rules/run_timeline.pdf"
 } else {
   # Snakemake-injected paths
-  config <- snakemake@config
+  exp_name <- snakemake@params[["run_name"]]
   git_metadata <- snakemake@input[["git_metadata"]]
   job_log_path <- snakemake@input[["job_log"]]
   resources_log_path <- snakemake@input[["resources_log"]]
@@ -48,7 +48,6 @@ job_log <- read.csv(job_log_path) %>%
 resources_log <- read.csv(resources_log_path)
 
 # Create jobs plot
-exp_name <- config$experiment$name
 date <- format(Sys.Date(), "%Y-%m-%d")
 pipeline_version <- fromJSON("logs/global_rules/git_metadata.json")$git_tag
 title <- paste0(exp_name, " timeline")
