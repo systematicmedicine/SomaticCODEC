@@ -1,6 +1,6 @@
 # run_pipeline.md
 
-All of the steps below must be run from the repositories root directory.
+All of the steps below must be run from the repositories root directory. Note that pipeline runs typically take 24-24 hours.
 
 1. Upload config files to config directory:
     * `config.yaml`
@@ -32,8 +32,12 @@ sudo docker run -it \
 ```
 bash bin/run_all.sh
 ```
+5. Wait for config check
 
-5. Cleanup
+  * The config check (step 1) should only take a few seconds
+  * Once it is sucessful, you can leave the pipeline unattended
+
+6. Cleanup
     
     * Once the pipeline finishes running (sucess or failure), an email message will be sent to `info@systematicmedicine.com`, and the AWS instance will automatically shut down.
     * The instance will need to be terminated manually via EC2 web interface (to remove EBS volume) 
