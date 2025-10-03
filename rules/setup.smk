@@ -14,12 +14,12 @@ Authors:
 # Checks mapping of MS and EX samples in ms_samples.csv and ex_samples.csv
 rule check_ex_ms_mapping:
     input:
-        ex_csv = config["files"]["ex_samples_metadata"],
-        ms_csv = config["files"]["ms_samples_metadata"]
+        ex_csv = config["metadata"]["ex_samples_metadata"],
+        ms_csv = config["metadata"]["ms_samples_metadata"]
     output:
         "logs/global_rules/check_ex_ms_mapping.done"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     log:
         "logs/global_rules/check_ex_ms_mapping.log"
     benchmark:
@@ -31,18 +31,18 @@ rule check_ex_ms_mapping:
 # Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
 rule check_included_chromosomes_present:
     input:
-        fai = config["files"]["reference_genome"] + ".fai",
-        precomputed_masks = config["files"]["precomputed_masks"]
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
+        precomputed_masks = config["sci_params"]["global"]["precomputed_masks"]
     output:
         "logs/global_rules/check_included_chromosomes_present.done"
     params:
-        included_chromosomes = config["chroms"]["included_chromosomes"]
+        included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
     log:
         "logs/global_rules/check_included_chromosomes_present.log"
     benchmark:
         "logs/global_rules/check_included_chromosomes_present.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/check_included_chromosomes_present.py"
 
@@ -51,18 +51,18 @@ rule check_included_chromosomes_present:
     # e.g. chrUn, chr*_random, chrM, chrEBV
 rule included_excluded_chromosomes_beds:
     input:
-        fai = config["files"]["reference_genome"] + ".fai",
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
     output:
         exclude_bed = temp("tmp/downloads/excluded_chromosomes.bed"),
         include_bed = temp("tmp/downloads/included_chromosomes.bed")
     params:
-        included_chromosomes = config["chroms"]["included_chromosomes"]
+        included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
     log:
         "logs/global_rules/included_excluded_chromosomes_beds.log"
     benchmark:
         "logs/global_rules/included_excluded_chromosomes_beds.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     run:
         # Define chromosomes included for variant calling
         included_chromosomes = set(params.included_chromosomes)
@@ -84,21 +84,21 @@ rule included_excluded_chromosomes_beds:
 # Creates index files from reference genome
 rule bwamem_index_files:
     input:
-        reference = config["files"]["reference_genome"]
+        reference = config["sci_params"]["global"]["reference_genome"]
     output:
-        amb = config["files"]["reference_genome"] + ".amb",
-        ann = config["files"]["reference_genome"] + ".ann",
-        bwt = config["files"]["reference_genome"] + ".bwt.2bit.64",
-        pac = config["files"]["reference_genome"] + ".pac",
-        sa = config["files"]["reference_genome"] + ".0123"
+        amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
+        ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
+        bwt = config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["global"]["reference_genome"] + ".pac",
+        sa = config["sci_params"]["global"]["reference_genome"] + ".0123"
     log:
         "logs/global_rules/bwamem_index_files.log"
     benchmark:
         "logs/global_rules/bwamem_index_files.benchmark.txt"
     threads:
-        config["resources"]["threads"]["moderate"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         bwa-mem2 index {input.reference} 2>> {log}
@@ -108,15 +108,15 @@ rule bwamem_index_files:
 # Creates reference .fai file
 rule samtools_index_files:
     input:
-        reference = config["files"]["reference_genome"]
+        reference = config["sci_params"]["global"]["reference_genome"]
     output:
-        fai = config["files"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     log:
         "logs/global_rules/samtools_index_files.log"
     benchmark:
         "logs/global_rules/samtools_index_files.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         samtools faidx {input.reference} 2>> {log}
@@ -125,15 +125,15 @@ rule samtools_index_files:
 # Creates reference .dict file
 rule picard_sequence_dict:
     input:
-        ref = config["files"]["reference_genome"]
+        ref = config["sci_params"]["global"]["reference_genome"]
     output:
-        dictf = os.path.splitext(config["files"]["reference_genome"])[0] + ".dict"
+        dictf = os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict"
     log:
         "logs/global_rules/picard_sequence_dict.log"
     benchmark:
         "logs/global_rules/picard_sequence_dict.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp CreateSequenceDictionary \
@@ -144,15 +144,15 @@ rule picard_sequence_dict:
 # Creates index files for input VCFs
 rule tabix_index_files:
     input:
-        germline_vcf = config["files"]["known_germline_variants"]
+        germline_vcf = config["sci_params"]["global"]["known_germline_variants"]
     output:
-        germline_tbi = config["files"]["known_germline_variants"] + ".tbi"
+        germline_tbi = config["sci_params"]["global"]["known_germline_variants"] + ".tbi"
     log:
         "logs/global_rules/tabix_index_files.log"
     benchmark:
         "logs/global_rules/tabix_index_files.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         tabix -p vcf {input.germline_vcf} 2>> {log}
@@ -165,14 +165,14 @@ rule log_system_resource_usage:
         log = "logs/global_rules/system_resource_usage.csv",
         done_file = "logs/global_rules/log_system_resource_usage.done"
     params:
-        sleep_interval = config["rules"]["log_system_resource_usage"]["sleep_interval"],
-        total_cores = int(os.popen("nproc").read().strip()) - config["resources"]["threads"]["global_buffer"]
+        sleep_interval = config["infrastructure"]["log_system_resource_usage"]["sleep_interval"],
+        total_cores = int(os.popen("nproc").read().strip()) - config["infrastructure"]["threads"]["global_buffer"]
     log:
         "logs/global_rules/log_system_resource_usage.log"
     benchmark:
         "logs/global_rules/log_system_resource_usage.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         export SLEEP_INTERVAL={params.sleep_interval}
@@ -193,7 +193,7 @@ rule ensure_pipeline_log_exists:
     benchmark:
         "logs/global_rules/ensure_pipeline_log_exists.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         touch {output.log}

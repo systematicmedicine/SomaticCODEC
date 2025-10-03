@@ -15,7 +15,7 @@ import helpers.get_metadata as md
 rule ms_raw_fastq_metrics:
     input:
         setup_files = setup_files,
-        ms_samples = config["files"]["ms_samples_metadata"],
+        ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
@@ -30,9 +30,9 @@ rule ms_raw_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
     threads: 
-        config["resources"]["threads"]["light"]
+        config["infrastructure"]["threads"]["light"]
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         r1_base=$(basename {input.r1} .fastq.gz)
@@ -72,9 +72,9 @@ rule ms_processed_fastq_metrics:
     benchmark:
         "logs/{ms_sample}/ms_processed_fastq_metrics.benchmark.txt"
     threads:
-        config["resources"]["threads"]["light"]
+        config["infrastructure"]["threads"]["light"]
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """        
         fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2} 2>> {log}
@@ -104,7 +104,7 @@ rule ms_fastqc_summary_metrics:
     benchmark:
         "logs/{ms_sample}/ms_fastqc_summary_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/fastqc_summary_metrics.py"
 
@@ -122,7 +122,7 @@ rule ms_alignment_metrics:
     benchmark:
         "logs/{ms_sample}/ms_alignment_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         samtools flagstat {input.bam} > {output.stats} 2>> {log}
@@ -147,7 +147,7 @@ rule ms_duplication_metrics:
     benchmark:
         "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
        "../scripts/ms_duplication_metrics.py"
 
@@ -165,9 +165,9 @@ rule ms_depth_histogram_metrics:
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
     params:
-        threshold = config["rules"]["ms_low_depth_mask"]["min_depth"]
+        threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
     resources:
-        memory = config["resources"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         awk '{{print $3}}' {input.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
@@ -186,13 +186,13 @@ rule ms_coverage_by_depth_metrics:
         coverage_by_depth = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
     params:
         sample = "{ms_sample}",
-        min_depth = config["rules"]["ms_low_depth_mask"]["min_depth"]
+        min_depth = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
        "../scripts/ms_coverage_by_depth_metrics.py"
 
@@ -208,7 +208,7 @@ rule ms_germ_risk_variant_metrics:
     benchmark:
         "logs/{ms_sample}/ms_germ_risk_variant_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         bcftools stats -s - {input.vcf} > {output.stat} 2>> {log}
@@ -222,13 +222,13 @@ rule ms_germ_risk_variant_metrics_summary:
         summary = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics_summary.json"
     params:
         sample = "{ms_sample}",
-        min_depth = config["rules"]["ms_low_depth_mask"]["min_depth"]
+        min_depth = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_germ_risk_variant_metrics_summary.log"
     benchmark:
         "logs/{ms_sample}/ms_germ_risk_variant_metrics_summary.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
         "../scripts/ms_germ_risk_variant_metrics_summary.py"
 
@@ -236,13 +236,13 @@ rule ms_germ_risk_variant_metrics_summary:
 # Generates metrics for each mask BED file
 rule ms_masking_metrics:
     input:
-        precomputed_masks = expand("{mask}", mask=config["files"]["precomputed_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
         ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
-        ref_index = config["files"]["reference_genome"] + ".fai"
+        ref_index = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
         mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json",
         intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),
@@ -254,6 +254,6 @@ rule ms_masking_metrics:
     benchmark:
         "logs/{ms_sample}/ms_masking_metrics.benchmark.txt"
     resources:
-        memory = config["resources"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["light"]
     script:
        "../scripts/ms_masking_metrics.py"

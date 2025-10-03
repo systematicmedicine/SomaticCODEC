@@ -56,7 +56,7 @@ def test_sequences_are_shorter_by_umi_length(lightweight_test_run):
     post_counts = {Path(f).name: count_fastq_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
     config = load_config("config/config.yaml")
-    umi_length = config["rules"]["ex_extract_fastq_umis"]["umi_length"]
+    umi_length = config["sci_params"]["ex_extract_fastq_umis"]["umi_length"]
 
     assert total_post_length == total_pre_length - (umi_length * total_post_reads), (f"Expected {umi_length}bp reduction per read. "
                                                                             f"Actual reduction: {(total_pre_length - total_post_length) / total_post_reads}bp per read")

@@ -39,7 +39,7 @@ VCF_CASES = {
 # --------------------------------------------------------------------------------------
 
 R_WRAPPER_TEMPLATE = """
-methods::setClass("Snakemake", slots = c(input = "list", output = "list", log = "list", config = "list"))
+methods::setClass("Snakemake", slots = c(input = "list", output = "list", log = "list", config = "list", params = "list"))
 snakemake <- methods::new("Snakemake",
     input = list(
         index_path = "{fai}",
@@ -50,7 +50,10 @@ snakemake <- methods::new("Snakemake",
         metrics_plot = "{metrics_plot}"
     ),
     log = list("{log}"),
-    config = jsonlite::fromJSON("{config_json}")
+    config = jsonlite::fromJSON("{config_json}"),
+    params = list(
+        included_chroms = c("chr21", "chr22")
+    )
 )
 source("{script_path}", echo = TRUE, max.deparse.length = Inf)
 """
@@ -59,7 +62,7 @@ source("{script_path}", echo = TRUE, max.deparse.length = Inf)
 # Tests
 # --------------------------------------------------------------------------------------
 
-@pytest.mark.parametrize("case_name,vcf_path", VCF_CASES.items())
+@pytest.mark.parametrize("case_name, vcf_path", VCF_CASES.items())
 def test_ex_snv_position(case_name, vcf_path):
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
@@ -69,8 +72,12 @@ def test_ex_snv_position(case_name, vcf_path):
 
         # Minimal config
         config = {
-            "chroms": {"included_chromosomes": ["chr21", "chr22"]},
-            "experiment": {"name": "test-exp"}
+            "run_name": "test-exp",
+            "sci_params": {
+                "global": {
+                    "included_chromosomes": ["chr21", "chr22"]
+                }
+            }
         }
 
         # Fill in the R wrapper script
