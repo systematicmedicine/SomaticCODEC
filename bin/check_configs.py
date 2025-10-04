@@ -35,7 +35,7 @@ SAMPLE_FILES = {
 }
 
 # Define expected adapter lengths
-EXPECTED_ADAPTER_LENGTHS = [17, 18, 19]
+EXPECTED_ADAPTER_LENGTHS = [18, 19]
 
 # --------------------------------------------------------------------------------
 # Helper functions
