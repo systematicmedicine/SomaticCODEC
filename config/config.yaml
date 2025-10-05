@@ -95,7 +95,7 @@ sci_params:
     z_dropoff: 100
 
   ex_trim_fastq:
-    max_error_rate: 0.1
+    max_error_rate: 0.12
     min_adapter_overlap: 8
     r1_cut_start: 3
     r2_cut_start: 3
