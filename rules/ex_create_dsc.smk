@@ -28,7 +28,7 @@ rule ex_call_dsc:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
+        bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
         metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt",
         intermediate_unsorted = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_unsorted.bam"),
     params:
@@ -88,7 +88,7 @@ rule ex_remap_dsc:
         pac = config["sci_params"]["global"]["reference_genome"] + ".pac",
         sa = config["sci_params"]["global"]["reference_genome"] + ".0123"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam"),
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam"),
         unsorted_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam")
