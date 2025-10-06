@@ -191,6 +191,7 @@ rule ex_annotate_map:
             --extract-umi-method=tag \
             --umi-tag=RX \
             --paired \
+            --unmapped-reads=use \
             --method=directional 2>> {log}
 
         samtools sort \
