@@ -16,6 +16,8 @@ from snakemake import snakemake
 import shutil
 import yaml
 from collections import Counter
+import warnings
+warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
 
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
@@ -59,36 +61,41 @@ def test_MI_bam_tag_added():
     ("tests/data/test_ex_annotate_map/map_correct_primary_mapped.bam")
      ])
 def test_group_by_umi(tmp_path, map_correct_path):
-    # Define params and paths
     ex_sample = "EX001"
-    map_correct_renamed = f"tmp/{ex_sample}/{ex_sample}_map_correct.bam"
-    grouped_bam_path = f"tmp/{ex_sample}/{ex_sample}_map_anno.bam"
 
-    # Make expected input directory
-    input_dir = Path(f"tmp/{ex_sample}")
-    input_dir.mkdir(parents=True, exist_ok=True)
+    # Copy input BAM to temporary directory
+    expected_input_path = Path(f"tmp/{ex_sample}/{ex_sample}_map_correct.bam")
+    copied_input_path = tmp_path / expected_input_path
+    copied_input_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(map_correct_path, copied_input_path)
+
+    # Define target BAM
+    target_bam = f"tmp/{ex_sample}/{ex_sample}_map_anno.bam"
+
+    # Copy snakemake files to temporary directory
+    shutil.copy("Snakefile", tmp_path / "Snakefile")
+    shutil.copytree("scripts", tmp_path / "scripts")
+    shutil.copytree("rules", tmp_path / "rules")
+    shutil.copytree("config", tmp_path / "config")
     
-    # Copy test bam to expected input directory
-    shutil.copy(map_correct_path, map_correct_renamed)
-
+    # Run snakemake inside temporary directory
     # Load config
-    with open("config/config.yaml") as f:
+    with open(tmp_path / "config/config.yaml") as f:
         config_dict = yaml.safe_load(f)
-    
-    # Create snakemake command
-    success = snakemake(
-        snakefile=str("Snakefile"),
-        config=config_dict,
-        targets=[str(grouped_bam_path)],
-        cores=1,
-        verbose=True
-    )
 
-    # Run snakemake command and assert no errors
+    success = snakemake(
+        snakefile=str(tmp_path / "Snakefile"),
+        config=config_dict,
+        targets=[target_bam],
+        cores=1,
+        verbose=True,
+        workdir=str(tmp_path)
+            )
+
     assert success
 
     # Check that each read name appears twice only (once for R1 and R2)
-    with pysam.AlignmentFile(grouped_bam_path, "rb") as bam:
+    with pysam.AlignmentFile(tmp_path / target_bam, "rb") as bam:
         read_names = [read.query_name for read in bam]
 
     counts = Counter(read_names)
