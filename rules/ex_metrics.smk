@@ -458,12 +458,12 @@ rule ex_recurrent_variant_metrics:
         somatic_vcfs = expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config)),
         germ_contaminant_vcfs = expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = md.get_ex_sample_ids(config))
     output:
-        metrics_path = "metrics/batch/batch_recurrent_variant_metrics.json",
-        vcf_path = "metrics/batch/batch_recurrent_variants.vcf"
+        vcf_path = "metrics/batch/batch_recurrent_variants.vcf",
+        metrics_path = "metrics/batch/batch_recurrent_variant_metrics.json"
     log:
-        "logs/batch/batch_ex_recurrent_variant_metrics.log"
+        "logs/global_rules/batch_ex_recurrent_variant_metrics.log"
     benchmark:
-        "logs/batch/batch_ex_recurrent_variant_metrics.benchmark.txt"
+        "logs/global_rules/batch_ex_recurrent_variant_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     script:

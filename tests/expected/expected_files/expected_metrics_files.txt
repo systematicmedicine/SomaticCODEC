@@ -78,6 +78,7 @@ metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metric
 metrics/{ex_technical_control}/{ex_technical_control}_trim_5prime_metrics_tc.json
 metrics/{ex_technical_control}/{ex_technical_control}_r1_trim_3prime_metrics_tc.json
 metrics/{ex_technical_control}/{ex_technical_control}_r2_trim_3prime_metrics_tc.json
+metrics/batch/batch_recurrent_variants.vcf
 metrics/batch/batch_recurrent_variant_metrics.json
 metrics/metrics_report.csv
 metrics/metrics_heatmap.png
