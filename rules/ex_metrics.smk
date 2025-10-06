@@ -455,9 +455,11 @@ Identify somatic variants present in multiple samples in a batch
 """
 rule ex_recurrent_variant_metrics:
     input:
-        vcfs = expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config))
+        somatic_vcfs = expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config)),
+        germ_contaminant_vcfs = expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = md.get_ex_sample_ids(config))
     output:
-        metrics = "metrics/batch/batch_recurrent_variant_metrics.json"
+        metrics_path = "metrics/batch/batch_recurrent_variant_metrics.json",
+        vcf_path = "metrics/batch/batch_recurrent_variants.vcf"
     log:
         "logs/batch/batch_ex_recurrent_variant_metrics.log"
     benchmark:
