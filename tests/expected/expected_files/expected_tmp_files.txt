@@ -65,10 +65,10 @@ tmp/{ex_sample}/{ex_sample}_map_correct.bam
 tmp/{ex_sample}/{ex_sample}_map_correct_unsorted.bam
 tmp/{ex_sample}/{ex_sample}_map_readgroup_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam
-tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam.bai
+tmp/{ex_sample}/{ex_sample}_map_moveumi_primary_tmp.bam
+tmp/{ex_sample}/{ex_sample}_map_moveumi_primary_tmp.bam.bai
 tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bai
 tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam
-tmp/{ex_sample}/{ex_sample}_map_groupbyumi_primary_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_groupbyumi_sorted_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_groupbyumi_MI_tag_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam

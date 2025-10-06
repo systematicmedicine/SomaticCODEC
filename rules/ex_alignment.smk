@@ -134,9 +134,9 @@ rule ex_annotate_map:
         umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
         intermediate_readgroup = temp("tmp/{ex_sample}/{ex_sample}_map_readgroup_tmp.bam"),
         intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
-        intermediate_moveumi_index = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam.bai"),
+        intermediate_moveumi_primary = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_primary_tmp.bam"),
+        intermediate_moveumi_primary_index = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_primary_tmp.bam.bai"),
         intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam"),
-        intermediate_groupbyumi_primary = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_primary_tmp.bam"),
         intermediate_groupbyumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_sorted_tmp.bam"),
         intermediate_groupbyumi_MI_tag = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_MI_tag_tmp.bam"),
         intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
@@ -171,10 +171,18 @@ rule ex_annotate_map:
             -o {output.intermediate_moveumi} \
             --remove-umi true 2>> {log}
 
-        samtools index {output.intermediate_moveumi} 2>> {log}
+        samtools view \
+            -@ {threads} \
+            --output-fmt bam \
+            --output-fmt-option level={params.compression_level} \
+            -F 0x900 \
+            {output.intermediate_moveumi} > \
+            {output.intermediate_moveumi_primary} 2>> {log}
+
+        samtools index {output.intermediate_moveumi_primary} 2>> {log}
         
         umi_tools group \
-            --stdin={output.intermediate_moveumi} \
+            --stdin={output.intermediate_moveumi_primary} \
             --output-bam \
             --compresslevel={params.compression_level} \
             --no-sort-output \
@@ -183,16 +191,7 @@ rule ex_annotate_map:
             --extract-umi-method=tag \
             --umi-tag=RX \
             --paired \
-            --unmapped-reads=use \
             --method=directional 2>> {log}
-
-        samtools view \
-            -@ {threads} \
-            --output-fmt bam \
-            --output-fmt-option level={params.compression_level} \
-            -F 0x900 \
-            {output.intermediate_groupbyumi} > \
-            {output.intermediate_groupbyumi_primary} 2>> {log}
 
         samtools sort \
             -n \
@@ -200,7 +199,7 @@ rule ex_annotate_map:
             --output-fmt bam \
             --output-fmt-option level={params.compression_level} \
             -o {output.intermediate_groupbyumi_sorted} \
-            {output.intermediate_groupbyumi_primary} 2>> {log}
+            {output.intermediate_groupbyumi} 2>> {log}
 
         python scripts/ex_rename_umi_bam_tag.py \
             --input {output.intermediate_groupbyumi_sorted} \
