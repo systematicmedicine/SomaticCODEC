@@ -79,33 +79,35 @@ def count_recurrent_variants(variants_df):
     return grouped
 
 # Writes the recurrent variant table to VCF format
-def write_recurrent_variants_to_vcf(recurrent_df, output_vcf_path, reference_vcf_path=None):
-
-    # Choose output mode based on file extension
+def write_recurrent_variants_to_vcf(recurrent_df, output_vcf_path):
+    # Detect output format
     if output_vcf_path.endswith(".vcf"):
         mode = "w"
     elif output_vcf_path.endswith(".vcf.gz"):
-        mode = "wz"  # BGZF-compressed
+        mode = "wz"
     else:
         raise ValueError(f"[ERROR] Unsupported VCF output extension: {output_vcf_path}")
 
-    # Load or create VCF header
-    if reference_vcf_path:
-        with pysam.VariantFile(reference_vcf_path) as header_template:
-            header = header_template.header.copy()
-    else:
-        header = pysam.VariantHeader()
-        header.add_meta('fileformat', value='VCFv4.2')
-        header.add_meta('INFO', items=[('ID', 'COUNT'), ('Number', '1'), ('Type', 'Integer'),
-                                       ('Description', 'Number of VCFs in which this variant was found')])
+    # Filter to only recurrent variants
+    filtered_df = recurrent_df[recurrent_df['count'] > 1].copy()
 
-    # Write output VCF
+    # Define minimal header
+    header = pysam.VariantHeader()
+    header.add_meta('fileformat', value='VCFv4.2')
+    header.add_meta('INFO', items=[('ID', 'COUNT'), ('Number', '1'), ('Type', 'Integer'),
+                                   ('Description', 'Number of VCFs in which this variant was found')])
+
+    # Add contigs from recurrent_df
+    for contig in sorted(filtered_df['chrom'].unique()):
+        header.contigs.add(contig)
+
+    # Write VCF
     with pysam.VariantFile(output_vcf_path, mode, header=header) as out_vcf:
-        for _, row in recurrent_df.iterrows():
+        for _, row in filtered_df.iterrows():
             rec = out_vcf.new_record(
                 contig=row['chrom'],
-                start=int(row['pos']) - 1,  # VCF is 0-based in pysam
-                stop = int(row['pos']) - 1 + max(len(row['ref']), len(row['alt'])),
+                start=int(row['pos']) - 1,
+                stop=int(row['pos']) - 1 + max(len(row['ref']), len(row['alt'])),
                 alleles=(row['ref'], row['alt']),
                 info={'COUNT': row['count']}
             )
@@ -122,11 +124,26 @@ def write_recurrent_metrics_json(output_path, somatic_variants_df, filtered_vari
 
     metrics = {
         "description": "Summary metrics for somatic variant recurrence across samples",
-        "total_variants_before_filtering": total_before_filtering,
-        "total_variants_after_filtering": total_after_filtering,
-        "total_unique_variants_after_filtering": total_unique_after_filtering,
-        "total_recurrent_variants_after_filtering": total_recurrent,
-        "percentage_recurrent_variants": pct_recurrent
+        "total_variants_before_filtering": {
+            "value": int(total_before_filtering),
+            "description": "Total number of somatic SNVs across all samples"
+        },
+        "total_variants_after_filtering": {
+            "value": int(total_after_filtering),
+            "description": "Number of somatic SNVs remaining after filtering against germline contaminants"
+        },
+        "total_unique_variants_after_filtering": {
+            "value": int(total_unique_after_filtering),
+            "description": "Number of unique SNVs (after filtering and deduplication across samples)"
+        },
+        "total_recurrent_variants_after_filtering": {
+            "value": int(total_recurrent),
+            "description": "Number of SNVs observed in more than one sample"
+        },
+        "percentage_recurrent_variants": {
+            "value": float(pct_recurrent),
+            "description": "Percentage of filtered SNVs that were observed in multiple samples"
+        }
     }
 
     with open(output_path, "w") as f:
@@ -143,7 +160,7 @@ if __name__ == "__main__":
     germ_contaminant_vcf_paths = snakemake.input.germ_contaminant_vcfs
     output_metrics_path = snakemake.output.metrics_path
     output_vcf_path = snakemake.output.vcf_path
-    log_path = snakemake.log
+    log_path = snakemake.log[0]
 
     # Inititate logging
     sys.stdout = open(log_path, "a")
@@ -163,11 +180,7 @@ if __name__ == "__main__":
     recurrent_variants_df = count_recurrent_variants(filtered_somatic_variants)
 
     # Write recurrent variants to vcf
-    write_recurrent_variants_to_vcf(
-        recurrent_df=recurrent_variants_df,
-        output_vcf_path=output_vcf_path,
-        reference_vcf_path=somatic_vcf_paths[0]  # Optional: for header reuse
-    )
+    write_recurrent_variants_to_vcf(recurrent_variants_df, output_vcf_path)
     
     # Calculate metrics
     write_recurrent_metrics_json(
