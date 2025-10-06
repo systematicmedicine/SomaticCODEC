@@ -130,7 +130,7 @@ rule ex_annotate_map:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
+        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam",
         umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
         intermediate_readgroup = temp("tmp/{ex_sample}/{ex_sample}_map_readgroup_tmp.bam"),
         intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),

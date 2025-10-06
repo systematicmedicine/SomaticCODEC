@@ -16,8 +16,6 @@ from snakemake import snakemake
 import shutil
 import yaml
 from collections import Counter
-import warnings
-warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
 
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
