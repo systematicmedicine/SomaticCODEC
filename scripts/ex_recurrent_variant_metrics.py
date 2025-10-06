@@ -153,14 +153,13 @@ def write_recurrent_metrics_json(output_path, somatic_variants_df, filtered_vari
 # Main logic
 # ---------------------------------------------------------------------------------------
 
-if __name__ == "__main__":
-   
-    # Snakemake parameter injection
-    somatic_vcf_paths = snakemake.input.somatic_vcfs
-    germ_contaminant_vcf_paths = snakemake.input.germ_contaminant_vcfs
-    output_metrics_path = snakemake.output.metrics_path
-    output_vcf_path = snakemake.output.vcf_path
-    log_path = snakemake.log[0]
+def main(
+    somatic_vcf_paths, 
+    germ_contaminant_vcf_paths, 
+    output_metrics_path, 
+    output_vcf_path, 
+    log_path
+    ):
 
     # Inititate logging
     sys.stdout = open(log_path, "a")
@@ -192,3 +191,14 @@ if __name__ == "__main__":
 
     # Log script completion
     print("[INFO] Completed ex_recurrent_variant_metrics.py")
+
+if __name__ == "__main__":
+    main(
+        somatic_vcf_paths = snakemake.input.somatic_vcfs,
+        germ_contaminant_vcf_paths = snakemake.input.germ_contaminant_vcfs,
+        output_metrics_path = snakemake.output.metrics_path,
+        output_vcf_path = snakemake.output.vcf_path,
+        log_path = snakemake.log[0]
+    )
+   
+
