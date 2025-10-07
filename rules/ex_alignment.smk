@@ -80,16 +80,20 @@ rule ex_map:
 
 """
 Filter mapped reads
-    - Remove read pairs that are on different chromosomes
-    - Remove reads pairs that are too far apart (~500bp, determined by aligner)
-    - Remove read pairs that are not read in the correct directions
+    - Remove reads without 0x2 (properly paired) flag, i.e.:
+        - Read pairs that are on different chromosomes
+        - Read pairs that are too far apart (~500bp, determined by aligner)
+        - Read pairs that are not read in the correct directions
+    - Remove read pairs with 0x100, 0x800 and 0x4 flags, i.e.:
+        - Secondary alignments
+        - Supplementary alignments
+        - Unmapped reads
 """
 rule ex_filter_map:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam"),
-        intermediate_unsorted = temp("tmp/{ex_sample}/{ex_sample}_map_correct_unsorted.bam")
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam")
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
@@ -106,40 +110,25 @@ rule ex_filter_map:
         -@ {threads} \
         -b \
         -f 0x2 \
+        -F 0x904 \
         --output-fmt bam \
         --output-fmt-option level={params.compression_level} \
-        {input.bam} > {output.intermediate_unsorted} 2>> {log}
-
-        samtools sort \
-        -@ {threads} \
-        --output-fmt bam \
-        --output-fmt-option level={params.compression_level} \
-        -o {output.bam} \
-        {output.intermediate_unsorted} 2>> {log}
+        {input.bam} > {output.bam} 2>> {log}
         """
 
 
 """
  Annotate the mapped reads for downstream rules
-    - Move UMI from read name to RX:Z tag
-    - Add mate information to read pairs
-    - Assign molecular identifiers based on RX:Z: umi tags to allow for single and duplex strand consensus generation
-    - Assign generic sample and read group metadata for tool compatibility
+    - Add read group information (all reads given same read group)
+    - Add read mate information to flags/CIGAR strings
 """
 rule ex_annotate_map:
     input:
         bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
     output:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam",
-        umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
-        intermediate_readgroup = temp("tmp/{ex_sample}/{ex_sample}_map_readgroup_tmp.bam"),
-        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
-        intermediate_moveumi_primary = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_primary_tmp.bam"),
-        intermediate_moveumi_primary_index = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_primary_tmp.bam.bai"),
-        intermediate_groupbyumi = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_tmp.bam"),
-        intermediate_groupbyumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_sorted_tmp.bam"),
-        intermediate_groupbyumi_MI_tag = temp("tmp/{ex_sample}/{ex_sample}_map_groupbyumi_MI_tag_tmp.bam"),
-        intermediate_mateinfo = temp("tmp/{ex_sample}/{ex_sample}_map_mateinfo_tmp.bam"),
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
+        intermediate_read_group = temp("tmp/{ex_sample}/{ex_sample}_map_read_group_tmp.bam"),
+        intermediate_read_group_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_read_group_sorted_tmp.bam")
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
@@ -152,71 +141,108 @@ rule ex_annotate_map:
         memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """
+        # Add read group information (all reads given same read group)
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
             AddOrReplaceReadGroups \
             --COMPRESSION_LEVEL {params.compression_level} \
             --INPUT {input.bam} \
-            --OUTPUT {output.intermediate_readgroup} \
+            --OUTPUT {output.intermediate_read_group} \
             --RGID {wildcards.ex_sample} \
             --RGLB lib1 \
             --RGPL illumina \
             --RGPU unit1 \
             --RGSM {wildcards.ex_sample} \
             --VALIDATION_STRINGENCY LENIENT 2>> {log}
-        
-        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression={params.compression_level} \
-            CopyUmiFromReadName \
-            -i {output.intermediate_readgroup} \
-            -o {output.intermediate_moveumi} \
-            --remove-umi true 2>> {log}
 
-        samtools view \
-            -@ {threads} \
-            --output-fmt bam \
-            --output-fmt-option level={params.compression_level} \
-            -F 0x900 \
-            {output.intermediate_moveumi} > \
-            {output.intermediate_moveumi_primary} 2>> {log}
-
-        samtools index {output.intermediate_moveumi_primary} 2>> {log}
-        
-        umi_tools group \
-            --stdin={output.intermediate_moveumi_primary} \
-            --output-bam \
-            --compresslevel={params.compression_level} \
-            --no-sort-output \
-            --stdout={output.intermediate_groupbyumi} \
-            --group-out={output.umi_metrics} \
-            --extract-umi-method=tag \
-            --umi-tag=RX \
-            --paired \
-            --unmapped-reads=use \
-            --method=directional 2>> {log}
-
+        # Sort by query name for fgbio SetMateInformation
         samtools sort \
             -n \
             -@ {threads} \
             --output-fmt bam \
             --output-fmt-option level={params.compression_level} \
-            -o {output.intermediate_groupbyumi_sorted} \
-            {output.intermediate_groupbyumi} 2>> {log}
+            -o {output.intermediate_read_group_sorted} \
+            {output.intermediate_read_group} 2>> {log}
 
-        python scripts/ex_rename_umi_bam_tag.py \
-            --input {output.intermediate_groupbyumi_sorted} \
-            --output {output.intermediate_groupbyumi_MI_tag} 2>> {log}
-
+        # Add mate information to flags/CIGAR strings for read pairs
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
             SetMateInformation \
-            -i {output.intermediate_groupbyumi_MI_tag} \
-            -o {output.intermediate_mateinfo} 2>> {log}
+            -i {output.intermediate_read_group_sorted} \
+            -o {output.bam} 2>> {log}
+        """
 
+"""
+Group reads by UMI
+    - Identify groups of reads with same/similar UMI (determined by umitools directional method)
+    - Add UMI groups to UG:i tag
+    - Move UMI from UG:i tag to MI:Z tag
+"""
+rule ex_group_by_umi:
+    input:
+        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
+    output:
+        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi_grouped.bam"),
+        umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
+        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
+        intermediate_moveumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam"),
+        intermediate_moveumi_sorted_index = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam.bai"),
+        intermediate_umi_group_UG = temp("tmp/{ex_sample}/{ex_sample}_map_umi_group_UG_tmp.bam"),
+        intermediate_umi_group_UG_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_umi_group_UG_sorted_tmp.bam"),
+    params:
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
+    log:
+        "logs/{ex_sample}/ex_group_by_umi.log"
+    benchmark:
+        "logs/{ex_sample}/ex_group_by_umi.benchmark.txt"
+    threads:
+        config["infrastructure"]["threads"]["heavy"]
+    resources:
+        memory = config["infrastructure"]["memory"]["heavy"]
+    shell:
+        """        
+        # Move UMI from read name to RX:Z tag
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
-            SortBam \
-            -i {output.intermediate_mateinfo} \
-            -o {output.bam} \
-            -s TemplateCoordinate 2>> {log}
+            CopyUmiFromReadName \
+            -i {input.bam} \
+            -o {output.intermediate_moveumi} \
+            --remove-umi true 2>> {log}
+
+        # Sort by coordinate for umi_tools group
+        samtools sort \
+            -@ {threads} \
+            --output-fmt bam \
+            --output-fmt-option level={params.compression_level} \
+            -o {output.intermediate_moveumi_sorted} \
+            {output.intermediate_moveumi} 2>> {log}
+
+        # Index BAM for umi_tools group
+        samtools index {output.intermediate_moveumi_sorted} 2>> {log}
+
+        # Group reads by UMI and add UMI groups to UG:i tag
+        umi_tools group \
+            --stdin={output.intermediate_moveumi_sorted} \
+            --output-bam \
+            --compresslevel={params.compression_level} \
+            --stdout={output.intermediate_umi_group_UG} \
+            --no-sort-output \
+            --group-out={output.umi_metrics} \
+            --extract-umi-method=tag \
+            --umi-tag=RX \
+            --paired \
+            --method=directional 2>> {log}  
+
+        # Sort by query name for ex_rename_umi_bam_tag.py 
+        samtools sort \
+            -@ {threads} \
+            -n \
+            --output-fmt bam \
+            --output-fmt-option level={params.compression_level} \
+            -o {output.intermediate_umi_group_UG_sorted} \
+            {output.intermediate_umi_group_UG} 2>> {log}
+
+        # Move UMI group from UG:i tag to MI:Z tag as expected by consensus caller
+        python scripts/ex_rename_umi_bam_tag.py \
+            --input {output.intermediate_umi_group_UG_sorted} \
+            --output {output.bam} 2>> {log} 
         """
-        
