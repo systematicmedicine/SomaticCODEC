@@ -1,3 +1,3 @@
 ms_sample,fastq1,fastq2,donor_id,comments
-MS004,tmp/downloads/S004_Chr21_10000reads_r1_umi.fastq.gz,tmp/downloads/S004_Chr21_10000reads_r2_umi.fastq.gz,R1234,"sperm, 18 years old"
-MS005,tmp/downloads/S005_Chr21_10000reads_r1_umi.fastq.gz,tmp/downloads/S005_Chr21_10000reads_r2_umi.fastq.gz,R0101,"buffy coat, 80 years old"
+SEQ0004,tmp/downloads/S004_Chr21_10000reads_r1_umi.fastq.gz,tmp/downloads/S004_Chr21_10000reads_r2_umi.fastq.gz,R1234,"sperm, 18 years old"
+SEQ0005,tmp/downloads/S005_Chr21_10000reads_r1_umi.fastq.gz,tmp/downloads/S005_Chr21_10000reads_r2_umi.fastq.gz,R0101,"buffy coat, 80 years old"

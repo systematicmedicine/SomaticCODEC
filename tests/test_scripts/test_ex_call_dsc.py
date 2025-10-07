@@ -45,12 +45,12 @@ def test_no_duplicated_read_names(lightweight_test_run):
 
         read_names = []
 
-        with pysam.AlignmentFile(bam_path, "rb") as bam:
+        with pysam.AlignmentFile(bam_path, "rb", check_sq=False) as bam:
             for read in bam:
                 # Add read name to list
                 read_names.append(read.query_name)
 
-            # Assert read query names appear twice only (once each for R1 and R2)
+            # Assert read query names appear once only (R1 and R2 collapsed into consensus read)
             name_counts = Counter(read_names)
             for name, count in name_counts.items():
-                assert count == 2, f"Query name {name} appears {count} times in {bam_path}, expected 2 appearances"
+                assert count == 1, f"Query name {name} appears {count} times in {bam_path}, expected 1 appearance"

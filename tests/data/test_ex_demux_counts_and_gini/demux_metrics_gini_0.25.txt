@@ -19,7 +19,7 @@ Total written (filtered):      2,923,536 bp (100.0%)
   Read 1:     1,461,768 bp
   Read 2:     1,461,768 bp
 
-=== First read: Adapter EX001 ===
+=== First read: Adapter SEQ0001 ===
 
 Sequence: CTTGAACGGACTGTCCAC; Type: anchored 5'; Length: 18; Trimmed: 500 times
 
@@ -33,7 +33,7 @@ length	count	expect	max.err	error counts
 19	26	0.0	2	0 25 1
 
 
-=== First read: Adapter EX002 ===
+=== First read: Adapter SEQ0002 ===
 
 Sequence: GAGCCTACTCAGTCAACG; Type: anchored 5'; Length: 18; Trimmed: 1500 times
 
@@ -44,7 +44,7 @@ length	count	expect	max.err	error counts
 18	4972	0.0	2	4972
 
 
-=== Second read: Adapter EX001 ===
+=== Second read: Adapter SEQ0001 ===
 
 Sequence: CACCGAGCGTTAGACTAC; Type: anchored 5'; Length: 18; Trimmed: 500 times
 
@@ -58,7 +58,7 @@ length	count	expect	max.err	error counts
 19	24	0.0	2	0 20 4
 
 
-=== Second read: Adapter EX002 ===
+=== Second read: Adapter SEQ0002 ===
 
 Sequence: GTGTCGAACACTTGACGG; Type: anchored 5'; Length: 18; Trimmed: 1500 times
 
