@@ -5,7 +5,7 @@
 # SomaticCODEC
 #### A CODEC-based assay and open-source pipeline for quantifying somatic mutation burden in normal human tissue
 
-`SomaticCODEC` is a rigorously validated bioinformatics assay optimized for detecting rare somatic mutations in normal human tissues — supporting applications in ageing, somatic mosaicism, and population genomics.
+`SomaticCODEC` is a rigorously validated bioinformatics assay optimized for detecting rare somatic mutations in normal human tissues — supporting applications in ageing, mosaicism and preventative cancer research.
 It leverages the CODEC sequencing protocol (with modifications from [Bae et al., 2023](https://doi.org/10.1038/s41588-023-01376-0)) and a new, modular, and test-driven bioinformatics pipeline.
 
 ### Key features
@@ -39,7 +39,7 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
 ### Developer guide
 
-* Versioning
+- [Versioning](versioning.md)
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![CI: passing](https://img.shields.io/github/actions/workflow/status/systematicmedicine/SomaticCODEC/test.yml)
