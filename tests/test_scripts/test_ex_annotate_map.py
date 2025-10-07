@@ -16,7 +16,7 @@ sys.path.insert(0, str(project_root))
 
 from helpers.bam_helpers import count_bam_data_points
 
-# Test that the read count decreases due to collapsing by UMI
+# Test that the read counts don't change during annotation
 def test_reads_decrease(lightweight_test_run):
     # Locate all pre-annotation BAM files
     pre_files = glob.glob("tmp/*/*_map_correct.bam")
@@ -28,7 +28,9 @@ def test_reads_decrease(lightweight_test_run):
     post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
-    # Assert total reads post annotation <= total reads pre annotation
-    assert total_post_reads <= total_pre_reads, (
-        f"Post-annotation reads ({total_post_reads}) > pre-annotation reads ({total_pre_reads})"
+    # Assert total reads post annotation == total reads pre annotation
+    assert total_post_reads == total_pre_reads, (
+        f"Post-annotation reads ({total_post_reads}) != pre-annotation reads ({total_pre_reads})"
     )
+
+
