@@ -80,11 +80,11 @@ def lightweight_test_run():
 
     config_data["infrastructure"]["memory"]["heavy"] = 4
     config_data["infrastructure"]["memory"]["moderate"] = 4
-    config_data["infrastructure"]["memory"]["light"] = 4
-    config_data["infrastructure"]["threads"]["heavy"] = 4
-    config_data["infrastructure"]["threads"]["moderate"] = 4
-    config_data["infrastructure"]["threads"]["light"] = 4
-    config_data["infrastructure"]["compression"]["gzip_level"] = 5
+    config_data["infrastructure"]["memory"]["light"] = 2
+    config_data["infrastructure"]["threads"]["heavy"] = 2
+    config_data["infrastructure"]["threads"]["moderate"] = 2
+    config_data["infrastructure"]["threads"]["light"] = 1
+    config_data["infrastructure"]["compression"]["gzip_level"] = 1
 
 
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
