@@ -19,6 +19,7 @@ from cyvcf2 import VCF
 import pandas as pd
 import pysam
 import json
+import sys
 
 # ---------------------------------------------------------------------------------------
 # Define functions
@@ -119,7 +120,7 @@ def write_recurrent_metrics_json(output_path, somatic_variants_df, filtered_vari
     total_before_filtering = len(somatic_variants_df)
     total_after_filtering = len(filtered_variants_df)
     total_unique_after_filtering = recurrent_variants_df.shape[0]
-    total_recurrent = (recurrent_variants_df['count'] > 1).sum()
+    total_recurrent = recurrent_variants_df.loc[recurrent_variants_df['count'] > 1, 'count'].sum()
     pct_recurrent = round(100 * total_recurrent / total_after_filtering, 2) if total_after_filtering > 0 else 0.0
 
     metrics = {
@@ -138,7 +139,7 @@ def write_recurrent_metrics_json(output_path, somatic_variants_df, filtered_vari
         },
         "total_recurrent_variants_after_filtering": {
             "value": int(total_recurrent),
-            "description": "Number of SNVs observed in more than one sample"
+            "description": "Total recurrent variants in fltered callset. E.g. if a variant is in 3 samples it is counted 3 times"
         },
         "percentage_recurrent_variants": {
             "value": float(pct_recurrent),
