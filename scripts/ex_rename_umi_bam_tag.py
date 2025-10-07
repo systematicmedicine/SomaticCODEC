@@ -40,7 +40,7 @@ for read in bam_in:
         prev_name = read.query_name
         prev_mi = mi_value
     else:
-        # propagate MI from previous read if names match
+        # propagate MI from previous read (after ensuring names match)
         if read.query_name == prev_name and prev_mi is not None:
             read.set_tag("MI", prev_mi, value_type="Z")
         else:
