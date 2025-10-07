@@ -133,6 +133,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
+    "metrics/batch/batch_recurrent_variants.vcf",
     "metrics/batch/batch_recurrent_variant_metrics.json",
 ]
 
