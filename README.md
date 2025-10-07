@@ -28,7 +28,7 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 - **Running the Pipeline**
   - Configuring parameters
   - Creating sample sheets
-  - [Pipeline execution guide](docs/run_pipeline.md)
+  - [Run pipeline](docs/run_pipeline.md)
 - **Interpreting Outputs**
   - Results and output structure
   - Metrics report
