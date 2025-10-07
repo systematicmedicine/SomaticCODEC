@@ -241,7 +241,9 @@ rule ex_group_by_umi:
             -o {output.intermediate_umi_group_UG_sorted} \
             {output.intermediate_umi_group_UG} 2>> {log}
 
+        # Remove unneeded BX tag
         # Move UMI group from UG:i tag to MI:Z tag as expected by consensus caller
+        # Propogate MI:Z tag from R1 to R2
         python scripts/ex_rename_umi_bam_tag.py \
             --input {output.intermediate_umi_group_UG_sorted} \
             --output {output.bam} 2>> {log} 

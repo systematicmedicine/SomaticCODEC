@@ -1,7 +1,7 @@
 """
---- test_ex_demux_metrics_gini.py
+--- test_ex_demux_counts_and_gini.py
 
-Tests the script ex_demux_metrics_gini.py
+Tests the script ex_demux_counts_and_gini.py
 
 Authors:
     - Chat-GPT
@@ -19,9 +19,9 @@ sys.path.insert(0, str(project_root))
 from scripts.ex_demux_counts_and_gini import main
 
 @pytest.mark.parametrize("demux_path, expected_gini", [
-    ("tests/data/test_ex_demux_metrics_gini/demux_metrics_gini_0.txt", 0.0),
-    ("tests/data/test_ex_demux_metrics_gini/demux_metrics_gini_0.25.txt", 0.25),
-    ("tests/data/test_ex_demux_metrics_gini/demux_metrics_gini_0.5.txt", 0.5),
+    ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.txt", 0.0),
+    ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.25.txt", 0.25),
+    ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.5.txt", 0.5),
 ])
 def test_gini_coeff_calculation(tmp_path, demux_path, expected_gini):
     output_json = tmp_path / "demux_gini.json"
