@@ -26,11 +26,12 @@ Create duplex consensus (DSC)
 """
 rule ex_call_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
+        bam = "tmp/{ex_sample}/{ex_sample}_map_umi_grouped.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
         metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt",
-        intermediate_unsorted = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_unsorted.bam"),
+        intermediate_umi_grouped_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_umi_grouped_sorted_tmp.bam"),
+        intermediate_dsc_unsorted = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_unsorted_tmp.bam")
     params:
         error_rate_pre_umi = config["sci_params"]["ex_call_dsc"]["error_rate_pre_umi"],
         error_rate_post_umi = config["sci_params"]["ex_call_dsc"]["error_rate_post_umi"],
@@ -51,9 +52,16 @@ rule ex_call_dsc:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
-            CallCodecConsensusReads \
+            SortBam \
             -i {input.bam} \
-            -o {output.intermediate_unsorted} \
+            -o {output.intermediate_umi_grouped_sorted} \
+            -s TemplateCoordinate 2>> {log}
+        
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression={params.compression_level} \
+            CallCodecConsensusReads \
+            -i {output.intermediate_umi_grouped_sorted} \
+            -o {output.intermediate_dsc_unsorted} \
             --error-rate-pre-umi {params.error_rate_pre_umi} \
             --error-rate-post-umi {params.error_rate_post_umi} \
             --min-input-base-quality {params.min_input_base_quality} \
@@ -69,7 +77,7 @@ rule ex_call_dsc:
             -@ {threads} \
             --no-PG \
             -o {output.bam} \
-            {output.intermediate_unsorted} 2>> {log}
+            {output.intermediate_dsc_unsorted} 2>> {log}
         """
 
 
