@@ -47,7 +47,7 @@ git clone --branch dev git@github.com:systematicmedicine/SomaticCODEC.git
 
 # Build Docker image
 
-cd codec-opensource
+cd SomaticCODEC
 sudo docker build -t codec-image .
 ```
 

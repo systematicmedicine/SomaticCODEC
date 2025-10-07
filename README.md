@@ -5,7 +5,7 @@
 # SomaticCODEC
 #### A CODEC-based assay and open-source pipeline for quantifying somatic mutation burden in normal human tissue
 
-`SomaticCODEC` is a rigorously validated bioinformatics assay optimized for detecting rare somatic mutations in normal human tissues — supporting applications in ageing, mosaicism and preventative cancer research.
+SomaticCODEC is a rigorously validated bioinformatics assay optimized for detecting rare somatic mutations in normal human tissues — supporting applications in ageing, mosaicism and preventative cancer research.
 It leverages the CODEC sequencing protocol (with modifications from [Bae et al., 2023](https://doi.org/10.1038/s41588-023-01376-0)) and a new, modular, and test-driven bioinformatics pipeline.
 
 ### Key features
@@ -21,25 +21,33 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
 - **Pipeline Overview**
 - **Library Preparation**
-  - `SOP0017 CODECseq library preparation`
-  - `SOP0029 CODECseq matched sample library preparation`
+  - SOP0017 CODECseq library preparation
+  - SOP0029 CODECseq matched sample library preparation
 - **Compute Platform Setup**
-  - [Setup EC2 guide](docs/ec2_setup.md)
+  - [EC2 setup guide](docs/ec2_setup.md)
 - **Running the Pipeline**
   - Configuring parameters
   - Creating sample sheets
   - [Run pipeline](docs/run_pipeline.md)
 - **Interpreting Outputs**
-  - Results and output structure
+  - Primary outputs
   - Metrics report
   - Metrics files and plots
-- **Pipeline Validation**
-  - Unit testing framework
-  - Assay validation results
+- **Assay Validation**
+  - System level validation
+  - Component level validation
+  - Software testing
 
 ### Developer guide
 
 - [Versioning](versioning.md)
 
+### Maintainers
+
+This repository is developed and maintained by [Systematic Medicine Pty Ltd](https://systematicmedicine.com), an Australian-based biotechnology company and wholly owned subsiduary of [Leading Technology Group](https://leadingtechnology.com).
+
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![CI: passing](https://img.shields.io/github/actions/workflow/status/systematicmedicine/SomaticCODEC/test.yml)
+![Version](https://img.shields.io/github/v/tag/systematicmedicine/SomaticCODEC?label=version)
+![Repo Size](https://img.shields.io/github/repo-size/systematicmedicine/SomaticCODEC)
+![Last Commit](https://img.shields.io/github/last-commit/systematicmedicine/SomaticCODEC)
