@@ -19,7 +19,8 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
 ### User guide
 
-- **Pipeline Overview**
+- **Overview**
+  - Assay overview
 - **Library Preparation**
   - SOP0017 CODECseq library preparation
   - SOP0029 CODECseq matched sample library preparation
@@ -37,10 +38,8 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
   - System level validation
   - Component level validation
   - Software testing
-
-### Developer guide
-
-- [Versioning](versioning.md)
+- **Developer guide (internal)**
+  - [Versioning](versioning.md)
 
 ### Maintainers
 
