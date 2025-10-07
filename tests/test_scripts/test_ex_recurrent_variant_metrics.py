@@ -4,39 +4,50 @@
 Tests the script ex_recurrent_variant_metrics.py
 
 Authors:
-    - Chat-GPT
-    - Joshua Johnstone
+    - Cameron Fraser
 """
-import json
-import glob
-import os
-from pathlib import Path
+
+# Imports
 import sys
+import json
+from math import isclose
+from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
+from ex_recurrent_variant_metrics import main
 
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
+# Create dictionary of paths to test data
+DATA_DIR = "tests/data/test_ex_recurrent_variant_metrics/"
+TEST_DATA = {
+    "somatic_vcfs": [
+        DATA_DIR + "somatic_1.vcf",
+        DATA_DIR + "somatic_2.vcf",
+        DATA_DIR + "somatic_3.vcf"
+    ],
+    "germline_contaminant_vcfs": [
+        DATA_DIR + "germ_contaminants.vcf"
+    ]
+}
 
-from scripts.ex_recurrent_variant_metrics import main
+# Test script rpduces expected values
+def test_ex_recurrent_variant_metrics(tmp_path):
 
-def test_find_recurrent_variants(tmp_path):
-    vcf_paths = glob.glob("tests/data/test_ex_recurrent_variant_metrics/*.vcf")
-    output_json = tmp_path / "recurrent_variants.json"
+    # Run script
+    main(
+        somatic_vcf_paths = TEST_DATA["somatic_vcfs"],
+        germ_contaminant_vcf_paths = TEST_DATA["germline_contaminant_vcfs"],
+        output_metrics_path = str(tmp_path / "metrics.json"),
+        output_vcf_path = str(tmp_path / "recurrent.vcf"),
+        log_path = str(tmp_path / "log.txt"),
+    )
 
-    class MockSnakemake:
-        input = type("input", (), {"vcfs": vcf_paths})
-        output = type("output", (), {"metrics": str(output_json)})
-        log = ["log.txt"]
-        params = {}
+    # Load output metrics
+    with open(tmp_path / "metrics.json") as f:
+        metrics = json.load(f)
 
-    main(MockSnakemake)
-
-    with open(output_json) as f:
-        result = json.load(f)
-
-    assert result["total_variant_calls"] == 6
-    assert result["total_distinct_variants"] == 4
-    assert result["total_recurrent_variants"] == 1
-    assert result["pct_recurrent_variants"] == 25
-
-    if os.path.exists("log.txt"):
-        os.remove("log.txt")
+    # Check individual values (edit as per your expectations)
+    assert metrics["total_variants_before_filtering"]["value"] == 15
+    assert metrics["total_variants_after_filtering"]["value"] == 12
+    assert metrics["total_unique_variants_after_filtering"]["value"] == 6
+    assert metrics["total_recurrent_variants_after_filtering"]["value"] == 9
+    assert isclose(metrics["percentage_recurrent_variants"]["value"], 75, rel_tol=1e-6)
