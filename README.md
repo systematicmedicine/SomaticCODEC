@@ -1,22 +1,45 @@
-# codec-opensource
-A bioinformatics pipeline for calling somatic mutations in sequenced CODEC libraries.
+<p align="center">
+  <img src="https://leadingtechnology.com/2021/wp-content/uploads/2021/10/sysmed-logo.png" alt="Systematic Medicine" width="200"/>
+</p>
 
-## Key differences from [`broadinstitute/CODECsuite`](https://github.com/broadinstitute/CODECsuite)
+# SomaticCODEC
+#### A CODEC-based assay and open-source pipeline for quantifying somatic mutation burden in normal human tissue
 
-* Fully open-source toolchain (e.g. `cutadapt`, `fgbio`, `samtools`, etc)
-* Tailored for calling somatic mutations in normal tissue
-* Uses independent matched samples (from same individual) to differentiate true somatic variants from germline variants
-* Extensive range of QC metrics generated (e.g. `fastqc`)
-* Fully containerized docker workflow
+`SomaticCODEC` is a rigorously validated bioinformatics assay optimized for detecting rare somatic mutations in normal human tissues — supporting applications in ageing, somatic mosaicism, and population genomics.
+It leverages the CODEC sequencing protocol (with modifications from [Bae et al., 2023](https://doi.org/10.1038/s41588-023-01376-0)) and a new, modular, and test-driven bioinformatics pipeline.
 
-## Library prep and sequencing
-Prepare and sequence libraries as per: 
+### Key features
 
-* `SOP0017 CODECseq library preparation`
-* `SOP0029 CODECseq matched sample library preparation`
+- **Tailored for somatic mutation detection in normal tissue**
+- **Matched-sample design**: distinguishes somatic from germline variants using independent samples from the same individual
+- **Open-source toolchain**: reproducible, portable, and cloud-ready (Docker + Snakemake)
+- **Extensive assay validation**: >80 component-level and >10 system-level metrics
+- **Automated QC reports**: detailed metrics, plots, and validation benchmarks
+- **Robust software engineering**: unit tests, integration tests, config validators, CI support
 
-## Setup instructions
-* [Amazon EC2](docs/setup_EC2.md)
+### User guide
 
-## Running the pipeline
-* [Running pipeline](docs/run_pipeline.md)
+- **Pipeline Overview**
+- **Library Preparation**
+  - `SOP0017 CODECseq library preparation`
+  - `SOP0029 CODECseq matched sample library preparation`
+- **Compute Platform Setup**
+  - [Setup EC2 guide](docs/ec2_setup.md)
+- **Running the Pipeline**
+  - Configuring parameters
+  - Creating sample sheets
+  - [Pipeline execution guide](docs/run_pipeline.md)
+- **Interpreting Outputs**
+  - Results and output structure
+  - Metrics report
+  - Metrics files and plots
+- **Pipeline Validation**
+  - Unit testing framework
+  - Assay validation results
+
+### Developer guide
+
+* Versioning
+
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![CI: passing](https://img.shields.io/github/actions/workflow/status/systematicmedicine/SomaticCODEC/test.yml)
