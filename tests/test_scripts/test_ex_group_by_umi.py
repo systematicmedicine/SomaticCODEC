@@ -18,7 +18,7 @@ sys.path.insert(0, str(project_root))
 
 from helpers.bam_helpers import count_bam_data_points
 
-def test_group_by_umi():
+def test_group_by_umi(lightweight_test_run):
     # Locate all pre-UMI grouping BAM files
     pre_files = glob.glob("tmp/*/*_map_anno.bam")
     
