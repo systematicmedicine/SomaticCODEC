@@ -31,7 +31,7 @@ print(cfg['infrastructure']['memory']['global_buffer'])
 TOTAL_MEM_GB=$(awk '/MemTotal/ {printf "%.0f", $2 / 1024 / 1024}' /proc/meminfo)
 USABLE_MEM_GB=$((TOTAL_MEM_GB - GLOBAL_BUFFER_GB))
 
-echo "[INFO] Usable memory for Snakemake $(USABLE_MEM_GB) GB"
+echo "[INFO] Usable memory for Snakemake ${USABLE_MEM_GB} GB"
 
 # CPU
 GLOBAL_CORE_BUFFER=$(python3 -c "
