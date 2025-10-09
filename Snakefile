@@ -133,13 +133,9 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids),
     "metrics/batch/batch_recurrent_variants.vcf",
     "metrics/batch/batch_recurrent_variant_metrics.json",
-]
-
-# Define metrics for ex technical controls
-ex_tc_metrics = [
-    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids),
 ]
 
 # Define other metrics
@@ -164,7 +160,6 @@ rule all:
         setup_files + 
         ms_metrics + 
         ex_metrics +
-        ex_tc_metrics + 
         other_metrics +
         results
 
