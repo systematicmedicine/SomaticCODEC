@@ -68,8 +68,8 @@ tmp/{ex_sample}/{ex_sample}_map_anno.bam
 tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam.bai
-tmp/{ex_sample}/{ex_sample}_map_umi_group_UG_tmp.bam
-tmp/{ex_sample}/{ex_sample}_map_umi_group_UG_sorted_tmp.bam
+tmp/{ex_sample}/{ex_sample}_map_dedup_tmp.bam
+tmp/{ex_sample}/{ex_sample}_map_dedup_sorted_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_umi_grouped.bam
 tmp/{ex_sample}/{ex_sample}_map_umi_grouped_sorted_tmp.bam
 tmp/{ex_sample}/{ex_sample}_unmap_dsc_unsorted_tmp.bam
