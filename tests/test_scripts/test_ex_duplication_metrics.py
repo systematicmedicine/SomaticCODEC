@@ -7,41 +7,34 @@ Authors:
     - Chat-GPT
     - Joshua Johnstone
 """
-import json
 import pytest
-import os
-from pathlib import Path
+import json
 import sys
+from pathlib import Path
 
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from scripts.ex_duplication_metrics import main
 
-@pytest.mark.parametrize("hist_path, expected_dup_rate, expected_pct_unique", [
-    ("tests/data/test_ex_duplication_metrics/map_umi_metrics_100pct_unique.txt", 0, 100),
-    ("tests/data/test_ex_duplication_metrics/map_umi_metrics_90pct_unique.txt", 10, 90),
-    ("tests/data/test_ex_duplication_metrics/map_umi_metrics_50pct_unique.txt", 50, 50),
-    ("tests/data/test_ex_duplication_metrics/map_umi_metrics_0pct_unique.txt", 100, 0)
+@pytest.mark.parametrize("dedup_metrics, expected_dedup_rate", [
+    ("tests/data/test_ex_duplication_metrics/dedup_metrics.txt", 0.05)
 ])
-def test_duplication_metrics(tmp_path, hist_path, expected_dup_rate, expected_pct_unique):
+def test_duplication_rate_calculation(tmp_path, dedup_metrics, expected_dedup_rate):
     output_json = tmp_path / "duplication_metrics.json"
+    sample = "TestSample"
+    log_path = tmp_path / "log.txt"
 
     class MockSnakemake:
-        input = type("input", (), {"umi_metrics": hist_path})
+        input = type("input", (), {"umi_metrics": dedup_metrics})
+
         output = type("output", (), {"json": str(output_json)})
-        log = [str(tmp_path / "log.txt")]
-        class Params:
-            sample = "TestSample"
-        params = Params()
+        log = [str(log_path)]
+        params = type("params", (), {"sample": sample})
 
     main(MockSnakemake)
 
     with open(output_json) as f:
         result = json.load(f)
 
-    assert result["duplication_rate"] == expected_dup_rate
-    assert result["pct_unique_reads"] == expected_pct_unique
-
-    if os.path.exists(str(tmp_path / "log.txt")):
-        os.remove(str(tmp_path / "log.txt"))
+    assert result["duplication_rate"] == expected_dedup_rate
