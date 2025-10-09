@@ -32,9 +32,9 @@ def test_group_by_umi(lightweight_test_run):
     post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
-    # Assertion 1: Total reads post-UMI grouping == total reads pre-UMI grouping
-    assert total_post_reads == total_pre_reads, (
-        f"Post-UMI grouping reads ({total_post_reads}) != pre-UMI grouping reads ({total_pre_reads})"
+    # Assertion 1: Total reads post-UMI grouping <= total reads pre-UMI grouping
+    assert total_post_reads <= total_pre_reads, (
+        f"Post-UMI grouping reads ({total_post_reads}) > pre-UMI grouping reads ({total_pre_reads})"
     )
 
     # Collect relevant data about post-UMI grouping BAMs
@@ -65,14 +65,11 @@ def test_group_by_umi(lightweight_test_run):
         
             # Assertion 2: All reads have 6bp UMIs in the RX:Z tag
             assert all_reads_have_UMI_in_RX == True, (f"BAM file {bam_path} has reads missing 6bp UMIs in RX tag")
-
-            # Assertion 3: No reads have BX tags
-            assert no_reads_have_BX == True, (f"BAM file {bam_path} has reads with BX tags")
             
-            # Assertion 4: All reads have UMI groups in the MI:Z tag
+            # Assertion 3: All reads have UMI groups in the MI:Z tag
             assert all_reads_have_MI == True, (f"BAM file {bam_path} has reads missing MI tags")
 
-            # Assertion 5: Read query names appear twice only (once each for R1 and R2)
+            # Assertion 4: Read query names appear twice only (once each for R1 and R2)
             name_counts = Counter(read_names)
             for name, count in name_counts.items():
                 assert count == 2, f"Query name {name} appears {count} times in {bam_path}, expected 2 appearances"

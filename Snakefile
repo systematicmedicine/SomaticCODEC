@@ -159,7 +159,7 @@ rule all:
     input:
         setup_files + 
         ms_metrics + 
-        ex_metrics +
+        #ex_metrics +
         other_metrics +
         results
 
