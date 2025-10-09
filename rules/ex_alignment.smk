@@ -174,8 +174,8 @@ rule ex_annotate_map:
 """
 Group reads by UMI
     - Identify groups of reads with same/similar UMI (determined by umitools directional method)
-    - Add UMI groups to UG:i tag
-    - Move UMI from UG:i tag to MI:Z tag
+    - Deduplicate based on UMI and alignment
+    - Add unique UMI group (MI:Z) tag to each read pair
 """
 rule ex_group_by_umi:
     input:
@@ -186,8 +186,8 @@ rule ex_group_by_umi:
         intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
         intermediate_moveumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam"),
         intermediate_moveumi_sorted_index = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam.bai"),
-        intermediate_umi_group_UG = temp("tmp/{ex_sample}/{ex_sample}_map_umi_group_UG_tmp.bam"),
-        intermediate_umi_group_UG_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_umi_group_UG_sorted_tmp.bam"),
+        intermediate_dedup = temp("tmp/{ex_sample}/{ex_sample}_map_dedup_tmp.bam"),
+        intermediate_dedup_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_dedup_sorted_tmp.bam"),
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
@@ -208,7 +208,7 @@ rule ex_group_by_umi:
             -o {output.intermediate_moveumi} \
             --remove-umi true 2>> {log}
 
-        # Sort by coordinate for umi_tools group
+        # Sort by coordinate for umi_tools dedup
         samtools sort \
             -@ {threads} \
             --output-fmt bam \
@@ -216,35 +216,32 @@ rule ex_group_by_umi:
             -o {output.intermediate_moveumi_sorted} \
             {output.intermediate_moveumi} 2>> {log}
 
-        # Index BAM for umi_tools group
+        # Index BAM for umi_tools dedup
         samtools index {output.intermediate_moveumi_sorted} 2>> {log}
 
-        # Group reads by UMI and add UMI groups to UG:i tag
-        umi_tools group \
+        # Deduplicate reads by UMI and alignment
+        umi_tools dedup \
             --stdin={output.intermediate_moveumi_sorted} \
-            --output-bam \
             --compresslevel={params.compression_level} \
-            --stdout={output.intermediate_umi_group_UG} \
+            --stdout={output.intermediate_dedup} \
             --no-sort-output \
-            --group-out={output.umi_metrics} \
             --extract-umi-method=tag \
             --umi-tag=RX \
             --paired \
+            --log={output.umi_metrics} \
             --method=directional 2>> {log}  
 
-        # Sort by query name for ex_rename_umi_bam_tag.py 
+        # Sort by query name for ex_add_umi_group_tag.py
         samtools sort \
             -@ {threads} \
             -n \
             --output-fmt bam \
             --output-fmt-option level={params.compression_level} \
-            -o {output.intermediate_umi_group_UG_sorted} \
-            {output.intermediate_umi_group_UG} 2>> {log}
+            -o {output.intermediate_dedup_sorted} \
+            {output.intermediate_dedup} 2>> {log}
 
-        # Remove unneeded BX tag
-        # Move UMI group from UG:i tag to MI:Z tag as expected by consensus caller
-        # Propogate MI:Z tag from R1 to R2
-        python scripts/ex_rename_umi_bam_tag.py \
-            --input {output.intermediate_umi_group_UG_sorted} \
+        # Add unique MI:Z tag to each read pair for fgbio CallCodecConsensusReads
+        python scripts/ex_add_umi_group_tag.py \
+            --input {output.intermediate_dedup_sorted} \
             --output {output.bam} 2>> {log} 
         """
