@@ -45,13 +45,16 @@ def main(snakemake):
 
     duplication_rate = round(1 - output_reads / input_reads, 4)
 
+    pct_unique_reads = round((1 - duplication_rate) * 100)
+
     # Prepare JSON
     metrics_dict = {
         "Description:": "Duplication rate based on UMItools dedup metrics",
         "sample": sample,
         "input_reads": input_reads,
         "deduplicated_reads": output_reads,
-        "duplication_rate": duplication_rate
+        "duplication_rate": duplication_rate,
+        "pct_unique_reads": pct_unique_reads
     }
 
     # Write JSON

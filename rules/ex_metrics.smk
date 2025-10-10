@@ -551,9 +551,9 @@ rule ex_somatic_variant_germline_contexts:
     benchmark:
         "logs/{ex_sample}/ex_somatic_variant_germline_context.benchmark.txt"
     threads: 
-        config["infrastructure"]["threads"]["light"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     script:
         "../scripts/ex_somatic_variant_germline_contexts.py"
 

@@ -36,20 +36,20 @@ def main(snakemake):
         ex_intermediate_bgz = Path(tmpdir) / "ex_intermediate_bgz.vcf.gz"
 
         with open(ms_intermediate_vcf, "wb") as out_f, open(snakemake.log[0], "a") as log_file:
-            subprocess.run(["bcftools", "view", "-Ov", str(ms_pileup_bcf)], 
+            subprocess.run(["bcftools", "view", "--threads", str(threads), "-Ov", str(ms_pileup_bcf)], 
                            stdout=out_f, stderr=log_file, check=True)
 
         with open(ms_intermediate_bgz, "wb") as out_f, open(snakemake.log[0], "a") as log_file:
-            subprocess.run(["bgzip", "-c", str(ms_intermediate_vcf)], stdout=out_f, stderr=log_file, check=True)
+            subprocess.run(["bgzip", "-@", str(threads), "-c", str(ms_intermediate_vcf)], stdout=out_f, stderr=log_file, check=True)
 
         with open(snakemake.log[0], "a") as log_file:
-            subprocess.run(["tabix", "-p", "vcf", str(ms_intermediate_bgz)], stderr=log_file, check=True)
+            subprocess.run(["tabix", "--threads", str(threads), "-p", "vcf", str(ms_intermediate_bgz)], stderr=log_file, check=True)
         
         with open(ex_intermediate_bgz, "wb") as out_f, open(snakemake.log[0], "a") as log_file:
-            subprocess.run(["bgzip", "-c", str(ex_somatic_vcf)], stdout=out_f, stderr=log_file, check=True)
+            subprocess.run(["bgzip", "-c", "-@", str(threads), str(ex_somatic_vcf)], stdout=out_f, stderr=log_file, check=True)
 
         with open(snakemake.log[0], "a") as log_file:
-            subprocess.run(["tabix", "-p", "vcf", str(ex_intermediate_bgz)], stderr=log_file, check=True)
+            subprocess.run(["tabix", "--threads", str(threads), "-p", "vcf", str(ex_intermediate_bgz)], stderr=log_file, check=True)
 
         # --- Get germline records for positions where somatic variants were called ---
         germline_context_vcf.parent.mkdir(parents=True, exist_ok=True)
