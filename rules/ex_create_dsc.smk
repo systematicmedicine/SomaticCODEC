@@ -60,6 +60,7 @@ rule ex_call_dsc:
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
             CallCodecConsensusReads \
+            --threads {threads} \
             -i {output.intermediate_umi_grouped_sorted} \
             -o {output.intermediate_dsc_unsorted} \
             --error-rate-pre-umi {params.error_rate_pre_umi} \
