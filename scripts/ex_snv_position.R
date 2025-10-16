@@ -94,7 +94,8 @@ metrics_json <- list(
   chromosomes_MAD = setNames(as.list(chr.mad$MAD), chr.mad$Chrom),
   mean_MAD = mean(chr.mad$MAD, na.rm = TRUE),
   median_MAD = median(chr.mad$MAD, na.rm = TRUE),
-  max_MAD = max(chr.mad$MAD, na.rm = TRUE)
+  max_MAD = max(chr.mad$MAD, na.rm = TRUE),
+  percentiles_MAD = setNames(as.list(quantile(chr.mad$MAD, probs = seq(0, 1, 0.1), na.rm = TRUE)), paste0(seq(0, 100, 10), "th"))
 )
 
 # Write JSON to disk
