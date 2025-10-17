@@ -26,10 +26,10 @@ sci_params:
   global:
     reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
     reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
-    known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
+    known_germline_variants: tmp/downloads/gnomad.genomes.v4.1.sites.AF0.001_PASS.vcf.bgz # Must be bgzipped
     precomputed_masks:
       - "tmp/downloads/GRCh38_alldifficultregions.bed"
-      - "tmp/downloads/gnomad_AF_0.1.bed"
+      - "tmp/downloads/gnomad.AF0.1_PASS.bed"
       - "tmp/downloads/GCRh38_repeat_masker.bed"
     included_chromosomes: [
       "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10",
@@ -175,7 +175,7 @@ infrastructure:
     global_buffer: 4
       
   disk:
-    iops: 3000 # Default for AWS EC2 gp3 volumes
+    iops: 8000
     
   compression:
     gzip_level: 1
