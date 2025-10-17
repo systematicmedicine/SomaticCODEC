@@ -12,10 +12,16 @@ Instuctions for setting up codec-opensource pipeline on Amazon EC2
 * Select <i>Launch instances</I>
 * Configure the instance
     * OS Image: Ubuntu 24.04 LTS
-    * Instance type: m6i.32xlarge (small runs), m6i.32xlarge (large runs)
+    * Instance type: 
+        * 1-2 EX/MS sample pairs: m6i.32xlarge
+        * 3+ EX/MS sample pairs: m7i.48xlarge
     * Key pair: A key you have access to (or create new key pair) 
     * Allow SSH traffic: My IP
-    * Configure storage: 16000GiB gp3
+    * Configure storage: 
+        * Volume type: gp3
+        * Size (GiB): 1000 per EX or MS sample
+        * IOPS: 8000
+        * Throughput (MiB/s): 2000
     * IAM instance profile: EC2_S3_Write
 * Connect to the instance
     * navigate to EC2 > Instances
