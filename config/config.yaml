@@ -176,7 +176,7 @@ infrastructure:
       
   disk:
     iops: 8000
-    throughput: 2000 #MiBs
+    throughput: 2000 #MiB/s
     
   compression:
     gzip_level: 1
