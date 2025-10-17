@@ -75,7 +75,8 @@ rule create_run_timeline_plot:
         plot = "logs/global_rules/run_timeline.pdf"
     params:
         run_name = config["run_name"],
-        max_iops = config["infrastructure"]["disk"]["iops"]
+        max_iops = config["infrastructure"]["disk"]["iops"],
+        max_throughput = config["infrastructure"]["disk"]["throughput"]
     log:
         "logs/global_rules/create_run_timeline_plot.log"
     benchmark:

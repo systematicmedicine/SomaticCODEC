@@ -32,6 +32,7 @@ if (!exists("snakemake")) {
   job_log_path <- snakemake@input[["job_log"]]
   resources_log_path <- snakemake@input[["resources_log"]]
   max_iops <- snakemake@params[["max_iops"]]
+  max_throughput <- snakemake@params[["max_throughput"]]
   log_path <- snakemake@log[[1]]
   output_plot_path <- snakemake@output[["plot"]]
 }
@@ -84,10 +85,11 @@ resources_utilised <- resources_log %>%
   mutate(time = as.POSIXct(time, tz = "UTC"),
          disk_space = disk_used_GB / (disk_used_GB + disk_avail_GB) * 100,
          disk_IOPS = (disk_IOPS / max_iops) * 100,
+         disk_throughput = (disk_throughput_MiBs / max_throughput) * 100,
          mem = mem_used_GB / (mem_used_GB + mem_avail_GB) * 100,
          cpu = cpu_load / (cpu_load + cpu_avail) * 100) %>% 
-  select(time, disk_space, disk_IOPS, mem, cpu) %>% 
-  pivot_longer(cols = c(disk_space, disk_IOPS, mem, cpu),
+  select(time, disk_space, disk_IOPS, disk_throughput, mem, cpu) %>% 
+  pivot_longer(cols = c(disk_space, disk_IOPS, disk_throughput, mem, cpu),
                values_to = "pct_utilisation",
                names_to = "resource")
 
@@ -97,8 +99,14 @@ resources_plot <- ggplot(resources_utilised) +
   scale_y_continuous(limits = c(0, 100)) +
   scale_x_datetime(limits = as.POSIXct(c(min(job_log$start_time), 
                                          max(job_log$finish_time)),
-                                       tz = "UTC")) +
-  theme(plot.caption = element_text(hjust = 0))
+                                       tz = "UTC"),
+                  name = NULL,
+                  breaks = seq(min(job_log$start_time), 
+                              max(job_log$finish_time),
+                              (max(job_log$finish_time) - min(job_log$start_time)) / 6)) +
+  theme(plot.caption = element_text(hjust = 0),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 timeline_plot <- ggarrange(jobs_plot, resources_plot, 
           nrow = 2,
