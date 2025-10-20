@@ -473,24 +473,25 @@ rule ex_recurrent_variant_metrics:
 """
 Determines how many called somatic variants are present in dataset of common germline variants
 """
-rule ex_germline_contamination:
+rule ex_gnomAD_overlap:
     input:
         somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        somatic_all_vcf = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf",
         germline_vcf = config["sci_params"]["global"]["known_germline_variants"],
         germline_tbi = config["sci_params"]["global"]["known_germline_variants"] + ".tbi"
     output:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
         germline_matches = "metrics/{ex_sample}/{ex_sample}_germline_matches.vcf",
-        metrics_file = "metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json"
+        metrics_file = "metrics/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json"
     log:
-        "logs/{ex_sample}/ex_germline_contamination.log"
+        "logs/{ex_sample}/ex_gnomAD_overlap.log"
     benchmark:
-        "logs/{ex_sample}/ex_germline_contamination.benchmark.txt"
+        "logs/{ex_sample}/ex_gnomAD_overlap.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     script:
-        "../scripts/ex_germline_contamination.py"
+        "../scripts/ex_gnomAD_overlap.py"
 
 
 """
