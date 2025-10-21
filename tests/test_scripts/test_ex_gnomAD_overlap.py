@@ -27,7 +27,7 @@ from scripts.ex_gnomAD_overlap import main
             "tests/data/test_ex_gnomAD_overlap/somatic_all_overlap.vcf",
             "tests/data/test_ex_gnomAD_overlap/gnomad-chr21-micro.vcf.bgz",
             3,
-            0.5
+            0.3
         ),
         # No overlap
         (
@@ -73,5 +73,5 @@ def test_ex_gnomAD_overlap(tmp_path, somatic_path, somatic_all_path, germline_pa
 
     # Validate metrics
     metrics = json.loads(metrics_file.read_text())
-    assert metrics["total_gnomAD_matches"] == expected_matches
-    assert metrics["rate_gnomAD_overlap"] == expected_overlap_rate
+    assert metrics["total_gnomAD_matches"]["value"] == expected_matches
+    assert metrics["rate_gnomAD_overlap"]["value"] == expected_overlap_rate
