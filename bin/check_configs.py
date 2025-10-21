@@ -142,18 +142,19 @@ def check_ex_adapter_sequences(metadata: dict, expected_lengths: list[int]):
 
     print("[INFO] ex_adapter sequences are valid (A/T/C/G only, expected lengths)")
 
-# Check each ex_sample has a valid ex_lane defined in ex_lanes.csv
+# Check each ex_sample and ex_technical_control has a valid ex_lane defined in ex_lanes.csv
 def check_ex_lane_mapping(metadata: dict):
 
-    sample_lanes = set(metadata["ex_samples_metadata"]["ex_lane"])
+    ex_sample_lanes = set(metadata["ex_samples_metadata"]["ex_lane"])
+    ex_tc_lanes = set(metadata["ex_technical_controls_metadata"]["ex_lane"])
     valid_lanes = set(metadata["ex_lanes_metadata"]["ex_lane"])
 
-    missing = sample_lanes - valid_lanes
+    missing = (ex_sample_lanes | ex_tc_lanes) - valid_lanes
     if missing:
-        sys.exit(f"[ERROR] ex_lane(s) in ex_samples.csv not found in ex_lanes.csv:\n"
+        sys.exit(f"[ERROR] ex_lane(s) in ex_samples.csv or ex_technical_controls.csv not found in ex_lanes.csv:\n"
                  + "\n".join(sorted(missing)))
 
-    print("[INFO] All ex_samples map to valid ex_lanes")
+    print("[INFO] All ex_samples and ex_technical_controls map to valid ex_lanes")
 
 # Check that all S3 URIs in download_list.csv exist
 def check_s3_files_exist(metadata: dict):
@@ -215,7 +216,7 @@ if __name__ == "__main__":
     # Check ex_adapter sequences contain only A/T/C/G and have expected length
     check_ex_adapter_sequences(metadata_tables, EXPECTED_ADAPTER_LENGTHS)
 
-    # Check each ex_sample has a valid ex_lane defined in ex_lanes.csv
+    # Check each ex_sample and ex_technical_control has a valid ex_lane defined in ex_lanes.csv
     check_ex_lane_mapping(metadata_tables)
 
     # Check that all S3 URIs in download_list.csv exist
