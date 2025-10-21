@@ -131,7 +131,7 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_snv_position_plot.pdf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_germline_contamination_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids),
     "metrics/batch/batch_recurrent_variants.vcf",
