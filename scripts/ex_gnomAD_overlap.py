@@ -87,28 +87,34 @@ def main(snakemake):
             sample_fmt = cols[8].split(":")
             sample_vals = cols[9].split(":")
             fmt = dict(zip(sample_fmt, sample_vals))
-            dp_fmt = int(fmt.get("DP", 0))    # High-quality read depth (--min-BQ filter)
+            dp_fmt = int(fmt.get("DP", 0))
 
-            evaluated_bases += dp_fmt
+            if dp_fmt > 0:
+                evaluated_bases += 1
 
     # --- Calculate percent gnomAD overlap ---
     percent_gnomAD_overlap = round(100 * num_matches / total_variants, 2) if total_variants > 0 else 0
 
     # --- Calculate rate of gnomAD overlap ---
-    rate_gnomAD_overlap = round(num_matches / evaluated_bases, 2)
+    rate_gnomAD_overlap = round(num_matches / evaluated_bases, 6) if evaluated_bases > 0 else 0
 
     # --- Write metrics JSON ---
     metrics_file.parent.mkdir(parents=True, exist_ok=True)
     with open(metrics_file, "w") as f:
         json.dump({
-            "description": "Number and rate of called somatic variants overlapping known germline variants",
+            "description": "Number and rate of called somatic variants that overlapp with known germline variants",
             "somatic_vcf": str(somatic_vcf),
             "gnomAD_vcf": str(germline_vcf),
-            "total_evaluated_bases": evaluated_bases,
-            "total_somatic_variants": total_variants,
-            "total_gnomAD_matches": num_matches,
-            "percent_gnomAD_overlap": percent_gnomAD_overlap,
-            "rate_gnomAD_overlap": rate_gnomAD_overlap
+            "total_evaluated_bases": {"description": "Number of unmasked bases with DP > 0 and BQ > min_base_quality",
+                                      "value": evaluated_bases},
+            "total_somatic_variants": {"description": "Number of called somatic variants",
+                                      "value": total_variants},
+            "total_gnomAD_matches": {"description": "Number of called somatic variants that overlap with gnomAD",
+                                      "value": num_matches},
+            "percent_gnomAD_overlap": {"description": "Percentage of called somatic variants that overlap with gnomAD",
+                                      "value": percent_gnomAD_overlap},
+            "rate_gnomAD_overlap": {"description": "Rate of SNVs that overlap with gnomAD per evalulated base",
+                                      "value": rate_gnomAD_overlap},
         }, f, indent=2)
 
     print(f"[INFO] Completed ex_gnomAD_overlap.py")

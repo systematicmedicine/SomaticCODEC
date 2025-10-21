@@ -1,8 +1,8 @@
 ##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description="All filters passed">
 ##bcftoolsVersion=1.22+htslib-1.22.1
-##bcftoolsCommand=mpileup --fasta-ref tmp/downloads/GRCh38_Chr21_plus_stubs.fna --output-type b --count-orphans --max-BQ 150 --min-BQ 70 --min-MQ 0 --no-BAQ --annotate AD,DP --regions-file tmp/S001/S001_include.bed -o tmp/S001/S001_bcf_mpileup.bcf tmp/S001/S001_map_dsc_anno_filtered.bam
-##reference=file://tmp/downloads/GRCh38_Chr21_plus_stubs.fna
+##bcftoolsCommand=mpileup --threads 2 --fasta-ref tmp/downloads/GRCh38_Chr21_plus_stubs.fa --output-type b --count-orphans --max-BQ 150 --min-BQ 70 --min-MQ 0 --no-BAQ --annotate AD,DP --regions-file tmp/SEQ0001/SEQ0001_include.bed --output-type b1 -o tmp/SEQ0001/SEQ0001_bcf_mpileup.bcf tmp/SEQ0001/SEQ0001_map_dsc_anno_filtered.bam
+##reference=file://tmp/downloads/GRCh38_Chr21_plus_stubs.fa
 ##contig=<ID=chr1,length=1>
 ##contig=<ID=chr2,length=1>
 ##contig=<ID=chr3,length=1>
@@ -50,15 +50,18 @@
 ##INFO=<ID=DP4,Number=4,Type=Integer,Description="Number of high-quality ref-forward , ref-reverse, alt-forward and alt-reverse bases">
 ##INFO=<ID=MQ,Number=1,Type=Integer,Description="Average mapping quality">
 ##bcftools_callVersion=1.22+htslib-1.22.1
-##bcftools_callCommand=call --multiallelic-caller --keep-alts --output-type b -o tmp/S001/S001_bcf_called.bcf tmp/S001/S001_bcf_mpileup.bcf; Date=Mon Aug 25 23:29:29 2025
+##bcftools_callCommand=call --threads 2 --multiallelic-caller --keep-alts --output-type b1 -o tmp/SEQ0001/SEQ0001_bcf_called.bcf tmp/SEQ0001/SEQ0001_bcf_mpileup.bcf; Date=Tue Oct 21 03:48:32 2025
 ##bcftools_viewVersion=1.22+htslib-1.22.1
-##bcftools_viewCommand=view -e 'TYPE="indel" || TYPE="ref"' -Ob -o tmp/S001/S001_bcf_biallelic.bcf tmp/S001/S001_bcf_called.bcf; Date=Mon Aug 25 23:29:29 2025
-##bcftools_normVersion=1.22+htslib-1.22.1
-##bcftools_normCommand=norm -m -both -Ov -o results/S001/S001_variants.vcf tmp/S001/S001_bcf_biallelic.bcf; Date=Mon Aug 25 23:29:29 2025
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	S001
-chr21	7324842	.	C	T	56.523	.	DP=7;VDB=0.02;SGB=-0.453602;RPBZ=0;MQBZ=0;MQSBZ=0;BQBZ=0;SCBZ=0;MQ0F=0;AC=1;AN=2;DP4=2,3,2,0;MQ=60	GT:PL:DP:AD	0/1:90,0,242:7:5,2
-chr21	7324999	.	C	T	21.4353	.	DP=3;SGB=-0.379885;RPBZ=0;MQBZ=0;MQSBZ=0;BQBZ=0;SCBZ=0;MQ0F=0;AC=1;AN=2;DP4=1,0,0,1;MQ=60	GT:PL:DP:AD	0/1:54,0,54:2:1,1
-chr21	7325002	.	C	T	21.4353	.	DP=3;SGB=-0.379885;RPBZ=0;MQBZ=0;BQBZ=0;SCBZ=0;MQ0F=0;AC=1;AN=2;DP4=0,1,0,1;MQ=60	GT:PL:DP:AD	0/1:54,0,54:2:1,1
-chr21	7324842	.	C	C	56.523	.	DP=7;VDB=0.02;SGB=-0.453602;RPBZ=0;MQBZ=0;MQSBZ=0;BQBZ=0;SCBZ=0;MQ0F=0;AC=1;AN=2;DP4=2,3,2,0;MQ=60	GT:PL:DP:AD	0/1:90,0,242:7:5,2
-chr21	7324999	.	C	C	21.4353	.	DP=3;SGB=-0.379885;RPBZ=0;MQBZ=0;MQSBZ=0;BQBZ=0;SCBZ=0;MQ0F=0;AC=1;AN=2;DP4=1,0,0,1;MQ=60	GT:PL:DP:AD	0/1:54,0,54:2:1,1
-chr21	7325002	.	C	C	21.4353	.	DP=3;SGB=-0.379885;RPBZ=0;MQBZ=0;BQBZ=0;SCBZ=0;MQ0F=0;AC=1;AN=2;DP4=0,1,0,1;MQ=60	GT:PL:DP:AD	0/1:54,0,54:2:1,1
+##bcftools_viewCommand=view --threads 2 -e TYPE="indel" -Ov -o tmp/SEQ0001/SEQ0001_all_positions.vcf tmp/SEQ0001/SEQ0001_bcf_called.bcf; Date=Tue Oct 21 03:48:33 2025
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SEQ0001
+chr21	5218654	.	A	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=13,9,0,0;MQ=60	GT:DP:AD	0/0:22:22
+chr21	5218655	.	T	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=10,7,0,0;MQ=60	GT:DP:AD	0/0:17:17
+chr21	5218656	.	C	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=13,9,0,0;MQ=60	GT:DP:AD	0/0:22:22
+chr21	5218657	.	T	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=9,7,0,0;MQ=60	GT:DP:AD	0/0:16:16
+chr21	5218658	.	C	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=11,7,0,0;MQ=60	GT:DP:AD	0/0:18:18
+chr21	5218659	.	A	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=11,7,0,0;MQ=60	GT:DP:AD	0/0:18:18
+chr21	5218660	.	C	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=13,8,0,0;MQ=60	GT:DP:AD	0/0:21:21
+chr21	5218661	.	T	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=11,7,0,0;MQ=60	GT:DP:AD	0/0:18:18
+chr21	5218662	.	T	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=11,8,0,0;MQ=60	GT:DP:AD	0/0:19:19
+chr21	5218663	.	A	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=12,8,0,0;MQ=60	GT:DP:AD	0/0:20:20
+chr21	5218664	.	A	.	284.59	.	DP=23;MQ0F=0;AN=2;DP4=12,8,0,0;MQ=60	GT:DP:AD	0/0:0:0
