@@ -1,7 +1,7 @@
 """
---- test_ex_germline_contamination.py
+--- test_ex_gnomAD_overlap.py
 
-Tests the script ex_germline_contamination.py
+Tests the script ex_gnomAD_overlap.py
 
 Authors:
     - Chat-GPT
@@ -12,35 +12,34 @@ import json
 from types import SimpleNamespace
 import sys
 from pathlib import Path
-import shutil
 
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from scripts.ex_germline_contamination import main
+from scripts.ex_gnomAD_overlap import main
 
 @pytest.mark.parametrize(
-    "somatic_path, germline_path, expected_matches",
+    "somatic_path, somatic_all_path, germline_path, expected_matches, expected_overlap_rate",
     [
         # Three overlapping variants
         (
-            "tests/data/test_ex_germline_contamination/somatic_overlap.vcf",
-            "tests/data/test_ex_germline_contamination/gnomad-chr21-micro.vcf.bgz",
-            3
+            "tests/data/test_ex_gnomAD_overlap/somatic_overlap.vcf",
+            "tests/data/test_ex_gnomAD_overlap/somatic_all_overlap.vcf",
+            "tests/data/test_ex_gnomAD_overlap/gnomad-chr21-micro.vcf.bgz",
+            3,
+            0.3
         ),
         # No overlap
         (
-            "tests/data/test_ex_germline_contamination/somatic_no_overlap.vcf",
-            "tests/data/test_ex_germline_contamination/gnomad-chr21-micro.vcf.bgz",
+            "tests/data/test_ex_gnomAD_overlap/somatic_no_overlap.vcf",
+            "tests/data/test_ex_gnomAD_overlap/somatic_all_no_overlap.vcf",
+            "tests/data/test_ex_gnomAD_overlap/gnomad-chr21-micro.vcf.bgz",
+            0,
             0
         )
     ]
 )
-def test_ex_germline_contamination(tmp_path, somatic_path, germline_path, expected_matches):
-    # --- Define input paths ---
-    tmp_somatic_vcf = tmp_path / "somatic_overlap.vcf"
-    shutil.copy(somatic_path, tmp_somatic_vcf)
-    germline_vcf = germline_path
+def test_ex_gnomAD_overlap(tmp_path, somatic_path, somatic_all_path, germline_path, expected_matches, expected_overlap_rate):
 
     # --- Prepare output paths ---
     intermediate_bgz = tmp_path / "somatic.bgz"
@@ -52,8 +51,9 @@ def test_ex_germline_contamination(tmp_path, somatic_path, germline_path, expect
     # --- Mock snakemake object ---
     snakemake = SimpleNamespace(
         input=SimpleNamespace(
-            somatic_vcf=str(tmp_somatic_vcf),
-            germline_vcf=str(germline_vcf)
+            somatic_vcf=str(somatic_path),
+            somatic_all_vcf=str(somatic_all_path),
+            germline_vcf=str(germline_path)
         ),
         output=SimpleNamespace(
             intermediate_somatic_bgz=str(intermediate_bgz),
@@ -73,4 +73,5 @@ def test_ex_germline_contamination(tmp_path, somatic_path, germline_path, expect
 
     # Validate metrics
     metrics = json.loads(metrics_file.read_text())
-    assert metrics["germline_matches"] == expected_matches
+    assert metrics["total_gnomAD_matches"]["value"] == expected_matches
+    assert metrics["rate_gnomAD_overlap"]["value"] == expected_overlap_rate
