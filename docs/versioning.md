@@ -6,7 +6,7 @@ Explanation of how semantic versioning is implemented in this codebase.
 
 Version numbers use the MAJOR.MINOR.PATCH format. 
 
-Increment the relevant version number when making the following changes:
+The relevant version number is incremented when making the following changes:
 
 - **MAJOR**: Changes that affect variant calling
     - Example: Adding a new read-level filter
@@ -22,13 +22,13 @@ Increment the relevant version number when making the following changes:
 The following tests must be carried out before merging changes into `master`:
 
 - **MAJOR**: 
+    - All tests required for **MINOR** and **PATCH**
     - All system level metrics pass
-    - Includes all tests required for **MINOR** and **PATCH**
 
 - **MINOR**: 
+    - All tests required for **PATCH**
     - Pipeline runs successfully on 2+ full-size files
     - Runtime does not increase excessively
-    - Includes all tests required for **PATCH**
 
 - **PATCH**:
     - All unit/integration tests pass
