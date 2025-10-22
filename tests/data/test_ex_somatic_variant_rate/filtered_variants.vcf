@@ -1,0 +1,5 @@
+##fileformat=VCFv4.2
+##bcftoolsCommand=mpileup --min-BQ 20 --min-MQ 30
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE
+chr1	100	.	A	G	50	PASS	DP=12	GT:AD:DP	0/1:7,5:8
+chr1	200	.	C	T	50	PASS	DP=20	GT:AD:DP	0/1:10,10:15

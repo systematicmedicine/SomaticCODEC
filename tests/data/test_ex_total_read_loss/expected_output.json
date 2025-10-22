@@ -1,0 +1,6 @@
+{
+    "lane": "testlane",
+    "paired_input_reads": 4,
+    "final_dsc_reads": 2,
+    "percent_reads_lost": 50.0
+}

@@ -1,0 +1,15 @@
+file_name,source_dir,destination_dir,expected_md5sum
+GRCh38_Chr21_plus_stubs.fa,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,b0fe0648b9fed7791be7bf70d1e795eb
+GRCh38_alldifficultregions_10lines.bed,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,edf0c1ac6edeb944adf985ae42e61d90
+GRCh38-gnomad-variants-AF-0.01_10lines.bed,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,edf0c1ac6edeb944adf985ae42e61d90
+GCRh38_repeat_masker_10lines.bed,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,b04d51c45573bb74b0fee51fe452c6d9
+gnomad-chr21-micro.vcf.bgz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,fe47d5353992fd019966b721cf9fa550
+2025-09-30_trinucleotide_contexts.csv,s3://sysmed-ref-s3/trinucleotide-contexts/2025-09-30-combined-contexts/,tmp/downloads,ba87bb2d38f03402f2f6f42fb34b215c
+ex_lane1_Chr21_10000reads_r1.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,900afac2a4a890e0c079be9aa62d96c2
+ex_lane1_Chr21_10000reads_r2.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,faca4e64491872b1edd47d3ab32303b4
+ex_lane2_Chr21_5000reads_r1.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,d92d7ffaed3110756ac46132f285295b
+ex_lane2_Chr21_5000reads_r2.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,0eda9164d9c0ae19d4ee25821a96a2a7
+S004_Chr21_10000reads_r1_umi.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,98f18e0c8d72074ced93f1d3c34e01e6
+S004_Chr21_10000reads_r2_umi.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,8b560fa66868fde178feda9e0ac7238b
+S005_Chr21_10000reads_r1_umi.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,b9452d043e38b60467312e1958384118
+S005_Chr21_10000reads_r2_umi.fastq.gz,s3://sysmed-ref-s3/test_data/lightweight_test_run/,tmp/downloads,1406c9e3f49c0e38fa5ac62116210cc0

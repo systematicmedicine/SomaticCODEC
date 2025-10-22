@@ -1,0 +1,1 @@
+results/{ex_sample}/{ex_sample}_variants.vcf

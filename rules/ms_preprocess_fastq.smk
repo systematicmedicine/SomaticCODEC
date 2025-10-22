@@ -3,95 +3,118 @@
 
 Rules for performing fastqc, adaptor trimming, and quality filtering on demuxed ms FASTQs.
 
-Input: Demuxed FASTQ files generated from Illumina sequencing of Illumina PCR-free libraries 
+Input: 
+    - Demuxed FASTQ files generated from Illumina sequencing of Illumina PCR-free libraries 
 Outputs: 
     - Processed ms FASTQ files
-    - Metrics files
 
-Author: Joshua Johnstone
-
+Authors:
+    - Joshua Johnstone
+    - Cameron Fraser
 """
 
-# Combines reads from samples run across two lanes
-rule_combine_lanes:
+import helpers.get_metadata as md
+
+"""
+Trims FASTQ files
+    - Spacer from 5' end of reads
+    - Adaptors
+    - Poly-G artifacts (>10 Gs at 3' end)
+    - Bases of quality < qual_trim_threshold from read ends
+"""
+rule ms_trim_fastq:
     input:
-        r1_l5 = "tmp/data/{sample}_L005_R1.fastq.gz",
-        r2_l5 = "tmp/data/{sample}_L005_R2.fastq.gz",
-        r1_l6 = "tmp/data/{sample}_L006_R1.fastq.gz",
-        r2_l6 = "tmp/data/{sample}_L006_R1.fastq.gz"
+        setup_files = setup_files,
+        ms_samples = config["metadata"]["ms_samples_metadata"],
+        r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
+        r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
-        r1 = "tmp/data/{sample}_r1.fastq.gz",
-        r2 = "tmp/data/{sample}_r2.fastq.gz"
+        intermediate_spacer_removed_r1 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz"),
+        intermediate_spacer_removed_r2 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz"),
+        r1 = temp("tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
+        report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.txt"
+    params:
+        adaptor_1 = config["sci_params"]["ms_trim_fastq"]["adaptor_1"],
+        adaptor_2 = config["sci_params"]["ms_trim_fastq"]["adaptor_2"],
+        spacer_length = config["sci_params"]["ms_trim_fastq"]["spacer_length"],
+        qual_trim_threshold = config["sci_params"]["ms_trim_fastq"]["qual_trim_threshold"],
+        max_error_rate = config["sci_params"]["ms_trim_fastq"]["max_error_rate"],
+        min_overlap = config["sci_params"]["ms_trim_fastq"]["min_overlap"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
+    log:
+        "logs/{ms_sample}/ms_trim_fastq.log"
+    benchmark:
+        "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
+    threads: 
+        config["infrastructure"]["threads"]["heavy"]
+    resources:
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
-        """
-        cat {input.r1_l5} {input.r1_l6} > {output.r1} \
-        cat {input.r2_l5} {input.r2_l6} > {output.r1}
-
-        """
-
-
-# Generates a fastqc report for the demuxed FASTQs
-rule ms_fastqc_raw:
-    input:
-        r1 = "tmp/data/{sample}_r1.fastq.gz",
-        r2 = "tmp/data/{sample}_r2.fastq.gz"
-    output:
-        r1_report = "tmp/metrics/fastqc/{sample}_r1_fastqc.html",
-        r2_report = "tmp/metrics/fastqc/{sample}_r2_fastqc.html"
-    threads: 4
-    shell:
-        """
-        fastqc -t {threads} -o tmp/metrics/fastqc {input.r1} {input.r2}
-
-        """
-
-# Identifies and trims adaptors
-# -a CTGTCTCTTATACACATCT is the transposase ME sequence
-# -A ATGTGTATAAGAGACA is the ME sequence reverse complement
-# Trims poly-G artifacts (>10 Gs at 3' end)
-# Trims bases of quality <20
-# Removes reads less than 100bp after trimming
-
-rule ms_trim_filter:
-    input:
-        r1 = "tmp/data/{sample}_r1.fastq.gz",
-        r2 = "tmp/data/{sample}_r2.fastq.gz"
-    output:
-        r1 = "tmp/data/{sample}_processed_r1.fastq.gz",
-        r2 = "tmp/data/{sample}_processed_r2.fastq.gz",
-        report = "tmp/metrics/cutadapt/{sample}_trimfilter_metrics.html",
-        json = "tmp/metrics/cutadapt/{sample}_trimfilter_metrics.json"
-    threads: 8
-    shell: 
         """
         cutadapt \
+          -j {threads} \
+          -u {params.spacer_length} \
+          -U {params.spacer_length} \
+          -o {output.intermediate_spacer_removed_r1} \
+          -p {output.intermediate_spacer_removed_r2} \
+          --compression-level {params.compression_level} \
+          {input.r1} {input.r2} 2>> {log}
+        
+        cutadapt \
             -j {threads} \
-            -a CTGTCTCTTATACACATCT \
-            -A CTGTCTCTTATACACATCT \
-            -a ATGTGTATAAGAGACA \
-            -A ATGTGTATAAGAGACA \
+            -a {params.adaptor_1} \
+            -A {params.adaptor_1} \
+            -a {params.adaptor_2} \
+            -A {params.adaptor_2} \
             -a "G{{10}}" \
             -A "G{{10}}" \
-            --quality-cutoff 20 \
-            --minimum-length 100 \
+            --quality-cutoff {params.qual_trim_threshold} \
+            -e {params.max_error_rate} \
+            -O {params.min_overlap} \
             -o {output.r1} \
             -p {output.r2} \
-            {input.r1} {input.r2} \
-            --report=full > {output.report} \
-            --json={output.json}
-
+            --compression-level {params.compression_level} \
+            {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \
+            --report=full > {output.report} 2>> {log}
         """
-# Generates a new fastqc report for processed reads
-rule ms_fastqc_processed:
+
+"""
+Filters FASTQ files
+    - Reads less than minimum length
+    - Reads with low average quality
+"""
+rule ms_filter_fastq:
     input:
-        r1 = "tmp/data/{sample}_processed_r1.fastq.gz",
-        r2 = "tmp/data/{sample}_processed_r2.fastq.gz"
+        r1 = "tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz",
+        r2 = "tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz",    
     output:
-        r1_report = "tmp/metrics/fastqc/processed/{sample}_processed_r1_fastqc.html",
-        r2_report = "tmp/metrics/fastqc/processed/{sample}_processed_r2_fastqc.html"
-    threads: 2
+        r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
+        r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
+        filter_metrics = "metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt"
+    params:
+        min_read_length = config["sci_params"]["ms_filter_fastq"]["min_read_length"],
+        average_quality_threshold = config["sci_params"]["ms_filter_fastq"]["average_quality_threshold"]
+    log:
+        "logs/{ms_sample}/ms_filter_fastq.log"
+    benchmark:
+        "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
+    threads:
+        config["infrastructure"]["threads"]["heavy"]
+    resources:
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
-        fastqc -t {threads} -o tmp/metrics/fastqc/processed {input.r1} {input.r2}
-
+        trimmomatic PE \
+            -phred33 \
+            -threads {threads} \
+            -summary {output.filter_metrics} \
+            {input.r1} \
+            {input.r2} \
+            {output.r1} \
+            /dev/null \
+            {output.r2} \
+            /dev/null \
+            MINLEN:{params.min_read_length} \
+            AVGQUAL:{params.average_quality_threshold} 2>> {log}
         """

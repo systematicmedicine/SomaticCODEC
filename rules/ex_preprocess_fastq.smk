@@ -1,189 +1,146 @@
 """
 --- ex_preprocess_fastq.smk ---
 
-Rules for preprocssessing FASTQ files for experimental samples
+Rules for preprocessing FASTQ files for experimental samples
 
-Input: Raw FASTQ files, generated from Illumina sequencing of CODEC libraries, prepared from experimental samples
+Input: Demuxed experimental sample FASTQ files
 Output: Fully processed FASTQ files ready for alignment 
 
-Author: James Phie
+Authors: 
+    - James Phie
+    - Cameron Fraser
+"""
+
+import helpers.get_metadata as md
+
 
 """
-# Replace default index names with experiment specific sample names as defined in ex_samples.csv
-rule ex_namesamples:
+Trim reads so that only inserts are remaining
+    1. Trim 5' adapter sequences
+    2. Trim 3' adapter sequences
+    3. Trim additional bases from the 5' end (to account for short adapter sequences/A-tailing remnants)
+    4. Trim additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
+    5. Remove any bases with a Q score less than set cutoff from the 3' end
+"""
+rule ex_trim_fastq:
     input:
-        r1start=config['r1start'],
-        r1end=config['r1end'],
-        r2start=config['r2start'],
-        r2end=config['r2end'],
-        mapping=config['ex_samples'],
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
     output:
-        r1start_out="tmp/r1start.fasta",
-        r1end_out="tmp/r1end.fasta",
-        r2start_out="tmp/r2start.fasta",
-        r2end_out="tmp/r2end.fasta"
-    script:
-        "../scripts/samplenames.py"
-
-# FastQC on raw fastq files (before demultiplexing or any processing)
-rule ex_fastqcraw_metrics:
-    input:
-        fastq1 = ex_raw_fastq1,
-        fastq2 = ex_raw_fastq2
-    output:
-        fastqc_report1 = "metrics/r1_fastqc_raw_metrics.html",
-        fastqc_report2 = "metrics/r2_fastqc_raw_metrics.html"
+        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
+        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
+        trim5primejson = "metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json",
+        r1_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json",
+        r2_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json",
+        intermediate_r1_1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters.fastq.gz"),
+        intermediate_r2_1 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters.fastq.gz"),
+        intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
+        intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
+    params:
+        max_error_rate = config["sci_params"]["ex_trim_fastq"]["max_error_rate"],
+        min_adapter_overlap = config["sci_params"]["ex_trim_fastq"]["min_adapter_overlap"],
+        quality_cutoff = config["sci_params"]["ex_trim_fastq"]["quality_cutoff"],
+        r1_cut_start = config["sci_params"]["ex_trim_fastq"]["r1_cut_start"],
+        r2_cut_start = config["sci_params"]["ex_trim_fastq"]["r2_cut_start"],
+        r1_cut_end = config["sci_params"]["ex_trim_fastq"]["r1_cut_end"],
+        r2_cut_end = config["sci_params"]["ex_trim_fastq"]["r2_cut_end"],
+        r1_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_start"],
+        r1_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r1_end"],
+        r2_start = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_start"],
+        r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"],
+        compression_level = config["infrastructure"]["compression"]["gzip_level"]
+    log:
+        "logs/{ex_sample}/ex_trim_fastq.log"
+    benchmark:
+        "logs/{ex_sample}/ex_trim_fastq.benchmark.txt"
+    threads:
+        config["infrastructure"]["threads"]["heavy"]
     resources:
-        mem = 8,
-        runtime = 24
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
-        fastqc {input.fastq1} -o metrics/
-        fastqc {input.fastq2} -o metrics/
-
-        mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
-        mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
-        """
-
-# Removes first 3bp of R1 and R2 to read name as 6 base UMI. Demultiplexes using R1 and R2 5' sample indices (both must agree). Trims 5' sample indices. 
-rule ex_demux:
-    input:
-        fastq1 = ex_raw_fastq1,
-        fastq2 = ex_raw_fastq2,
-        r1_start = "tmp/r1start.fasta",
-        r2_start = "tmp/r2start.fasta"
-    output:
-        demuxed_r1 = temp(expand("tmp/{sample}_r1_raw.fastq.gz", sample=ex_sample_names)),
-        demuxed_r2 = temp(expand("tmp/{sample}_r2_raw.fastq.gz", sample=ex_sample_names)),
-        report = "metrics/demux_metrics.txt",
-        json = "metrics/demux_metrics.json"
-    threads:
-        config['ncores']
-    shell:
-        """
-        #Trim the UMI (first 3 bases) of each read and append to read name
-        #Demultiplex PE reads based on sample indice on read 1
-        #Trim 5' sample indices from read 1 and read 2
         cutadapt \
           -j {threads} \
-          --no-indels \
-          -e 2 \
-          -g ^file:{input.r1_start} \
-          -G ^file:{input.r2_start} \
-          --cut 3 \
-          -U 3 \
-          --pair-adapters \
-          --rename='{{id}}:{{r1.cut_prefix}}{{r2.cut_prefix}}' \
-          -o tmp/{{name}}_r1_raw.fastq.gz \
-          -p tmp/{{name}}_r2_raw.fastq.gz \
-          {input.fastq1} {input.fastq2} \
-          --report=full > {output.report} \
-          --json={output.json}
-        """
+          --error-rate {params.max_error_rate} \
+          -g ^{params.r1_start} \
+          -G ^{params.r2_start} \
+          -o {output.intermediate_r1_1} \
+          -p {output.intermediate_r2_1} \
+          --compression-level {params.compression_level} \
+          {input.r1} {input.r2} \
+          --json={output.trim5primejson} 2>> {log}
 
-# Identifies and trims 3' sample indices from R1 and R2 when present
-rule ex_trim:
-    input:
-        r1 = "tmp/{sample}_r1_raw.fastq.gz",
-        r2 = "tmp/{sample}_r2_raw.fastq.gz",
-        r1_end = "tmp/r1end.fasta",
-        r2_end = "tmp/r2end.fasta"
-    output:
-        r1 = temp("tmp/{sample}/{sample}_r1_trim.fastq.gz"),
-        r2 = temp("tmp/{sample}/{sample}_r2_trim.fastq.gz"),
-        report = "metrics/{sample}/{sample}_trim_metrics.txt",
-        json = "metrics/{sample}/{sample}_trim_metrics.json"
-    threads:
-        config['ncores']
-    shell:
-        """
-        #Trim 1bp from 5' end (T from ligation)
-        #Trim 3' indices/adapters
         cutadapt \
           -j {threads} \
-          --cut 1 \
-          -U 1 \
-          -e 1 \
-          -O 7 \
-          -a file:{input.r1_end} \
-          -A file:{input.r2_end} \
+          --error-rate {params.max_error_rate} \
+          --overlap {params.min_adapter_overlap} \
+          -b {params.r1_end} \
+          -o {output.intermediate_r1_2} \
+          --compression-level {params.compression_level} \
+          {output.intermediate_r1_1} \
+          --json={output.r1_trim3primejson} 2>> {log}
+
+        cutadapt \
+          -j {threads} \
+          --error-rate {params.max_error_rate} \
+          --overlap {params.min_adapter_overlap} \
+          -b {params.r2_end} \
+          -o {output.intermediate_r2_2} \
+          --compression-level {params.compression_level} \
+          {output.intermediate_r2_1} \
+          --json={output.r2_trim3primejson} 2>> {log}
+
+        cutadapt \
+          -j {threads} \
+          -u {params.r1_cut_start} \
+          -U {params.r2_cut_start} \
+          -u {params.r1_cut_end} \
+          -U {params.r2_cut_end} \
+          --quality-cutoff {params.quality_cutoff} \
           -o {output.r1} \
           -p {output.r2} \
-          {input.r1} {input.r2} \
-          --report=full > {output.report} \
-          --json={output.json}
-        """
+          --compression-level {params.compression_level} \
+          {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
+        """ 
 
-# Trims 5' and 3' ends to remove residual adapter/A-tailing bases. Filters inserts size <15bp. 
-rule ex_trimfilter:
+
+"""
+Filter reads
+    - Remove reads that are too short
+    - Remove reads where the mean quality score is too low
+""" 
+rule ex_filter_fastq:
     input: 
-        r1 = "tmp/{sample}/{sample}_r1_trim.fastq.gz",
-        r2 = "tmp/{sample}/{sample}_r2_trim.fastq.gz",  
+        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
+        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",  
     output:
-        r1 = temp("tmp/{sample}/{sample}_r1_trimfilter.fastq.gz"),
-        r2 = temp("tmp/{sample}/{sample}_r2_trimfilter.fastq.gz"),
-        report = "metrics/{sample}/{sample}_trimfilter_metrics.txt",
-        json = "metrics/{sample}/{sample}_trimfilter_metrics.json"
+        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
+        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
+        filter_metrics = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
+    params:
+        average_quality_threshold = config["sci_params"]["ex_filter_fastq"]["average_quality_threshold"],
+        min_read_length = config["sci_params"]["ex_filter_fastq"]["min_read_length"]
+    log:
+        "logs/{ex_sample}/ex_filter_fastq.log"
+    benchmark:
+        "logs/{ex_sample}/ex_filter_fastq.benchmark.txt"
     threads:
-        config['ncores']
+        config["infrastructure"]["threads"]["heavy"]
+    resources:
+        memory = config["infrastructure"]["memory"]["moderate"]        
     shell:  
         """
-        #Trim 8 bases from 3' end of read 1 and read 2 to remove any remaining short (<7bp) sample indices.
-        #8 base trimming could be relaxed as duplex seq will detect and filter adapters due to R1R2 disagree later. 
-        #The trim also removes poly A-tails from ligation. 
-        #Filter for insert length <15bp
-        cutadapt \
-        -j {threads} \
-        -u -8 \
-        -U -8 \
-        -u 2 \
-        -U 2 \
-        --minimum-length 70 \
-        --quality-cutoff 20 \
-        -o {output.r1} \
-        -p {output.r2} \
-        {input.r1} {input.r2} \
-        --report=full > {output.report} \
-        --json={output.json}
+        trimmomatic PE \
+            -phred33 \
+            -threads {threads} \
+            -summary {output.filter_metrics} \
+            {input.r1} \
+            {input.r2} \
+            {output.r1} \
+            /dev/null \
+            {output.r2} \
+            /dev/null \
+            MINLEN:{params.min_read_length} \
+            AVGQUAL:{params.average_quality_threshold} 2>> {log}
         """
 
-# FastQC on demultiplexed, trimmed FASTQs 
-rule ex_fastqctrim_metrics:
-    input:
-        fastq1 = "tmp/{sample}/{sample}_r1_trimfilter.fastq.gz",
-        fastq2 = "tmp/{sample}/{sample}_r2_trimfilter.fastq.gz"
-    output:
-        fastqc_report1 = "metrics/{sample}/{sample}_r1_trimfilter_metrics.html",
-        fastqc_report2 = "metrics/{sample}/{sample}_r2_trimfilter_metrics.html"
-    shell:
-        """
-        fastqc {input.fastq1} -o metrics/{wildcards.sample}
-        fastqc {input.fastq2} -o metrics/{wildcards.sample}
-
-        mv metrics/{wildcards.sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1}
-        mv metrics/{wildcards.sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2}
-        """
-
-# Custom python script to assess demultiplexing. 
-rule ex_rawreadcounts_metrics:
-    input:
-        json = "metrics/demux_metrics.json"
-    output:
-        readcounts = "metrics/sample_readcounts_metrics.txt"
-    params:
-        fasta = config['r1start'],
-        used = ex_sample_names
-    script:
-        "../scripts/rawreadcounts.py"
-
-# Custom python script to assess how many unused indices were detected from other experiments (similar metrics to rawreadcounts). This should always be 0. 
-rule ex_batchcontamination_metrics:
-    input:
-        json = "metrics/demux_metrics.json"
-    output:
-        contamination = "metrics/batchcontamination_metrics.txt"
-    params:
-        fasta = config['r1start'],
-        used = ex_sample_names
-    script:
-        "../scripts/batchcontamination.py"

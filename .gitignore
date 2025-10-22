@@ -4,13 +4,26 @@
 *.snakemake-tmp*
 *.snakemake-tmp/
 
-# Intermediate files generated while running pipeline
+# Omit the contents of the following directories
 tmp/*
 !tmp/.gitkeep
 
-# During development, dont push results and metrics files to remote repo
 results/*
 !results/.gitkeep
 
 metrics/*
 !metrics/.gitkeep
+
+logs/*
+!logs/.gitkeep
+!logs/**/.gitkeep
+
+# Pycache generated when running pytest
+__pycache__/
+
+# vscode settings files
+.vscode/
+
+# Temp files that exist while .xlsx files are open
+config/~$component_level_metrics.xlsx
+config/~$system_level_metrics.xlsx

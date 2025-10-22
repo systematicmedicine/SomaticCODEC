@@ -1,0 +1,10 @@
+Metric,File_path,Expected
+ms_mapped_alignment,tests/data/test_regex/S00X_alignment_stats.txt,99.73
+ms_insert_size_alignment,tests/data/test_regex/S00X_insert_size_metrics.txt,53
+ms_reads_filtered_length_quality,tests/data/test_regex/S00X_filter_metrics_ms.txt,35.01
+ex_mapped_initial_alignment,tests/data/test_regex/S00X_map_metrics.txt,91.37
+ex_properly_paired_initial_alignment,tests/data/test_regex/S00X_map_metrics.txt,67.52
+ex_insert_size_initial_alignment,tests/data/test_regex/S00X_insert_metrics.txt,127
+ex_reads_filtered_length_quality,tests/data/test_regex/S00X_filter_metrics_ex.txt,92.15
+ex_duplex_base_disagreement,tests/data/test_regex/S00X_call_codec_consensus_metrics.txt,0.005034
+external_concordance_trinuc_context,tests/data/test_regex/S00X_trinuc_similarities.csv,0.5323

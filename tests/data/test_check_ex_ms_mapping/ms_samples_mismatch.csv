@@ -1,0 +1,3 @@
+ms_sample,fastq1,fastq2,donor_id,comments
+S004,tmp/downloads/S004_Chr21_10000reads_r1.fastq.gz,tmp/downloads/S004_Chr21_10000reads_r2.fastq.gz,R6789,"sperm, 18 years old"
+S005,tmp/downloads/S005_Chr21_10000reads_r1.fastq.gz,tmp/downloads/S005_Chr21_10000reads_r2.fastq.gz,R0101,"buffy coat, 80 years old"
