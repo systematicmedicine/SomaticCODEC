@@ -1,14 +1,189 @@
 ---
-cwd: /work
-ref: tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna
-region_bed: tmp/reference/GRCh38_notinalldifficultregions.bed
-region_interval_list: tmp/reference/GRCh38_notinalldifficultregions.interval_list
-dbsnp: tmp/reference/common_all_20180418_with_chr.vcf.gz
-ref_dict: tmp/reference/GCA_000001405.15_GRCh38_no_alt_analysis_set.dict
-ex_samples: config/ex_samples.csv
-r1start: config/r1start.fasta
-r2start: config/r2start.fasta
-r1end: config/r1end.fasta
-r2end: config/r2end.fasta
-s3seq_fastq_folder: 20250121-CODECseq-pilot-2
-ncores: 4
+# ------------------------------------------------------------------------------
+# Run name
+# ------------------------------------------------------------------------------
+run_name: experiment_1
+
+# ------------------------------------------------------------------------------
+# Metadata
+# ------------------------------------------------------------------------------
+metadata:
+
+  ex_samples_metadata: config/ex_samples.csv
+  ex_technical_controls_metadata: config/ex_technical_controls.csv
+  ex_lanes_metadata: config/ex_lanes.csv
+  ex_adapters_metadata: config/ex_adapters.csv
+  ms_samples_metadata: config/ms_samples.csv
+  component_metrics_metadata: config/component_level_metrics.xlsx
+  system_metrics_metadata: config/system_level_metrics.xlsx
+  download_list: config/download_list.csv
+
+# ------------------------------------------------------------------------------
+# Scientific parameters
+# ------------------------------------------------------------------------------
+sci_params:
+  
+  global:
+    reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
+    reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
+    known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
+    precomputed_masks:
+      - "tmp/downloads/GRCh38_alldifficultregions.bed"
+      - "tmp/downloads/gnomad_AF_0.1.bed"
+      - "tmp/downloads/GCRh38_repeat_masker.bed"
+    included_chromosomes: [
+      "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10",
+      "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", 
+      "chr20", "chr21", "chr22", "chrX", "chrY"
+      ]
+
+  ex_annotate_map:
+    min_umi_length: 6
+
+  ex_call_dsc:
+    error_rate_pre_umi: 45
+    error_rate_post_umi: 40
+    min_input_base_quality: 10
+    min_read_pairs: 1
+    min_duplex_length: 1
+    max_duplex_disagreement_rate: 0.04
+
+  ex_call_somatic_snv:
+    max_base_quality: 150
+    min_base_quality: 70
+
+  ex_demultiplex_fastq:
+    max_error_rate: 0.1
+    min_adapter_overlap: 8
+
+  ex_extract_fastq_umis:
+    umi_length: 3
+
+  ex_filter_dsc:
+    min_mapq: 50
+
+  ex_filter_fastq:
+    min_read_length: 80
+    average_quality_threshold: 30
+
+  ex_map:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
+
+  ex_remap_dsc:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
+
+  ex_trim_fastq:
+    max_error_rate: 0.12
+    min_adapter_overlap: 8
+    r1_cut_start: 3
+    r2_cut_start: 3
+    r1_cut_end: -9  # Must be negative
+    r2_cut_end: -9  # Must be negative
+    quality_cutoff: 20
+
+  ex_tc_trim_fastq:
+    max_error_rate: 0.1
+    min_adapter_overlap: 8
+    r1_cut_start: 3
+    r2_cut_start: 3
+    r1_cut_end: -9  # Must be negative
+    r2_cut_end: -9  # Must be negative
+    
+  ex_variant_call_disagree_metrics:
+    number_of_reads: 2000000
+
+  ms_filter_fastq:
+    average_quality_threshold: 30
+    min_read_length: 100
+
+  ms_germline_mask:
+    indel_padding_bases: 5
+
+  ms_germline_risk:
+    max_base_qual: 60
+    max_depth: 250
+    min_alt_vaf: 0.10
+    min_base_qual: 20
+    min_map_qual: 0
+
+  ms_low_depth_mask:
+    min_depth: 40
+
+  ms_map:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
+
+  ms_remove_duplicates:
+    duplicate_decision_method: t # Measures positions based on template start/end
+    optical_duplicate_distance: 2500
+
+  ms_trim_fastq:
+    adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+    adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+    max_error_rate: 0.1
+    min_overlap: 3
+    spacer_length: 3
+    qual_trim_threshold: 20 # Trims low quality bases from 3' end of read
+
+# ------------------------------------------------------------------------------
+# Infrastructure
+# ------------------------------------------------------------------------------
+infrastructure:
+    
+  memory: # Memory units are expressed in gigabytes (GB) throughout pipeline
+    light: 8
+    moderate: 32
+    heavy: 64
+    global_buffer: 16
+    
+  threads:
+    light: 2
+    moderate: 12
+    heavy: 24
+    global_buffer: 4
+      
+  disk:
+    iops: 8000
+    throughput: 2000 #MiB/s
+    
+  compression:
+    gzip_level: 1
+    
+  log_system_resource_usage:
+      sleep_interval: 60
+    
+  aws:
+    s3_bucket: "s3://sysmed-tmp-s3/codec-opensource-runs/"
+    sns_arn: "arn:aws:sns:ap-southeast-2:554765025175:ec2-pipeline-complete"

@@ -1,0 +1,9 @@
+# ------------------------------------------------------------------------------
+# File paths
+# ------------------------------------------------------------------------------
+metadata:
+  ex_samples_metadata: tests/data/test_check_ex_ms_mapping/ex_samples_match.csv
+  ms_samples_metadata: tests/data/test_check_ex_ms_mapping/ms_samples_match.csv
+  ex_lanes_metadata: config/ex_lanes.csv
+  ex_adapters_metadata: config/ex_adapters.csv
+  ex_technical_controls_metadata: config/ex_technical_controls.csv

@@ -1,0 +1,64 @@
+name: codec-env
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  # Core Python
+  - python=3.9
+  - pip=25.1.1
+
+  # Python libraries
+  - biopython=1.85
+  - cyvcf2=0.31.1
+  - matplotlib=3.9.4
+  - numpy=2.0.2
+  - pandas=2.3.1
+  - openpyxl=3.1.5
+  - pysam=0.23.3
+  - pytest=8.4.1
+  - quicksect=0.2.2
+  - rpy2=3.6.2
+  - scipy=1.13.1
+  - seaborn=0.13.2
+  - pyfaidx=0.9.0.3
+  - pypdf=6.0.0  
+
+  # Bioinformatics tools
+  - bcftools=1.22
+  - bedops=2.4.42
+  - bedtools=2.31.1
+  - bwa-mem2=2.3
+  - cutadapt=5.1
+  - fastqc=0.12.1
+  - fgbio=3.0.0
+  - gatk4=4.6.2.0
+  - graphviz=12.2.1
+  - picard=3.4.0
+  - samtools=1.22.1
+  - seqkit=2.10.0
+  - snakemake=7.32.4
+  - trimmomatic=0.39
+  - umi_tools=1.1.6
+  - pigz=2.8
+  - sysstat=12.7.6
+
+  # R packages
+  - r-dplyr=1.1.4
+  - r-ggplot2=3.5.2
+  - r-jsonlite=2.0.0
+  - r-openxlsx=4.2.8
+  - r-ggpubr=0.6.1
+  - r-tidyr=1.3.1
+
+  # System utilities
+  - click=8.1.8
+  - perl=5.32.1
+  - python-graphviz=0.21
+  - r-base=4.4.2
+  - tmux=3.5
+
+  # pip-only packages (not in conda-forge/bioconda)
+  - pip:
+      - awscli==1.41.13
+      - pytest-order==1.3.0

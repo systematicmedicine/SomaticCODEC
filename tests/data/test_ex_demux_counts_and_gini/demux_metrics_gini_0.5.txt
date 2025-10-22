@@ -1,0 +1,69 @@
+This is cutadapt 5.1 with Python 3.9.23
+Command line parameters: -j 4 -e 2 -g ^file:tmp/lane1/lane1_r1_start.fasta -G ^file:tmp/lane1/lane1_r2_start.fasta --pair-adapters --report=full --action=none -o tmp/{name}_r1_demux.fastq.gz -p tmp/{name}_r2_demux.fastq.gz tmp/lane1/lane1_r1_umi_extracted.fastq.gz tmp/lane1/lane1_r2_umi_extracted.fastq.gz
+Processing paired-end reads on 4 cores ...
+
+=== Summary ===
+
+Total read pairs processed:              9,944
+  Read 1 with adapter:                   9,944 (100.0%)
+  Read 2 with adapter:                   9,944 (100.0%)
+
+== Read fate breakdown ==
+Pairs discarded as untrimmed:                0 (0.0%)
+Pairs written (passing filters):         9,944 (100.0%)
+
+Total basepairs processed:     2,923,536 bp
+  Read 1:     1,461,768 bp
+  Read 2:     1,461,768 bp
+Total written (filtered):      2,923,536 bp (100.0%)
+  Read 1:     1,461,768 bp
+  Read 2:     1,461,768 bp
+
+=== First read: Adapter SEQ0001 ===
+
+Sequence: CTTGAACGGACTGTCCAC; Type: anchored 5'; Length: 18; Trimmed: 5000 times
+
+No. of allowed errors: 2
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+16	36	0.0	1	0 0 36
+17	430	0.0	1	0 422 8
+18	4480	0.0	2	4356 117 7
+19	26	0.0	2	0 25 1
+
+
+=== First read: Adapter SEQ0002 ===
+
+Sequence: GAGCCTACTCAGTCAACG; Type: anchored 5'; Length: 18; Trimmed: 0 times
+
+No. of allowed errors: 2
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+18	4972	0.0	2	4972
+
+
+=== Second read: Adapter SEQ0001 ===
+
+Sequence: CACCGAGCGTTAGACTAC; Type: anchored 5'; Length: 18; Trimmed: 5000 times
+
+No. of allowed errors: 2
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+16	29	0.0	1	0 0 29
+17	376	0.0	1	0 348 28
+18	4543	0.0	2	4186 280 77
+19	24	0.0	2	0 20 4
+
+
+=== Second read: Adapter SEQ0002 ===
+
+Sequence: GTGTCGAACACTTGACGG; Type: anchored 5'; Length: 18; Trimmed: 0 times
+
+No. of allowed errors: 2
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+18	4972	0.0	2	4972
