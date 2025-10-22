@@ -2,7 +2,7 @@
 
 All of the steps below must be run from the repositories root directory. Note that pipeline runs typically take 23-29 hours.
 
-1. Create and [check config files](docs/config_checklist.md):
+1. Create and [check config files](config_checklist.md):
     * `config.yaml`
     * `ex_lanes.csv`
     * `ex_samples.csv`
