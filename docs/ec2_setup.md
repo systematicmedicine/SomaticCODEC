@@ -48,7 +48,7 @@ aws s3 cp s3://sysmed-ref-s3/keys/codec-opensource-deploy-key/codec-opensource-d
 chmod 600 ~/.ssh/codec-opensource-deploy-key
 
 GIT_SSH_COMMAND='ssh -i ~/.ssh/codec-opensource-deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new' \
-git clone --branch dev git@github.com:systematicmedicine/SomaticCODEC.git
+git clone --branch master git@github.com:systematicmedicine/SomaticCODEC.git
 
 
 # Build Docker image
