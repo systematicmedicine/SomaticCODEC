@@ -1,10 +1,34 @@
 # Versioning.md
 
-Explanation of how semantic versioning is implmeneted in this codebase.
+Explanation of how semantic versioning is implemented in this codebase.
 
-- **MAJOR**: Changes that influence variant calling, anticipated to have a significant impact
-    - Example: FASTQ files have an additional filter applied
-- **MINOR**: Changes that influence variant calling, not anticipated to have a significant impact
-    - Example: A much faster de-ducplication algorithm is used that is functionally similar to the previous implementaton, but not identical.
-- **PATCH** Changes that do not influence variant calling
-    - Example: New metrics file, unit tests or documentation
+## Incrementing version numbers
+
+Version numbers use the MAJOR.MINOR.PATCH format. 
+
+The relevant version number is incremented when making the following changes:
+
+- **MAJOR**: Changes that affect variant calling
+    - Example: Adding a new read-level filter
+
+- **MINOR**: Changes that do not affect variant calling
+    - Example: Adding a new metrics file
+
+- **PATCH**: Changes that do not affect variant calling or metrics outputs
+    - Example: Updating unit tests or documentation
+
+## Required testing before merging into `master`
+
+The following tests must be carried out before merging changes into `master`:
+
+- **MAJOR**: 
+    - All tests required for **MINOR** and **PATCH**
+    - All system level metrics pass
+
+- **MINOR**: 
+    - All tests required for **PATCH**
+    - Pipeline runs successfully on 2+ full-size files
+    - Runtime does not increase excessively
+
+- **PATCH**:
+    - All unit/integration tests pass
