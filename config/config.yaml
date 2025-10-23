@@ -66,6 +66,9 @@ sci_params:
     min_read_length: 80
     average_quality_threshold: 30
 
+  ex_group_by_umi:
+    min_umi_length: 6
+
   ex_map:
     band_width: 100
     gap_extension_penalty: 1

@@ -128,7 +128,7 @@ rule ex_annotate_map:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
         intermediate_read_group = temp("tmp/{ex_sample}/{ex_sample}_map_read_group_tmp.bam"),
-        intermediate_read_group_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_read_group_sorted_tmp.bam")
+        intermediate_collated = temp("tmp/{ex_sample}/{ex_sample}_map_collated_tmp.bam")
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
@@ -154,28 +154,26 @@ rule ex_annotate_map:
             --RGSM {wildcards.ex_sample} \
             --VALIDATION_STRINGENCY LENIENT 2>> {log}
 
-        # Sort by query name for fgbio SetMateInformation
-        samtools sort \
-            -n \
-            -@ {threads} \
-            --output-fmt bam \
-            --output-fmt-option level={params.compression_level} \
-            -o {output.intermediate_read_group_sorted} \
-            {output.intermediate_read_group} 2>> {log}
+        # Group reads by name for samtools fixmate
+        samtools collate \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -o {output.intermediate_collated} \
+        {output.intermediate_read_group} 2>> {log}
 
         # Add mate information to flags/CIGAR strings for read pairs
-        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression={params.compression_level} \
-            SetMateInformation \
-            -i {output.intermediate_read_group_sorted} \
-            -o {output.bam} 2>> {log}
+        samtools fixmate \
+        -@ {threads} \
+        --output-fmt bam \
+        --output-fmt-option level={params.compression_level} \
+        -m {output.intermediate_collated} \
+        {output.bam} 2>> {log}
         """
 
+
 """
-Group reads by UMI
-    - Identify groups of reads with same/similar UMI (determined by umitools directional method)
-    - Deduplicate based on UMI and alignment
-    - Add unique UMI group (MI:Z) tag to each read pair
+Group reads by UMI and alignment
 """
 rule ex_group_by_umi:
     input:
@@ -184,12 +182,10 @@ rule ex_group_by_umi:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi_grouped.bam"),
         umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
         intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
-        intermediate_moveumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam"),
-        intermediate_moveumi_sorted_index = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam.bai"),
-        intermediate_dedup = temp("tmp/{ex_sample}/{ex_sample}_map_dedup_tmp.bam"),
-        intermediate_dedup_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_dedup_sorted_tmp.bam"),
+        intermediate_moveumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam")
     params:
-        compression_level = config["infrastructure"]["compression"]["gzip_level"]
+        compression_level = config["infrastructure"]["compression"]["gzip_level"],
+        min_umi_length = config["sci_params"]["ex_group_by_umi"]["min_umi_length"]
     log:
         "logs/{ex_sample}/ex_group_by_umi.log"
     benchmark:
@@ -208,40 +204,24 @@ rule ex_group_by_umi:
             -o {output.intermediate_moveumi} \
             --remove-umi true 2>> {log}
 
-        # Sort by coordinate for umi_tools dedup
+        # Sort by template-coordinate for fgbio GroupReadsByUmi
         samtools sort \
             -@ {threads} \
             --output-fmt bam \
             --output-fmt-option level={params.compression_level} \
+            --template-coordinate \
             -o {output.intermediate_moveumi_sorted} \
             {output.intermediate_moveumi} 2>> {log}
 
-        # Index BAM for umi_tools dedup
-        samtools index {output.intermediate_moveumi_sorted} 2>> {log}
-
-        # Deduplicate reads by UMI and alignment
-        umi_tools dedup \
-            --stdin={output.intermediate_moveumi_sorted} \
-            --compresslevel={params.compression_level} \
-            --stdout={output.intermediate_dedup} \
-            --no-sort-output \
-            --extract-umi-method=tag \
-            --umi-tag=RX \
-            --paired \
-            --log={output.umi_metrics} \
-            --method=directional 2>> {log}  
-
-        # Sort by query name for ex_add_umi_group_tag.py
-        samtools sort \
-            -@ {threads} \
-            -n \
-            --output-fmt bam \
-            --output-fmt-option level={params.compression_level} \
-            -o {output.intermediate_dedup_sorted} \
-            {output.intermediate_dedup} 2>> {log}
-
-        # Add unique MI:Z tag to each read pair for fgbio CallCodecConsensusReads
-        python scripts/ex_add_umi_group_tag.py \
-            --input {output.intermediate_dedup_sorted} \
-            --output {output.bam} 2>> {log} 
+        # Group reads by UMI and alignment
+        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
+            --compression={params.compression_level} \
+            --async-io \
+            GroupReadsByUmi \
+            --min-umi-length {params.min_umi_length} \
+            -i {output.intermediate_moveumi_sorted} \
+            -o {output.bam} \
+            -f {output.umi_metrics} \
+            -m 0 \
+            --strategy=adjacency 2>> {log} 
         """
