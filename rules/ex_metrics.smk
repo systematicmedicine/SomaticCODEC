@@ -319,7 +319,7 @@ Calculate DSC remapping metrics
 """
 rule ex_dsc_remap_metrics:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam",
+        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
     output:
         metrics = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
     params:
