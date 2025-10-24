@@ -15,6 +15,7 @@ Types of changes:
 
 ### Changed
 
+- SNV distnace metrics computes additional percentiles (#231)
 - bin/package_outputs.py now records checksums of all files it packages (#230)
 - germline_contamination metric is now gnomAD_overlap, calculates rate of SNVs overlapping with gnomAD per evaluated base (#229)
 
