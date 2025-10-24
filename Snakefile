@@ -58,7 +58,6 @@ setup_files = [
     "tmp/downloads/excluded_chromosomes.bed",
     "logs/global_rules/check_included_chromosomes_present.done",
     "logs/global_rules/log_system_resource_usage.done",
-    "logs/global_rules/check_ex_ms_mapping.done",
     "logs/bin_scripts/run_pipeline.log"
 ]
 

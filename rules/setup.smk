@@ -9,24 +9,9 @@ Rules for setting up the bioinformatics pipeline.
 Authors: 
     - James Phie
     - Joshua Johnstone
+    - Cameron Fraser
 
 """
-# Checks mapping of MS and EX samples in ms_samples.csv and ex_samples.csv
-rule check_ex_ms_mapping:
-    input:
-        ex_csv = config["metadata"]["ex_samples_metadata"],
-        ms_csv = config["metadata"]["ms_samples_metadata"]
-    output:
-        "logs/global_rules/check_ex_ms_mapping.done"
-    resources:
-        memory = config["infrastructure"]["memory"]["light"]
-    log:
-        "logs/global_rules/check_ex_ms_mapping.log"
-    benchmark:
-        "logs/global_rules/check_ex_ms_mapping.benchmark.txt"
-    script:
-        "../scripts/check_ex_ms_mapping.py"
-
 
 # Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
 rule check_included_chromosomes_present:
