@@ -15,7 +15,7 @@ import numpy as np
 from cyvcf2 import VCF
 
 # Define hard coded variables
-PERCENTILES_TO_COMPUTE = [0, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 100]
+PERCENTILES_TO_COMPUTE = [0, 0.1, 1, 2, 5, 10, 25, 50, 75, 90, 95, 98, 99, 99.9, 100]
 
 # Given a VCF path, compute the distribution of distances to the nearest SNV
 def calculate_nearest_snv_percentiles(vcf_path):
