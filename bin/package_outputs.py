@@ -3,7 +3,8 @@
 """
 -- package_outputs.py --
 
-Create a tar file containing all key outputs of a successful pipeline run.
+Create a tar file containing all key outputs of a successful pipeline run,
+including a checksums.txt file for integrity verification.
 
 Authors:
     * Chat-GPT
@@ -14,15 +15,56 @@ import os
 import sys
 import tarfile
 import yaml
+import hashlib
+import tempfile
+
+def compute_file_checksum(file_path, hash_algo="sha256"):
+    """Compute SHA256 checksum of a file."""
+    h = hashlib.new(hash_algo)
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+def collect_checksums(root_dir, archive_structure):
+    """Walk through all files in the archive structure and compute checksums."""
+    print("[INFO] Computing file checksums...")
+    checksum_lines = []
+
+    for src, _ in archive_structure.items():
+        src_path = os.path.join(root_dir, src)
+        if not os.path.exists(src_path):
+            print(f"[WARN] Skipping checksum for missing path: {src_path}")
+            continue
+
+        if os.path.isfile(src_path):
+            rel_path = os.path.relpath(src_path, root_dir)
+            checksum = compute_file_checksum(src_path)
+            checksum_lines.append(f"{checksum}  {rel_path}")
+        else:
+            for dirpath, _, filenames in os.walk(src_path):
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    rel_path = os.path.relpath(file_path, root_dir)
+                    checksum = compute_file_checksum(file_path)
+                    checksum_lines.append(f"{checksum}  {rel_path}")
+
+    # Write checksums.txt to a temporary directory
+    tmp_dir = tempfile.mkdtemp()
+    tmp_checksum_path = os.path.join(tmp_dir, "checksums.txt")
+    with open(tmp_checksum_path, "w") as f:
+        f.write("\n".join(sorted(checksum_lines)) + "\n")
+
+    print(f"[INFO] Checksums written to temporary file: {tmp_checksum_path}")
+    return tmp_checksum_path
 
 def main():
     print("[INFO] Starting package_outputs.py")
 
-    # Resolve project root
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     print(f"[INFO] Project root: {root_dir}")
 
-    # Load experiment name from config
+    # Load experiment name
     try:
         config_path = os.path.join(root_dir, "config", "config.yaml")
         with open(config_path, "r") as f:
@@ -33,11 +75,9 @@ def main():
         print(f"[ERROR] Failed to read experiment name from config: {e}")
         sys.exit(1)
 
-    # Define output archive path
     archive_path = os.path.join(root_dir, f"{experiment_name}.tar.gz")
     print(f"[INFO] Creating archive: {archive_path}")
 
-    # Define structure to add to archive
     archive_structure = {
         "results": "Data/results",
         "metrics": "Data/metrics",
@@ -46,12 +86,20 @@ def main():
         "scripts": "Methods/scripts",
         "config": "Methods/config",
         "Snakefile": "Methods/Snakefile",
-        "bin" : "Methods/bin",
-        "helpers" : "Methods/helpers",
-        "Dockerfile" : "Methods/Dockerfile",
-        "environment.yml" : "Methods/environment.yml"
+        "bin": "Methods/bin",
+        "helpers": "Methods/helpers",
+        "Dockerfile": "Methods/Dockerfile",
+        "environment.yml": "Methods/environment.yml"
     }
 
+    # Compute checksums
+    try:
+        checksum_file = collect_checksums(root_dir, archive_structure)
+    except Exception as e:
+        print(f"[ERROR] Failed to compute checksums: {e}")
+        sys.exit(1)
+
+    # Package everything into tar.gz
     try:
         with tarfile.open(archive_path, "w:gz") as tar:
             for src, dest in archive_structure.items():
@@ -61,6 +109,11 @@ def main():
                     continue
                 print(f"[INFO] Adding: {src_path} → {dest}")
                 tar.add(src_path, arcname=dest)
+
+            # Add checksums.txt to archive under Data/checksums/
+            print(f"[INFO] Adding: {checksum_file} → Data/checksums/checksums.txt")
+            tar.add(checksum_file, arcname="Data/checksums/checksums.txt")
+
     except Exception as e:
         print(f"[ERROR] Failed to create archive: {e}")
         sys.exit(1)
