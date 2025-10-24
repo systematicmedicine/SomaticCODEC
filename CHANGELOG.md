@@ -15,7 +15,7 @@ Types of changes:
 
 ### Changed
 
-- bin/package_outputs.py now records checksums of all files it packages (#)
+- bin/package_outputs.py now records checksums of all files it packages (#230)
 - germline_contamination metric is now gnomAD_overlap, calculates rate of SNVs overlapping with gnomAD per evaluated base (#229)
 
 ## [1.0.0] - 2025-10-23
