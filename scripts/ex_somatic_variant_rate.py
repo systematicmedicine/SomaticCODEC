@@ -5,12 +5,15 @@ Calculates the somatic variant rate and bases filtered during variant calling fr
 
 This script is to be used exclusively with its parent rule
 
-Author: James Phie
+Author: 
+    - James Phie
+    - Cameron Fraser
 """
 
 # Load libraries
 import re
 import sys
+import json
 
 def main(snakemake):
     # Redirect stdout and stderr to the Snakemake log file
@@ -76,16 +79,20 @@ def main(snakemake):
     snv_rate = num_snv_bases / evaluated_bases if evaluated_bases > 0 else 0
     snv_per_diploid = snv_rate * 6_400_000_000
 
-    # Summarise the following values in a spreadsheet
+    # Write output to JSON
+    result = {
+        "starting_bases": starting_bases,
+        "min-BQ": min_bq,
+        "min-MQ": min_mq,
+        "filtered_bases": filtered_bases,
+        "evaluated_bases": evaluated_bases,
+        "num_snv_bases": num_snv_bases,
+        "snv_rate": float(f"{snv_rate:.6e}"),
+        "snv_per_diploid": round(snv_per_diploid, 2)
+    }
+
     with open(output_path, "w") as out:
-        out.write(f"starting_bases\t{starting_bases}\n")
-        out.write(f"min-BQ\t{min_bq}\n")
-        out.write(f"min-MQ\t{min_mq}\n")
-        out.write(f"filtered_bases\t{filtered_bases}\n")
-        out.write(f"evaluated_bases\t{evaluated_bases}\n")
-        out.write(f"num_snv_bases\t{num_snv_bases}\n")
-        out.write(f"snv_rate\t{snv_rate:.6e}\n")
-        out.write(f"snv_per_diploid\t{snv_per_diploid:.2f}\n")
+        json.dump(result, out, indent=4)
 
     # Print script completion message to log
     print("[INFO] Completed ex_somatic_variant_rate.py")

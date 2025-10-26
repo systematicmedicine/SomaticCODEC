@@ -6,11 +6,13 @@ Tests the script ex_somatic_variant_rate.py
 Authors:
     - Chat-GPT
     - Joshua Johnstone
+    - Cameron Fraser
 """
 import pytest
 import os
 from pathlib import Path
 import sys
+import json
 
 project_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(project_root))
@@ -61,7 +63,7 @@ from scripts.ex_somatic_variant_rate import main
     ]
 )
 def test_somatic_variant_rate(tmp_path, vcf_path, expected_metrics):
-    output_file = tmp_path / "results.txt"
+    output_file = tmp_path / "results.json"
     log_file = tmp_path / "log.txt"
 
     class MockSnakemake:
@@ -71,17 +73,23 @@ def test_somatic_variant_rate(tmp_path, vcf_path, expected_metrics):
 
     main(MockSnakemake)
 
+    # Load metrics
     metrics = {}
     with open(output_file) as f:
-        for line in f:
-            key, val = line.strip().split("\t")
-            if key in ["snv_rate"]:
-                metrics[key] = float(val)
-            elif key in ["snv_per_diploid"]:
-                metrics[key] = float(val)
-            else:
-                metrics[key] = val if val == "NA" else int(val)
-
+        metrics = json.load(f)
+        metrics["starting_bases"] = int(metrics["starting_bases"])
+        metrics["filtered_bases"] = int(metrics["filtered_bases"])
+        metrics["evaluated_bases"] = int(metrics["evaluated_bases"])
+        metrics["num_snv_bases"] = int(metrics["num_snv_bases"])
+        metrics["snv_rate"] = float(metrics["snv_rate"])
+        metrics["snv_per_diploid"] = float(metrics["snv_per_diploid"])
+    
+    if metrics["min-BQ"] != "NA":
+        metrics["min-BQ"] = int(metrics["min-BQ"])
+    if metrics["min-MQ"] != "NA":
+        metrics["min-MQ"] = int(metrics["min-MQ"])
+    
+    # Test if metrics match expected values
     assert metrics["starting_bases"] == expected_metrics["starting_bases"]
     assert metrics["min-BQ"] == expected_metrics["min-BQ"]
     assert metrics["min-MQ"] == expected_metrics["min-MQ"]
