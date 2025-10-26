@@ -29,9 +29,7 @@ rule ex_call_dsc:
         bam = "tmp/{ex_sample}/{ex_sample}_map_umi_grouped.bam"
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
-        metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt",
-        intermediate_umi_grouped_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_umi_grouped_sorted_tmp.bam"),
-        intermediate_dsc_unsorted = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_unsorted_tmp.bam")
+        metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
     params:
         error_rate_pre_umi = config["sci_params"]["ex_call_dsc"]["error_rate_pre_umi"],
         error_rate_post_umi = config["sci_params"]["ex_call_dsc"]["error_rate_post_umi"],
@@ -52,17 +50,10 @@ rule ex_call_dsc:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
-            SortBam \
-            -i {input.bam} \
-            -o {output.intermediate_umi_grouped_sorted} \
-            -s TemplateCoordinate 2>> {log}
-        
-        JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
-            --compression={params.compression_level} \
             CallCodecConsensusReads \
             --threads {threads} \
-            -i {output.intermediate_umi_grouped_sorted} \
-            -o {output.intermediate_dsc_unsorted} \
+            -i {input.bam} \
+            -o {output.bam} \
             --error-rate-pre-umi {params.error_rate_pre_umi} \
             --error-rate-post-umi {params.error_rate_post_umi} \
             --min-input-base-quality {params.min_input_base_quality} \
@@ -70,21 +61,12 @@ rule ex_call_dsc:
             --min-duplex-length {params.min_duplex_length} \
             --max-duplex-disagreement-rate {params.max_duplex_disagreement_rate} \
             --stats {output.metrics} 2>> {log}
-
-        samtools sort \
-            --output-fmt bam \
-            --output-fmt-option level={params.compression_level} \
-            -n \
-            -@ {threads} \
-            --no-PG \
-            -o {output.bam} \
-            {output.intermediate_dsc_unsorted} 2>> {log}
         """
 
 
 """
 Realign the DSC to the reference genome
-    - This is required because the conensus sequence may differe from the sequences previously used for alignment
+    - This is required because the consensus sequence may differ from the sequences previously used for alignment
     - Single stranded overhangs are present in this BAM to assist with alignment (ideally filtered later)
 """
 rule ex_remap_dsc:
@@ -100,7 +82,7 @@ rule ex_remap_dsc:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam"),
         intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
         intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam"),
-        unsorted_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted.bam")
+        unsorted_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.bam")
     params:
         band_width = config["sci_params"]["ex_remap_dsc"]["band_width"],
         clipping_penalty = config["sci_params"]["ex_remap_dsc"]["clipping_penalty"],
@@ -179,7 +161,7 @@ rule ex_annotate_dsc:
     output:
         bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
         bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
-        intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_tmp.bam")
+        intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_unsorted_tmp.bam")
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
@@ -194,6 +176,7 @@ rule ex_annotate_dsc:
         """
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
+            --async-io \
             ZipperBams \
             -i {input.mapped} \
             --unmapped {input.unmapped} \
