@@ -1,0 +1,3 @@
+family_size	count	fraction	fraction_gt_or_eq_family_size
+1	900	0.95	1.0
+2	50	0.05	0.05
