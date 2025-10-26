@@ -24,6 +24,10 @@ Types of changes:
 
 - Removed rule that checks ex-ms mappings. This is also checked by check_config.py script (#232)
 
+### Fixed
+
+- Uncommented ex_metrics in rule all of Snakefile (#234)
+
 ## [1.0.0] - 2025-10-23
 
 ### Added
