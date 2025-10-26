@@ -15,6 +15,7 @@ Types of changes:
 
 ### Changed
 
+- Increased number of rounding digits for gnomAD overlap rate metric (#235)
 - Swapped umi_tools dedup for fgbio GroupReadsByUmi, and fgbio SortBam and SetMateInformation for samtools sort and fixmate (#233)
 - SNV distance metrics computes additional percentiles (#231)
 - bin/package_outputs.py now records checksums of all files it packages (#230)
