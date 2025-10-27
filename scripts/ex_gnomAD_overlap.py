@@ -96,7 +96,7 @@ def main(snakemake):
     percent_gnomAD_overlap = round(100 * num_matches / total_variants, 2) if total_variants > 0 else 0
 
     # --- Calculate rate of gnomAD overlap ---
-    rate_gnomAD_overlap = round(num_matches / evaluated_bases, 6) if evaluated_bases > 0 else 0
+    rate_gnomAD_overlap = round(num_matches / evaluated_bases, 10) if evaluated_bases > 0 else 0
 
     # --- Write metrics JSON ---
     metrics_file.parent.mkdir(parents=True, exist_ok=True)
