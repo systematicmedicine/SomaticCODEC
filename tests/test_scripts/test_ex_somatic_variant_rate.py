@@ -31,7 +31,7 @@ from scripts.ex_somatic_variant_rate import main
                 "evaluated_bases": 35,
                 "num_snv_bases": 11,
                 "snv_rate": 0.3142857,
-                "snv_per_diploid": 2011428571.43,
+                "snv_per_diploid": 1905743997,
             },
         ),
         (
@@ -44,7 +44,7 @@ from scripts.ex_somatic_variant_rate import main
                 "evaluated_bases": 23,
                 "num_snv_bases": 15,
                 "snv_rate": 0.6521739,
-                "snv_per_diploid": 4173913043.48
+                "snv_per_diploid": 3954607210
             }
         ),
         (

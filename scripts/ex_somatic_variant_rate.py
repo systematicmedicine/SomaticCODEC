@@ -15,6 +15,12 @@ import re
 import sys
 import json
 
+# Define human nuclear genome size
+#   - External reference: 10.1126/science.abj6987
+#   - Internal reference: CODECseq/20251027 Human genome size/20251027-Human-genome-size.html
+
+HUMAN_NUC_GENOME_SIZE = 6_063_731_176  
+
 def main(snakemake):
     # Redirect stdout and stderr to the Snakemake log file
     sys.stdout = open(snakemake.log[0], "a")
@@ -77,7 +83,7 @@ def main(snakemake):
             num_snv_bases += sum(ad_vals[1:]) if len(ad_vals) > 1 else 0
 
     snv_rate = num_snv_bases / evaluated_bases if evaluated_bases > 0 else 0
-    snv_per_diploid = snv_rate * 6_400_000_000
+    snv_per_diploid = snv_rate * HUMAN_NUC_GENOME_SIZE
 
     # Write output to JSON
     result = {
