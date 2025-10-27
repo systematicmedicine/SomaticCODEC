@@ -158,7 +158,6 @@ def check_ex_lane_mapping(metadata: dict):
 
 # Check that all S3 URIs in download_list.csv exist
 def check_s3_files_exist(metadata: dict):
-    """Check that all S3 URIs in download_list.csv exist."""
     dl = metadata["download_list"]
 
     for _, row in dl.iterrows():
@@ -182,6 +181,11 @@ def check_s3_files_exist(metadata: dict):
 
     print("[INFO] All S3 objects in download_list.csv exist")
 
+# Check that run_name has been set
+def check_run_name_set(config: dict):
+    if config["run_name"] == "experiment_1":
+        sys.exit(f"[ERROR] run_name has not been set, currently default value")
+
 # --------------------------------------------------------------------------------
 # Main logic
 # --------------------------------------------------------------------------------
@@ -200,7 +204,7 @@ if __name__ == "__main__":
 
     # Load metadata tables
     metadata_tables = load_metadata_tables(config)
-
+    
     # Check download list contains required files 
     check_download_list(config, metadata_tables)
 
@@ -221,3 +225,6 @@ if __name__ == "__main__":
 
     # Check that all S3 URIs in download_list.csv exist
     check_s3_files_exist(metadata_tables)
+
+    # Check that run_name has been set
+    check_run_name_set(config)
