@@ -86,19 +86,43 @@ def main(snakemake):
     snv_per_diploid = snv_rate * HUMAN_NUC_GENOME_SIZE
 
     # Write output to JSON
-    result = {
-        "starting_bases": starting_bases,
-        "min-BQ": min_bq,
-        "min-MQ": min_mq,
-        "filtered_bases": filtered_bases,
-        "evaluated_bases": evaluated_bases,
-        "num_snv_bases": num_snv_bases,
-        "snv_rate": float(f"{snv_rate:.6e}"),
-        "snv_per_diploid": round(snv_per_diploid, 2)
+    results = {
+        "starting_bases": {
+            "value": starting_bases,
+            "description": "Total number of bases assessed before base and mapping quality filtering."
+        },
+        "min-BQ": {
+            "value": min_bq,
+            "description": "Minimum base quality threshold applied (--min-BQ)."
+        },
+        "min-MQ": {
+            "value": min_mq,
+            "description": "Minimum mapping quality threshold applied (--min-MQ)."
+        },
+        "filtered_bases": {
+            "value": filtered_bases,
+            "description": "Number of bases excluded by quality filters (starting minus evaluated)."
+        },
+        "evaluated_bases": {
+            "value": evaluated_bases,
+            "description": "Number of bases that passed filtering and were assessed for variants."
+        },
+        "num_snv_bases": {
+            "value": num_snv_bases,
+            "description": "Total number of single-base SNVs detected (MNVs decomposed to 1 bp units)."
+        },
+        "snv_rate": {
+            "value": float(f"{snv_rate:.6e}"),
+            "description": "SNV rate per base (num_snv_bases / evaluated_bases)."
+        },
+        "snv_per_diploid": {
+            "value": round(snv_per_diploid, 2),
+            "description": f"Estimated number of SNVs per diploid human genome ({HUMAN_NUC_GENOME_SIZE:,} bp). Estimated from T2T-CHM13."
+        }
     }
 
     with open(output_path, "w") as out:
-        json.dump(result, out, indent=4)
+        json.dump(results, out, indent=4)
 
     # Print script completion message to log
     print("[INFO] Completed ex_somatic_variant_rate.py")

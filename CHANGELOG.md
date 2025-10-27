@@ -15,6 +15,8 @@ Types of changes:
 
 ### Changed
 
+- SNVs per diploid genome uses new value for normalisation, derived from T2T-CHM13 (#)
+- Somatic variant rate metrics changed from TXT to JSON format, descriptions added (#)
 - Swapped umi_tools dedup for fgbio GroupReadsByUmi, and fgbio SortBam and SetMateInformation for samtools sort and fixmate (#233)
 - SNV distance metrics computes additional percentiles (#231)
 - bin/package_outputs.py now records checksums of all files it packages (#230)
