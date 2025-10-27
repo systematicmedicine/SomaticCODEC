@@ -15,6 +15,7 @@ Types of changes:
 
 ### Changed
 
+- Config check script checks that experiment name is not default value (#237)
 - SNVs per diploid genome uses new value for normalisation, derived from T2T-CHM13 (#236)
 - Somatic variant rate metrics changed from TXT to JSON format, descriptions added (#236)
 - Increased number of rounding digits for gnomAD overlap rate metric (#235)
