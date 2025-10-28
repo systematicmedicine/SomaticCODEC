@@ -15,6 +15,8 @@ Types of changes:
 
 ### Changed
 
+- New definitions directory. Hard coded definitions (e.g. pipeline outputs) are defined here. Different from config that they are not user facing. (#239)
+- Refactoring of rules file structure. Each smk file contains a single rule, and smk files are located in nested directory structure. (#239)
 - Abstracted output definitions from top-level snakefile to rules/output_definitions (#238)
 - Config check script checks that experiment name is not default value (#237)
 - SNVs per diploid genome uses new value for normalisation, derived from T2T-CHM13 (#236)

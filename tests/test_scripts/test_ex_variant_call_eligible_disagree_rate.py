@@ -36,11 +36,9 @@ import hashlib
 
 # Run pytest from repo root so these relative paths resolve.
 TEST_DATA = Path("tests/data/test_ex_variant_call_eligible_disagree_rate")
-EX_CALL_SOMATIC_PATH = Path("rules") / "ex_call_somatic.smk"
 BED = TEST_DATA / "include.bed"
 BAM = TEST_DATA / "test_map_dsc_anno_filtered.bam"
 BAI = TEST_DATA / "test_map_dsc_anno_filtered.bam.bai"
-EXPECTED_SHA256_CALL_SOMATIC = "c0b34bf4ec3364aadd577efa18318fcef669353be3e4517d8cf3e4b96969e98e"
 REQUIRED_Q = 70
 
 
@@ -169,26 +167,3 @@ def test_only_bed_positions_are_eligible(bam, bed_idx):
 def test_at_least_one_disagreement_found(bam, bed_idx):
     _, disagreements, _ = mod.tally_disagreements(bam, bed_idx, REQUIRED_Q, 10000)
     assert disagreements == 1, f"Expected 1 disagreement, found {disagreements}"
-
-# --------------------------------------------------------------------------------------
-# 4) Guardrail: ex_call_somatic.smk checksum must not change (assumption lock)
-# --------------------------------------------------------------------------------------
-
-def _sha256sum(path: Path) -> str:
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-def test_ex_call_somatic_checksum_guardrail():
-    if not EX_CALL_SOMATIC_PATH.exists():
-        pytest.skip(f"{EX_CALL_SOMATIC_PATH} not found; skipping checksum guardrail.")
-    digest = _sha256sum(EX_CALL_SOMATIC_PATH)
-    assert digest == EXPECTED_SHA256_CALL_SOMATIC, (
-        f"Checksum for {EX_CALL_SOMATIC_PATH} changed.\n\n"
-        f"  Expected SHA256: {EXPECTED_SHA256_CALL_SOMATIC}\n"
-        f"  Found SHA256:    {digest}\n\n"
-        "If this change is intentional (logic changed but assumptions still hold), "
-        "update EXPECTED_SHA256 in this test."
-    )
