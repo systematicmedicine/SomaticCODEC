@@ -43,14 +43,15 @@ include: "definitions/pipeline_outputs.smk"
 # Define rule all
 rule all:
     input:
-        setup_files + 
-        ms_metrics + 
-        ex_metrics +
-        other_metrics +
-        results
+        global_setup + 
+        ms_processing_metrics + 
+        ex_processing_metrics +
+        ex_variant_calling +
+        ex_variant_analysis +
+        global_metrics
 
 # ---------------------------------------------------------------------------------------------
 # Include rules files
 # ---------------------------------------------------------------------------------------------
 
-include: "rules/include_all.smk"     
+include: "rules/include_all.smk"

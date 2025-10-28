@@ -18,7 +18,7 @@ ms_sample_ids = md.get_ms_sample_ids(config)
 # ---------------------------------------------------------------------------------------------
 # Setup files
 # ---------------------------------------------------------------------------------------------
-setup_files = [
+global_setup = [
     config["sci_params"]["global"]["reference_genome"] + ".amb",
     config["sci_params"]["global"]["reference_genome"] + ".ann",
     config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
@@ -34,9 +34,9 @@ setup_files = [
 ]
 
 # ---------------------------------------------------------------------------------------------
-# Metrics for MS samples
+# Processing metrics for MS samples
 # ---------------------------------------------------------------------------------------------
-ms_metrics = [
+ms_processing_metrics = [
     expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_ids),
     expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt", ms_sample = ms_sample_ids),
@@ -62,9 +62,9 @@ ms_metrics = [
 ]
 
 # ---------------------------------------------------------------------------------------------
-# Metrics for EX samples
+# Processing metrics for EX samples
 # ---------------------------------------------------------------------------------------------
-ex_metrics = [
+ex_processing_metrics = [
     expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
     expand("metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json", ex_lane = ex_lane_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
@@ -98,6 +98,21 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids)
+]
+
+# ---------------------------------------------------------------------------------------------
+# Somatic varaint calling
+# ---------------------------------------------------------------------------------------------
+ex_variant_calling = [
+    expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = ex_sample_ids)
+
+]
+
+# ---------------------------------------------------------------------------------------------
+# Analysis of called variants
+# ---------------------------------------------------------------------------------------------
+ex_variant_analysis = [
     expand("metrics/{ex_sample}/{ex_sample}_trinuc_context.csv", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_trinuc_plots.pdf", ex_sample = ex_sample_ids),
@@ -108,15 +123,14 @@ ex_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids),
     "metrics/batch/batch_recurrent_variants.vcf",
-    "metrics/batch/batch_recurrent_variant_metrics.json",
+    "metrics/batch/batch_recurrent_variant_metrics.json"
 ]
 
 # ---------------------------------------------------------------------------------------------
-# Other metrics files
+# Global metrics
 # ---------------------------------------------------------------------------------------------
-other_metrics = [
+global_metrics = [
     "logs/global_rules/git_metadata.json",
     "metrics/metrics_report.csv",
     "metrics/metrics_heatmap.png",
@@ -124,11 +138,4 @@ other_metrics = [
     "logs/global_rules/system_resource_usage.csv",
     "logs/global_rules/job_log.csv",
     "logs/global_rules/create_run_timeline_plot.log"
-]
-
-# ---------------------------------------------------------------------------------------------
-# Results
-# ---------------------------------------------------------------------------------------------
-results = [
-    expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = ex_sample_ids)
 ]
