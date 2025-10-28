@@ -1,12 +1,25 @@
-# Generates a pass/fail report for component & system level metrics
+# ====================================================================================
+# 
+#   create_metrics_report.smk
+#
+#   Generates a pass/fail report for component & system level metrics
+#
+#   Author: Cameron
+#
+# ====================================================================================
 
+# Rule depends on output lists defined in pipeline_outputs.smk
+include: os.path.join(workflow.basedir, "definitions", "pipeline_outputs.smk")
+
+# Rule
 rule create_metrics_report:
     input:
         component_metrics_metadata = config["metadata"]["component_metrics_metadata"],
         system_metrics_metadata = config["metadata"]["system_metrics_metadata"],
         version_metadata = "logs/global_rules/git_metadata.json",
-        ms_metrics = ms_metrics,
-        ex_metrics = ex_metrics
+        ms_processing_metrics =  ms_processing_metrics,
+        ex_processing_metrics = ex_processing_metrics,
+        ex_variant_analysis = ex_variant_analysis
     output:
         csv_path = "metrics/metrics_report.csv",
         heatmap_path = "metrics/metrics_heatmap.png"

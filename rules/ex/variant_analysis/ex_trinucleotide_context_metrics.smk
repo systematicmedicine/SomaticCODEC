@@ -8,9 +8,9 @@ rule ex_trinucleotide_context_metrics:
         ref_fasta_path = config["sci_params"]["global"]["reference_genome"],
         context_csv_path = config["sci_params"]["global"]["reference_tri_contexts"]
     output:
-        sample_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_context.csv",
-        similarities_csv = "metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
-        plot_pdf = "metrics/{ex_sample}/{ex_sample}_trinuc_plots.pdf"
+        sample_csv = "results/{ex_sample}/{ex_sample}_trinuc_context.csv",
+        similarities_csv = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
+        plot_pdf = "results/{ex_sample}/{ex_sample}_trinuc_plots.pdf"
     log:
         "logs/{ex_sample}/ex_trinuc_context.log"
     benchmark:
