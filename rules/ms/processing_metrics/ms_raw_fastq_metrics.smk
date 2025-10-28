@@ -1,10 +1,23 @@
-# Generates a fastqc report for demuxed ms FASTQs
+# ====================================================================================
+# 
+#   ms_raw_fastq_metrics.smk
+#
+#   Generates a fastqc report for demuxed ms FASTQs
+#
+#   Authors: 
+#        - Joshua Johnstone
+#        - Cameron Fraser
+#
+# ====================================================================================
+
+# Rule depends on output lists defined in pipeline_outputs.smk
+include: os.path.join(workflow.basedir, "definitions", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
 
 rule ms_raw_fastq_metrics:
     input:
-        setup_files = setup_files,
+        global_setup = global_setup,
         ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
