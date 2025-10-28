@@ -15,6 +15,8 @@ Types of changes:
 
 ### Changed
 
+- Variant analyses now output to results/ dir instead of metrics/ dir (#240)
+- Dependency made explicit for rules that depended on output lists, by importing definitions/pipeline_outputs.smk (#240)
 - New definitions directory. Hard coded definitions (e.g. pipeline outputs) are defined here. Different from config that they are not user facing. (#239)
 - Refactoring of rules file structure. Each smk file contains a single rule, and smk files are located in nested directory structure. (#239)
 - Abstracted output definitions from top-level snakefile to rules/output_definitions (#238)
