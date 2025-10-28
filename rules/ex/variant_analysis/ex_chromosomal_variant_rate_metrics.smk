@@ -6,7 +6,7 @@ rule ex_chromosomal_variant_rate_metrics:
         vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
+        metrics = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
     params:
         included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
     log:

@@ -67,14 +67,23 @@ find_metric_files <- function(pattern) {
   # Ensure the pattern only matches files ending in the given suffix
   full_pattern <- paste0(pattern, "$")
   
-  files <- list.files(
+  # Search metrics directory recursively
+  metrics_files <- list.files(
     path = "metrics",
     pattern = full_pattern,
     recursive = TRUE,
     full.names = TRUE
   )
   
-  return(files)
+  # Search results directory recursively
+  results_files <- list.files(
+    path = "results",
+    pattern = full_pattern,
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  
+  return(c(metrics_files, results_files))
 }
 
 # ---------------------------------------------------------------------------
