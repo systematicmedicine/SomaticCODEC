@@ -10,8 +10,8 @@ rule ex_gnomAD_overlap:
     output:
         intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
         intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
-        germline_matches = "metrics/{ex_sample}/{ex_sample}_germline_matches.vcf",
-        metrics_file = "metrics/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json"
+        germline_matches = "results/{ex_sample}/{ex_sample}_germline_matches.vcf",
+        metrics_file = "results/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json"
     log:
         "logs/{ex_sample}/ex_gnomAD_overlap.log"
     benchmark:

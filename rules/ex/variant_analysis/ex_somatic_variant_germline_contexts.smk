@@ -12,7 +12,7 @@ rule ex_somatic_variant_germline_contexts:
         ),
         ex_somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf"
     output:
-        vcf = "metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
+        vcf = "results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
     log:
         "logs/{ex_sample}/ex_somatic_variant_germline_context.log"
     benchmark:

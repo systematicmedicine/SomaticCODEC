@@ -91,7 +91,6 @@ ex_processing_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_duplication_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_rate.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json", ex_sample = ex_sample_ids),
@@ -113,18 +112,19 @@ ex_variant_calling = [
 # Analysis of called variants
 # ---------------------------------------------------------------------------------------------
 ex_variant_analysis = [
-    expand("metrics/{ex_sample}/{ex_sample}_trinuc_context.csv", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_trinuc_similarities.csv", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_trinuc_plots.pdf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_snv_distance.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_snv_position_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_snv_position_plot.pdf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
-    "metrics/batch/batch_recurrent_variants.vcf",
-    "metrics/batch/batch_recurrent_variant_metrics.json"
+    expand("results/{ex_sample}/{ex_sample}_somatic_variant_rate.json", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_trinuc_context.csv", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_trinuc_similarities.csv", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_trinuc_plots.pdf", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_snv_distance.json", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_snv_position_metrics.json", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_snv_position_plot.pdf", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json", ex_sample = ex_sample_ids),
+    expand("results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
+    "results/batch/batch_recurrent_variants.vcf",
+    "results/batch/batch_recurrent_variant_metrics.json"
 ]
 
 # ---------------------------------------------------------------------------------------------
