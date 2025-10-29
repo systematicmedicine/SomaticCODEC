@@ -20,8 +20,10 @@ rule create_metrics_report:
         ex_processing_metrics = ex_processing_metrics,
         ex_variant_analysis = ex_variant_analysis
     output:
-        csv_path = "metrics/metrics_report.csv",
-        heatmap_path = "metrics/metrics_heatmap.png"
+        component_csv = "metrics/component_metrics_report.csv",
+        component_png = "metrics/component_metrics_heatmap.png",
+        system_csv = "results/system_metrics_report.csv",
+        system_png = "results/system_metrics_heatmap.png"
     params:
         run_name = config["run_name"]
     log:
