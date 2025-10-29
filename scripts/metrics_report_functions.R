@@ -252,7 +252,7 @@ assess_metric <- function(metric) {
 # Create metrics heatmap
 # ---------------------------------------------------------------------------
 
-plot_metric_heatmap <- function(df, exp_name) {
+plot_metric_heatmap <- function(df, title, suptitle) {
   library(ggplot2)
   library(dplyr)
 
@@ -262,7 +262,6 @@ plot_metric_heatmap <- function(df, exp_name) {
   }
 
   date <- format(Sys.Date(), "%Y-%m-%d")
-  title <- paste0(exp_name, " metrics")
 
   df <- df %>%
     mutate(
@@ -301,8 +300,8 @@ plot_metric_heatmap <- function(df, exp_name) {
       legend.background = element_rect(fill = "white", color = NA),
       legend.box.background = element_rect(fill = "white", color = NA)
     ) +
+    ggtitle(title, suptitle) +
     labs(
-      title = title,
       x = "Sample",
       y = "Metric",
       fill = "Grade"
