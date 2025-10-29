@@ -36,6 +36,7 @@ Types of changes:
 ### Fixed
 
 - Uncommented ex_metrics in rule all of Snakefile (#234)
+- Fixed bug in metrics report where SampleIDs were not correctly resolved for outputs in results directory (#242)
 
 ## [1.0.0] - 2025-10-23
 
