@@ -1,7 +1,7 @@
 # ===========================================================================
 # Metrics report.R
 #
-# Collate component level and system level metrics into a report
+# Collate component level and system level metrics into respective reports
 #   - To be used exclusively with Snakemake parent rule create_metrics_report
 #   - Recieves parameter injection from parent rule
 #
@@ -26,16 +26,20 @@ if (!exists("snakemake")) {
   COMPONENT_METRICS_PATH <- "config/component_level_metrics.xlsx"
   SYSTEM_METRICS_PATH <- "config/system_level_metrics.xlsx"
   EXP_NAME <- "Test experiment"
-  CSV_OUTPUT_PATH <- "metrics/metrics_report.csv"
-  HEATMAP_PATH <- "metrics/metrics_heatmap.png"
+  COMPONENT_CSV <- "metrics/component_metrics_report.csv"
+  COMPONENT_PNG <- "metrics/component_metrics_report.png"
+  SYSTEM_CSV <- "results/system_metrics_report.csv"
+  SYSTEM_PNG <- "results/system_metrics_report.png"
   LOG_PATH <- "logs/metrics_report.log"
 } else {
   # Snakemake-injected paths
   COMPONENT_METRICS_PATH <- snakemake@input[["component_metrics_metadata"]]
   SYSTEM_METRICS_PATH <- snakemake@input[["system_metrics_metadata"]]
   EXP_NAME <- snakemake@params[["run_name"]]
-  CSV_OUTPUT_PATH <- snakemake@output[["csv_path"]]
-  HEATMAP_PATH <- snakemake@output[["heatmap_path"]]
+  COMPONENT_CSV <- snakemake@output[["component_csv"]]
+  COMPONENT_PNG <- snakemake@output[["component_png"]]
+  SYSTEM_CSV <- snakemake@output[["system_csv"]]
+  SYSTEM_PNG <- snakemake@output[["system_png"]]
   LOG_PATH <- snakemake@log[[1]]
 }
 
@@ -60,35 +64,42 @@ sink(log_con, type = "message")
 message(sprintf("[INFO] Script started at %s\n", Sys.time()))
 
 # ---------------------------------------------------------------------------
-# Create metrics report
+# Create metrics reports (component & system)
 # ---------------------------------------------------------------------------
 
-# Load metrics metadata
-component.meta <- read.xlsx(COMPONENT_METRICS_PATH, sheet = "Metrics") %>%
+# Define metadata for both reports
+report_types <- c("Component", "System")
+metrics_paths <- c(COMPONENT_METRICS_PATH, SYSTEM_METRICS_PATH)
+csv_paths     <- c(COMPONENT_CSV, SYSTEM_CSV)
+png_paths     <- c(COMPONENT_PNG, SYSTEM_PNG)
+
+for (i in seq_along(report_types)) {
+  type <- report_types[i]
+  metrics_path <- metrics_paths[i]
+  csv_path <- csv_paths[i]
+  png_path <- png_paths[i]
+
+  # Load metrics metadata
+  meta <- read.xlsx(metrics_path, sheet = "Metrics") %>%
     coerce_types(METRICS_FILE_SCHEMA)
 
-system.meta <- read.xlsx(SYSTEM_METRICS_PATH, sheet = "Metrics") %>%
-    coerce_types(METRICS_FILE_SCHEMA)
+  # Assess metrics
+  report_list <- lapply(split(meta, seq_len(nrow(meta))), assess_metric)
+  report_df <- bind_rows(report_list)
 
-combined.meta <- bind_rows(component.meta, system.meta) %>%
-    filter(include_automated_report == TRUE)
+  # Write CSV report
+  write.csv(report_df, csv_path, row.names = FALSE, quote = FALSE)
 
-# Assess each metric
-report.list <- lapply(split(combined.meta, seq_len(nrow(combined.meta))), assess_metric)
-report.df <- bind_rows(report.list)
-
-# Create CSV report
-write.csv(report.df, CSV_OUTPUT_PATH, row.names = FALSE, quote = FALSE)
-
-# Create heatmap report
-report.heatmap <- plot_metric_heatmap(report.df, EXP_NAME)
-save_scaled_heatmap(
-  plot = report.heatmap, 
-  path = HEATMAP_PATH, 
-  nrows = nrow(report.df), 
-  ncols = ncol(report.df),
-  base_height = 0.06
+  # Create and save heatmap
+  heatmap <- plot_metric_heatmap(report_df, paste0(type, "-level metrics report"), EXP_NAME)
+  save_scaled_heatmap(
+    plot = heatmap,
+    path = png_path,
+    nrows = nrow(report_df),
+    ncols = ncol(report_df),
+    base_height = 0.06
   )
+}
 
 # ---------------------------------------------------------------------------
 # Cleanup

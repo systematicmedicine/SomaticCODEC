@@ -2,8 +2,10 @@
 
 rule create_job_log:
     input:
-        metrics_report_csv = "metrics/metrics_report.csv",
-        metrics_report_heatmap = "metrics/metrics_heatmap.png",
+        component_metrics_csv = "metrics/component_metrics_report.csv",
+        component_metrics_png = "metrics/component_metrics_heatmap.png",
+        system_metrics_csv = "results/system_metrics_report.csv",
+        system_metrics_png = "results/system_metrics_heatmap.png",
         log = ancient("logs/bin_scripts/run_pipeline.log")
     output:
         csv = "logs/global_rules/job_log.csv"
