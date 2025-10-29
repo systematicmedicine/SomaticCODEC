@@ -15,6 +15,7 @@ Types of changes:
 
 ### Added
 
+- External concordance in SNV rate included in automated report (#246)
 - Added ex_duplex_overlap_metrics, calculates the overlap between R1 and R2 for each duplex consensus sequence (#243)
 - Added ex_duplex_overlap component metric (#243)
 - New definitions directory. Hard coded definitions (e.g. pipeline outputs) are defined here (#239)
