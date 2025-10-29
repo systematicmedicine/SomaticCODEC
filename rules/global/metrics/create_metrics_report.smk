@@ -16,7 +16,6 @@ rule create_metrics_report:
     input:
         component_metrics_metadata = config["metadata"]["component_metrics_metadata"],
         system_metrics_metadata = config["metadata"]["system_metrics_metadata"],
-        version_metadata = "logs/global_rules/git_metadata.json",
         ms_processing_metrics =  ms_processing_metrics,
         ex_processing_metrics = ex_processing_metrics,
         ex_variant_analysis = ex_variant_analysis

@@ -224,7 +224,11 @@ assess_metric <- function(metric) {
     grade <- grade_metric_value(value, ideal_lower, ideal_upper, nn_lower, nn_upper)
 
     # Extract sample ID from filename (e.g., S001_metric.txt → S001)
-    sample_id <- sub("^metrics/([^/]+)/.*$", "\\1", file_path)
+    sample_id <- ifelse(
+      grepl("^(metrics|results)/[^/]+/", file_path),
+      sub("^(metrics|results)/([^/]+)/.*$", "\\2", file_path),
+      NA
+    )
 
     # Create formatted targets string
     targets <- format_targets(nn_lower, nn_upper, ideal_lower, ideal_upper)
@@ -245,21 +249,10 @@ assess_metric <- function(metric) {
 }
 
 # ---------------------------------------------------------------------------
-# Get pipeline version
-# ---------------------------------------------------------------------------
-get_pipeline_version <- function(version_metadata_path) {
-  tryCatch({
-    jsonlite::fromJSON(version_metadata_path)$git_tag
-  }, error = function(e) {
-    "unknown version"
-  })
-}
-
-# ---------------------------------------------------------------------------
 # Create metrics heatmap
 # ---------------------------------------------------------------------------
 
-plot_metric_heatmap <- function(df, exp_name, pipeline_version) {
+plot_metric_heatmap <- function(df, exp_name) {
   library(ggplot2)
   library(dplyr)
 
@@ -270,7 +263,6 @@ plot_metric_heatmap <- function(df, exp_name, pipeline_version) {
 
   date <- format(Sys.Date(), "%Y-%m-%d")
   title <- paste0(exp_name, " metrics")
-  subtitle <- paste0(date, ", ", pipeline_version)
 
   df <- df %>%
     mutate(
@@ -311,7 +303,6 @@ plot_metric_heatmap <- function(df, exp_name, pipeline_version) {
     ) +
     labs(
       title = title,
-      subtitle = subtitle,
       x = "Sample",
       y = "Metric",
       fill = "Grade"
