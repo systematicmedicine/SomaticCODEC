@@ -15,7 +15,8 @@ Types of changes:
 
 ### Added
 
-- Added ex_duplex_overlap_metrics, calculates the overlap between R1 and R2 for each duplex consensus sequence (#)
+- Added ex_duplex_overlap_metrics, calculates the overlap between R1 and R2 for each duplex consensus sequence (#243)
+- Added ex_duplex_overlap component metric (#243)
 
 ### Changed
 
