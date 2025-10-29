@@ -26,7 +26,6 @@ if (!exists("snakemake")) {
   COMPONENT_METRICS_PATH <- "config/component_level_metrics.xlsx"
   SYSTEM_METRICS_PATH <- "config/system_level_metrics.xlsx"
   EXP_NAME <- "Test experiment"
-  VERSION_METADATA_PATH <- "logs/global_rules/git_metadata.json"
   CSV_OUTPUT_PATH <- "metrics/metrics_report.csv"
   HEATMAP_PATH <- "metrics/metrics_heatmap.png"
   LOG_PATH <- "logs/metrics_report.log"
@@ -35,7 +34,6 @@ if (!exists("snakemake")) {
   COMPONENT_METRICS_PATH <- snakemake@input[["component_metrics_metadata"]]
   SYSTEM_METRICS_PATH <- snakemake@input[["system_metrics_metadata"]]
   EXP_NAME <- snakemake@params[["run_name"]]
-  VERSION_METADATA_PATH <- snakemake@input[["version_metadata"]]
   CSV_OUTPUT_PATH <- snakemake@output[["csv_path"]]
   HEATMAP_PATH <- snakemake@output[["heatmap_path"]]
   LOG_PATH <- snakemake@log[[1]]
@@ -83,7 +81,7 @@ report.df <- bind_rows(report.list)
 write.csv(report.df, CSV_OUTPUT_PATH, row.names = FALSE, quote = FALSE)
 
 # Create heatmap report
-report.heatmap <- plot_metric_heatmap(report.df, EXP_NAME, get_pipeline_version(VERSION_METADATA_PATH))
+report.heatmap <- plot_metric_heatmap(report.df, EXP_NAME)
 save_scaled_heatmap(
   plot = report.heatmap, 
   path = HEATMAP_PATH, 
