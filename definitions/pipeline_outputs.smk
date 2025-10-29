@@ -133,8 +133,10 @@ ex_variant_analysis = [
 # ---------------------------------------------------------------------------------------------
 global_metrics = [
     "logs/global_rules/git_metadata.json",
-    "metrics/metrics_report.csv",
-    "metrics/metrics_heatmap.png",
+    "metrics/component_metrics_report.csv",
+    "metrics/component_metrics_heatmap.png",
+    "results/system_metrics_report.csv",
+    "results/system_metrics_heatmap.png",
     "logs/global_rules/combined_benchmarks.csv",
     "logs/global_rules/system_resource_usage.csv",
     "logs/global_rules/job_log.csv",
