@@ -156,6 +156,32 @@ def check_ex_lane_mapping(metadata: dict):
 
     print("[INFO] All ex_samples and ex_technical_controls map to valid ex_lanes")
 
+# Check that all input FASTQ paths are globally unique
+def check_input_fastqs_unique(metadata: dict):
+    """
+    Ensures that all FASTQ paths across:
+      - ms_samples_metadata: fastq1, fastq2
+      - ex_lanes_metadata:   fastq1, fastq2
+    are globally unique. Exits with an error if duplicates are found.
+    """
+    try:
+        all_fastqs = pd.concat([
+            metadata["ms_samples_metadata"]["fastq1"],
+            metadata["ms_samples_metadata"]["fastq2"],
+            metadata["ex_lanes_metadata"]["fastq1"],
+            metadata["ex_lanes_metadata"]["fastq2"],
+        ], ignore_index=True).dropna()
+    except KeyError as e:
+        sys.exit(f"[ERROR] Missing key or column while checking FASTQ uniqueness: {e}")
+
+    duplicated = all_fastqs[all_fastqs.duplicated(keep=False)].unique()
+
+    if len(duplicated) > 0:
+        dup_list = "\n".join(sorted(duplicated))
+        sys.exit(f"[ERROR] Duplicate FASTQ file paths found:\n{dup_list}")
+
+    print("[INFO] All input FASTQ file paths are unique")
+
 # Check that all S3 URIs in download_list.csv exist
 def check_s3_files_exist(metadata: dict):
     dl = metadata["download_list"]
@@ -222,6 +248,9 @@ if __name__ == "__main__":
 
     # Check each ex_sample and ex_technical_control has a valid ex_lane defined in ex_lanes.csv
     check_ex_lane_mapping(metadata_tables)
+
+    # Check that input FASTQs are globally unique
+    check_input_fastqs_unique(metadata_tables)
 
     # Check that all S3 URIs in download_list.csv exist
     check_s3_files_exist(metadata_tables)
