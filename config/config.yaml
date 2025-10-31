@@ -43,10 +43,10 @@ sci_params:
   ex_call_dsc:
     error_rate_pre_umi: 45
     error_rate_post_umi: 40
-    min_input_base_quality: 10
+    min_input_base_quality: 30
     min_read_pairs: 1
     min_duplex_length: 1
-    max_duplex_disagreement_rate: 0.04
+    max_duplex_disagreement_rate: 0.02
 
   ex_call_somatic_snv:
     max_base_quality: 150
