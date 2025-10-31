@@ -100,6 +100,38 @@ def check_download_list_md5sums(metadata: dict):
 
     print("[INFO] All expected_md5sum entries are present and valid")
 
+# Check that all sample-like IDs are globally unique
+def check_sample_ids_unique(metadata: dict):
+    """
+    Ensures that all sample identifiers across the following fields are globally unique:
+      - ex_samples_metadata["ex_sample"]
+      - ex_lanes_metadata["ex_lane"]
+      - ex_technical_controls_metadata["ex_technical_control"]
+      - ex_adapters_metadata["ex_adapter"]
+      - ms_samples_metadata["ms_sample"]
+
+    Exits with an error if any duplicates are found.
+    """
+    try:
+        all_ids = pd.concat([
+            metadata["ex_samples_metadata"]["ex_sample"],
+            metadata["ex_lanes_metadata"]["ex_lane"],
+            metadata["ex_technical_controls_metadata"]["ex_technical_control"],
+            metadata["ex_adapters_metadata"]["ex_adapter"],
+            metadata["ms_samples_metadata"]["ms_sample"],
+        ], ignore_index=True).dropna()
+    except KeyError as e:
+        sys.exit(f"[ERROR] Missing key or column while checking sample ID uniqueness: {e}")
+
+    duplicated = all_ids[all_ids.duplicated(keep=False)].unique()
+
+    if len(duplicated) > 0:
+        dup_list = "\n".join(sorted(duplicated))
+        sys.exit(f"[ERROR] Duplicate sample identifiers found across metadata:\n{dup_list}")
+
+    print("[INFO] All sample identifiers are globally unique")
+
+
 # Check each ex_sample is mapped to an ms_sample with the same donor_id
 def check_ex_ms_mapping(metadata: dict):
     ex = metadata["ex_samples_metadata"].set_index("ms_sample")
@@ -236,6 +268,9 @@ if __name__ == "__main__":
 
     # Check that checksums are valid md5sums
     check_download_list_md5sums(metadata_tables)
+
+    # Check that all sample IDs are globally unique
+    check_sample_ids_unique(metadata_tables)
 
     # Check each ex_sample is mapped to an ms_sample with the same donor_id
     check_ex_ms_mapping(metadata_tables)
