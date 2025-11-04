@@ -39,7 +39,7 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
   - Component level validation
   - Software testing
 - **Developer guide (internal)**
-  - [Versioning](versioning.md)
+  - [Versioning](docs/versioning.md)
 
 ### Maintainers
 

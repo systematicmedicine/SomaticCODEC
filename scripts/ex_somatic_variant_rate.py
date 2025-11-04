@@ -5,12 +5,21 @@ Calculates the somatic variant rate and bases filtered during variant calling fr
 
 This script is to be used exclusively with its parent rule
 
-Author: James Phie
+Author: 
+    - James Phie
+    - Cameron Fraser
 """
 
 # Load libraries
 import re
 import sys
+import json
+
+# Define human nuclear genome size
+#   - External reference: 10.1126/science.abj6987
+#   - Internal reference: CODECseq/20251027 Human genome size/20251027-Human-genome-size.html
+
+HUMAN_NUC_GENOME_SIZE = 6_063_731_176  
 
 def main(snakemake):
     # Redirect stdout and stderr to the Snakemake log file
@@ -74,18 +83,46 @@ def main(snakemake):
             num_snv_bases += sum(ad_vals[1:]) if len(ad_vals) > 1 else 0
 
     snv_rate = num_snv_bases / evaluated_bases if evaluated_bases > 0 else 0
-    snv_per_diploid = snv_rate * 6_400_000_000
+    snv_per_diploid = snv_rate * HUMAN_NUC_GENOME_SIZE
 
-    # Summarise the following values in a spreadsheet
+    # Write output to JSON
+    results = {
+        "starting_bases": {
+            "value": starting_bases,
+            "description": "Total number of bases assessed before base and mapping quality filtering."
+        },
+        "min-BQ": {
+            "value": min_bq,
+            "description": "Minimum base quality threshold applied (--min-BQ)."
+        },
+        "min-MQ": {
+            "value": min_mq,
+            "description": "Minimum mapping quality threshold applied (--min-MQ)."
+        },
+        "filtered_bases": {
+            "value": filtered_bases,
+            "description": "Number of bases excluded by quality filters (starting minus evaluated)."
+        },
+        "evaluated_bases": {
+            "value": evaluated_bases,
+            "description": "Number of bases that passed filtering and were assessed for variants."
+        },
+        "num_snv_bases": {
+            "value": num_snv_bases,
+            "description": "Total number of single-base SNVs detected (MNVs decomposed to 1 bp units)."
+        },
+        "snv_rate": {
+            "value": float(f"{snv_rate:.6e}"),
+            "description": "SNV rate per base (num_snv_bases / evaluated_bases)."
+        },
+        "snv_per_diploid": {
+            "value": round(snv_per_diploid, 2),
+            "description": f"Estimated number of SNVs per diploid human genome ({HUMAN_NUC_GENOME_SIZE:,} bp). Estimated from T2T-CHM13."
+        }
+    }
+
     with open(output_path, "w") as out:
-        out.write(f"starting_bases\t{starting_bases}\n")
-        out.write(f"min-BQ\t{min_bq}\n")
-        out.write(f"min-MQ\t{min_mq}\n")
-        out.write(f"filtered_bases\t{filtered_bases}\n")
-        out.write(f"evaluated_bases\t{evaluated_bases}\n")
-        out.write(f"num_snv_bases\t{num_snv_bases}\n")
-        out.write(f"snv_rate\t{snv_rate:.6e}\n")
-        out.write(f"snv_per_diploid\t{snv_per_diploid:.2f}\n")
+        json.dump(results, out, indent=4)
 
     # Print script completion message to log
     print("[INFO] Completed ex_somatic_variant_rate.py")

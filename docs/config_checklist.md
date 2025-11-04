@@ -3,8 +3,9 @@
 Manually check config files for the following:
 
 * `config.yaml`
+    * Downloaded from GitHub, correct branch.
     * Run name has been set
-    * Scientific parameters are set as desired
+    * Change any scientific parameters that are different from default
 * `ex_lanes.csv`
     * ex_lane IDs are correct
     * fastq1 and fast2 paths are mapped to R1 and R2 files
