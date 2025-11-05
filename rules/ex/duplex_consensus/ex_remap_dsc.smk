@@ -41,11 +41,16 @@ rule ex_remap_dsc:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Convert BAM to FASTQ
         samtools fastq \
         -0 \
         {output.intermediate_fastq} \
         {input.bam} 2>> {log}
 
+        # Realign reads
         bwa-mem2 mem \
         -t {threads} \
         -k {params.min_seed_length} \
@@ -64,6 +69,7 @@ rule ex_remap_dsc:
         {input.ref} \
         {output.intermediate_fastq} > {output.intermediate_sam} 2>> {log}
 
+        # Convert SAM to BAM
         samtools view \
         --output-fmt bam \
         --output-fmt-option level={params.compression_level} \
@@ -71,6 +77,7 @@ rule ex_remap_dsc:
         -bS \
         {output.intermediate_sam} > {output.unsorted_bam} 2>> {log}
 
+        # Sort by read name
         samtools sort \
         --output-fmt bam \
         --output-fmt-option level={params.compression_level} \

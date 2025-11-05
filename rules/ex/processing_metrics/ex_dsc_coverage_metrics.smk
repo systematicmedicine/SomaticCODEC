@@ -28,6 +28,6 @@ rule ex_dsc_coverage_metrics:
     benchmark:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["heavy"]
     script:
         os.path.join(workflow.basedir, "scripts", "ex_dsc_coverage_metrics.py")

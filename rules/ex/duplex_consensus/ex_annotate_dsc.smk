@@ -25,6 +25,10 @@ rule ex_annotate_dsc:
         config["infrastructure"]["threads"]["heavy"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Transer metadata from unmapped BAM to mapped BAM
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
             --async-io \
@@ -35,6 +39,7 @@ rule ex_annotate_dsc:
             --tags-to-revcomp Consensus \
             -o {output.intermediate_anno} 2>> {log}
 
+        # Sort BAM by coordinate
         samtools sort \
         --output-fmt bam \
         --output-fmt-option level={params.compression_level} \
@@ -42,5 +47,6 @@ rule ex_annotate_dsc:
         -o {output.bam} \
         {output.intermediate_anno} 2>> {log}
 
+        # Index BAM
         samtools index -@ {threads} {output.bam} 2>> {log}
         """

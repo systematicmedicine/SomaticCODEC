@@ -27,6 +27,10 @@ rule ex_filter_fastq:
         memory = config["infrastructure"]["memory"]["moderate"]        
     shell:  
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Filter reads
         trimmomatic PE \
             -phred33 \
             -threads {threads} \
