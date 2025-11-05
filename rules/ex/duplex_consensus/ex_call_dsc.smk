@@ -29,6 +29,10 @@ rule ex_call_dsc:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+       # Set memory limit
+       ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Call duplex consensus
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \
             CallCodecConsensusReads \

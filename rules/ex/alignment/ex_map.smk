@@ -38,6 +38,10 @@ rule ex_map:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Map reads
         bwa-mem2 mem \
         -t {threads} \
         -k {params.min_seed_length} \
@@ -56,6 +60,7 @@ rule ex_map:
         {input.ref} \
         {input.fastq1} {input.fastq2} > {output.intermediate_sam} 2>> {log}
 
+        # Convert SAM to BAM
         samtools view \
         -@ {threads} \
         --output-fmt bam \

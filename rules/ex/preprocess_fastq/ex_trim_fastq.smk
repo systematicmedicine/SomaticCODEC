@@ -46,6 +46,10 @@ rule ex_trim_fastq:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Trim 5' adapter sequences
         cutadapt \
           -j {threads} \
           --error-rate {params.max_error_rate} \
@@ -57,6 +61,7 @@ rule ex_trim_fastq:
           {input.r1} {input.r2} \
           --json={output.trim5primejson} 2>> {log}
 
+        # Trim 3' adapter sequences from R1
         cutadapt \
           -j {threads} \
           --error-rate {params.max_error_rate} \
@@ -67,6 +72,7 @@ rule ex_trim_fastq:
           {output.intermediate_r1_1} \
           --json={output.r1_trim3primejson} 2>> {log}
 
+        # Trim 3' adapter sequences from R2
         cutadapt \
           -j {threads} \
           --error-rate {params.max_error_rate} \
@@ -77,6 +83,7 @@ rule ex_trim_fastq:
           {output.intermediate_r2_1} \
           --json={output.r2_trim3primejson} 2>> {log}
 
+        # Trim additional bases and low quality bases
         cutadapt \
           -j {threads} \
           -u {params.r1_cut_start} \
