@@ -17,5 +17,18 @@ rule ex_bases_trimmed:
         "logs/{ex_sample}/ex_bases_trimmed.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_bases_trimmed.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate bases trimmed
+        python {workflow.basedir}/scripts/ex_bases_trimmed.py \
+            --pre_r1 {input.pre_r1} \
+            --pre_r2 {input.pre_r2} \
+            --post_r1 {input.post_r1} \
+            --post_r2 {input.post_r2} \
+            --json {output.json} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

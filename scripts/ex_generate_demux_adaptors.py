@@ -19,21 +19,36 @@ Author:
 # Import libraries
 import sys
 from pathlib import Path
+import argparse
+import json
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--adapter_fasta_outputs", required=True, nargs="+")
+parser.add_argument("--config", required=True)
+parser.add_argument("--log", required=True)
+args = parser.parse_args()
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
 sys.path.insert(0, str(PROJECT_ROOT))
 import helpers.get_metadata as md
 
 # Redirect stderr and stdout to Snakemake log
-sys.stdout = open(snakemake.log[0], "a")
-sys.stderr = open(snakemake.log[0], "a")
+sys.stdout = open(args.log, "a")
+sys.stderr = open(args.log, "a")
+print("[INFO] Starting ex_generate_demux_adaptors.py")
+
+# Load config
+config = json.loads(args.config)
 
 # Load nested dictionary of ex adapter sequences
   # Assumes format: dict[ex_lane][ex_sample or ex_technical_control][region] -> adapter sequence (str)
-adapter_dict = md.get_ex_lane_adapter_dict(snakemake.config)
+adapter_dict = md.get_ex_lane_adapter_dict(config)
+
+# Define output paths
+output_paths = args.adapter_fasta_outputs
 
 # Generate adapta FASTAS
-for output_path in snakemake.output:
+for output_path in output_paths:
     output_path = Path(output_path)
     filename = output_path.name
     lane, region_with_ext = filename.split("_", 1)
@@ -45,3 +60,5 @@ for output_path in snakemake.output:
             sequence = region_dict[region]
             f.write(f">{sample_id}\n{sequence}\n")
     print(f"[INFO] Wrote: {output_path}")
+
+print("[INFO] Finished ex_generate_demux_adaptors.py")
