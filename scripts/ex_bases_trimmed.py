@@ -11,25 +11,26 @@ Authors:
 import json
 import subprocess
 import sys
-from pathlib import Path
+import argparse
 
-def main(snakemake):
+def main(args):
+    
     # Redirect stdout/stderr
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_bases_trimmed.py")
 
     # Inputs
-    pre_files = [snakemake.input["pre_r1"], snakemake.input["pre_r2"]]
-    post_files = [snakemake.input["post_r1"], snakemake.input["post_r2"]]
-    json_out_path = snakemake.output["json"]
-    sample = snakemake.params["sample"]
+    pre_files = [args.pre_r1, args.pre_r2]
+    post_files = [args.post_r1, args.post_r2]
+    json_out_path = args.json
+    sample = args.sample
 
     def count_bases(fastq_path: str):
         result = subprocess.run(
             ["seqkit", "stats", "-Ta", fastq_path],
             stdout=subprocess.PIPE,
-            stderr=open(snakemake.log[0], "a"),
+            stderr=open(args.log, "a"),
             text=True,
             check=True
         )
@@ -60,4 +61,13 @@ def main(snakemake):
     print("[INFO] Completed ex_bases_trimmed.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pre_r1", required=True)
+    parser.add_argument("--pre_r2", required=True)
+    parser.add_argument("--post_r1", required=True)
+    parser.add_argument("--post_r2", required=True)
+    parser.add_argument("--json", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

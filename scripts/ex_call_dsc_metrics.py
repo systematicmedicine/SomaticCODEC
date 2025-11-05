@@ -12,48 +12,52 @@ Authors:
 import subprocess
 import json
 import sys
+import argparse
 
-def main(snakemake):
-    # Redirect stdout and stderr to log file
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
-    print("[INFO] Starting ex_call_dsc_metrics.py")
+parser = argparse.ArgumentParser()
+parser.add_argument("--pre_call_bam", required=True)
+parser.add_argument("--post_call_bam", required=True)
+parser.add_argument("--call_dsc_metrics", required=True)
+parser.add_argument("--sample", required=True)
+parser.add_argument("--log", required=True)
+args = parser.parse_args()
 
-    # Load Snakemake inputs
-    pre_call_bam_path = snakemake.input["pre_call_bam"]
-    post_call_bam_path = snakemake.input["post_call_bam"]
-    json_out_path = snakemake.output["call_dsc_metrics"]
-    sample = snakemake.params["sample"]
+# Redirect stdout and stderr to log file
+sys.stdout = open(args.log, "a")
+sys.stderr = open(args.log, "a")
+print("[INFO] Starting ex_call_dsc_metrics.py")
 
-    # Count primary aligned reads in a BAM
-    def count_reads(bam_path):
-        with open(snakemake.log[0], "a") as log_file:
-            result = subprocess.run(
-                ["samtools", "view", "-c", "-F", "0x900", bam_path],
-                stdout=subprocess.PIPE,
-                stderr=log_file,
-                text=True,
-                check=True
-            )
-        return int(result.stdout.strip())
+# Load Snakemake inputs
+pre_call_bam_path = args.pre_call_bam
+post_call_bam_path = args.post_call_bam
+json_out_path = args.call_dsc_metrics
+sample = args.sample
 
-    # Calculate reads pre and post calling dsc
-    pre_reads = count_reads(pre_call_bam_path)
-    post_reads = count_reads(post_call_bam_path)
-    reads_lost = round(100 * (pre_reads - post_reads) / pre_reads, 1)
+# Count primary aligned reads in a BAM
+def count_reads(bam_path):
+    with open(args.log, "a") as log_file:
+        result = subprocess.run(
+            ["samtools", "view", "-c", "-F", "0x900", bam_path],
+            stdout=subprocess.PIPE,
+            stderr=log_file,
+            text=True,
+            check=True
+        )
+    return int(result.stdout.strip())
 
-    # Write data to JSON
-    output_data = {
-        "description": "Percentage of reads lost during ex_call_dsc.",
-        "sample": sample,
-        "reads_lost": reads_lost
-    }
+# Calculate reads pre and post calling dsc
+pre_reads = count_reads(pre_call_bam_path)
+post_reads = count_reads(post_call_bam_path)
+reads_lost = round(100 * (pre_reads - post_reads) / pre_reads, 1)
 
-    with open(json_out_path, "w") as out_f:
-        json.dump(output_data, out_f, indent=4)
+# Write data to JSON
+output_data = {
+    "description": "Percentage of reads lost during ex_call_dsc.",
+    "sample": sample,
+    "reads_lost": reads_lost
+}
 
-    print("[INFO] Completed ex_call_dsc_metrics.py")
+with open(json_out_path, "w") as out_f:
+    json.dump(output_data, out_f, indent=4)
 
-# Only run in Snakemake
-if __name__ == "__main__":
-    main(snakemake) 
+print("[INFO] Completed ex_call_dsc_metrics.py")

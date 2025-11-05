@@ -3,6 +3,7 @@ Generates adapter FASTA files for demultiplexing
 """
 
 import helpers.get_metadata as md
+import json
 
 rule ex_generate_demux_adaptors:
     input:
@@ -16,11 +17,22 @@ rule ex_generate_demux_adaptors:
             ex_lane = md.get_ex_lane_ids(config),
             region = ["r1_start", "r1_end", "r2_start", "r2_end"]
         )
+    params:
+        config_json = json.dumps(config)
     log:
         "logs/global_rules/ex_generate_demux_adaptors.log"
     benchmark:
         "logs/global_rules/ex_generate_demux_adaptors.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_generate_demux_adaptors.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Generate adapter FASTA files
+        python {workflow.basedir}/scripts/ex_generate_demux_adaptors.py \
+            --adapter_fasta_outputs {output.adapter_fasta_outputs} \
+            --config '{params.config_json}' \
+            --log {log} 2>> {log}
+        """
