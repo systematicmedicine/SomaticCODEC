@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_demultiplex_fastq.py ---
 

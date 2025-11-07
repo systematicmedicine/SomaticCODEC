@@ -8,18 +8,18 @@ Authors:
     - Joshua Johnstone
 """
 import json
-from pathlib import Path
-import sys
 import pytest
 import types
 
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_bases_trimmed import main
+from scripts.ex.processing_metrics.ex_bases_trimmed import main
 
 @pytest.mark.parametrize("pre_r1, pre_r2, post_r1, post_r2, expected_trimmed, expected_pct", [
-    ("tests/data/pre_r1.fq", "tests/data/pre_r2.fq", "tests/data/post_r1.fq", "tests/data/post_r2.fq", 75, 12.5)
+    ("tests/data/test_ex_bases_trimmed/pre_r1.fq", 
+     "tests/data/test_ex_bases_trimmed/pre_r2.fq", 
+     "tests/data/test_ex_bases_trimmed/post_r1.fq", 
+     "tests/data/test_ex_bases_trimmed/post_r2.fq", 
+     75, 
+     12.5)
 ])
 def test_bases_trimmed(tmp_path, pre_r1, pre_r2, post_r1, post_r2, expected_trimmed, expected_pct):
     args = types.SimpleNamespace(

@@ -21,7 +21,7 @@ rule ex_call_dsc_metrics:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Calculate percentage reads lost
-        python {workflow.basedir}/scripts/ex_call_dsc_metrics.py \
+        ex_call_dsc_metrics.py \
             --pre_call_bam {input.pre_call_bam} \
             --post_call_bam {input.post_call_bam} \
             --call_dsc_metrics {output.call_dsc_metrics} \

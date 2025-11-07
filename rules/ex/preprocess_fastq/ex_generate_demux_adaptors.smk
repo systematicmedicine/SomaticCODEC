@@ -31,7 +31,7 @@ rule ex_generate_demux_adaptors:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Generate adapter FASTA files
-        python {workflow.basedir}/scripts/ex_generate_demux_adaptors.py \
+        ex_generate_demux_adaptors.py \
             --adapter_fasta_outputs {output.adapter_fasta_outputs} \
             --config '{params.config_json}' \
             --log {log} 2>> {log}

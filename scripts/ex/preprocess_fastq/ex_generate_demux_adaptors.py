@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_generate_demux_adaptors.py
 

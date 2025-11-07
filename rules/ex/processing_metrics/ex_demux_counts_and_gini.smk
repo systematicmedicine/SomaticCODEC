@@ -23,7 +23,7 @@ rule ex_demux_counts_and_gini:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Calculate adapter counts and Gini coefficient
-        python {workflow.basedir}/scripts/ex_demux_counts_and_gini.py \
+        ex_demux_counts_and_gini.py \
             --demux_metrics {input.demux_metrics} \
             --demux_gini {output.demux_gini} \
             --config '{params.config_json}' \
