@@ -47,7 +47,7 @@ rule ex_demultiplex_fastq:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Demulitplex
-        python {workflow.basedir}/scripts/ex_demultiplex_fastq.py \
+        ex_demultiplex_fastq.py \
             --raw_r1 {input.raw_r1} \
             --raw_r2 {input.raw_r2} \
             --r1_start {input.r1_start} \

@@ -23,7 +23,7 @@ rule ex_bases_trimmed:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Calculate bases trimmed
-        python {workflow.basedir}/scripts/ex_bases_trimmed.py \
+        ex_bases_trimmed.py \
             --pre_r1 {input.pre_r1} \
             --pre_r2 {input.pre_r2} \
             --post_r1 {input.post_r1} \

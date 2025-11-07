@@ -35,7 +35,7 @@ rule ex_dsc_coverage_metrics:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Calculate DSC coverage metrics
-        python {workflow.basedir}/scripts/ex_dsc_coverage_metrics.py \
+        ex_dsc_coverage_metrics.py \
             --bam_ex_dsc {input.bam_ex_dsc} \
             --bai_ex_dsc {input.bai_ex_dsc} \
             --include_bed {input.include_bed} \
