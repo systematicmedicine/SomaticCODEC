@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # ====================================================================
 # ex_snv_distance_metrics.py
 #
@@ -7,12 +8,15 @@
 # Authors:
 #   - Chat-GPT
 #   - Cameron Fraser
+#   - Joshua Johnstone
 # ====================================================================
 
 # Load libraries
 import json
 import numpy as np
 from cyvcf2 import VCF
+import argparse
+import sys
 
 # Define hard coded variables
 PERCENTILES_TO_COMPUTE = [0, 0.1, 1, 2, 5, 10, 25, 50, 75, 90, 95, 98, 99, 99.9, 100]
@@ -51,11 +55,15 @@ def calculate_nearest_snv_percentiles(vcf_path):
     print(values)
     return {str(p): round(v, 2) for p, v in zip(PERCENTILES_TO_COMPUTE, values)}
 
+def main(args):
 
-# === Snakemake orchestration only ===
-if __name__ == "__main__":
-    vcf_path = snakemake.input.vcf
-    output_path = snakemake.output.metrics_json
+    # Redirect stdout/stderr
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
+    print("[INFO] Starting ex_snv_distance_metrics.py")
+
+    vcf_path = args.vcf
+    output_path = args.metrics_json
 
     metrics = {
         "description": "Distance to nearest SNV (bp). Only calculated for SNVs that have at least one other SNV on the same chromosome.",
@@ -64,3 +72,16 @@ if __name__ == "__main__":
 
     with open(output_path, "w") as f:
         json.dump(metrics, f, indent=2)
+
+    print("[INFO] Completed ex_snv_distance_metrics.py")
+
+# === Snakemake orchestration only ===
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--vcf", required=True)
+    parser.add_argument("--metrics_json", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
+
+    

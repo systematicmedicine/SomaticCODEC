@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # =============================================================================
 #   ex_snv_position.R
 #
@@ -16,16 +17,27 @@
 library(dplyr)
 library(jsonlite)
 library(ggplot2)
+library(argparse)
 
 # Snakemake parameter injection
-VCF_PATH <- snakemake@input[["vcf_path"]]
-FAI_PATH <- snakemake@input[["index_path"]]
-METRICS_PATH <- snakemake@output[["metrics_json"]]
-PLOT_PATH <- snakemake@output[["metrics_plot"]]
-INCLUDED_CHROMS <- snakemake@params[["included_chroms"]]
-RUN_NAME <- snakemake@params[["run_name"]]
+parser <- ArgumentParser()
+parser$add_argument("--vcf_path", required = TRUE)
+parser$add_argument("--index_path", required = TRUE)
+parser$add_argument("--metrics_json", required = TRUE)
+parser$add_argument("--metrics_plot", required = TRUE)
+parser$add_argument("--included_chroms", required = TRUE, nargs = "+")
+parser$add_argument("--run_name", required = TRUE)
+parser$add_argument("--log", required = TRUE)
+args <- parser$parse_args()
 
-LOG_PATH <- snakemake@log[[1]]
+VCF_PATH <- args$vcf_path
+FAI_PATH <- args$index_path
+METRICS_PATH <- args$metrics_json
+PLOT_PATH <- args$metrics_plot
+INCLUDED_CHROMS <- args$included_chroms
+RUN_NAME <- args$run_name
+
+LOG_PATH <- args$log
 
 # Start logging
 log_con <- file(LOG_PATH, open = "wt")

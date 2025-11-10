@@ -12,5 +12,14 @@ rule ex_duplex_overlap_metrics:
         "logs/{ex_sample}/ex_duplex_overlap_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_duplex_overlap_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate duplex overlap metrics
+        ex_duplex_overlap_metrics.py \
+            --bam {input.bam} \
+            --metrics {output.metrics} \
+            --log {log} 2>> {log}
+        """

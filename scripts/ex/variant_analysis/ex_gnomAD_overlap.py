@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_gnomAD_overlap.py
 
@@ -14,32 +15,33 @@ from pathlib import Path
 import subprocess
 import json
 import sys
+import argparse
 
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_gnomAD_overlap.py")
 
     # Inputs
-    somatic_vcf = Path(snakemake.input.somatic_vcf)
-    somatic_all_vcf = Path(snakemake.input.somatic_all_vcf)
-    germline_vcf = Path(snakemake.input.germline_vcf)
+    somatic_vcf = Path(args.somatic_vcf)
+    somatic_all_vcf = Path(args.somatic_all_vcf)
+    germline_vcf = Path(args.germline_vcf)
 
     # Outputs
-    intermediate_bgz = Path(snakemake.output.intermediate_somatic_bgz)
-    germline_matches = Path(snakemake.output.germline_matches)
-    metrics_file = Path(snakemake.output.metrics_file)
+    intermediate_bgz = Path(args.intermediate_somatic_bgz)
+    germline_matches = Path(args.germline_matches)
+    metrics_file = Path(args.metrics_file)
 
     # --- Compress & index somatic VCF ---
-    with open(intermediate_bgz, "wb") as out_f, open(snakemake.log[0], "a") as log_file:
+    with open(intermediate_bgz, "wb") as out_f, open(args.log, "a") as log_file:
         subprocess.run(["bgzip", "-c", str(somatic_vcf)], stdout=out_f, stderr=log_file, check=True)
 
-    with open(snakemake.log[0], "a") as log_file:
+    with open(args.log, "a") as log_file:
         subprocess.run(["tabix", "-p", "vcf", str(intermediate_bgz)], stderr=log_file, check=True)
 
     # --- Count total number of somatic variants ---
-    with open(snakemake.log[0], "a") as log_file:
+    with open(args.log, "a") as log_file:
         result = subprocess.run(
             ["bcftools", "view", "-H", str(somatic_vcf)],
             stdout=subprocess.PIPE,
@@ -51,7 +53,7 @@ def main(snakemake):
 
     # --- Intersect with germline VCF ---
     germline_matches.parent.mkdir(parents=True, exist_ok=True)
-    with open(snakemake.log[0], "a") as log_file:
+    with open(args.log, "a") as log_file:
         subprocess.run(
             ["bcftools", "isec", "-n=2", "-w1", "-O", "v",
             str(germline_vcf), str(intermediate_bgz), "-o", str(germline_matches)],
@@ -61,7 +63,7 @@ def main(snakemake):
         )
 
     # --- Count number of germline matches ---
-    with open(snakemake.log[0], "a") as log_file:
+    with open(args.log, "a") as log_file:
         result = subprocess.run(
             ["bcftools", "view", "-H", str(germline_matches)],
             stdout=subprocess.PIPE,
@@ -120,4 +122,14 @@ def main(snakemake):
     print(f"[INFO] Completed ex_gnomAD_overlap.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--somatic_vcf", required=True)
+    parser.add_argument("--somatic_all_vcf", required=True)
+    parser.add_argument("--germline_vcf", required=True)
+    parser.add_argument("--intermediate_somatic_bgz", required=True)
+    parser.add_argument("--intermediate_somatic_tbi", required=True)
+    parser.add_argument("--germline_matches", required=True)
+    parser.add_argument("--metrics_file", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

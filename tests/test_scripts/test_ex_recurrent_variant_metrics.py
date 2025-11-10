@@ -8,13 +8,10 @@ Authors:
 """
 
 # Imports
-import sys
 import json
 from math import isclose
-from pathlib import Path
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
-from ex_recurrent_variant_metrics import main
+import types
+from scripts.ex.variant_analysis.ex_recurrent_variant_metrics import main
 
 # Create dictionary of paths to test data
 DATA_DIR = "tests/data/test_ex_recurrent_variant_metrics/"
@@ -33,13 +30,14 @@ TEST_DATA = {
 def test_ex_recurrent_variant_metrics(tmp_path):
 
     # Run script
-    main(
-        somatic_vcf_paths = TEST_DATA["somatic_vcfs"],
-        germ_contaminant_vcf_paths = TEST_DATA["germline_contaminant_vcfs"],
-        output_metrics_path = str(tmp_path / "metrics.json"),
-        output_vcf_path = str(tmp_path / "recurrent.vcf"),
-        log_path = str(tmp_path / "log.txt"),
+    args = types.SimpleNamespace(
+        somatic_vcfs=TEST_DATA["somatic_vcfs"],
+        germ_contaminant_vcfs=TEST_DATA["germline_contaminant_vcfs"],
+        vcf_path=str(tmp_path / "recurrent.vcf"),
+        metrics_path=str(tmp_path / "metrics.json"),
+        log=str(tmp_path / "log.txt")
     )
+    main(args=args)
 
     # Load output metrics
     with open(tmp_path / "metrics.json") as f:

@@ -1,14 +1,18 @@
+"""
+--- ex_snv_distance_metrics.py ---
+
+Test that the script ex_snv_distance_metrics.py works correctly
+
+Authors:
+    - Chat-GPT
+    - Cameron Fraser
+"""
 
 # Setup
-import os
-import sys
-from pathlib import Path
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
-from ex_snv_distance_metrics import calculate_nearest_snv_percentiles
+from scripts.ex.variant_analysis.ex_snv_distance_metrics import calculate_nearest_snv_percentiles
 
 # Define hard coded variables
-VCF_PATH = PROJECT_ROOT / "tests" / "data" / "test_ex_snv_distance_metrics" / "S00X_variants.vcf"
+VCF_PATH = "tests/data/test_ex_snv_distance_metrics/S00X_variants.vcf"
 EXPECTED = {
         "0": 20,
         "25": 20,

@@ -17,5 +17,18 @@ rule create_run_timeline_plot:
         "logs/global_rules/create_run_timeline_plot.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "create_run_timeline_plot.R")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Create run timeline plot
+        create_run_timeline_plot.R \
+            --job_log {input.job_log} \
+            --resources_log {input.resources_log} \
+            --plot {output.plot} \
+            --run_name {params.run_name} \
+            --max_iops {params.max_iops} \
+            --max_throughput {params.max_throughput} \
+            --log {log} 2>> {log}
+        """

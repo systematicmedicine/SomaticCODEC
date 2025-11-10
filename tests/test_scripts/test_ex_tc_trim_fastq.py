@@ -11,14 +11,9 @@ Authors:
 
 import glob
 from pathlib import Path
-import sys
 import os
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
-from helpers.get_metadata import load_config, get_ex_technical_control_ids
+from scripts.helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
+from scripts.helpers.get_metadata import load_config, get_ex_technical_control_ids
 
 def test_read_counts_preserved():
     config = load_config("config/config.yaml")

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- create_job_log.py ---
 
@@ -14,15 +15,16 @@ import re
 import csv
 import sys
 from datetime import datetime
+import argparse
 
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting create_job_log.py")
 
-    log_file = snakemake.input.log
-    csv_file = snakemake.output.csv
+    log_file = args.run_pipeline_log
+    csv_file = args.job_log_csv
 
     # Regex patterns
     start_pattern = re.compile(
@@ -84,4 +86,9 @@ def main(snakemake):
     print("[INFO] Completed create_job_log.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run_pipeline_log", required=True)
+    parser.add_argument("--job_log_csv", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

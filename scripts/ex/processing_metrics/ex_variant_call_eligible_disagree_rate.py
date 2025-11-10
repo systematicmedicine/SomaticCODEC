@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # =====================================================================
 # ex_variant_call_eligible_disagree_rate.py
 #
@@ -41,7 +42,7 @@ import sys
 import json
 import random
 from typing import Dict, Tuple, List
-
+import argparse
 import pysam
 
 # ---------------------------------------------------------------------
@@ -194,21 +195,21 @@ def tally_disagreements(bam, bed_idx, required_q: int, number_of_reads: int):
 # ---------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------
-def main(snakemake):
+def main(args):
     # Start logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_variant_call_eligible_disagree_rate.py")
 
     # Snakemake parameter injection
-    bam_path = snakemake.input.bam
-    bai_path = snakemake.input.bai
-    bed_path = snakemake.input.include_bed
-    out_json = snakemake.output.metrics_json
+    bam_path = args.bam
+    bai_path = args.bai
+    bed_path = args.include_bed
+    out_json = args.metrics_json
 
-    REQUIRED_Q = int(snakemake.params.required_Q)
-    NUMBER_OF_READS = int(snakemake.params.number_of_reads)
-    THREADS = int(getattr(snakemake, "threads", 1))
+    REQUIRED_Q = int(args.required_Q)
+    NUMBER_OF_READS = int(args.number_of_reads)
+    THREADS = int(args.threads)
 
     print(f"[INFO] BAM: {bam_path}")
     print(f"[INFO] BED: {bed_path}")
@@ -262,4 +263,14 @@ def main(snakemake):
     print("[INFO] Finished ex_variant_call_eligible_disagree_rate.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bam", required=True)
+    parser.add_argument("--bai", required=True)
+    parser.add_argument("--include_bed", required=True)
+    parser.add_argument("--metrics_json", required=True)
+    parser.add_argument("--required_Q", required=True)
+    parser.add_argument("--number_of_reads", required=True)
+    parser.add_argument("--threads", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_total_read_loss.py ---
 
@@ -15,13 +16,13 @@ Authors:
 import json
 import subprocess
 import pysam
-import os
 import sys
+import argparse
 
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_total_read_loss.py")
 
     # Count number of reads in a FASTQ file
@@ -47,15 +48,15 @@ def main(snakemake):
             return sum(1 for _ in bam)
         
     # Define sample name
-    sample = snakemake.params.sample
+    sample = args.sample
 
     # Count R1 and R2 reads using seqkit
-    r1_count = count_fastq_reads(snakemake.input.input_fastq1)
-    r2_count = count_fastq_reads(snakemake.input.input_fastq2)
+    r1_count = count_fastq_reads(args.input_fastq1)
+    r2_count = count_fastq_reads(args.input_fastq2)
     paired_reads_post_demux = min(r1_count, r2_count)
 
     # Count reads in final DSC BAM
-    final_dsc_reads = count_bam_reads(snakemake.input.dsc_final)
+    final_dsc_reads = count_bam_reads(args.dsc_final)
 
     # Calculate read loss
     reads_lost = paired_reads_post_demux - final_dsc_reads
@@ -69,10 +70,18 @@ def main(snakemake):
         "percent_reads_lost": round(percent_lost, 2)
     }
 
-    with open(snakemake.output.file_path, 'w') as out_f:
+    with open(args.metrics, 'w') as out_f:
         json.dump(result, out_f, indent=4)
 
     print("[INFO] Completed ex_total_read_loss.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_fastq1", required=True)
+    parser.add_argument("--input_fastq2", required=True)
+    parser.add_argument("--dsc_final", required=True)
+    parser.add_argument("--metrics", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- fastqc_summary_metrics.py ---
 
@@ -14,11 +15,12 @@ from pathlib import Path
 import json
 import sys
 import numpy as np, scipy.stats
+import argparse
 
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting fastqc_summary_metrics.py")
 
     # Parses fastqc_data.txt into a dictionary of dataframes
@@ -45,10 +47,10 @@ def main(snakemake):
         return modules
 
     # Load sample name
-    sample = snakemake.params.sample
+    sample = args.sample
 
     # Load fastqc file paths
-    fastqc_file_paths = snakemake.input.fastqc_files
+    fastqc_file_paths = args.fastqc_files
 
     # For each fastqc_data file, pull out key metrics and output in json
     for file_path in fastqc_file_paths:
@@ -115,4 +117,9 @@ def main(snakemake):
     print("[INFO] Completed fastqc_summary_metrics.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fastqc_files", required=True, nargs="+")
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

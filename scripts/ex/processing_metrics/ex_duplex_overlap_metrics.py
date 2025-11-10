@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_duplex_overlap_metrics.py ---
 
@@ -13,18 +14,19 @@ import sys
 import json
 import pysam
 import numpy as np
+import argparse
 
-def main(snakemake):
+def main(args):
     # Redirect stdout and stderr to the Snakemake log file
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_duplex_overlap_metrics.py")
 
     # Define inputs
-    dsc_bam = snakemake.input.bam
+    dsc_bam = args.bam
 
     # Define input path
-    json_out_path = snakemake.output.metrics
+    json_out_path = args.metrics
 
     overlap_lengths = []
 
@@ -57,6 +59,10 @@ def main(snakemake):
 
     print("[INFO] Completed ex_duplex_overlap_metrics.py")
 
-# Run in Snakemake
 if __name__ == "__main__":
-    main(snakemake) 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bam", required=True)
+    parser.add_argument("--metrics", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args) 

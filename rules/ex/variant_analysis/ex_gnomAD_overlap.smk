@@ -18,5 +18,19 @@ rule ex_gnomAD_overlap:
         "logs/{ex_sample}/ex_gnomAD_overlap.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_gnomAD_overlap.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate gnomAD overlap metrics
+        ex_gnomAD_overlap.py \
+            --somatic_vcf {input.somatic_vcf} \
+            --somatic_all_vcf {input.somatic_all_vcf} \
+            --germline_vcf {input.germline_vcf} \
+            --intermediate_somatic_bgz {output.intermediate_somatic_bgz} \
+            --intermediate_somatic_tbi {output.intermediate_somatic_tbi} \
+            --germline_matches {output.germline_matches} \
+            --metrics_file {output.metrics_file} \
+            --log {log} 2>> {log}
+        """

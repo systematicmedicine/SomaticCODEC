@@ -13,7 +13,8 @@ from unittest.mock import patch, MagicMock
 import tempfile
 import json
 import os
-from scripts.ex_dsc_remap_metrics import main
+import types
+from scripts.ex.processing_metrics.ex_dsc_remap_metrics import main
 import scripts.helpers.get_metadata as md
 
 
@@ -58,18 +59,15 @@ def test_read_loss_cases(
 
     config = md.load_config("config/config.yaml")
 
-    class FakeSnakemake:
-        class Input:
-            bam = "fake.bam"
-        input = Input()
-        output = type("Output", (), {"metrics": json_out_path})
-        class Params:
-            min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"]
-            sample = "TestSample"
-        params = Params()
-        log = ["logfile.log"]
+    args = types.SimpleNamespace(
+        bam = "fake.bam",
+        metrics = json_out_path,
+        min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"],
+        sample="TestSample",
+        log=str("logfile.log")
+    )
 
-    main(FakeSnakemake())
+    main(args=args)
 
     with open(json_out_path) as f:
         data = json.load(f)

@@ -9,12 +9,7 @@ Authors:
 """
 from pathlib import Path
 import glob
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from helpers.bam_helpers import count_bam_data_points
+from scripts.helpers.bam_helpers import count_bam_data_points
 
 # Test that remapping does not change read count
 def test_read_counts_preserved(lightweight_test_run):

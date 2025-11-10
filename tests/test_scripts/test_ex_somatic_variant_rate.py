@@ -10,14 +10,9 @@ Authors:
 """
 import pytest
 import os
-from pathlib import Path
-import sys
 import json
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_somatic_variant_rate import main
+import types
+from scripts.ex.variant_analysis.ex_somatic_variant_rate import main
 @pytest.mark.parametrize(
     "vcf_path, expected_metrics",
     [
@@ -67,12 +62,13 @@ def test_somatic_variant_rate(tmp_path, vcf_path, expected_metrics):
     output_file = tmp_path / "results.json"
     log_file = tmp_path / "log.txt"
 
-    class MockSnakemake:
-        input = type("input", (), {"vcf_all": vcf_path})
-        output = type("output", (), {"results": str(output_file)})
-        log = [str(log_file)]
-
-    main(MockSnakemake)
+    # Run script
+    args = types.SimpleNamespace(
+        vcf_all=vcf_path,
+        results=output_file,
+        log=log_file
+        )
+    main(args=args)
 
     # Load metrics
     metrics = {}

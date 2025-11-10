@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_somatic_variant_rate.py ---
 
@@ -14,6 +15,7 @@ Author:
 import re
 import sys
 import json
+import argparse
 
 # Define human nuclear genome size
 #   - External reference: 10.1126/science.abj6987
@@ -21,15 +23,15 @@ import json
 
 HUMAN_NUC_GENOME_SIZE = 6_063_731_176  
 
-def main(snakemake):
+def main(args):
     # Redirect stdout and stderr to the Snakemake log file
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_somatic_variant_rate.py")
 
     # Setup
-    vcf_path = snakemake.input.vcf_all
-    output_path = snakemake.output.results
+    vcf_path = args.vcf_all
+    output_path = args.results
 
     starting_bases = 0
     filtered_bases = 0
@@ -128,4 +130,9 @@ def main(snakemake):
     print("[INFO] Completed ex_somatic_variant_rate.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--vcf_all", required=True)
+    parser.add_argument("--results", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

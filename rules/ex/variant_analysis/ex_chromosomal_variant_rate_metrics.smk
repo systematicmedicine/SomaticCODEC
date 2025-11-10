@@ -15,5 +15,16 @@ rule ex_chromosomal_variant_rate_metrics:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_chromosomal_variant_rate_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate chromosomal variant rate metrics
+        ex_chromosomal_variant_rate_metrics.py \
+            --vcf {input.vcf} \
+            --fai {input.fai} \
+            --metrics {output.metrics} \
+            --included_chromosomes {params.included_chromosomes} \
+            --log {log} 2>> {log}
+        """
