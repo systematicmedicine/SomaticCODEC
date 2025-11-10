@@ -4,7 +4,7 @@ Filter reads
     - Remove reads where the mean quality score is too low
 """
 
-import helpers.get_metadata as md
+import scripts.helpers.get_metadata as md
 
 rule ex_filter_fastq:
     input: 

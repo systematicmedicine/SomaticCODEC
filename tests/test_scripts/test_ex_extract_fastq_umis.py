@@ -9,13 +9,8 @@ Authors:
 """
 import glob
 from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq, first_n_headers
-from helpers.get_metadata import load_config
+from scripts.helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq, first_n_headers
+from scripts.helpers.get_metadata import load_config
 
 # Test that extracting UMIs does not change read count
 def test_read_counts_preserved(lightweight_test_run):

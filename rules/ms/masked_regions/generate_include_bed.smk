@@ -7,7 +7,7 @@
 #       - Inverse of combined mask
 # ----------------------------------------------------------------------------------------------
 
-import helpers.get_metadata as md
+import scripts.helpers.get_metadata as md
 
 rule generate_include_bed:
     input:
