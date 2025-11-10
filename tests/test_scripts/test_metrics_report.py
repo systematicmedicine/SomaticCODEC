@@ -9,16 +9,10 @@ Authors:
 """
 
 # Import libraries
-import os
-import sys
 import pytest
 import pandas as pd
 from pathlib import Path
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-import helpers.get_metadata as md
+import scripts.helpers.get_metadata as md
 
 # -------------------------------------------------------------------------------------
 # Fixtures

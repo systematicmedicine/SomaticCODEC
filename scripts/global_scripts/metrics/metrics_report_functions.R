@@ -1,8 +1,8 @@
+#!/usr/bin/env Rscript
 # ===========================================================================
-# Metrics report.R
+# metrics_report_functions.R
 #
-# Collate component level and system level metrics into a report
-#   - Component level metrics are defined in config/component_metrics.xlsx
+# Functions used in metrics_report.R
 #
 # Authors: 
 #   - Cameron Fraser

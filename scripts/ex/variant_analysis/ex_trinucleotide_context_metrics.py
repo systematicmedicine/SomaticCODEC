@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 # =====================================================================
-# ex_trinuc_conexts.py
+# ex_trinucleotide_context_metrics.py
 #
 # Calculate trinucleotide context for a sample, and compare to reference
 # contexts.
@@ -38,6 +39,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 from pypdf import PdfReader, PdfWriter
+import argparse
 
 # ---------------------------------------------------------------------
 # Functions
@@ -106,19 +108,30 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
 # ---------------------------------------------------------------------
 if __name__ == "__main__":
 
-    # Start logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
-    print("[INFO] Starting ex_trinuc_contexts.py")
-
     # Snakemake parameter injection
-    vcf_path = snakemake.input.vcf_path
-    ref_fasta_path = snakemake.input.ref_fasta_path
-    context_csv_path = snakemake.input.context_csv_path
-    output_sample_csv = snakemake.output.sample_csv
-    output_similarity_csv = snakemake.output.similarities_csv
-    output_plot_pdf = snakemake.output.plot_pdf
-    sample_name = snakemake.wildcards.ex_sample
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--vcf_path", required=True)
+    parser.add_argument("--ref_fasta_path", required=True)
+    parser.add_argument("--context_csv_path", required=True)
+    parser.add_argument("--sample_csv", required=True)
+    parser.add_argument("--similarities_csv", required=True)
+    parser.add_argument("--plot_pdf", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+
+    vcf_path = args.vcf_path
+    ref_fasta_path = args.ref_fasta_path
+    context_csv_path = args.context_csv_path
+    output_sample_csv = args.sample_csv
+    output_similarity_csv = args.similarities_csv
+    output_plot_pdf = args.plot_pdf
+    sample_name = args.sample
+
+    # Start logging
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
+    print("[INFO] Starting ex_trinuc_contexts.py")
 
     # Define contexts
     CONTEXTS = get_contexts()

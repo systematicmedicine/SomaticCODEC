@@ -1,7 +1,7 @@
 # =========================================================================
-# test_ex_trinuc_contexts.py
+# test_ex_trinucleotide_context_metrics.py
 #
-# Tests the script ex_trinuc_contexts.py
+# Tests the script ex_trinucleotide_context_metrics.py
 #   - Tests that trinucleotide contexts are corectly calculated for a sample
 #
 # Authors:
@@ -10,20 +10,16 @@
 # =========================================================================
 
 # Import libraries
-import sys
+
 import pandas as pd
-import pytest
+from scripts.ex.variant_analysis.ex_trinucleotide_context_metrics import get_sample_trinuc_context, get_contexts
+from pyfaidx import Fasta
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
-from ex_trinuc_contexts import get_sample_trinuc_context, get_contexts
-from pyfaidx import Fasta
-
 # Define hard coded variables
-VCF_PATH = PROJECT_ROOT / "tests" / "data" / "test_ex_trinuc_contexts" / "S00X_variants.vcf"
-REF_GENOME_PATH = PROJECT_ROOT / "tests" / "data" / "lightweight_test_run" / "GRCh38_Chr21_plus_stubs.fa"
-EXPECTED_CONTEXT = PROJECT_ROOT / "tests" / "expected" / "ex_trinuc_contexts" / "S00X_expected_context.csv"
+VCF_PATH = "tests/data/test_ex_trinucleotide_context_metrics/S00X_variants.vcf"
+REF_GENOME_PATH = Path("tests/data/lightweight_test_run/GRCh38_Chr21_plus_stubs.fa")
+EXPECTED_CONTEXT = "tests/expected/ex_trinuc_contexts/S00X_expected_context.csv"
 
 def test_get_sample_trinuc_context(tmp_path):
     """

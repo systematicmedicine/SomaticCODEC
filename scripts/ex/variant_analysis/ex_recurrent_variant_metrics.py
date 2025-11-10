@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # =======================================================================================
 # --- ex_recurrent_variant_metrics.py ---
 #
@@ -20,6 +21,7 @@ import pandas as pd
 import pysam
 import json
 import sys
+import argparse
 
 # ---------------------------------------------------------------------------------------
 # Define functions
@@ -154,24 +156,18 @@ def write_recurrent_metrics_json(output_path, somatic_variants_df, filtered_vari
 # Main logic
 # ---------------------------------------------------------------------------------------
 
-def main(
-    somatic_vcf_paths, 
-    germ_contaminant_vcf_paths, 
-    output_metrics_path, 
-    output_vcf_path, 
-    log_path
-    ):
+def main(args):
 
     # Inititate logging
-    sys.stdout = open(log_path, "a")
-    sys.stderr = open(log_path, "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_recurrent_variant_metrics.py")
     
     # Load all somatic variants
-    somatic_variants = load_variants_from_vcfs(somatic_vcf_paths)
+    somatic_variants = load_variants_from_vcfs(args.somatic_vcfs)
 
     # Load gnomAD variants
-    germline_contaminants = load_variants_from_vcfs(germ_contaminant_vcf_paths)
+    germline_contaminants = load_variants_from_vcfs(args.germ_contaminant_vcfs)
 
     # Filter somatic variants
     filtered_somatic_variants = filter_variants_by_exclusion_set(somatic_variants, germline_contaminants)
@@ -180,11 +176,11 @@ def main(
     recurrent_variants_df = count_recurrent_variants(filtered_somatic_variants)
 
     # Write recurrent variants to vcf
-    write_recurrent_variants_to_vcf(recurrent_variants_df, output_vcf_path)
+    write_recurrent_variants_to_vcf(recurrent_variants_df, args.vcf_path)
     
     # Calculate metrics
     write_recurrent_metrics_json(
-        output_path=output_metrics_path,
+        output_path=args.metrics_path,
         somatic_variants_df=somatic_variants,
         filtered_variants_df=filtered_somatic_variants,
         recurrent_variants_df=recurrent_variants_df
@@ -194,12 +190,13 @@ def main(
     print("[INFO] Completed ex_recurrent_variant_metrics.py")
 
 if __name__ == "__main__":
-    main(
-        somatic_vcf_paths = snakemake.input.somatic_vcfs,
-        germ_contaminant_vcf_paths = snakemake.input.germ_contaminant_vcfs,
-        output_metrics_path = snakemake.output.metrics_path,
-        output_vcf_path = snakemake.output.vcf_path,
-        log_path = snakemake.log[0]
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--somatic_vcfs", required=True, nargs="+")
+    parser.add_argument("--germ_contaminant_vcfs", required=True, nargs="+")
+    parser.add_argument("--vcf_path", required=True)
+    parser.add_argument("--metrics_path", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
    
 

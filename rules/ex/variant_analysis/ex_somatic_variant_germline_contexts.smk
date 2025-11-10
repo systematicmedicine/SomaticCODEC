@@ -12,7 +12,7 @@ rule ex_somatic_variant_germline_contexts:
         ),
         ex_somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf"
     output:
-        vcf = "results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
+        contexts_vcf = "results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
     log:
         "logs/{ex_sample}/ex_somatic_variant_germline_context.log"
     benchmark:
@@ -21,5 +21,16 @@ rule ex_somatic_variant_germline_contexts:
         config["infrastructure"]["threads"]["heavy"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_somatic_variant_germline_contexts.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate germline contexts
+        ex_somatic_variant_germline_contexts.py \
+            --ms_pileup_bcf {input.ms_pileup_bcf} \
+            --ex_somatic_vcf {input.ex_somatic_vcf} \
+            --contexts_vcf {output.contexts_vcf} \
+            --threads {threads} \
+            --log {log} 2>> {log}
+        """

@@ -30,19 +30,17 @@ rule ex_fastqcraw_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Run fastqc
         fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
-
         fastqc -t {threads} {input.fastq2} -o metrics/ 2>> {log}
 
+        # Rename outputs
         mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1} 2>> {log}
-
         mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2} 2>> {log}
-
         mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.zip {output.zip_r1} 2>> {log}
-
         mv metrics/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2} 2>> {log}
 
+        # Extract txt file from zip output
         unzip -p {output.zip_r1} */fastqc_data.txt > {output.txt_r1} 2>> {log}
-
         unzip -p {output.zip_r2} */fastqc_data.txt > {output.txt_r2} 2>> {log}
         """

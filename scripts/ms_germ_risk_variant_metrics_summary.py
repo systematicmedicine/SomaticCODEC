@@ -13,13 +13,9 @@ import pandas as pd
 import json
 from collections import defaultdict
 import sys
-from pathlib import Path
 import subprocess
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
-sys.path.insert(0, str(PROJECT_ROOT))
-
-from helpers.vcf_helpers import count_vcf_data_points
+from scripts.helpers.vcf_helpers import count_vcf_data_points
 
 def main(snakemake):
     # Initiate logging

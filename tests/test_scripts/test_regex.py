@@ -38,7 +38,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 CSV_PATH = os.path.join(PROJECT_ROOT, 'tests', 'expected', 'test_regex', 'regex_expected_values.csv')
 COMPONENT_XLSX = os.path.join(PROJECT_ROOT, 'config', 'component_level_metrics.xlsx')
 SYSTEM_XLSX = os.path.join(PROJECT_ROOT, 'config', 'system_level_metrics.xlsx')
-R_SCRIPT_PATH = os.path.join(PROJECT_ROOT, 'scripts', 'metrics_report_functions.R')
+R_SCRIPT_PATH = os.path.join(PROJECT_ROOT, 'scripts/global_scripts/metrics', 'metrics_report_functions.R')
 
 # Load R script
 robjects.r.source(R_SCRIPT_PATH)

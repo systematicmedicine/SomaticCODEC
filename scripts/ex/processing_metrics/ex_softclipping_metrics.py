@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_softclipping_metrics.py ---
 
@@ -17,11 +18,12 @@ import json
 import numpy as np
 import os
 import sys
+import argparse
 
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_total_read_loss.py")
 
     # Extract soft-clipped base counts per read from a BAM file
@@ -43,8 +45,8 @@ def main(snakemake):
             f"{p}th_percentile": int(np.percentile(values_array, p, method="nearest")) for p in percentiles
         }
 
-    bam_path = snakemake.input.dsc_final
-    output_json = snakemake.output.file_path
+    bam_path = args.dsc_final
+    output_json = args.metrics
 
     softclip_lengths = get_softclip_lengths(bam_path)
 
@@ -71,4 +73,9 @@ def main(snakemake):
     print("[INFO] Completed ex_total_read_loss.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dsc_final", required=True)
+    parser.add_argument("--metrics", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

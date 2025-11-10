@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_duplication_metrics.py ---
 
@@ -20,19 +21,20 @@ Authors:
 import pandas as pd
 import sys
 import json
+import argparse
 
-def main(snakemake):
+def main(args):
     # Redirect stdout and stderr to the Snakemake log file
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_duplication_metrics.py")
 
     # Define inputs
-    hist_file = snakemake.input.umi_metrics
-    sample = snakemake.params.sample
+    hist_file = args.umi_metrics
+    sample = args.sample
 
     # Define output
-    output_json = snakemake.output.json
+    output_json = args.json
 
     rows = []
     df = pd.read_csv(hist_file, sep="\t")
@@ -59,4 +61,10 @@ def main(snakemake):
     print("[INFO] Completed ex_duplication_metrics.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--umi_metrics", required=True)
+    parser.add_argument("--json", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

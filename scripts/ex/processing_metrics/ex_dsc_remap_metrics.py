@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_dsc_remap_metrics.py ---
 
@@ -14,20 +15,21 @@ Authors:
 import subprocess
 import sys
 import json
+import argparse
 
-def main(snakemake):
+def main(args):
     # Redirect stdout and stderr to the Snakemake log file
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_dsc_remap_metrics.py")
 
     # Inputs from Snakemake
-    dsc_bam = snakemake.input.bam
-    min_mapq = snakemake.params.min_mapq
-    sample = snakemake.params.sample
+    dsc_bam = args.bam
+    min_mapq = args.min_mapq
+    sample = args.sample
 
     # Output path
-    json_out_path = snakemake.output.metrics
+    json_out_path = args.metrics
 
     def count_reads(cmd):
         """Run a samtools view command and return the count as int"""
@@ -71,6 +73,12 @@ def main(snakemake):
 
     print("[INFO] Completed ex_dsc_remap_metrics.py")
 
-# Run in Snakemake
 if __name__ == "__main__":
-    main(snakemake) 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bam", required=True)
+    parser.add_argument("--metrics", required=True)
+    parser.add_argument("--min_mapq", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

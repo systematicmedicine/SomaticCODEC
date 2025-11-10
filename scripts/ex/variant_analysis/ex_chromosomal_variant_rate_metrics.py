@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_chromosomal_variant_rate_metrics.py ---
 
@@ -11,11 +12,12 @@ import numpy as np
 from collections import defaultdict
 import json
 import sys
+import argparse
 
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_chromosomal_variant_rate_metrics.py")
 
     # Calculates Gini coefficient
@@ -26,10 +28,10 @@ def main(snakemake):
         return cumulative_diffs / (2 * n**2 * np.mean(x))
 
     # Get paths
-    vcf_path = snakemake.input.vcf
-    fai_path = snakemake.input.fai
-    included_chromosomes = snakemake.params.included_chromosomes
-    json_out_path = snakemake.output.metrics
+    vcf_path = args.vcf
+    fai_path = args.fai
+    included_chromosomes = args.included_chromosomes
+    json_out_path = args.metrics
 
     # Load chromosome lengths for included chromsomes from FAI
     chrom_lengths = {}
@@ -86,5 +88,12 @@ def main(snakemake):
     print("[INFO] Completed ex_chromosomal_variant_rate_metrics.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--vcf", required=True)
+    parser.add_argument("--fai", required=True)
+    parser.add_argument("--metrics", required=True)
+    parser.add_argument("--included_chromosomes", required=True, nargs = "+")
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
 

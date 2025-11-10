@@ -29,10 +29,8 @@
 import sys
 import importlib.util
 from pathlib import Path
-
 import pysam
 import pytest
-import hashlib
 
 # Run pytest from repo root so these relative paths resolve.
 TEST_DATA = Path("tests/data/test_ex_variant_call_eligible_disagree_rate")
@@ -43,7 +41,7 @@ REQUIRED_Q = 70
 
 
 # Import the script as a module without executing __main__
-SCRIPT_PATH = Path("scripts") / "ex_variant_call_eligible_disagree_rate.py"
+SCRIPT_PATH = Path("scripts/ex/processing_metrics") / "ex_variant_call_eligible_disagree_rate.py"
 spec = importlib.util.spec_from_file_location(
     "ex_variant_call_eligible_disagree_rate", str(SCRIPT_PATH)
 )

@@ -14,5 +14,9 @@ rule ex_map_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Generate alignment metrics        
         samtools flagstat {input.bam} > {output.txt} 2>> {log}
         """

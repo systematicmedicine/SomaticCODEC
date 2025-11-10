@@ -7,7 +7,7 @@ rule ex_total_read_loss:
         input_fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
         dsc_final = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
     output:
-        file_path = "metrics/{ex_sample}/{ex_sample}_total_read_loss.json"
+        metrics = "metrics/{ex_sample}/{ex_sample}_total_read_loss.json"
     params:
         sample = "{ex_sample}"
     log:
@@ -16,5 +16,17 @@ rule ex_total_read_loss:
         "logs/{ex_sample}/ex_total_read_loss.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_total_read_loss.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate total read loss
+        ex_total_read_loss.py \
+            --input_fastq1 {input.input_fastq1} \
+            --input_fastq2 {input.input_fastq2} \
+            --dsc_final {input.dsc_final} \
+            --metrics {output.metrics} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

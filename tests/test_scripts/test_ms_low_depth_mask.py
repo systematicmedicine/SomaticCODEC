@@ -8,12 +8,7 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from helpers.get_metadata import load_config, get_ms_sample_ids
+from scripts.helpers.get_metadata import load_config, get_ms_sample_ids
 
 # Test that low depth BED has the correct structure
 def test_bed_structure_correct(lightweight_test_run):

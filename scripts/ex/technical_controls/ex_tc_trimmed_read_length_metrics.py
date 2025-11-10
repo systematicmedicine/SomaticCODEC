@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ex_tc_trimmed_read_length_metrics.py ---
 
@@ -13,6 +14,7 @@ import sys
 import subprocess
 import numpy as np
 import json
+import argparse
 
 def get_lengths_with_seqkit(fastq):
     cmd = ["seqkit", "fx2tab", str(fastq)]
@@ -40,21 +42,21 @@ def safe_percentiles(lengths, percentiles):
     return {f"{p}th": int(np.percentile(lengths, p)) for p in percentiles}
 
 
-def main(snakemake):
+def main(args):
     # Redirect stdout/stderr
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ex_tc_trimmed_read_length_metrics.py")
 
     # Define inputs
-    trimmed_r1 = snakemake.input.r1
-    trimmed_r2 = snakemake.input.r2
+    trimmed_r1 = args.r1
+    trimmed_r2 = args.r2
 
     # Define sample name
-    sample = snakemake.params.sample
+    sample = args.sample
 
     # Define output path
-    output_json = snakemake.output.json
+    output_json = args.json
 
     # Collect lengths
     lengths_r1 = get_lengths_with_seqkit(trimmed_r1)
@@ -94,5 +96,12 @@ def main(snakemake):
 
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--r1", required=True)
+    parser.add_argument("--r2", required=True)
+    parser.add_argument("--json", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
 
