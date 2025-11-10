@@ -2,7 +2,7 @@
 Generates adapter FASTA files for demultiplexing
 """
 
-import helpers.get_metadata as md
+import scripts.helpers.get_metadata as md
 import json
 
 rule ex_generate_demux_adaptors:

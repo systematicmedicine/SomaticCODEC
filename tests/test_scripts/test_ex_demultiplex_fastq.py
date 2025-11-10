@@ -10,12 +10,7 @@ Authors:
 
 from pathlib import Path
 import glob
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from helpers.fastq_helpers import count_fastq_data_points
+from scripts.helpers.fastq_helpers import count_fastq_data_points
 
 def test_read_counts(lightweight_test_run):
     # Locate all pre-demux FASTQ files

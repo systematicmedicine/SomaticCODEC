@@ -3,7 +3,7 @@ Demultiplex each lane FASTQ into sample FASTQs
     - Use the 18bp sample indices to match reads to samples
 """
 
-import helpers.get_metadata as md
+import scripts.helpers.get_metadata as md
 
 rule ex_demultiplex_fastq:
     input:

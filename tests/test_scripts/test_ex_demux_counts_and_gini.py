@@ -9,11 +9,9 @@ Authors:
 """
 import json
 import pytest
-import os
-from pathlib import Path
 import types
 from scripts.ex.processing_metrics.ex_demux_counts_and_gini import main
-from helpers.get_metadata import load_config
+from scripts.helpers.get_metadata import load_config
 
 @pytest.mark.parametrize("demux_metrics, expected_gini", [
     ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.txt", 0.0),

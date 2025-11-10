@@ -2,7 +2,7 @@
 Obtains the germline contexts for positions where somatic variants were called
 """
 
-import helpers.get_metadata as md
+import scripts.helpers.get_metadata as md
 
 rule ex_somatic_variant_germline_contexts:
     input:

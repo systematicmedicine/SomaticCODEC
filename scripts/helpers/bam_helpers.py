@@ -9,7 +9,7 @@ Authors:
 """
 import subprocess
 import pysam
-from helpers.get_metadata import load_config
+from scripts.helpers.get_metadata import load_config
 
 # Counts the number of reads in a BAM file
 def count_bam_data_points(path):

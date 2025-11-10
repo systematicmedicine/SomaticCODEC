@@ -24,11 +24,13 @@ os.chdir(workflow.basedir)
 include: "rules/include_all.smk"
 
 # ---------------------------------------------------------------------------------------------
-# Add scripts to PATH
+# Add scripts to PATH and PYTHONPATH
 # ---------------------------------------------------------------------------------------------
 
 for root, dirs, files in os.walk(os.path.join(workflow.basedir, "scripts")):
     os.environ["PATH"] = root + os.pathsep + os.environ.get("PATH", "")
+
+os.environ["PYTHONPATH"] = os.path.abspath(".") + os.pathsep + os.environ.get("PYTHONPATH", "")
 
 # ---------------------------------------------------------------------------------------------
 # Define pipeline outputs

@@ -22,16 +22,13 @@ import sys
 from pathlib import Path
 import argparse
 import json
+import scripts.helpers.get_metadata as md
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--adapter_fasta_outputs", required=True, nargs="+")
 parser.add_argument("--config", required=True)
 parser.add_argument("--log", required=True)
 args = parser.parse_args()
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]  # assumes scripts/ is directly under PROJECT_ROOT
-sys.path.insert(0, str(PROJECT_ROOT))
-import helpers.get_metadata as md
 
 # Redirect stderr and stdout to Snakemake log
 sys.stdout = open(args.log, "a")
