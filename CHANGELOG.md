@@ -15,13 +15,12 @@ Types of changes:
 
 ### Added
 
-- Added enforcement of memory limits to all rules (#250 and )
+- Added enforcement of memory limits to all rules (#250 and 251)
 - Added all scripts to PATH and PYTHONPATH (#250)
 
 ### Changed
 - Refactored scripts directory to nested structure (#250)
 - Converted all python scripts into modules (#250)
-- check_configs.py checks for multiple uses of the same adapter within each lane ()
 
 ## [2.0.0] - 2025-11-05
 
