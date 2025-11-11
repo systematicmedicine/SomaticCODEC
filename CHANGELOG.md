@@ -15,7 +15,7 @@ Types of changes:
 
 ### Added
 
-- Added enforcement of memory limits to each rule (#250)
+- Added enforcement of memory limits to all rules (#250 and 251)
 - Added all scripts to PATH and PYTHONPATH (#250)
 
 ### Changed
