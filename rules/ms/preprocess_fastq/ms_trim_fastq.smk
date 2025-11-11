@@ -6,7 +6,7 @@ Trims FASTQ files
     - Bases of quality < qual_trim_threshold from read ends
 """
 # Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "pipeline_outputs.smk")
+include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
 

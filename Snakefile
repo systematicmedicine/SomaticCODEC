@@ -37,7 +37,7 @@ os.environ["PYTHONPATH"] = os.path.abspath(".") + os.pathsep + os.environ.get("P
 # ---------------------------------------------------------------------------------------------
 
 # Import pipeline outputs
-include: "definitions/pipeline_outputs.smk"
+include: "definitions/outputs/pipeline_outputs.smk"
 
 # Define rule all
 rule all:
