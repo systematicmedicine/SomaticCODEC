@@ -6,7 +6,7 @@ Trim reads so that only inserts are remaining
     4. Trim additional bases from the 3' end (to account for short adapter sequences/A-tailing remnants)
 """
 
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 rule ex_tc_trim_fastq:
     input:

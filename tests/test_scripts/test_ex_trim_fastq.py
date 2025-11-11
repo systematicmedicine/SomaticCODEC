@@ -11,8 +11,8 @@ Authors:
 import glob
 from pathlib import Path
 import os
-from scripts.helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
-from scripts.helpers.get_metadata import load_config, get_ex_sample_ids
+from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
+from helpers.get_metadata import load_config, get_ex_sample_ids
 
 def test_read_counts_preserved(lightweight_test_run):
     config = load_config("config/config.yaml")

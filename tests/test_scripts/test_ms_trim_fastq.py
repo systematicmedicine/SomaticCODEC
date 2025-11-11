@@ -12,8 +12,8 @@ Authors:
 
 # Import modules
 from pathlib import Path
-from scripts.helpers.get_metadata import load_config, get_ms_sample_fastqs
-from scripts.helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
+from helpers.get_metadata import load_config, get_ms_sample_fastqs
+from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
 
 
 # Test that the total number of reads does not change

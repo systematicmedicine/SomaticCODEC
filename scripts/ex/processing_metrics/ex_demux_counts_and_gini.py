@@ -16,7 +16,7 @@ from collections import defaultdict
 import json
 import sys
 import argparse
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 def main(args):  
 

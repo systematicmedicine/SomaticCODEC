@@ -7,7 +7,7 @@
 # ==============================================================================================
 
 # Load libraries
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 # Get lists of sample ids
 ex_lane_ids = md.get_ex_lane_ids(config)

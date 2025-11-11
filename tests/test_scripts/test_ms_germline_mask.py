@@ -9,7 +9,7 @@ Authors:
 """
 from pathlib import Path
 import pandas as pd
-from scripts.helpers.get_metadata import load_config, get_ms_sample_ids
+from helpers.get_metadata import load_config, get_ms_sample_ids
 
 # Test that germline variant BEDs have the correct structure
 def test_bed_structure_correct(lightweight_test_run):

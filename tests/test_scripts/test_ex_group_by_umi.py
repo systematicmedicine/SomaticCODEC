@@ -11,7 +11,7 @@ from pathlib import Path
 import glob
 import pysam
 from collections import Counter
-from scripts.helpers.bam_helpers import count_bam_data_points
+from helpers.bam_helpers import count_bam_data_points
 
 def test_group_by_umi(lightweight_test_run):
     # Locate all pre-UMI grouping BAM files

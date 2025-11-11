@@ -9,7 +9,7 @@ Authors:
 """
 from pathlib import Path
 import glob
-from scripts.helpers.bam_helpers import count_bam_data_points
+from helpers.bam_helpers import count_bam_data_points
 
 # Test that the read counts don't change during annotation
 def test_reads_decrease(lightweight_test_run):

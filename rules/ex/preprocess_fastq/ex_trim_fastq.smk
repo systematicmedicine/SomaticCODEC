@@ -7,7 +7,7 @@ Trim reads so that only inserts are remaining
     5. Remove any bases with a Q score less than set cutoff from the 3' end
 """
 
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 rule ex_trim_fastq:
     input:

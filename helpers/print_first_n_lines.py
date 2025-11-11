@@ -9,14 +9,14 @@ Authors:
 
 """
 from pathlib import Path
-from scripts.helpers.fastq_helpers import print_fastq_first_n_lines
-from scripts.helpers.vcf_helpers import print_vcf_first_n_lines
-from scripts.helpers.bed_helpers import print_bed_first_n_lines
-from scripts.helpers.tabular_helpers import print_tabular_first_n_lines
-from scripts.helpers.bam_helpers import print_bam_first_n_lines
-from scripts.helpers.sam_helpers import print_sam_first_n_lines
-from scripts.helpers.bcf_helpers import print_bcf_first_n_lines
-from scripts.helpers.fasta_helpers import print_fasta_first_n_lines
+from helpers.fastq_helpers import print_fastq_first_n_lines
+from helpers.vcf_helpers import print_vcf_first_n_lines
+from helpers.bed_helpers import print_bed_first_n_lines
+from helpers.tabular_helpers import print_tabular_first_n_lines
+from helpers.bam_helpers import print_bam_first_n_lines
+from helpers.sam_helpers import print_sam_first_n_lines
+from helpers.bcf_helpers import print_bcf_first_n_lines
+from helpers.fasta_helpers import print_fasta_first_n_lines
 
 # Calls the appropriate function based on file suffix
 def print_first_n_lines(path, n_lines):

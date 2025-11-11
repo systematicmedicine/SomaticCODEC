@@ -8,8 +8,8 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-from scripts.helpers.vcf_helpers import check_vcf_structure
-from scripts.helpers.get_metadata import load_config, get_ex_sample_ids
+from helpers.vcf_helpers import check_vcf_structure
+from helpers.get_metadata import load_config, get_ex_sample_ids
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):

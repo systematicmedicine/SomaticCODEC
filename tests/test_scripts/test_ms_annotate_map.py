@@ -9,7 +9,7 @@ Authors:
 """
 from pathlib import Path
 import glob
-from scripts.helpers.bam_helpers import count_bam_data_points, count_reads_with_read_group
+from helpers.bam_helpers import count_bam_data_points, count_reads_with_read_group
 
 # Test that read groups have been added
 def test_read_groups_added(lightweight_test_run):

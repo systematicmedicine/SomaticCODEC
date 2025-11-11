@@ -5,7 +5,7 @@ Calculate DSC coverage metrics
     - ex_duplex_coverage_wholegenome: Positions with >0x duplex depth in the include_bed region as a percentage of the whole genome
 """
 
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 rule ex_dsc_coverage_metrics:
     input:

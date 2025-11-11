@@ -15,7 +15,7 @@ import json
 import os
 import types
 from scripts.ex.processing_metrics.ex_dsc_remap_metrics import main
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 
 @pytest.mark.parametrize(
