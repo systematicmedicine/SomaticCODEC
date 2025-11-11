@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- check_included_chromosomes_present.py
 
@@ -11,17 +12,18 @@ Authors:
 """
 from pathlib import Path
 import sys
+import argparse
 
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting check_included_chromosomes_present.py", flush=True)
 
     # Load inputs
-    reference_fai = Path(snakemake.input.fai)
-    precomputed_masks = [Path(p) for p in snakemake.input.precomputed_masks]
-    included_chromosomes = set(snakemake.params.included_chromosomes)
+    reference_fai = Path(args.fai)
+    precomputed_masks = [Path(p) for p in args.precomputed_masks]
+    included_chromosomes = set(args.included_chromosomes)
 
     errors = False
 
@@ -54,7 +56,7 @@ def main(snakemake):
         sys.exit(1)
 
     # --- All checks passed, create done file ---
-    with open(snakemake.output[0], "w") as f:
+    with open(args.done_file, "w") as f:
         f.write("✅ All chromosomes included for variant calling are present in reference FAI and common BEDs.\n")
 
     print(f"✅ All chromosomes included for variant calling are present in reference FAI and common BEDs.", flush=True)
@@ -62,4 +64,11 @@ def main(snakemake):
     print("[INFO] Completed check_included_chromosomes_present.py", flush=True)
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fai", required=True)
+    parser.add_argument("--precomputed_masks", required=True, nargs = "+")
+    parser.add_argument("--included_chromosomes", required=True, nargs = "+")
+    parser.add_argument("--done_file", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

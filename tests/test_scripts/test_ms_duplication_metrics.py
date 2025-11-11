@@ -9,13 +9,8 @@ Authors:
 """
 import pytest
 import json
-import sys
-from pathlib import Path
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ms_duplication_metrics import main
+import types
+from scripts.ms.processing_metrics.ms_duplication_metrics import main
 
 @pytest.mark.parametrize("dedup_metrics, expected_dedup_rate", [
     ("tests/data/test_ms_duplication_metrics/dedup_metrics.json", 0.05)
@@ -25,14 +20,13 @@ def test_duplication_rate_calculation(tmp_path, dedup_metrics, expected_dedup_ra
     sample = "TestSample"
     log_path = tmp_path / "log.txt"
 
-    class MockSnakemake:
-        input = type("input", (), {"dedup_metrics": dedup_metrics})
-
-        output = type("output", (), {"duplication_metrics": str(output_json)})
-        log = [str(log_path)]
-        params = type("params", (), {"sample": sample})
-
-    main(MockSnakemake)
+    args = types.SimpleNamespace(
+        dedup_metrics=dedup_metrics,
+        duplication_metrics=output_json,
+        sample=sample,
+        log=log_path
+    )
+    main(args=args)
 
     with open(output_json) as f:
         result = json.load(f)

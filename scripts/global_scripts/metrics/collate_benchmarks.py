@@ -18,6 +18,7 @@ import sys
 from datetime import timedelta
 import re
 import argparse
+import os
 
 def main(args):
 
@@ -25,9 +26,8 @@ def main(args):
     sys.stdout = open(args.log, "a")
     sys.stderr = open(args.log, "a")
 
-    # Resolve the script's directory and logs directory
-    script_dir = Path(__file__).resolve().parent
-    logs_dir = script_dir.parent / "logs"
+    # Define logs directory
+    logs_dir = Path("logs")
 
     # Match all *.benchmark.txt files
     benchmark_files = list(logs_dir.rglob("*.benchmark.txt"))
@@ -114,7 +114,7 @@ def main(args):
                 scope = relative_parts[0] if len(relative_parts) > 1 else "global"
             except ValueError:
                 scope = "global"
-            source = str(file.relative_to(script_dir.parent))
+            source = os.path.relpath(file, Path.cwd())
 
             df.insert(0, "rule", rule_name)
             df.insert(1, "scope", scope)
@@ -132,7 +132,7 @@ def main(args):
         combined_df.to_csv(output_file, index=False)
         print(f"Wrote combined benchmarks to {output_file} with {len(combined_df)} entries.")
     else:
-        print("No benchmark files found or successfully read.")
+        raise RuntimeError("No benchmark files found or successfully read.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

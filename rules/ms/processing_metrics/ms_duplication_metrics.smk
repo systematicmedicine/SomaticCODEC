@@ -13,5 +13,15 @@ rule ms_duplication_metrics:
         "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ms_duplication_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate duplication metrics
+        ms_duplication_metrics.py \
+            --dedup_metrics {input.dedup_metrics} \
+            --duplication_metrics {output.duplication_metrics} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

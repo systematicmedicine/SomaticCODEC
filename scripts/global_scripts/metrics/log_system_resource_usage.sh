@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# --- monitor_system_resources.sh ---
+# --- log_system_resource_usage.sh ---
 #
-# Logs disk space, memory, and cpu load at a defined interval while pipeline is running.
+# Logs system resources at a defined interval while pipeline is running.
 #
 # Authors: 
 #   - Joshua Johnstone

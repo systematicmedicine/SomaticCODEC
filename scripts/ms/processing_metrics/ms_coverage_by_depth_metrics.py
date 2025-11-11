@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ms_coverage_by_depth_metrics.py ---
 
@@ -11,20 +12,21 @@ Authors:
 import sys
 import pandas as pd
 import json
+import argparse
 
-def main(snakemake):
+def main(args):
     # Redirect stdout/stderr to log
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ms_coverage_by_depth_metrics.py")
 
     # Define inputs
-    depth_histogram = snakemake.input.depth_histogram
-    sample = snakemake.params.sample
-    min_depth = snakemake.params.min_depth
+    depth_histogram = args.depth_histogram
+    sample = args.sample
+    min_depth = args.min_depth
 
     # Define output
-    json_out = snakemake.output.coverage_by_depth
+    json_out = args.coverage_by_depth
 
     # Load depth histogram
     df = pd.read_csv(depth_histogram, sep=r"\s+", header=None, names=["count", "depth"])
@@ -60,5 +62,12 @@ def main(snakemake):
     print("[INFO] Completed ms_coverage_by_depth_metrics.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--depth_histogram", required=True)
+    parser.add_argument("--coverage_by_depth", required=True)
+    parser.add_argument("--min_depth", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
 

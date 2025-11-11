@@ -1,7 +1,7 @@
 """
---- test_monitor_system_resources.py
+--- test_log_system_resource_usage.py
 
-Tests the script monitor_system_resources.sh
+Tests the script log_system_resource_usage.sh
 
 Authors:
     - Chat-GPT
@@ -10,19 +10,13 @@ Authors:
 import subprocess
 import time
 import os
-import sys
-from pathlib import Path
 
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-def test_monitor_resources(tmp_path):
+def test_log_system_resource_usage(tmp_path):
     log_file = tmp_path / "system_resource_usage.csv"
     
     # Run the script in the background
     proc = subprocess.Popen(
-        ["bash", "scripts/monitor_system_resources.sh"],
-        cwd=project_root,
+        ["bash", "scripts/global_scripts/metrics/log_system_resource_usage.sh"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env={**os.environ, 
