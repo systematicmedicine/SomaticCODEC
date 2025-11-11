@@ -1,7 +1,7 @@
 """
---- test_ex_annotate_map.py
+--- test_ex_add_mate_information.py
 
-Tests the rule ex_annotate_map
+Tests the rule ex_add_mate_information
 
 Authors:
     - Chat-GPT
@@ -14,7 +14,7 @@ from helpers.bam_helpers import count_bam_data_points
 # Test that the read counts don't change during annotation
 def test_reads_decrease(lightweight_test_run):
     # Locate all pre-annotation BAM files
-    pre_files = glob.glob("tmp/*/*_map_correct.bam")
+    pre_files = glob.glob("tmp/*/*_map_read_group.bam")
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
     total_pre_reads = sum(pre_counts.values())
 

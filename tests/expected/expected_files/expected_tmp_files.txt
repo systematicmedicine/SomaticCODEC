@@ -14,9 +14,9 @@ tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz
 tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz
 tmp/{ms_sample}/{ms_sample}_raw_map.sam
 tmp/{ms_sample}/{ms_sample}_raw_map.bam
-tmp/{ms_sample}/{ms_sample}_annotated_map_uncollated.bam
-tmp/{ms_sample}/{ms_sample}_annotated_map_collated.bam
-tmp/{ms_sample}/{ms_sample}_annotated_map_fixmate.bam
+tmp/{ms_sample}/{ms_sample}_read_group_map.bam
+tmp/{ms_sample}/{ms_sample}_read_group_map_collated.bam
+tmp/{ms_sample}/{ms_sample}_fixmate_map_unsorted.bam
 tmp/{ms_sample}/{ms_sample}_annotated_map.bam
 tmp/{ms_sample}/{ms_sample}_annotated_map.bam.bai
 tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam
@@ -62,7 +62,7 @@ tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz
 tmp/{ex_sample}/{ex_sample}_map.bam
 tmp/{ex_sample}/{ex_sample}_map_tmp.sam
 tmp/{ex_sample}/{ex_sample}_map_correct.bam
-tmp/{ex_sample}/{ex_sample}_map_read_group_tmp.bam
+tmp/{ex_sample}/{ex_sample}_map_read_group.bam
 tmp/{ex_sample}/{ex_sample}_map_collated_tmp.bam
 tmp/{ex_sample}/{ex_sample}_map_anno.bam
 tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam

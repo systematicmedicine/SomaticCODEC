@@ -15,7 +15,7 @@ rule ex_insert_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
-        # Generate insert size metrics
+        # Set memory limit and generate insert size metrics
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp \
             CollectInsertSizeMetrics \
             I={input.bam} \
