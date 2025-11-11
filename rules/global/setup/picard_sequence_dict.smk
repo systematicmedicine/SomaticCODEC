@@ -13,7 +13,7 @@ rule picard_sequence_dict:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
-        # Create dict file
+        # Set memory limit and create dict file
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp CreateSequenceDictionary \
             R={input.ref} \
             O={output.dictf} 2>> {log}
