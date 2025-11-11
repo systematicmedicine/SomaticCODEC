@@ -10,13 +10,8 @@ Authors:
 import json
 import pytest
 import os
-from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_softclipping_metrics import main
+import types
+from scripts.ex.processing_metrics.ex_softclipping_metrics import main
 
 @pytest.mark.parametrize(
     "bam_path, expected_total_reads, expected_0th_percentile, expected_90th_percentile, expected_100th_percentile",
@@ -29,12 +24,12 @@ def test_softclipping_percentiles(tmp_path, bam_path, expected_total_reads, expe
     output_json = tmp_path / "softclip_metrics.json"
     log_file = tmp_path / "log.txt"
 
-    class MockSnakemake:
-        input = type("input", (), {"dsc_final": bam_path})
-        output = type("output", (), {"file_path": str(output_json)})
-        log = [str(log_file)]
-
-    main(MockSnakemake)
+    args = types.SimpleNamespace(
+        dsc_final=bam_path,
+        metrics=output_json,
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
 
     with open(output_json) as f:
         result = json.load(f)

@@ -50,6 +50,7 @@ dependencies:
   - r-openxlsx=4.2.8
   - r-ggpubr=0.6.1
   - r-tidyr=1.3.1
+  - r-argparse=2.3.1
 
   # System utilities
   - click=8.1.8

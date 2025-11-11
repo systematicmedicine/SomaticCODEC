@@ -41,5 +41,25 @@ rule ex_demultiplex_fastq:
         config["infrastructure"]["threads"]["heavy"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_demultiplex_fastq.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Demulitplex
+        ex_demultiplex_fastq.py \
+            --raw_r1 {input.raw_r1} \
+            --raw_r2 {input.raw_r2} \
+            --r1_start {input.r1_start} \
+            --r2_start {input.r2_start} \
+            --metrics {output.metrics} \
+            --max_error_rate {params.max_error_rate} \
+            --min_adapter_overlap {params.min_adapter_overlap} \
+            --lane_ids {params.lane_ids} \
+            --suffix_r1 {params.suffix_r1} \
+            --suffix_r2 {params.suffix_r2} \
+            --out_dir {params.out_dir} \
+            --compression_level {params.compression_level} \
+            --threads {threads} \
+            --log {log} 2>> {log}
+        """

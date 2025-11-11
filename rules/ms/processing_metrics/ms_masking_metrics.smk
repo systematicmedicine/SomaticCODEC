@@ -21,5 +21,23 @@ rule ms_masking_metrics:
         "logs/{ms_sample}/ms_masking_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ms_masking_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Generate mask metrics
+        ms_masking_metrics.py \
+            --precomputed_masks {input.precomputed_masks} \
+            --ms_lowdepth_bed {input.ms_lowdepth_bed} \
+            --ms_germ_del_bed {input.ms_germ_del_bed} \
+            --ms_germ_ins_bed {input.ms_germ_ins_bed} \
+            --ms_germ_snv_bed {input.ms_germ_snv_bed} \
+            --combined_bed {input.combined_bed} \
+            --ref_index {input.ref_index} \
+            --mask_metrics {output.mask_metrics} \
+            --intermediate_sorted {output.intermediate_sorted} \
+            --intermediate_merged {output.intermediate_merged} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

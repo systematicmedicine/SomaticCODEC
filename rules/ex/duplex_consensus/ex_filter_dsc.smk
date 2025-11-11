@@ -20,6 +20,10 @@ rule ex_filter_dsc:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Filter BAM
         samtools view \
         --output-fmt bam \
         --output-fmt-option level={params.compression_level} \
@@ -28,11 +32,13 @@ rule ex_filter_dsc:
         --min-MQ {params.min_mapq} \
         {input.bam} > {output.intermediate_bam} 2>> {log}
         
+        # Sort BAM by coordinate
         samtools sort \
         --output-fmt bam \
         --output-fmt-option level={params.compression_level} \
         -o {output.bam} \
         {output.intermediate_bam} 2>> {log}
         
+        # Index BAM
         samtools index {output.bam} 2>> {log}
         """

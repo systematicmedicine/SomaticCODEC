@@ -13,11 +13,6 @@ Authors:
 # Import libraries
 import glob
 from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.fastq_helpers import count_fastq_data_points
 
 # Test that filtering decreases the number of reads

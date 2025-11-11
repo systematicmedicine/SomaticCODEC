@@ -10,7 +10,8 @@ Authors:
 import json
 import pytest
 import os
-from scripts.ex_duplication_metrics import main
+import types
+from scripts.ex.processing_metrics.ex_duplication_metrics import main
 
 @pytest.mark.parametrize("hist_path, expected_dup_rate, expected_pct_unique", [
     ("tests/data/test_ex_duplication_metrics/map_umi_metrics_100pct_unique.txt", 0, 100),
@@ -21,15 +22,13 @@ from scripts.ex_duplication_metrics import main
 def test_duplication_metrics(tmp_path, hist_path, expected_dup_rate, expected_pct_unique):
     output_json = tmp_path / "duplication_metrics.json"
 
-    class MockSnakemake:
-        input = type("input", (), {"umi_metrics": hist_path})
-        output = type("output", (), {"json": str(output_json)})
-        log = [str(tmp_path / "log.txt")]
-        class Params:
-            sample = "TestSample"
-        params = Params()
-
-    main(MockSnakemake)
+    args = types.SimpleNamespace(
+        umi_metrics=hist_path,
+        json=output_json,
+        sample="TestSample",
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
 
     with open(output_json) as f:
         result = json.load(f)

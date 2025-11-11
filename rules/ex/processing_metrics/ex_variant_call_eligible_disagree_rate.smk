@@ -18,5 +18,19 @@ rule ex_variant_call_eligible_disagree_rate:
         "logs/{ex_sample}/ex_variant_call_eligible_disagree_rate.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_variant_call_eligible_disagree_rate.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate disagree rate
+        ex_variant_call_eligible_disagree_rate.py \
+            --bam {input.bam} \
+            --bai {input.bai} \
+            --include_bed {input.include_bed} \
+            --metrics_json {output.metrics_json} \
+            --required_Q {params.required_Q} \
+            --number_of_reads {params.number_of_reads} \
+            --threads {threads} \
+            --log {log} 2>> {log}
+        """

@@ -11,6 +11,17 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [Unreleased]
+
+### Added
+
+- Added enforcement of memory limits to each rule (#250)
+- Added all scripts to PATH and PYTHONPATH (#250)
+
+### Changed
+- Refactored scripts directory to nested structure (#250)
+- Converted all python scripts into modules (#250)
+
 ## [2.0.0] - 2025-11-05
 
 ### Added

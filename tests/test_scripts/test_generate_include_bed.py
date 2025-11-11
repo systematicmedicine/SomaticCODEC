@@ -16,11 +16,6 @@ Authors:
 
 import pandas as pd
 from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.bed_helpers import read_bed
 from helpers.fai_helpers import read_fai
 from helpers.get_metadata import load_config, get_ex_to_ms_sample_map
