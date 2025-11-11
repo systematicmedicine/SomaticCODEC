@@ -15,19 +15,16 @@ rule included_excluded_chromosomes_beds:
         "logs/global_rules/included_excluded_chromosomes_beds.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    run:
-        # Define chromosomes included for variant calling
-        included_chromosomes = set(params.included_chromosomes)
-
-        # Load the .fai and filter
-        with open(input.fai) as fai_in, open(output.exclude_bed, "w") as bed_out:
-            for line in fai_in:
-                chrom, length, *_ = line.strip().split("\t")
-                if chrom not in included_chromosomes:
-                    bed_out.write(f"{chrom}\t0\t{length}\n")
-
-        with open(input.fai) as fai_in, open(output.include_bed, "w") as bed_out:
-            for line in fai_in:
-                chrom, length, *_ = line.strip().split("\t")
-                if chrom in included_chromosomes:
-                    bed_out.write(f"{chrom}\t0\t{length}\n") 
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Create masks for included and excluded chromosomes
+        included_excluded_chromosomes_beds.py \
+            --fai {input.fai} \
+            --exclude_bed {output.exclude_bed} \
+            --include_bed {output.include_bed} \
+            --included_chromosomes {params.included_chromosomes} \
+            --log {log} 2>> {log}
+        """

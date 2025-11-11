@@ -15,38 +15,27 @@ library(dplyr)
 library(tidyr)
 library(ggpubr)
 library(jsonlite)
+library(argparse)
 
-# Define hard coded variables
-if (!exists("snakemake")) {
-  # Manual mode (for local testing)
-  exp_name <- "local_test_experiment"
-  git_metadata <- "logs/global_rules/git_metadata.json"
-  job_log_path <- "logs/global_rules/job_log.csv"
-  resources_log_path <- "logs/global_rules/system_resource_usage.csv"
-  max_iops <- 3000
-  log_path <- "logs/global_rules/create_run_timeline_plot.log"
-  output_plot_path <- "logs/global_rules/run_timeline.pdf"
-} else {
-  # Snakemake-injected paths
-  parser <- ArgumentParser()
-  parser$add_argument("--job_log", required = TRUE)
-  parser$add_argument("--resources_log", required = TRUE)
-  parser$add_argument("--plot", required = TRUE)
-  parser$add_argument("--run_name", required = TRUE)
-  parser$add_argument("--max_iops", required = TRUE)
-  parser$add_argument("--max_throughput", required = TRUE)
-  parser$add_argument("--log", required = TRUE)
-  args <- parser$parse_args()
+# Snakemake-injected paths
+parser <- ArgumentParser()
+parser$add_argument("--job_log", required = TRUE)
+parser$add_argument("--resources_log", required = TRUE)
+parser$add_argument("--plot", required = TRUE)
+parser$add_argument("--run_name", required = TRUE)
+parser$add_argument("--max_iops", required = TRUE)
+parser$add_argument("--max_throughput", required = TRUE)
+parser$add_argument("--log", required = TRUE)
+args <- parser$parse_args()
 
-  exp_name <- args$run_name
-  git_metadata <- args$git_metadata
-  job_log_path <- args$job_log
-  resources_log_path <- args$resources_log
-  max_iops <- args$max_iops
-  max_throughput <- args$max_throughput
-  log_path <- args$log
-  output_plot_path <- args$plot
-}
+exp_name <- args$run_name
+git_metadata <- args$git_metadata
+job_log_path <- args$job_log
+resources_log_path <- args$resources_log
+max_iops <- as.integer(args$max_iops)
+max_throughput <- as.integer(args$max_throughput)
+log_path <- args$log
+output_plot_path <- args$plot
 
 # Start logging
 log_con <- file(log_path, open = "wt")

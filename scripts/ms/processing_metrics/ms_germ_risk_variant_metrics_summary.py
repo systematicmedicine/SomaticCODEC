@@ -1,7 +1,8 @@
+#!/usr/bin/env python3
 """
 --- ms_germ_risk_variant_metrics_summary.py ---
 
-Generates a summary file with key candidate variant metrics
+Generates a summary file with key germline risk metrics
 
 To be used with rule ms_germ_risk_variant_metrics_summary
 
@@ -14,13 +15,12 @@ import json
 from collections import defaultdict
 import sys
 import subprocess
+import argparse
 
-from scripts.helpers.vcf_helpers import count_vcf_data_points
-
-def main(snakemake):
+def main(args):
     # Initiate logging
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ms_germ_risk_variant_metrics_summary.py")
 
     # Parses bcftools stats output into a dictionary of dataframes
@@ -45,21 +45,23 @@ def main(snakemake):
         return sections
 
     # Load sample name
-    sample = snakemake.params.sample
+    sample = args.sample
 
-    # Load metrics files
-    variant_metrics_path = snakemake.input.variant_metrics
-    pileup_bcf = snakemake.input.pileup_bcf
-    min_depth = snakemake.params.min_depth
+    # Define input paths
+    variant_metrics_path = args.variant_metrics
+    pileup_bcf = args.pileup_bcf
+
+    # Define min_depth param
+    min_depth = args.min_depth
 
     # Define output path
-    output_json = snakemake.output.summary
+    output_json = args.summary
 
     # Get each section of bcftools stats output
     sections = parse_bcftools_stats(variant_metrics_path)
 
     # Calculate number of bases eligible for variant calling (depth > min_depth, quality > min_BQ)
-    with open(snakemake.log[0], "a") as log_file:
+    with open(args.log, "a") as log_file:
         proc = subprocess.Popen(
             ["bcftools", "view", "--include", f"FMT/DP>={min_depth}", str(pileup_bcf)],
             stdout=subprocess.PIPE,
@@ -103,4 +105,12 @@ def main(snakemake):
     print("[INFO] Completed ms_germ_risk_variant_metrics_summary.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--variant_metrics", required=True)
+    parser.add_argument("--pileup_bcf", required=True)
+    parser.add_argument("--summary", required=True)
+    parser.add_argument("--min_depth", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)

@@ -21,40 +21,27 @@ library(openxlsx)
 library(argparse)
 source("scripts/global_scripts/metrics/metrics_report_functions.R")
 
-# Define hard coded variables
+# Snakemake-injected paths
+parser <- ArgumentParser()
+parser$add_argument("--component_metrics_metadata", required = TRUE)
+parser$add_argument("--system_metrics_metadata", required = TRUE)
+parser$add_argument("--component_csv", required = TRUE)
+parser$add_argument("--component_png", required = TRUE)
+parser$add_argument("--system_csv", required = TRUE)
+parser$add_argument("--system_png", required = TRUE)
+parser$add_argument("--run_name", required = TRUE)
+parser$add_argument("--log", required = TRUE)
+args <- parser$parse_args()
 
-if (!exists("snakemake")) {
-  # Manual mode (for local testing)
-  COMPONENT_METRICS_PATH <- "config/component_level_metrics.xlsx"
-  SYSTEM_METRICS_PATH <- "config/system_level_metrics.xlsx"
-  EXP_NAME <- "Test experiment"
-  COMPONENT_CSV <- "metrics/component_metrics_report.csv"
-  COMPONENT_PNG <- "metrics/component_metrics_report.png"
-  SYSTEM_CSV <- "results/system_metrics_report.csv"
-  SYSTEM_PNG <- "results/system_metrics_report.png"
-  LOG_PATH <- "logs/metrics_report.log"
-} else {
-  # Snakemake-injected paths
-  parser <- ArgumentParser()
-  parser$add_argument("--component_metrics_metadata", required = TRUE)
-  parser$add_argument("--system_metrics_metadata", required = TRUE)
-  parser$add_argument("--component_csv", required = TRUE)
-  parser$add_argument("--component_png", required = TRUE)
-  parser$add_argument("--system_csv", required = TRUE)
-  parser$add_argument("--system_png", required = TRUE)
-  parser$add_argument("--run_name", required = TRUE)
-  parser$add_argument("--log", required = TRUE)
-  args <- parser$parse_args()
+COMPONENT_METRICS_PATH <- args$component_metrics_metadata
+SYSTEM_METRICS_PATH <- args$system_metrics_metadata
+EXP_NAME <- args$run_name
+COMPONENT_CSV <- args$component_csv
+COMPONENT_PNG <- args$component_png
+SYSTEM_CSV <- args$system_csv
+SYSTEM_PNG <- args$system_png
+LOG_PATH <- args$log
 
-  COMPONENT_METRICS_PATH <- args$component_metrics_metadata
-  SYSTEM_METRICS_PATH <- args$system_metrics_metadata
-  EXP_NAME <- args$run_name
-  COMPONENT_CSV <- args$component_csv
-  COMPONENT_PNG <- args$component_png
-  SYSTEM_CSV <- args$system_csv
-  SYSTEM_PNG <- args$system_png
-  LOG_PATH <- args$log
-}
 
 # Define hard coded variables
 METRICS_FILE_SCHEMA <- list(

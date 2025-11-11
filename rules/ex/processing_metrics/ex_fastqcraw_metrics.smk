@@ -30,9 +30,15 @@ rule ex_fastqcraw_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Set memory limit
+        MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
+
         # Run fastqc
-        fastqc -t {threads} {input.fastq1} -o metrics/ 2>> {log}
-        fastqc -t {threads} {input.fastq2} -o metrics/ 2>> {log}
+        fastqc \
+        --memory $MEMORY_PER_FILE \
+        -t {threads} \
+         -o metrics/ \
+        {input.fastq1} {input.fastq2} 2>> {log}
 
         # Rename outputs
         mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1} 2>> {log}

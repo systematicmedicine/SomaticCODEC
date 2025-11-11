@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ms_masking_metrics.py ---
 
@@ -12,11 +13,12 @@ import sys
 import subprocess
 import json
 from pathlib import Path
+import argparse
 
-def main(snakemake):
+def main(args):
     # Redirect stdout/stderr to log
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting masking_metrics.py")
 
     def run_cmd(cmd):
@@ -28,11 +30,11 @@ def main(snakemake):
             sys.exit(1)
         return result.stdout.strip()
 
-    sample = snakemake.params.sample
-    ref_index = snakemake.input.ref_index
-    intermediate_sorted = snakemake.output.intermediate_sorted
-    intermediate_merged = snakemake.output.intermediate_merged
-    json_out_path = snakemake.output.mask_metrics
+    sample = args.sample
+    ref_index = args.ref_index
+    intermediate_sorted = args.intermediate_sorted
+    intermediate_merged = args.intermediate_merged
+    json_out_path = args.mask_metrics
 
     # Total genome size
     total_genome_bp = int(run_cmd(f"awk '{{sum += $2}} END {{print sum}}' {ref_index}"))
@@ -41,17 +43,17 @@ def main(snakemake):
     mask_files = {}
 
     # Name precomputed masks by file basename (without extension)
-    for bed_file in snakemake.input.precomputed_masks:
+    for bed_file in args.precomputed_masks:
         name = Path(bed_file).stem
         mask_files[name] = bed_file
 
     # Add other masks
     mask_files.update({
-        "lowdepth": snakemake.input.ms_lowdepth_bed,
-        "germ_deletions": snakemake.input.ms_germ_del_bed,
-        "germ_insertions": snakemake.input.ms_germ_ins_bed,
-        "germ_snvs": snakemake.input.ms_germ_snv_bed,
-        "combined_mask": snakemake.input.combined_bed,
+        "lowdepth": args.ms_lowdepth_bed,
+        "germ_deletions": args.ms_germ_del_bed,
+        "germ_insertions": args.ms_germ_ins_bed,
+        "germ_snvs": args.ms_germ_snv_bed,
+        "combined_mask": args.combined_bed,
     })
 
     results = {}
@@ -84,5 +86,19 @@ def main(snakemake):
     print("[INFO] Completed masking_metrics.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--precomputed_masks", required=True, nargs = "+")
+    parser.add_argument("--ms_lowdepth_bed", required=True)
+    parser.add_argument("--ms_germ_del_bed", required=True)
+    parser.add_argument("--ms_germ_ins_bed", required=True)
+    parser.add_argument("--ms_germ_snv_bed", required=True)
+    parser.add_argument("--combined_bed", required=True)
+    parser.add_argument("--ref_index", required=True)
+    parser.add_argument("--mask_metrics", required=True)
+    parser.add_argument("--intermediate_sorted", required=True)
+    parser.add_argument("--intermediate_merged", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
 

@@ -22,9 +22,15 @@ rule ex_fastqcfilter_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Set memory limit
+        MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
+
         # Run fastqc
-        fastqc -t {threads} {input.fastq1} -o metrics/{wildcards.ex_sample} 2>> {log}
-        fastqc -t {threads} {input.fastq2} -o metrics/{wildcards.ex_sample} 2>> {log}
+        fastqc \
+        --memory $MEMORY_PER_FILE \
+        -t {threads} \
+        -o metrics/{wildcards.ex_sample} \
+        {input.fastq1} {input.fastq2} 2>> {log}
 
         # Rename outputs
         mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1} 2>> {log}

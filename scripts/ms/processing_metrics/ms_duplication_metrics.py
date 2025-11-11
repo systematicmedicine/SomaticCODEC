@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 --- ms_duplication_metrics.py ---
 
@@ -9,19 +10,20 @@ Authors:
 """
 import sys
 import json
+import argparse
 
-def main(snakemake):
+def main(args):
     # Redirect stdout/stderr to log
-    sys.stdout = open(snakemake.log[0], "a")
-    sys.stderr = open(snakemake.log[0], "a")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
     print("[INFO] Starting ms_duplication_metrics.py")
 
     # Define inputs
-    dedup_metrics = snakemake.input.dedup_metrics
-    sample = snakemake.params.sample
+    dedup_metrics = args.dedup_metrics
+    sample = args.sample
 
     # Define output
-    json_out = snakemake.output.duplication_metrics
+    json_out = args.duplication_metrics
 
     # Load samtools markdup JSON metrics
     with open(dedup_metrics) as f:
@@ -56,4 +58,10 @@ def main(snakemake):
     print("[INFO] Completed ms_duplication_metrics.py")
 
 if __name__ == "__main__":
-    main(snakemake)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dedup_metrics", required=True)
+    parser.add_argument("--duplication_metrics", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
