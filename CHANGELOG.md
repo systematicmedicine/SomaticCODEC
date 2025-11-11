@@ -21,6 +21,7 @@ Types of changes:
 ### Changed
 - Refactored scripts directory to nested structure (#250)
 - Converted all python scripts into modules (#250)
+- check_configs.py checks that ex_adapters are used only once per ex_lane (#252) 
 
 ## [2.0.0] - 2025-11-05
 
