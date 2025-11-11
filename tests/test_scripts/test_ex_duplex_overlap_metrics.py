@@ -10,13 +10,8 @@ Authors:
 import json
 import pytest
 import os
-import sys
-from pathlib import Path
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_duplex_overlap_metrics import main
+import types
+from scripts.ex.processing_metrics.ex_duplex_overlap_metrics import main
 
 @pytest.mark.parametrize("bam_path, expected_0th, expected_50th, expected_100th", [
     ("tests/data/test_ex_duplex_overlap_metrics/dsc.bam", 0, 5, 10)
@@ -24,13 +19,12 @@ from scripts.ex_duplex_overlap_metrics import main
 def test_duplex_overlap_calculation(tmp_path, bam_path, expected_0th, expected_50th, expected_100th):
     output_json = tmp_path / "overlap_metrics.json"
 
-    class MockSnakemake:
-        input = type("input", (), {"bam": bam_path})
-        output = type("output", (), {"metrics": str(output_json)})
-        log = ["log.txt"]
-        params = {}
-
-    main(MockSnakemake)
+    args = types.SimpleNamespace(
+        bam=bam_path,
+        metrics=output_json,
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
 
     with open(output_json) as f:
         result = json.load(f)

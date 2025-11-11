@@ -25,14 +25,20 @@ rule combine_masks:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Combine masks
         cat {input.precomputed_masks} \
         {input.excluded_chromosomes_bed} \
         {input.ms_lowdepth_bed} \
         {input.ms_germ_del_bed} \
         {input.ms_germ_ins_bed} \
         {input.ms_germ_snv_bed} > {output.intermediate_cat} 2>> {log}
-        
+
+        # Sort combined BED in the same order as the reference file       
         bedtools sort -faidx {input.fai} -i {output.intermediate_cat} > {output.intermediate_sorted} 2>> {log}
 
+        # Merge overlapping regions in combined BED
         bedtools merge -i {output.intermediate_sorted} > {output.combined_bed} 2>> {log}
         """

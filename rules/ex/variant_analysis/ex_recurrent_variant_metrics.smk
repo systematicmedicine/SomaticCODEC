@@ -17,5 +17,16 @@ rule ex_recurrent_variant_metrics:
         "logs/global_rules/batch_ex_recurrent_variant_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_recurrent_variant_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate recurrent variant metrics
+        ex_recurrent_variant_metrics.py \
+            --somatic_vcfs {input.somatic_vcfs} \
+            --germ_contaminant_vcfs {input.germ_contaminant_vcfs} \
+            --vcf_path {output.vcf_path} \
+            --metrics_path {output.metrics_path} \
+            --log {log} 2>> {log}
+        """

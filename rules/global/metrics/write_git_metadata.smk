@@ -2,12 +2,20 @@
 
 rule write_git_metadata:
     output:
-        file_path = "logs/global_rules/git_metadata.json"
+        json = "logs/global_rules/git_metadata.json"
     log:
         "logs/global_rules/write_git_metadata.log"
     benchmark:
         "logs/global_rules/write_git_metadata.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "write_git_metadata.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Write git metadata
+        write_git_metadata.py \
+            --json {output.json} \
+            --log {log} 2>> {log}
+        """

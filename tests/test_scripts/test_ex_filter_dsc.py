@@ -9,11 +9,6 @@ Authors:
 """
 from pathlib import Path
 import glob
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.bam_helpers import count_bam_data_points, count_bam_reads_under_min_mapq
 from helpers.get_metadata import load_config
 

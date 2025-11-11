@@ -15,8 +15,10 @@ rule ms_alignment_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Generate alignment metrics
         samtools flagstat {input.bam} > {output.stats} 2>> {log}
 
+        # Generate insert size metrics
         picard -Xmx{resources.memory}g -Djava.io.tmpdir=tmp CollectInsertSizeMetrics \
             I={input.bam} \
             O={output.insert_metrics} \

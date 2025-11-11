@@ -29,6 +29,10 @@ rule ms_low_depth_mask:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Calculate depth per base
         samtools depth \
         -aa \
         --min-BQ {params.min_base_qual} \
@@ -37,10 +41,13 @@ rule ms_low_depth_mask:
         -J \
         {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
 
+        # Filter for depth < depth threshold
         awk -v threshold={params.threshold} '$3 < threshold {{print $1"\t"($2-1)"\t"$2}}' \
         {output.intermediate_depth_per_base} > {output.intermediate_lowdepth} 2>> {log}
 
+        # Sort by chromosome then position
         sort {output.intermediate_lowdepth} -k1,1V -k2,2n > {output.intermediate_lowdepth_sorted} 2>> {log}
 
+        # Merge adjacent regions
         bedtools merge -i {output.intermediate_lowdepth_sorted} > {output.bed} 2>> {log}
         """

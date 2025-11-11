@@ -15,10 +15,16 @@ rule log_system_resource_usage:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Define parameters
         export SLEEP_INTERVAL={params.sleep_interval}
         export TOTAL_CORES={params.total_cores}
         
-        bash scripts/monitor_system_resources.sh &
+        # Log system resources in background
+        log_system_resource_usage.sh &
 
-        touch {output.done_file}
+        # Create done file
+        touch {output.done_file} 2>> {log}
         """

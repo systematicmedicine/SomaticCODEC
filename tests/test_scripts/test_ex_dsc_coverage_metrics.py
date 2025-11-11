@@ -9,16 +9,11 @@ Authors:
 """
 import pytest
 import json
-from types import SimpleNamespace
 from unittest.mock import patch, MagicMock
 import io
-from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_dsc_coverage_metrics import main
+import argparse
+import tempfile
+from scripts.ex.processing_metrics.ex_dsc_coverage_metrics import main
 
 @pytest.mark.parametrize("ms_depth_path, include_bed_path, ex_dsc_depth_path, ref_fai_path, expected_values", [
     # Typical input
@@ -37,8 +32,10 @@ from scripts.ex_dsc_coverage_metrics import main
 ])
 @patch("subprocess.Popen")
 def test_ex_dsc_coverage_metrics(mock_popen, ms_depth_path, include_bed_path, ex_dsc_depth_path, ref_fai_path, expected_values, tmp_path):
-    output_path = tmp_path / "metrics.json"
-    log_path = tmp_path / "log.txt"
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_out, \
+         tempfile.NamedTemporaryFile(delete=False, suffix=".log") as tmp_log:
+        json_out_path = tmp_out.name
+        log_path = tmp_log.name
 
     # Read ex_dsc_depth_path file contents as list of lines (simulate samtools depth output)
     with open(ex_dsc_depth_path, "r") as f:
@@ -49,31 +46,24 @@ def test_ex_dsc_coverage_metrics(mock_popen, ms_depth_path, include_bed_path, ex
     mock_proc.wait.return_value = 0
     mock_popen.return_value = mock_proc
 
-    class FakeSnakemake:
-        input = SimpleNamespace(
-            bam_ex_dsc=ex_dsc_depth_path,
-            ms_depth=ms_depth_path,
-            include_bed=include_bed_path,
-            fai=ref_fai_path,
-        )
-        output = SimpleNamespace(
-            metrics=str(output_path),
-        )
-        params = SimpleNamespace(
-            quality_threshold=20,
-            sample="TestSample",
-            ms_depth_threshold=10,
-        )
-        log = [str(log_path)]
+    args = argparse.Namespace(
+        bam_ex_dsc="tmp/TestSample/TestSample_map_dsc_anno_filtered.bam",
+        bai_ex_dsc="tmp/TestSample/TestSample__map_dsc_anno_filtered.bam.bai",
+        include_bed=include_bed_path,
+        ms_depth=ms_depth_path,
+        fai=ref_fai_path,
+        metrics=json_out_path,
+        sample="TestSample",
+        quality_threshold="70",
+        ms_depth_threshold="40",
+        log=log_path
+    )
 
-    main(FakeSnakemake())
+    main(args=args)
 
-    with open(output_path) as f:
+    with open(json_out_path) as f:
         result = json.load(f)
 
     for key, expected_val in expected_values.items():
         assert key in result, f"{key} missing from output"
         assert result[key] == expected_val, f"{key}: expected {expected_val}, got {result[key]}"
-
-    if log_path.exists():
-        log_path.unlink()

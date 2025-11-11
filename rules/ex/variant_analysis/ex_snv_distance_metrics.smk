@@ -12,5 +12,14 @@ rule ex_snv_distance_metrics:
         "logs/{ex_sample}/ex_snv_distance_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_snv_distance_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate SNV distance metrics
+        ex_snv_distance_metrics.py \
+            --vcf {input.vcf} \
+            --metrics_json {output.metrics_json} \
+            --log {log} 2>> {log}
+        """

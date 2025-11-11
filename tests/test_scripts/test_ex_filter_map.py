@@ -9,12 +9,7 @@ Authors:
     - Cameron Fraser
 """
 from pathlib import Path
-import sys
 import pysam
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.get_metadata import load_config, get_ex_sample_ids
 from helpers.bam_helpers import count_bam_data_points
 

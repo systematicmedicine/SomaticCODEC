@@ -11,11 +11,6 @@ from pathlib import Path
 import glob
 import pysam
 from collections import Counter
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.bam_helpers import count_bam_data_points
 
 def test_group_by_umi(lightweight_test_run):

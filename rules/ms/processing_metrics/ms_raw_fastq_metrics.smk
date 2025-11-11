@@ -38,21 +38,27 @@ rule ms_raw_fastq_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
-        r1_base=$(basename {input.r1} .fastq.gz)
+        # Set memory limit
+        MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
 
+        # Get basename for input files
+        r1_base=$(basename {input.r1} .fastq.gz)
         r2_base=$(basename {input.r2} .fastq.gz)
         
-        fastqc -t {threads} -o metrics/{wildcards.ms_sample} {input.r1} {input.r2} 2>> {log}
+        # Run fastqc
+        fastqc \
+        --memory $MEMORY_PER_FILE \
+        -t {threads} \
+        -o metrics/{wildcards.ms_sample} \
+        {input.r1} {input.r2} 2>> {log}
 
+        # Rename output files
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}
-
         mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report} 2>> {log}
-
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.zip {output.r1_zip} 2>> {log}
-
         mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.zip {output.r2_zip} 2>> {log}
 
+        # Extract txt file from zip output
         unzip -p {output.r1_zip} */fastqc_data.txt > {output.r1_txt} 2>> {log}
-
         unzip -p {output.r2_zip} */fastqc_data.txt > {output.r2_txt} 2>> {log}
         """

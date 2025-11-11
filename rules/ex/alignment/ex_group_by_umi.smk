@@ -22,6 +22,9 @@ rule ex_group_by_umi:
         memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """        
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
         # Move UMI from read name to RX:Z tag
         JAVA_OPTS="-Xmx{resources.memory}g -Djava.io.tmpdir=tmp" fgbio \
             --compression={params.compression_level} \

@@ -34,6 +34,10 @@ rule ex_call_somatic_snv:
         memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Create pileup
         bcftools mpileup \
             --threads {threads} \
             --fasta-ref {input.ref} \
@@ -49,6 +53,7 @@ rule ex_call_somatic_snv:
             {input.bam} \
             -o {output.intermediate_mpileup} 2>> {log}
 
+        # Call somatic variants
         bcftools call \
             --threads {threads} \
             --multiallelic-caller \
@@ -57,12 +62,14 @@ rule ex_call_somatic_snv:
             -o {output.intermediate_called} \
             {output.intermediate_mpileup} 2>> {log}
 
+        # Create VCF with every unmasked position excluding INDELs
         bcftools view \
             --threads {threads} \
             -e 'TYPE="indel"' \
             {output.intermediate_called} \
             -Ov -o {output.vcf_all} 2>> {log}
 
+        # Create VCF with only alternate alleles
         bcftools view \
             --threads {threads} \
             -e 'TYPE="indel" || TYPE="ref"' \
@@ -70,6 +77,7 @@ rule ex_call_somatic_snv:
             -o {output.intermediate_biallelic} \
             {output.intermediate_called} 2>> {log}
 
+        # Split multiallelic sites into multiple lines
         bcftools norm \
             --threads {threads} \
             -m -both \

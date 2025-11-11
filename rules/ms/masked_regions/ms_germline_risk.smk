@@ -33,6 +33,10 @@ rule ms_germline_risk:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Create pileup
         bcftools mpileup \
         --threads {threads} \
         --fasta-ref {input.ref} \
@@ -47,6 +51,7 @@ rule ms_germline_risk:
         --output {output.intermediate_pileup} \
         {input.bam} 2>> {log}
 
+        # Filter for variants with VAF >= min_alt_vaf
         bcftools view \
         --threads {threads} \
         --include '(SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf}' \

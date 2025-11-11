@@ -8,12 +8,7 @@ Authors:
     - Joshua Johnstone
 """
 import glob
-import sys
 from pathlib import Path
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.fasta_helpers import count_fasta_data_points, check_fasta_structure
 from helpers.get_metadata import load_config, get_ex_sample_ids, get_ex_technical_control_ids
 

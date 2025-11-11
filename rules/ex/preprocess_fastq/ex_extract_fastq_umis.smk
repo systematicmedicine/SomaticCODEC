@@ -24,15 +24,19 @@ rule ex_extract_fastq_umis:
         umi_length = config["sci_params"]["ex_extract_fastq_umis"]["umi_length"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_lane}/ex_extract_umis.log"
+        "logs/{ex_lane}/ex_extract_fastq_umis.log"
     benchmark:
-        "logs/{ex_lane}/ex_extract_umis.benchmark.txt"
+        "logs/{ex_lane}/ex_extract_fastq_umis.benchmark.txt"
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Move UMIs from sequence to read name
         cutadapt \
           -j {threads} \
           --cut {params.umi_length} \
