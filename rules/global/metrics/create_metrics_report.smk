@@ -9,7 +9,7 @@
 # ====================================================================================
 
 # Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "pipeline_outputs.smk")
+include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 # Rule
 rule create_metrics_report:
