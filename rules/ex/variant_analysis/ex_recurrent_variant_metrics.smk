@@ -2,7 +2,7 @@
 Identify somatic variants present in multiple samples in a batch
 """
 
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 rule ex_recurrent_variant_metrics:
     input:

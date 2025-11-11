@@ -12,7 +12,7 @@ Authors:
 import pytest
 import pandas as pd
 from pathlib import Path
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 # -------------------------------------------------------------------------------------
 # Fixtures

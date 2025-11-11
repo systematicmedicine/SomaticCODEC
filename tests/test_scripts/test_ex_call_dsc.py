@@ -12,7 +12,7 @@ from pathlib import Path
 import glob
 from collections import Counter
 import pysam
-from scripts.helpers.bam_helpers import count_bam_data_points
+from helpers.bam_helpers import count_bam_data_points
 
 # Test that the read count decreases due to collapsing reads
 def test_reads_decrease(lightweight_test_run):

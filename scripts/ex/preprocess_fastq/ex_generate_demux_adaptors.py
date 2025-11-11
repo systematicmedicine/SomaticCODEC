@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 import argparse
 import json
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--adapter_fasta_outputs", required=True, nargs="+")

@@ -11,8 +11,8 @@ Authors:
 # Import libraries
 from pathlib import Path
 import pysam
-from scripts.helpers.get_metadata import load_config, get_ms_sample_ids
-from scripts.helpers.vcf_helpers import check_vcf_structure
+from helpers.get_metadata import load_config, get_ms_sample_ids
+from helpers.vcf_helpers import check_vcf_structure
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):

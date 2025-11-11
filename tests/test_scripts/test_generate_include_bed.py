@@ -16,9 +16,9 @@ Authors:
 
 import pandas as pd
 from pathlib import Path
-from scripts.helpers.bed_helpers import read_bed
-from scripts.helpers.fai_helpers import read_fai
-from scripts.helpers.get_metadata import load_config, get_ex_to_ms_sample_map
+from helpers.bed_helpers import read_bed
+from helpers.fai_helpers import read_fai
+from helpers.get_metadata import load_config, get_ex_to_ms_sample_map
 
 # Load input and output BEDs for a sample
 def get_mask_and_include_beds(ex_sample, ms_sample):

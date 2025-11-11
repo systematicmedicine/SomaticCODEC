@@ -8,7 +8,7 @@ Moves the read pair UMI to readname
 # Rule depends on output lists defined in pipeline_outputs.smk
 include: os.path.join(workflow.basedir, "definitions", "pipeline_outputs.smk")
 
-import scripts.helpers.get_metadata as md
+import helpers.get_metadata as md
 
 # Rule
 rule ex_extract_fastq_umis:

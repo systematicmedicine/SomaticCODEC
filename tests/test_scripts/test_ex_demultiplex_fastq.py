@@ -10,7 +10,7 @@ Authors:
 
 from pathlib import Path
 import glob
-from scripts.helpers.fastq_helpers import count_fastq_data_points
+from helpers.fastq_helpers import count_fastq_data_points
 
 def test_read_counts(lightweight_test_run):
     # Locate all pre-demux FASTQ files

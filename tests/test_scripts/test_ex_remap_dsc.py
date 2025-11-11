@@ -9,7 +9,7 @@ Authors:
 """
 from pathlib import Path
 import glob
-from scripts.helpers.bam_helpers import count_bam_data_points
+from helpers.bam_helpers import count_bam_data_points
 
 # Test that remapping does not change read count
 def test_read_counts_preserved(lightweight_test_run):

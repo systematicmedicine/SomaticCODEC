@@ -13,6 +13,15 @@ Types of changes:
 
 ## [Unreleased]
 
+### Added
+
+- Added enforcement of memory limits to each rule (#)
+- Added all scripts to PATH and PYTHONPATH (#)
+
+### Changed
+- Refactored scripts directory to nested structure (#)
+- Converted all python scripts into modules (#)
+
 ## [2.0.0] - 2025-11-05
 
 ### Added

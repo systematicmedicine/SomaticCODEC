@@ -10,8 +10,8 @@ Authors:
 
 import pandas as pd
 from pathlib import Path
-from scripts.helpers.get_metadata import load_config, get_ms_sample_ids
-from scripts.helpers.bed_helpers import merge_bed_intervals, read_bed
+from helpers.get_metadata import load_config, get_ms_sample_ids
+from helpers.bed_helpers import merge_bed_intervals, read_bed
 
 # Assert that combined BED matches expected merge of individual beds
 def assert_correctly_merged(ms_sample):
