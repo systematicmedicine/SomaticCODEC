@@ -28,7 +28,7 @@ rule ex_dsc_coverage_metrics:
     benchmark:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
     resources:
-        memory = config["infrastructure"]["memory"]["heavy"]
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
         """
         # Set memory limit
