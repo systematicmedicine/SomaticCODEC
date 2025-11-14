@@ -35,7 +35,7 @@ rule ex_map:
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
         """
         # Set memory limit

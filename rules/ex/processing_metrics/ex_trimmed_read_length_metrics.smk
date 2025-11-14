@@ -14,7 +14,7 @@ rule ex_trimmed_read_length_metrics:
     benchmark:
         "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt" 
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         # Set memory limit
