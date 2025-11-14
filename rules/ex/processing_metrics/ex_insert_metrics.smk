@@ -12,7 +12,7 @@ rule ex_insert_metrics:
     benchmark:
         "logs/{ex_sample}/ex_insert_metrics.benchmark.txt"
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         # Set memory limit and generate insert size metrics

@@ -16,7 +16,7 @@ rule bwamem_index_files:
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
         """
         # Set memory limit

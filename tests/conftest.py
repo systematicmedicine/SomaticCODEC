@@ -78,6 +78,7 @@ def lightweight_test_run():
 
     config_data["sci_params"]["ms_low_depth_mask"]["min_depth"] = 1
 
+    config_data["infrastructure"]["memory"]["extra_heavy"] = 6
     config_data["infrastructure"]["memory"]["heavy"] = 6
     config_data["infrastructure"]["memory"]["moderate"] = 4
     config_data["infrastructure"]["memory"]["light"] = 2
