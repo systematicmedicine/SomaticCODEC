@@ -169,7 +169,7 @@ infrastructure:
     light: 8
     moderate: 32
     heavy: 64
-    extra_heavy: 96
+    extra_heavy: 128
     global_buffer: 16
     
   threads:
