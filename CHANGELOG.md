@@ -11,17 +11,19 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [Unreleased]
+## [2.1.0] - 2025-11-17
 
 ### Added
 
 - Added enforcement of memory limits to all rules (#250 and 251)
+- Added extra_heavy memory allocation level (#255)
 - Added all scripts to PATH and PYTHONPATH (#250)
 
 ### Changed
 - Refactored directory structure of scripts and definitions (#250 and 254)
 - Converted all python scripts into modules (#250)
 - check_configs.py checks that ex_adapters are used only once per ex_lane (#252) 
+- Adjusted memory allocation for various rules (#255)
 
 ## [2.0.0] - 2025-11-05
 
