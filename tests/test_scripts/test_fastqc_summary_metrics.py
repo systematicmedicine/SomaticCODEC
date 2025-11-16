@@ -11,7 +11,8 @@ import json
 import pytest
 import os
 import shutil
-from scripts.fastqc_summary_metrics import main
+import types
+from scripts.global_scripts.metrics.fastqc_summary_metrics import main
 
 @pytest.mark.parametrize(
     "fastqc_file, expected_metrics",
@@ -41,12 +42,12 @@ def test_fastqc_summary_metrics(tmp_path, fastqc_file, expected_metrics):
     tmp_fastqc_path = sample_dir / "fastqc_data.txt"
     shutil.copy(fastqc_file, tmp_fastqc_path)
 
-    class MockSnakemake:  
-        input = type("input", (), {"fastqc_files": [tmp_fastqc_path]})
-        params = type("params", (), {"sample": sample_name})
-        log = ["log.txt"]
-
-    main(MockSnakemake)
+    args = types.SimpleNamespace(
+        fastqc_files=[tmp_fastqc_path],
+        sample="TestSample",
+        log=str("log.txt")
+    )
+    main(args=args)
 
     output_json_path = sample_dir / "fastqc_data_summary.json"
 

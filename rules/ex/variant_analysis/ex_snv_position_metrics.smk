@@ -17,5 +17,18 @@ rule ex_snv_position_metrics:
         "logs/{ex_sample}/ex_snv_position_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_snv_position.R")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate SNV position metrics
+        ex_snv_position.R \
+            --vcf_path {input.vcf_path} \
+            --index_path {input.index_path} \
+            --metrics_json {output.metrics_json} \
+            --metrics_plot {output.metrics_plot} \
+            --included_chroms {params.included_chroms} \
+            --run_name {params.run_name} \
+            --log {log} 2>> {log}
+        """

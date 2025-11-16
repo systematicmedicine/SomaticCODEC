@@ -14,5 +14,15 @@ rule ex_duplication_metrics:
         "logs/{ex_sample}/ex_duplication_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_duplication_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate duplication metrics
+        ex_duplication_metrics.py \
+            --umi_metrics {input.umi_metrics} \
+            --json {output.json} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

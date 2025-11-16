@@ -33,9 +33,13 @@ rule ms_map:
     threads: 
         config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Align reads
         bwa-mem2 mem \
         -t {threads} \
         -k {params.min_seed_length} \
@@ -52,6 +56,7 @@ rule ms_map:
         -T {params.min_alignment_score_thresh} \
         {input.ref} {input.r1_processed} {input.r2_processed} > {output.intermediate_sam} 2>> {log}
 
+        # Convert SAM to BAM
         samtools view \
         -@ {threads} \
         --output-fmt bam \

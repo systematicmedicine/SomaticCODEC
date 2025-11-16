@@ -25,7 +25,8 @@ rule ms_filter_fastq:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
-        trimmomatic PE \
+        # Filter for length and average quality
+        trimmomatic -Xmx{resources.memory}g -Djava.io.tmpdir=tmp PE \
             -phred33 \
             -threads {threads} \
             -summary {output.filter_metrics} \

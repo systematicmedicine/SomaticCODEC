@@ -8,9 +8,9 @@ Authors:
     - Joshua Johnstone
 """
 import json
-from types import SimpleNamespace
+import types
 import pytest
-from scripts.ms_masking_metrics import main 
+from scripts.ms.processing_metrics.ms_masking_metrics import main 
 
 @pytest.mark.parametrize("input_files, expected_percentages", [
     (
@@ -41,20 +41,23 @@ def test_masking_metrics(tmp_path, input_files, expected_percentages):
     intermediate_merged = tmp_path / "intermediate_merged.bed"
     output_json = tmp_path / "mask_metrics.json"
 
-    mock_snakemake = SimpleNamespace(
-        input=SimpleNamespace(**input_files),
-        params=SimpleNamespace(sample="TestSample"),
-        log=[str(log_path)],
-        output=SimpleNamespace(
-            intermediate_sorted=str(intermediate_sorted),
-            intermediate_merged=str(intermediate_merged),
-            mask_metrics=str(output_json)
-        )
+    args = types.SimpleNamespace(
+        precomputed_masks = input_files["precomputed_masks"],
+        ms_lowdepth_bed = input_files["ms_lowdepth_bed"],
+        ms_germ_del_bed = input_files["ms_germ_del_bed"],
+        ms_germ_ins_bed = input_files["ms_germ_ins_bed"],
+        ms_germ_snv_bed = input_files["ms_germ_snv_bed"],
+        combined_bed = input_files["combined_bed"],
+        ref_index = input_files["ref_index"],
+        mask_metrics = str(output_json),
+        intermediate_sorted = str(intermediate_sorted),
+        intermediate_merged = str(intermediate_merged),
+        sample="TestSample",
+        log=str(log_path)
     )
+    main(args=args)
 
-    main(mock_snakemake)
-
-    with open(tmp_path / "mask_metrics.json") as f:
+    with open(output_json) as f:
         data = json.load(f)
 
     for key, expected_value in expected_percentages.items():

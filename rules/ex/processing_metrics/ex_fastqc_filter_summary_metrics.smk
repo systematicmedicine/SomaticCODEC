@@ -16,5 +16,14 @@ rule ex_fastqc_filter_summary_metrics:
         "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "fastqc_summary_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate fastqc summary metrics
+        fastqc_summary_metrics.py \
+            --fastqc_files {input.fastqc_files} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

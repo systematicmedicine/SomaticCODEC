@@ -4,7 +4,7 @@ rule check_included_chromosomes_present:
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
         precomputed_masks = config["sci_params"]["global"]["precomputed_masks"]
     output:
-        "logs/global_rules/check_included_chromosomes_present.done"
+        done_file = "logs/global_rules/check_included_chromosomes_present.done"
     params:
         included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
     log:
@@ -13,5 +13,16 @@ rule check_included_chromosomes_present:
         "logs/global_rules/check_included_chromosomes_present.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "check_included_chromosomes_present.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Check included chromosomes present
+        check_included_chromosomes_present.py \
+            --fai {input.fai} \
+            --precomputed_masks {input.precomputed_masks} \
+            --included_chromosomes {params.included_chromosomes} \
+            --done_file {output.done_file} \
+            --log {log} 2>> {log}
+        """

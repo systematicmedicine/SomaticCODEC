@@ -6,7 +6,7 @@ Trims FASTQ files
     - Bases of quality < qual_trim_threshold from read ends
 """
 # Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "pipeline_outputs.smk")
+include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
 
@@ -40,6 +40,10 @@ rule ms_trim_fastq:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Remove spacer
         cutadapt \
           -j {threads} \
           -u {params.spacer_length} \
@@ -49,6 +53,7 @@ rule ms_trim_fastq:
           --compression-level {params.compression_level} \
           {input.r1} {input.r2} 2>> {log}
         
+        # Trim adaptors, poly-G artifacts, and low quality bases
         cutadapt \
             -j {threads} \
             -a {params.adaptor_1} \

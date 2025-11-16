@@ -9,10 +9,14 @@ rule ex_map_metrics:
     log:
         "logs/{ex_sample}/ex_map_metrics.log"
     benchmark:
-        "logs/{ex_sample}/ex_map_metrics.txt"
+        "logs/{ex_sample}/ex_map_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Generate alignment metrics        
         samtools flagstat {input.bam} > {output.txt} 2>> {log}
         """

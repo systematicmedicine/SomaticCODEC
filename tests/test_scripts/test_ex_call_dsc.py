@@ -10,13 +10,8 @@ Authors:
 """
 from pathlib import Path
 import glob
-import sys
 from collections import Counter
 import pysam
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.bam_helpers import count_bam_data_points
 
 # Test that the read count decreases due to collapsing reads

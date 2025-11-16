@@ -26,8 +26,9 @@ rule ex_filter_fastq:
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]        
     shell:  
-        """
-        trimmomatic PE \
+        """        
+        # Filter reads
+        trimmomatic -Xmx{resources.memory}g -Djava.io.tmpdir=tmp PE \
             -phred33 \
             -threads {threads} \
             -summary {output.filter_metrics} \

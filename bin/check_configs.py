@@ -244,6 +244,24 @@ def check_run_name_set(config: dict):
     if config["run_name"] == "experiment_1":
         sys.exit(f"[ERROR] run_name has not been set, currently default value")
 
+# Check that ex_adapters are used only once per ex_lane
+def check_adapters_used_once_per_lane(metadata: dict):
+
+    df = metadata["ex_samples_metadata"]
+    duplicates = df[df.duplicated(subset=["ex_lane", "ex_adapter"], keep=False)]
+    
+    if not duplicates.empty:
+        msg_lines = [
+            "[ERROR] The following ex_adapter(s) are used more than once within the same ex_lane:"
+        ]
+        for lane, group in duplicates.groupby("ex_lane"):
+            adapters = ", ".join(sorted(group["ex_adapter"].unique()))
+            msg_lines.append(f" Lane {lane}: {adapters}")
+        sys.exit("\n".join(msg_lines))
+    
+    print("[INFO] Each ex_adapter is used only once per ex_lane")
+
+
 # --------------------------------------------------------------------------------
 # Main logic
 # --------------------------------------------------------------------------------
@@ -292,3 +310,6 @@ if __name__ == "__main__":
 
     # Check that run_name has been set
     check_run_name_set(config)
+
+    # Check that ex_adapters are used only once per ex_lane
+    check_adapters_used_once_per_lane(metadata_tables)

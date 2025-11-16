@@ -27,5 +27,9 @@ rule generate_include_bed:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Generate include BED
         bedtools complement -i {input.mask_bed} -g {input.fai} > {output.include_bed} 2>> {log}
         """

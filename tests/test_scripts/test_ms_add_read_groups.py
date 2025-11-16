@@ -1,0 +1,46 @@
+"""
+--- test_test_ms_add_read_groups.py
+
+Tests the rule test_ms_add_read_groups
+
+Authors:
+    - Chat-GPT
+    - Joshua Johnstone
+"""
+from pathlib import Path
+import glob
+from helpers.bam_helpers import count_bam_data_points, count_reads_with_read_group
+
+# Test that read groups have been added
+def test_read_groups_added(lightweight_test_run):
+    # Get total reads pre adding read groups
+    pre_files = glob.glob("tmp/*/*_raw_map.bam")
+    pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
+    total_pre_reads = sum(pre_counts.values())
+
+    # Get number of reads with RG tags after test_ms_add_read_groups
+    post_files = glob.glob("tmp/*/*_read_group_map.bam")
+    post_counts_RG = {Path(f).name: count_reads_with_read_group(f) for f in post_files}
+    total_post_reads_with_RG = sum(post_counts_RG.values())
+
+    # Assert that all input reads had RG tags added
+    assert total_post_reads_with_RG == total_pre_reads, (
+        f"Reads with RG tag ({total_post_reads_with_RG}) not equal to input reads ({total_pre_reads})"
+    )
+
+# Test that adding read groups does not change read count
+def test_read_counts_preserved(lightweight_test_run):
+    # Locate all pre-read group BAM files
+    pre_files = glob.glob("tmp/*/*_raw_map.bam")
+    pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
+    total_pre_reads = sum(pre_counts.values())
+
+    # Locate all post-read group BAM files
+    post_files = glob.glob("tmp/*/*_read_group_map.bam")
+    post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
+    total_post_reads = sum(post_counts.values())
+
+    # Assert that total reads pre adding read groups == total reads post adding read groups
+    assert total_post_reads == total_pre_reads, (
+        f"Post-read group reads ({total_post_reads}) not equal to pre-read group reads ({total_pre_reads})"
+    )

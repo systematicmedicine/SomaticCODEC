@@ -23,6 +23,10 @@ rule ms_remove_duplicates:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Remove duplicates
         samtools markdup \
         -@ {threads} \
         --output-fmt bam \
@@ -36,6 +40,7 @@ rule ms_remove_duplicates:
         {input.bam} \
         {output.intermediate_unsorted} 2>> {log}
 
+        # Sort deduplicated BAM
         samtools sort \
         -@ {threads} \
         --output-fmt bam \
@@ -43,5 +48,6 @@ rule ms_remove_duplicates:
         -o {output.bam} \
         {output.intermediate_unsorted} 2>> {log}
 
+        # Create index file for deduplicated BAM
         samtools index {output.bam} 2>> {log}
         """
