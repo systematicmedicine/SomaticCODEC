@@ -10,14 +10,8 @@ Authors:
 import pytest
 import json
 import tempfile
-from types import SimpleNamespace
-import sys
-from pathlib import Path
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_trimmed_read_length_metrics import main
+import types
+from scripts.ex.processing_metrics.ex_trimmed_read_length_metrics import main
 
 @pytest.mark.parametrize(
     "r1_path, r2_path, expected_0th_percentile, expected_50th_percentile, expected_100th_percentile, expected_percent_zero_length",
@@ -33,24 +27,16 @@ def test_trimmed_read_length_metrics_real_fastqs(tmp_path, r1_path, r2_path, exp
     # Temporary output JSON
     with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_out:
         json_out_path = tmp_out.name
-    tmp_log = tmp_path / "log.txt"
 
-    # Create fake snakemake object
-    class FakeSnakemake:
-        input = SimpleNamespace(
-            r1=r1_path,
-            r2=r2_path
-        )
-        output = SimpleNamespace(
-            json=str(json_out_path),
-        )
-        params = SimpleNamespace(
-            sample="TestSample"
-        )
-        log = [str(tmp_log)]
-
-    # Run the actual script
-    main(FakeSnakemake())
+    # Run script
+    args = types.SimpleNamespace(
+        r1=r1_path,
+        r2=r2_path,
+        json=json_out_path,
+        sample="TestSample",
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
 
     # Load output JSON
     with open(json_out_path) as f:

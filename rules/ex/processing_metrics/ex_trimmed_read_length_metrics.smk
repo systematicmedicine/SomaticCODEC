@@ -14,6 +14,17 @@ rule ex_trimmed_read_length_metrics:
     benchmark:
         "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt" 
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_trimmed_read_length_metrics.py")
+        memory = config["infrastructure"]["memory"]["moderate"]
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate trimmed read length metrics
+        ex_trimmed_read_length_metrics.py \
+            --r1 {input.r1} \
+            --r2 {input.r2} \
+            --sample {params.sample} \
+            --json {output.json} \
+            --log {log} 2>> {log}
+        """

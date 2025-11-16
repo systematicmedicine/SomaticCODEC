@@ -12,11 +12,6 @@ Authors:
 
 # Import modules
 from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 from helpers.get_metadata import load_config, get_ms_sample_fastqs
 from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
 

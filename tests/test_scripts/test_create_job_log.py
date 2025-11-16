@@ -11,7 +11,9 @@ Authors:
 import csv
 import pytest
 import shutil
-from scripts import create_job_log
+import types
+from scripts.global_scripts.metrics.create_job_log import main
+
 @pytest.mark.parametrize(
     "log_file_path, expected_num_jobs",
     [
@@ -21,17 +23,16 @@ from scripts import create_job_log
 def test_job_log_parametrized(tmp_path, log_file_path, expected_num_jobs):
     # Copy the log file to temporary test directory
     tmp_log = tmp_path / "snakemake.log"
-    tmp_csv = tmp_path / "jobs.csv"
     shutil.copy(log_file_path, tmp_log)
-
-    # Mock Snakemake object
-    class MockSnakemake:
-        input = type("input", (), {"log": tmp_log})
-        output = type("output", (), {"csv": tmp_csv})
-        log = [str(tmp_path / "job_log.txt")]
+    tmp_csv = tmp_path / "jobs.csv"
 
     # Run the script
-    create_job_log.main(MockSnakemake)
+    args = types.SimpleNamespace(
+        run_pipeline_log=tmp_log,
+        job_log_csv=tmp_csv,
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
 
     # Read CSV and verify structure
     with open(tmp_csv) as f:

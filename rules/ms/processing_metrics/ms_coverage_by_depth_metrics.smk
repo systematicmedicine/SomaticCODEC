@@ -14,5 +14,16 @@ rule ms_coverage_by_depth_metrics:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ms_coverage_by_depth_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Generate coverage by depth metrics
+        ms_coverage_by_depth_metrics.py \
+            --depth_histogram {input.depth_histogram} \
+            --coverage_by_depth {output.coverage_by_depth} \
+            --min_depth {params.min_depth} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

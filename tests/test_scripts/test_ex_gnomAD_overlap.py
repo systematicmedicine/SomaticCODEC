@@ -9,14 +9,8 @@ Authors:
 """
 import pytest
 import json
-from types import SimpleNamespace
-import sys
-from pathlib import Path
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_gnomAD_overlap import main
+import types
+from scripts.ex.variant_analysis.ex_gnomAD_overlap import main
 
 @pytest.mark.parametrize(
     "somatic_path, somatic_all_path, germline_path, expected_matches, expected_overlap_rate",
@@ -48,24 +42,18 @@ def test_ex_gnomAD_overlap(tmp_path, somatic_path, somatic_all_path, germline_pa
     metrics_file = tmp_path / "metrics.json"
     log_file = tmp_path / "log.log"
 
-    # --- Mock snakemake object ---
-    snakemake = SimpleNamespace(
-        input=SimpleNamespace(
-            somatic_vcf=str(somatic_path),
-            somatic_all_vcf=str(somatic_all_path),
-            germline_vcf=str(germline_path)
-        ),
-        output=SimpleNamespace(
-            intermediate_somatic_bgz=str(intermediate_bgz),
-            intermediate_somatic_tbi=str(intermediate_tbi),
-            germline_matches=str(germline_matches),
-            metrics_file=str(metrics_file)
-        ),
-        log=[str(log_file)]
-    )
-
     # --- Run the script ---
-    main(snakemake)
+    args = types.SimpleNamespace(
+        somatic_vcf=somatic_path,
+        somatic_all_vcf=somatic_all_path,
+        germline_vcf=germline_path,
+        intermediate_somatic_bgz=intermediate_bgz,
+        intermediate_somatic_tbi=intermediate_tbi,
+        germline_matches=germline_matches,
+        metrics_file=metrics_file,
+        log=log_file
+    )
+    main(args=args)
 
     # --- Assertions ---
     assert germline_matches.exists()

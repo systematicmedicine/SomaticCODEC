@@ -5,12 +5,21 @@ rule ex_softclipping_metrics:
     input:
         dsc_final = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
     output:
-        file_path = "metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json"
+        metrics = "metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json"
     log:
         "logs/{ex_sample}/ex_softclipping_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_softclipping_metrics.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_softclipping_metrics.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate softclipping metrics
+        ex_softclipping_metrics.py \
+            --dsc_final {input.dsc_final} \
+            --metrics {output.metrics} \
+            --log {log} 2>> {log}
+        """

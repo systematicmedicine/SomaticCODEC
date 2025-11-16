@@ -28,6 +28,22 @@ rule ex_dsc_coverage_metrics:
     benchmark:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ex_dsc_coverage_metrics.py")
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Calculate DSC coverage metrics
+        ex_dsc_coverage_metrics.py \
+            --bam_ex_dsc {input.bam_ex_dsc} \
+            --bai_ex_dsc {input.bai_ex_dsc} \
+            --include_bed {input.include_bed} \
+            --ms_depth {input.ms_depth} \
+            --fai {input.fai} \
+            --metrics {output.metrics} \
+            --quality_threshold {params.quality_threshold} \
+            --sample {params.sample} \
+            --ms_depth_threshold {params.ms_depth_threshold} \
+            --log {log} 2>> {log}
+        """

@@ -16,8 +16,12 @@ rule bwamem_index_files:
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Create index files
         bwa-mem2 index {input.reference} 2>> {log}
         """

@@ -4,12 +4,12 @@
 #
 #   Generates a pass/fail report for component & system level metrics
 #
-#   Author: Cameron
+#   Author: Cameron Fraser
 #
 # ====================================================================================
 
 # Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "pipeline_outputs.smk")
+include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 # Rule
 rule create_metrics_report:
@@ -32,5 +32,19 @@ rule create_metrics_report:
         "logs/global_rules/create_metrics_report.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "metrics_report.R")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Create metrics report
+        metrics_report.R \
+            --component_metrics_metadata {input.component_metrics_metadata} \
+            --system_metrics_metadata {input.system_metrics_metadata} \
+            --component_csv {output.component_csv} \
+            --component_png {output.component_png} \
+            --system_csv {output.system_csv} \
+            --system_png {output.system_png} \
+            --run_name {params.run_name} \
+            --log {log} 2>> {log}
+        """

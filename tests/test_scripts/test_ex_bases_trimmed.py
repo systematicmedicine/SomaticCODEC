@@ -8,46 +8,33 @@ Authors:
     - Joshua Johnstone
 """
 import json
-from pathlib import Path
-import sys
 import pytest
+import types
 
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
+from scripts.ex.processing_metrics.ex_bases_trimmed import main
 
-from scripts.ex_bases_trimmed import main
-
-@pytest.mark.parametrize("pre_r1_path, pre_r2_path, post_r1_path, post_r2_path, expected_bases_trimmed, expected_pct_trimmed", [
+@pytest.mark.parametrize("pre_r1, pre_r2, post_r1, post_r2, expected_trimmed, expected_pct", [
     ("tests/data/test_ex_bases_trimmed/pre_r1.fq", 
-     "tests/data/test_ex_bases_trimmed/pre_r2.fq",
-     "tests/data/test_ex_bases_trimmed/post_r1.fq",
-     "tests/data/test_ex_bases_trimmed/post_r2.fq",
-     75,
+     "tests/data/test_ex_bases_trimmed/pre_r2.fq", 
+     "tests/data/test_ex_bases_trimmed/post_r1.fq", 
+     "tests/data/test_ex_bases_trimmed/post_r2.fq", 
+     75, 
      12.5)
-     ])
-def test_bases_trimmed_real_fastqs(tmp_path, pre_r1_path, pre_r2_path, post_r1_path, post_r2_path, expected_bases_trimmed, expected_pct_trimmed):
-    # Temporary output JSON file
-    json_out = tmp_path / "output.json"
+])
+def test_bases_trimmed(tmp_path, pre_r1, pre_r2, post_r1, post_r2, expected_trimmed, expected_pct):
+    args = types.SimpleNamespace(
+        pre_r1=pre_r1,
+        pre_r2=pre_r2,
+        post_r1=post_r1,
+        post_r2=post_r2,
+        json=str(tmp_path / "output.json"),
+        sample="TestSample",
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
 
-    # Mock Snakemake object
-    class FakeSnakemake:
-        input = {
-            "pre_r1": str(pre_r1_path),
-            "pre_r2": str(pre_r2_path),
-            "post_r1": str(post_r1_path),
-            "post_r2": str(post_r2_path)
-        }
-        output = {"json": str(json_out)}
-        params = {"sample": "TestSample"}
-        log = [str(tmp_path / "log.log")]
-
-    # Run script using mocked Snakemake
-    main(FakeSnakemake())
-
-    # Read JSON output
-    with open(json_out) as f:
+    with open(tmp_path / "output.json") as f:
         data = json.load(f)
 
-    # Check that number/percent bases trimmed matches expected values
-    assert data["trimmed_bases"] == expected_bases_trimmed
-    assert data["percent_bases_trimmed"] == expected_pct_trimmed
+    assert data["trimmed_bases"] == expected_trimmed
+    assert data["percent_bases_trimmed"] == expected_pct

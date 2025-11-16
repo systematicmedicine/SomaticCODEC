@@ -1,5 +1,5 @@
 """
-
+Generates a summary file with key germline risk metrics
 """
 
 rule ms_germ_risk_variant_metrics_summary:
@@ -17,5 +17,17 @@ rule ms_germ_risk_variant_metrics_summary:
         "logs/{ms_sample}/ms_germ_risk_variant_metrics_summary.benchmark.txt"
     resources:
         memory = config["infrastructure"]["memory"]["light"]
-    script:
-        os.path.join(workflow.basedir, "scripts", "ms_germ_risk_variant_metrics_summary.py")
+    shell:
+        """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+        
+        # Generate germline risk metrics summary
+        ms_germ_risk_variant_metrics_summary.py \
+            --variant_metrics {input.variant_metrics} \
+            --pileup_bcf {input.pileup_bcf} \
+            --summary {output.summary} \
+            --min_depth {params.min_depth} \
+            --sample {params.sample} \
+            --log {log} 2>> {log}
+        """

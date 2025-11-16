@@ -12,13 +12,8 @@ from unittest.mock import patch, MagicMock
 import tempfile
 import json
 import os
-import sys
-from pathlib import Path
-
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_call_dsc_metrics import main
+from scripts.ex.processing_metrics.ex_call_dsc_metrics import main
+import argparse
 
 @pytest.mark.parametrize("pre_out, post_out, expected, expect_error", [
     # Some reads lost
@@ -38,44 +33,43 @@ from scripts.ex_call_dsc_metrics import main
 ])
 @patch("subprocess.run")
 def test_read_loss_cases(mock_subprocess_run, pre_out, post_out, expected, expect_error):
-    # Setup mock behavior
+    # Mock behavior of subprocess.run
     def mock_run(cmd, stdout, stderr, text, check):
         mock_result = MagicMock()
-        if "pre" in cmd[-1]:
+        if "map_anno.bam" in cmd[-1]:
             mock_result.stdout = pre_out
-        elif "post" in cmd[-1]:
+        elif "unmap_dsc.bam" in cmd[-1]:
             mock_result.stdout = post_out
         return mock_result
 
     mock_subprocess_run.side_effect = mock_run
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_out:
+    # Temporary output and log files
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_out, \
+         tempfile.NamedTemporaryFile(delete=False, suffix=".log") as tmp_log:
         json_out_path = tmp_out.name
+        log_path = tmp_log.name
 
-    # Create fake snakemake object
-    class FakeSnakemake:
-        input = {
-            "pre_call_bam": "fake_pre.bam",
-            "post_call_bam": "fake_post.bam"
-        }
-        output = {
-            "call_dsc_metrics": json_out_path
-        }
-        params = {
-            "sample": "TestSample"
-        }
-        log = ["logfile.log"]
+    # Build fake argparse args
+    args = argparse.Namespace(
+        pre_call_bam="tmp/TestSample/TestSample_map_anno.bam",
+        post_call_bam="tmp/TestSample/TestSample_unmap_dsc.bam",
+        call_dsc_metrics=json_out_path,
+        sample="TestSample",
+        log=log_path
+    )
 
+    # Run the test
     if expect_error:
         with pytest.raises(Exception):
-            main(FakeSnakemake())
+            main(args)
     else:
-        main(FakeSnakemake())
+        main(args)
         with open(json_out_path) as f:
             data = json.load(f)
         assert round(data["reads_lost"], 1) == expected
 
-    os.remove(json_out_path)
-
-    if os.path.exists("logfile.log"):
-        os.remove("logfile.log")
+    # Cleanup
+    for path in [json_out_path, log_path]:
+        if os.path.exists(path):
+            os.remove(path)

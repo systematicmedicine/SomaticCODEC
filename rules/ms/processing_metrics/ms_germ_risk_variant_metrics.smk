@@ -13,5 +13,9 @@ rule ms_germ_risk_variant_metrics:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Generate germline risk variant metrics
         bcftools stats -s - {input.vcf} > {output.stat} 2>> {log}
         """

@@ -9,35 +9,31 @@ Authors:
 """
 import json
 import pytest
-import os
-import sys
-from pathlib import Path
+import types
+from scripts.ex.processing_metrics.ex_demux_counts_and_gini import main
+from helpers.get_metadata import load_config
 
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
-from scripts.ex_demux_counts_and_gini import main
-
-@pytest.mark.parametrize("demux_path, expected_gini", [
+@pytest.mark.parametrize("demux_metrics, expected_gini", [
     ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.txt", 0.0),
     ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.25.txt", 0.25),
     ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.5.txt", 0.5),
 ])
-def test_gini_coeff_calculation(tmp_path, demux_path, expected_gini):
-    output_json = tmp_path / "demux_gini.json"
+def test_gini_coeff_calculation(tmp_path, demux_metrics, expected_gini):
 
-    class MockSnakemake:
-        input = type("input", (), {"demux_metrics": demux_path})
-        output = type("output", (), {"demux_gini": str(output_json)})
-        log = ["log.txt"]
-        params = {}
+    # Create config JSON for script to use
+    config_yaml = load_config("config/config.yaml")
+    
+    config_json = json.dumps(config_yaml)  
+    
+    args = types.SimpleNamespace(
+        demux_metrics=demux_metrics,
+        demux_gini=str(tmp_path / "demux_gini.json"),
+        config=config_json,
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
 
-    main(MockSnakemake)
+    with open(tmp_path / "demux_gini.json") as f:
+        data = json.load(f)
 
-    with open(output_json) as f:
-        result = json.load(f)
-
-    assert result["gini_coefficient"] == pytest.approx(expected_gini, abs=0.01)
-
-    if os.path.exists("log.txt"):
-        os.remove("log.txt")
+    assert data["gini_coefficient"] == pytest.approx(expected_gini, abs=0.01)

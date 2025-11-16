@@ -17,9 +17,15 @@ rule ms_depth_histogram_metrics:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Extract depth column
         awk '{{print $3}}' {input.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
 
+        # Sort numerically
         sort -n {output.intermediate_depth_values} > {output.intermediate_depth_values_sorted} 2>> {log}
 
+        # Generate counts for each depth value
         uniq -c {output.intermediate_depth_values_sorted} > {output.depth_histogram} 2>> {log}
         """

@@ -10,13 +10,9 @@ Authors:
 
 # Import libraries
 from pathlib import Path
-import sys
 import pysam
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
 from helpers.get_metadata import load_config, get_ms_sample_ids
 from helpers.vcf_helpers import check_vcf_structure
-
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):

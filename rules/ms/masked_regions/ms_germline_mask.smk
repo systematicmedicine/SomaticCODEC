@@ -31,20 +31,27 @@ rule ms_germline_mask:
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
-        """        
+        """   
+        # Set memory limit
+        ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
+
+        # Create unformatted BED files for deletions, insertions, and SNVs
         vcf2bed --deletions < {input.vcf} > {output.intermediate_del_unformatted} 2>> {log}
         vcf2bed --insertions < {input.vcf} > {output.intermediate_ins_unformatted} 2>> {log}
         vcf2bed --snvs < {input.vcf} > {output.intermediate_snv_unformatted} 2>> {log}
 
+        # Format BED files
         cut -f1-3 {output.intermediate_del_unformatted} > {output.intermediate_del_unpadded} 2>> {log}
         cut -f1-3 {output.intermediate_ins_unformatted} > {output.intermediate_ins_unpadded} 2>> {log}
         cut -f1-3 {output.intermediate_snv_unformatted} > {output.ms_germ_snv_bed} 2>> {log}
 
+        # Add padding bases on either side of deletion regions
         bedtools slop \
         -b {params.indel_padding_bases} \
         -g {input.ref_fai} \
         -i {output.intermediate_del_unpadded} > {output.ms_germ_del_bed} 2>> {log}
         
+        # Add padding bases on either side of insertion regions
         bedtools slop \
         -b {params.indel_padding_bases} \
         -g {input.ref_fai} \
