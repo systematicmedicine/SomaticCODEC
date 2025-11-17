@@ -11,6 +11,12 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [Unreleased]
+
+### Changed
+
+- ex_dsc_coverage_metrics.py now calculates the percentage of bases with EX but not MS depth and vice versa (#)
+
 ## [2.1.0] - 2025-11-17
 
 ### Added
@@ -20,6 +26,7 @@ Types of changes:
 - Added all scripts to PATH and PYTHONPATH (#250)
 
 ### Changed
+
 - Refactored directory structure of scripts and definitions (#250 and 254)
 - Converted all python scripts into modules (#250)
 - check_configs.py checks that ex_adapters are used only once per ex_lane (#252) 
