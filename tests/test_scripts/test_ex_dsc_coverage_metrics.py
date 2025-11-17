@@ -66,4 +66,4 @@ def test_ex_dsc_coverage_metrics(mock_popen, ms_depth_path, include_bed_path, ex
 
     for key, expected_val in expected_values.items():
         assert key in result, f"{key} missing from output"
-        assert result[key] == expected_val, f"{key}: expected {expected_val}, got {result[key]}"
+        assert result[key]["value"] == expected_val, f"{key}: expected {expected_val}, got {result[key]}"
