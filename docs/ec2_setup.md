@@ -44,7 +44,7 @@ sudo usermod -aG docker "$USER"
 
 # Clone codec-opensource repository
 
-aws s3 cp s3://sysmed-ref-s3/keys/codec-opensource-deploy-key/codec-opensource-deploy-key ~/.ssh/codec-opensource-deploy-key
+aws s3 cp s3://sm-unrestricted-team-a/key/codec-opensource-deploy-key/codec-opensource-deploy-key ~/.ssh/codec-opensource-deploy-key
 chmod 600 ~/.ssh/codec-opensource-deploy-key
 
 GIT_SSH_COMMAND='ssh -i ~/.ssh/codec-opensource-deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new' \
