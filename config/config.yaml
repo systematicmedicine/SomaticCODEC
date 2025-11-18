@@ -189,5 +189,5 @@ infrastructure:
       sleep_interval: 60
     
   aws:
-    s3_bucket: "s3://sysmed-tmp-s3/codec-opensource-runs/"
+    s3_bucket: "s3://sm-unrestricted-team-a/tmp/codec-opensource-runs/"
     sns_arn: "arn:aws:sns:ap-southeast-2:554765025175:ec2-pipeline-complete"
