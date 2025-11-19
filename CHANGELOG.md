@@ -11,6 +11,16 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [2.1.1] - 2025-11-20
+
+### Changed
+
+- Updated docs/config_checklist.md (#259)
+
+### Fixed
+
+- Updated S3 paths in config and docs (#260 and 261)
+
 ## [2.1.0] - 2025-11-17
 
 ### Added
