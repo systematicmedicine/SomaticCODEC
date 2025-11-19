@@ -85,25 +85,23 @@ def main(args):
 
     # Get MS depth > half depth threshold positions
     ms_half_depth_threshold = ms_depth_threshold / 2
-    ms_depth_half_positions = {}
-    total_ms_half_depth_bases = 0
+    ms_depth_half_pos = {}
 
     with open(ms_depth, "r") as f:
         for line in f:
             chrom, pos_str, depth_str = line.split()
-            pos = int(pos_str) - 1
+            pos = int(pos_str)
             depth = int(depth_str)
             if depth > ms_half_depth_threshold:
-                ms_depth_half_positions.setdefault(chrom, set()).add(pos)
-                total_ms_half_depth_bases += 1
+                ms_depth_half_pos.setdefault(chrom, set()).add(pos)
 
     # Get duplex depth >0 positions and compare overlap with MS
-    total_include_bed_depth = 0
-    total_ex_duplex_depth_bases = 0
-    total_include_bed_covered_positions = 0
-    total_ex_and_ms_bases = 0
-    ex_and_ms_depth_positions = set()
-    total_ex_not_ms_bases = 0
+    include_bed_total_depth = 0
+    genome_duplex_depth_positions = 0
+    include_bed_covered_positions = 0
+    ms_ex_overlap_bases = 0
+    ex_total_bases = 0
+    union_bases = 0
 
     with open(args.log, "a") as log_file:
         proc_ex = subprocess.Popen(
@@ -119,95 +117,56 @@ def main(args):
         depth = int(depth_str)
 
         in_bed = in_intervals(chrom, pos, include_intervals)
-        in_ms = pos in ms_depth_half_positions.get(chrom, set())
+        in_ms = pos in ms_depth_half_pos.get(chrom, set())
 
         if depth > 0:
-            total_ex_duplex_depth_bases += 1
+            ex_total_bases += 1
+            genome_duplex_depth_positions += 1
             if in_ms:
-                total_ex_and_ms_bases += 1
-                ex_and_ms_depth_positions.add((chrom, pos))
-            else:
-                total_ex_not_ms_bases += 1
+                ms_ex_overlap_bases += 1
+
+        if in_ms or depth > 0:
+            union_bases += 1
 
         if in_bed:
-            total_include_bed_depth += depth
+            include_bed_total_depth += depth
             if depth > 0:
-                total_include_bed_covered_positions += 1
+                include_bed_covered_positions += 1
 
     proc_ex.stdout.close()
     proc_ex.wait()
 
-    total_ms_not_ex_bases = 0
-    for chrom, positions in ms_depth_half_positions.items():
-        for pos in positions:
-            if (chrom, pos) not in ex_and_ms_depth_positions:
-                total_ms_not_ex_bases += 1
-
     # Calculate metrics
-    total_ex_or_ms_bases = (total_ex_duplex_depth_bases + total_ms_half_depth_bases - total_ex_and_ms_bases)
-
-    ex_duplex_coverage = round((total_ex_duplex_depth_bases / total_genome_positions * 100) if total_genome_positions else 0, 2)
-    ms_half_depth_coverage = round((total_ms_half_depth_bases / total_genome_positions * 100) if total_genome_positions else 0, 2)
-    coverage_ex_or_ms = round((total_ex_or_ms_bases / total_genome_positions * 100) if total_genome_positions else 0, 2)
-    coverage_ex_not_ms = round((total_ex_not_ms_bases / total_ex_duplex_depth_bases * 100) if total_ex_duplex_depth_bases else 0, 2)
-    coverage_ms_not_ex = round((total_ms_not_ex_bases / total_ms_half_depth_bases * 100) if total_ms_half_depth_bases else 0, 2)
-    coverage_overlap_ex_ms = round((total_ex_and_ms_bases / total_ex_or_ms_bases * 100) if total_ex_or_ms_bases else 0, 2)
-    ex_dsc_coverage_wholegenome = round((total_include_bed_covered_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
+    coverage_overlap_ex_ms = round((ms_ex_overlap_bases / union_bases * 100) if union_bases else 0, 2)
+    ex_duplex_coverage = round((genome_duplex_depth_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
     include_bed_coverage = round((include_bed_total_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
-    ex_dsc_coverage_bedregions = round((total_include_bed_covered_positions / include_bed_total_positions * 100) if include_bed_total_positions else 0, 2)
-    ex_mean_analyzable_duplex_depth = round((total_include_bed_depth / include_bed_total_positions) if include_bed_total_positions else 0, 2)
+    ex_mean_analyzable_duplex_depth = round((include_bed_total_depth / include_bed_total_positions) if include_bed_total_positions else 0, 2)
+    ex_dsc_coverage_bedregions = round((include_bed_covered_positions / include_bed_total_positions * 100) if include_bed_total_positions else 0, 2)
+    ex_dsc_coverage_wholegenome = round((include_bed_covered_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
 
     # Write output
     output_data = {
+        "description": (
+        "Duplex sequencing coverage metrics.",
+        "Definitions:",
+        "total_genome_positions: Number of positions in the reference genome.",
+        "include_bed_total_positions: Number of positions in the include BED file.",
+        "include_bed_coverage: Percentage of genome positions in the include BED file.",
+        "ex_dsc_coverage_bedregions: Percentage of include BED positions with EX duplex depth > 0.",
+        "ex_duplex_coverage: Percentage of genome positions with duplex depth > 0.",
+        "coverage_overlap_ex_ms: Percentage of sequenced positions with 1. MS depth > half MS depth theshold and 2. EX duplex depth > 0.",
+        "ex_dsc_coverage_wholegenome: Percentage of genome positions eligible for variant calling (duplex depth > 0 & unmasked).",
+        "ex_mean_analyzable_duplex_depth: Mean duplex depth of positions eligible for variant calling (duplex depth > 0 & unmasked)."
+        ),
         "sample": sample,
-        "total_genome_positions": {
-            "value": total_genome_positions,
-            "description": "Number of positions in the reference genome"
-        },
-        "ex_duplex_coverage": {
-            "value": ex_duplex_coverage,
-            "description": "Percentage of genome positions with duplex depth > 0"
-        },
-        "ms_half_depth_coverage": {
-            "value": ms_half_depth_coverage,
-            "description": "Percentage of genome positions with MS depth > half MS depth threshold"
-        },
-        "coverage_ex_or_ms": {
-            "value": coverage_ex_or_ms,
-            "description": "Percentage of genome positions with EX duplex depth > 0 OR MS depth > half MS depth threshold"
-        },
-        "coverage_ex_not_ms": {
-            "value": coverage_ex_not_ms,
-            "description": "Percentage of positions with EX duplex depth > 0 that do not have MS depth > half MS depth threshold"
-        },
-        "coverage_ms_not_ex": {
-            "value": coverage_ms_not_ex,
-            "description": "Percentage of positions with MS depth > half MS depth threshold that do not have EX duplex depth > 0"
-        },
-        "coverage_overlap_ex_ms": {
-            "value": coverage_overlap_ex_ms,
-            "description": "Percentage of sequenced positions with 1. MS depth > half MS depth threshold AND 2. EX duplex depth > 0"
-        },
-        "ex_dsc_coverage_wholegenome": {
-            "value": ex_dsc_coverage_wholegenome,
-            "description": "Percentage of genome positions eligible for variant calling (duplex depth > 0 & unmasked)"
-        },
-        "include_bed_total_positions": {
-            "value": include_bed_total_positions,
-            "description": "Number of positions in the include BED file"
-        },
-        "include_bed_coverage": {
-            "value": include_bed_coverage,
-            "description": "Percentage of genome positions in the include BED file"
-        },
-        "ex_dsc_coverage_bedregions": {
-            "value": ex_dsc_coverage_bedregions,
-            "description": "Percentage of include BED positions with EX duplex depth > 0"
-        },
-        "ex_mean_analyzable_duplex_depth": {
-            "value": ex_mean_analyzable_duplex_depth,
-            "description": "Mean duplex depth of positions eligible for variant calling (duplex depth > 0 & unmasked)"
-        }                 
+        "total_genome_positions": total_genome_positions,
+        "include_bed_total_positions": include_bed_total_positions,
+        "include_bed_coverage": include_bed_coverage,
+        "ex_dsc_coverage_bedregions": ex_dsc_coverage_bedregions,
+        "ex_duplex_coverage": ex_duplex_coverage,
+        "coverage_overlap_ex_ms": coverage_overlap_ex_ms,
+        "ex_dsc_coverage_wholegenome": ex_dsc_coverage_wholegenome,
+        "ex_mean_analyzable_duplex_depth": ex_mean_analyzable_duplex_depth        
     }
 
     with open(json_out_path, "w") as out_f:
