@@ -32,6 +32,7 @@ dependencies:
   - cutadapt=5.1
   - fastqc=0.12.1
   - fgbio=3.0.0
+  - gatk4=4.6.2.0
   - graphviz=12.2.1
   - picard=3.4.0
   - samtools=1.22.1
