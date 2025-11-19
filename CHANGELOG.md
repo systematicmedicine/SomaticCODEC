@@ -15,13 +15,13 @@ Types of changes:
 
 ### Changed
 
-- ex_dsc_coverage_metrics.py now calculates the percentage of bases with EX but not MS depth and vice versa (#258)
+- ex_dsc_coverage_metrics.py now calculates the percentage of bases with EX but not MS depth and vice versa (#)
 
 ## [2.1.0] - 2025-11-17
 
 ### Added
 
-- Added enforcement of memory limits to all rules (#250, 251 and 253)
+- Added enforcement of memory limits to all rules (#250 and 251)
 - Added extra_heavy memory allocation level (#255)
 - Added all scripts to PATH and PYTHONPATH (#250)
 
