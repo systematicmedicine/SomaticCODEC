@@ -22,7 +22,7 @@ Instuctions for setting up codec-opensource pipeline on Amazon EC2
         * Size (GiB): 1000 per EX or MS sample
         * IOPS: 8000
         * Throughput (MiB/s): 2000
-    * IAM instance profile: EC2_S3_Write
+    * IAM instance profile: A profile with read access to the bucket where the sequencing data is stored, and write access to the bucket where the outputs will be uploaded
 * Connect to the instance
     * navigate to EC2 > Instances
     * In the list of instances, right click on your instance and select <I>connect</I>
