@@ -11,6 +11,12 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [Unreleased]
+
+### Fixed
+
+- Reduced thread allocation for rule ms_map to reduce memory usage (#)
+
 ## [2.1.1] - 2025-11-20
 
 ### Changed
