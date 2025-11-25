@@ -15,7 +15,7 @@ Types of changes:
 
 ### Fixed
 
-- Reduced thread allocation for rule ms_map to reduce memory usage (#)
+- Reduced thread allocation for rule ms_map to reduce memory usage (#267)
 
 ## [2.1.1] - 2025-11-20
 
