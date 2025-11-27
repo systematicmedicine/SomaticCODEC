@@ -12,9 +12,9 @@ The relevant version number is incremented when making the following changes:
     - Example: Adding a new read-level filter
 
 - **MINOR**: Changes that do not affect variant calling
-    - Example: Adding a new metrics file
+    - Example: Adding a new metrics file or updating resource allocation to a rule
 
-- **PATCH**: Changes that do not affect variant calling or metrics outputs
+- **PATCH**: Changes that do not affect variant calling, metrics outputs, or performance
     - Example: Updating unit tests or documentation
 
 ## Required testing before merging into `master`

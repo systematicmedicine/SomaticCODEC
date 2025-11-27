@@ -31,7 +31,7 @@ rule ms_map:
     benchmark:
         "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
