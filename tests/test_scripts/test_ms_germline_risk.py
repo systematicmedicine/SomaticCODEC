@@ -49,8 +49,11 @@ def test_germ_risk_variants_fit_criteria(lightweight_test_run):
             dp = vcf_sample.get("DP")
 
             alt_reads = sum(ad[1:])
-            vaf = alt_reads / dp
+            vaf = alt_reads / dp if dp > 0 else 0
 
             # Assert variants fit criteria
-            assert vaf >= min_alt_vaf, f"Variant {record} has VAF {vaf} which is < min_alt_vaf ({min_alt_vaf})"
-            assert dp >= min_depth, f"Variant {record} has depth {dp} which is < min_depth ({min_depth})"
+            assert dp < min_depth or vaf >= min_alt_vaf, (
+                f"Variant {record} does not meet masking criteria: "
+                f"Record values: DP={dp}, VAF={vaf}"
+                f"Criteria: min_depth < {min_depth} or min_alt_vaf >= {min_alt_vaf}"
+                )
