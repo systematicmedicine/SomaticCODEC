@@ -15,7 +15,7 @@ Types of changes:
 
 ### Changed
 
-- Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#)
+- Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#270)
 
 ## [2.2.0] - 2025-11-28
 
