@@ -21,6 +21,7 @@ rule ms_germline_risk:
         max_depth = config["sci_params"]["ms_germline_risk"]["max_depth"],
         min_alt_vaf = config["sci_params"]["ms_germline_risk"]["min_alt_vaf"],
         min_base_qual = config["sci_params"]["ms_germline_risk"]["min_base_qual"],
+        min_depth = config["sci_params"]["ms_low_depth_mask"]["min_depth"],
         min_map_qual = config["sci_params"]["ms_germline_risk"]["min_map_qual"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
@@ -51,10 +52,10 @@ rule ms_germline_risk:
         --output {output.intermediate_pileup} \
         {input.bam} 2>> {log}
 
-        # Filter for variants with VAF >= min_alt_vaf
+        # Filter for variants with VAF >= min_alt_vaf or depth < min_depth
         bcftools view \
         --threads {threads} \
-        --include '(SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf}' \
+        --include '(SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf} || FMT/DP < {params.min_depth}' \
         --output {output.vcf_germ} \
         {output.intermediate_pileup} 2>> {log}
         """
