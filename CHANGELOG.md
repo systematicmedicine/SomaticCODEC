@@ -19,7 +19,7 @@ Types of changes:
 
 ### Fixed
 
-- Added depth filter to ms_germline_risk to mask low depth sites missed by samtools depth (#)
+- Added depth filter to ms_germline_risk to mask low depth sites missed by samtools depth (#271)
 
 ## [2.2.0] - 2025-11-28
 
