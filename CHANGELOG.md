@@ -11,6 +11,12 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [Unreleased]
+
+### Changed
+
+- Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#)
+
 ## [2.2.0] - 2025-11-28
 
 ### Fixed
