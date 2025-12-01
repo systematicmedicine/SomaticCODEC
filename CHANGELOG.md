@@ -17,6 +17,10 @@ Types of changes:
 
 - Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#270)
 
+### Fixed
+
+- Added depth filter to ms_germline_risk to mask low depth sites missed by samtools depth (#)
+
 ## [2.2.0] - 2025-11-28
 
 ### Fixed
