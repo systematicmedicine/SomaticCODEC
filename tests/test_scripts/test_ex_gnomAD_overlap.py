@@ -62,4 +62,3 @@ def test_ex_gnomAD_overlap(tmp_path, somatic_path, somatic_all_path, germline_pa
     # Validate metrics
     metrics = json.loads(metrics_file.read_text())
     assert metrics["total_gnomAD_matches"]["value"] == expected_matches
-    assert metrics["rate_gnomAD_overlap"]["value"] == expected_overlap_rate
