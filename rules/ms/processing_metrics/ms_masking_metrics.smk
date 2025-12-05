@@ -6,7 +6,7 @@ rule ms_masking_metrics:
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
         ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
         ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
-        ms_germ_snv_bed = "tmp/{ms_sample}/{ms_sample}_germ_snvs.bed",
+        ms_germ_all_bed = "tmp/{ms_sample}/{ms_sample}_germ_all.bed",
         combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
         ref_index = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
@@ -32,7 +32,7 @@ rule ms_masking_metrics:
             --ms_lowdepth_bed {input.ms_lowdepth_bed} \
             --ms_germ_del_bed {input.ms_germ_del_bed} \
             --ms_germ_ins_bed {input.ms_germ_ins_bed} \
-            --ms_germ_snv_bed {input.ms_germ_snv_bed} \
+            --ms_germ_all_bed {input.ms_germ_all_bed} \
             --combined_bed {input.combined_bed} \
             --ref_index {input.ref_index} \
             --mask_metrics {output.mask_metrics} \
