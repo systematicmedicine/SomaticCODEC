@@ -20,8 +20,12 @@ Types of changes:
 ### Changed
 
 - Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#270)
-- uniformity_SNV_spacing system metric now uses 10th percentile, updated thresholds based on buffy coat data (#272 and 273)
+- Changed uniformity_SNV_spacing system metric to use 10th percentile, updated thresholds based on buffy coat data (#272 and 273)
 - Increased non-negotiable upper threshold for uniformity_SNV_position system metric from 15 to 20.1 (#274)
+
+### Removed
+
+- Removed gnomAD overlap rate calculation from ex_gnomAD_overlap.py (#275)
 
 ## [2.2.0] - 2025-11-28
 
