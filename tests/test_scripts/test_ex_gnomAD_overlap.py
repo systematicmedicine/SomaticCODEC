@@ -13,27 +13,25 @@ import types
 from scripts.ex.variant_analysis.ex_gnomAD_overlap import main
 
 @pytest.mark.parametrize(
-    "somatic_path, somatic_all_path, germline_path, expected_matches, expected_overlap_rate",
+    "somatic_path, somatic_all_path, germline_path, expected_matches",
     [
         # Three overlapping variants
         (
             "tests/data/test_ex_gnomAD_overlap/somatic_overlap.vcf",
             "tests/data/test_ex_gnomAD_overlap/somatic_all_overlap.vcf",
             "tests/data/test_ex_gnomAD_overlap/gnomad-chr21-micro.vcf.bgz",
-            3,
-            0.3
+            3
         ),
         # No overlap
         (
             "tests/data/test_ex_gnomAD_overlap/somatic_no_overlap.vcf",
             "tests/data/test_ex_gnomAD_overlap/somatic_all_no_overlap.vcf",
             "tests/data/test_ex_gnomAD_overlap/gnomad-chr21-micro.vcf.bgz",
-            0,
             0
         )
     ]
 )
-def test_ex_gnomAD_overlap(tmp_path, somatic_path, somatic_all_path, germline_path, expected_matches, expected_overlap_rate):
+def test_ex_gnomAD_overlap(tmp_path, somatic_path, somatic_all_path, germline_path, expected_matches):
 
     # --- Prepare output paths ---
     intermediate_bgz = tmp_path / "somatic.bgz"
@@ -62,4 +60,3 @@ def test_ex_gnomAD_overlap(tmp_path, somatic_path, somatic_all_path, germline_pa
     # Validate metrics
     metrics = json.loads(metrics_file.read_text())
     assert metrics["total_gnomAD_matches"]["value"] == expected_matches
-    assert metrics["rate_gnomAD_overlap"]["value"] == expected_overlap_rate

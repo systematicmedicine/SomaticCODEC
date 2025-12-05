@@ -4,7 +4,6 @@ Determines how many called somatic variants are present in dataset of common ger
 rule ex_gnomAD_overlap:
     input:
         somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        somatic_all_vcf = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf",
         germline_vcf = config["sci_params"]["global"]["known_germline_variants"],
         germline_tbi = config["sci_params"]["global"]["known_germline_variants"] + ".tbi"
     output:
@@ -26,7 +25,6 @@ rule ex_gnomAD_overlap:
         # Calculate gnomAD overlap metrics
         ex_gnomAD_overlap.py \
             --somatic_vcf {input.somatic_vcf} \
-            --somatic_all_vcf {input.somatic_all_vcf} \
             --germline_vcf {input.germline_vcf} \
             --intermediate_somatic_bgz {output.intermediate_somatic_bgz} \
             --intermediate_somatic_tbi {output.intermediate_somatic_tbi} \
