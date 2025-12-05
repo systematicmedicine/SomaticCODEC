@@ -25,7 +25,7 @@ Types of changes:
 
 ### Removed
 
-- Removed gnomAD overlap rate calculation from ex_gnomAD_overlap.py (#)
+- Removed gnomAD overlap rate calculation from ex_gnomAD_overlap.py (#275)
 
 ## [2.2.0] - 2025-11-28
 
