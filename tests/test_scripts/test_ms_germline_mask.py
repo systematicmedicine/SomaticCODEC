@@ -19,7 +19,7 @@ def test_bed_structure_correct(lightweight_test_run):
     for ms_sample in ms_samples:
         bed_files = [Path(f"tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
                      Path(f"tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
-                     Path(f"tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")]
+                     Path(f"tmp/{ms_sample}/{ms_sample}_germ_all.bed")]
         
         for bed_file in bed_files:
             with bed_file.open() as f:

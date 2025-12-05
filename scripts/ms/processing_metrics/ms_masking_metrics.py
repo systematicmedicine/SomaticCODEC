@@ -52,7 +52,7 @@ def main(args):
         "lowdepth": args.ms_lowdepth_bed,
         "germ_deletions": args.ms_germ_del_bed,
         "germ_insertions": args.ms_germ_ins_bed,
-        "germ_snvs": args.ms_germ_snv_bed,
+        "germ_all": args.ms_germ_all_bed,
         "combined_mask": args.combined_bed,
     })
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument("--ms_lowdepth_bed", required=True)
     parser.add_argument("--ms_germ_del_bed", required=True)
     parser.add_argument("--ms_germ_ins_bed", required=True)
-    parser.add_argument("--ms_germ_snv_bed", required=True)
+    parser.add_argument("--ms_germ_all_bed", required=True)
     parser.add_argument("--combined_bed", required=True)
     parser.add_argument("--ref_index", required=True)
     parser.add_argument("--mask_metrics", required=True)

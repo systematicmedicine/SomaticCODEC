@@ -16,12 +16,12 @@ rule ms_germline_mask:
     output:
         intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
         intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
-        intermediate_snv_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed"),
+        intermediate_all_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_all_unformatted.bed"),
         intermediate_del_unpadded = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unpadded.bed"),
         intermediate_ins_unpadded = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unpadded.bed"),
         ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
         ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-        ms_germ_snv_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_snvs.bed")
+        ms_germ_all_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_all.bed")
     params:
         indel_padding_bases = config["sci_params"]["ms_germline_mask"]["indel_padding_bases"]
     log:
@@ -35,15 +35,17 @@ rule ms_germline_mask:
         # Set memory limit
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
 
-        # Create unformatted BED files for deletions, insertions, and SNVs
+        # Create unformatted BED file for all records in VCF
+        vcf2bed < {input.vcf} > {output.intermediate_all_unformatted} 2>> {log}
+
+        # Create separate BED files for insertions and deletions (to allow padding)
         vcf2bed --deletions < {input.vcf} > {output.intermediate_del_unformatted} 2>> {log}
         vcf2bed --insertions < {input.vcf} > {output.intermediate_ins_unformatted} 2>> {log}
-        vcf2bed --snvs < {input.vcf} > {output.intermediate_snv_unformatted} 2>> {log}
 
         # Format BED files
         cut -f1-3 {output.intermediate_del_unformatted} > {output.intermediate_del_unpadded} 2>> {log}
         cut -f1-3 {output.intermediate_ins_unformatted} > {output.intermediate_ins_unpadded} 2>> {log}
-        cut -f1-3 {output.intermediate_snv_unformatted} > {output.ms_germ_snv_bed} 2>> {log}
+        cut -f1-3 {output.intermediate_all_unformatted} > {output.ms_germ_all_bed} 2>> {log}
 
         # Add padding bases on either side of deletion regions
         bedtools slop \
