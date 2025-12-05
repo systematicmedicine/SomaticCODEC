@@ -20,7 +20,7 @@ from scripts.ms.processing_metrics.ms_masking_metrics import main
             "ms_lowdepth_bed": "tests/data/test_ms_masking_metrics/lowdepth.bed",
             "ms_germ_del_bed": "tests/data/test_ms_masking_metrics/germ_del.bed",
             "ms_germ_ins_bed": "tests/data/test_ms_masking_metrics/germ_ins.bed",
-            "ms_germ_snv_bed": "tests/data/test_ms_masking_metrics/germ_snv.bed",
+            "ms_germ_all_bed": "tests/data/test_ms_masking_metrics/germ_all.bed",
             "combined_bed": "tests/data/test_ms_masking_metrics/combined.bed",
             "ref_index": "tests/data/test_ms_masking_metrics/reference.fai",
         },
@@ -30,7 +30,7 @@ from scripts.ms.processing_metrics.ms_masking_metrics import main
             "lowdepth": 0.25,
             "germ_deletions": 12.5,
             "germ_insertions": 17.5,
-            "germ_snvs": 0.02,
+            "germ_all": 0.02,
             "combined_mask": 100
         }
     )
@@ -46,7 +46,7 @@ def test_masking_metrics(tmp_path, input_files, expected_percentages):
         ms_lowdepth_bed = input_files["ms_lowdepth_bed"],
         ms_germ_del_bed = input_files["ms_germ_del_bed"],
         ms_germ_ins_bed = input_files["ms_germ_ins_bed"],
-        ms_germ_snv_bed = input_files["ms_germ_snv_bed"],
+        ms_germ_all_bed = input_files["ms_germ_all_bed"],
         combined_bed = input_files["combined_bed"],
         ref_index = input_files["ref_index"],
         mask_metrics = str(output_json),
