@@ -63,14 +63,17 @@ def test_germ_risk_variants_fit_criteria(lightweight_test_run):
                 )
             
 @pytest.mark.parametrize("deduped_bam, deduped_bai, expected_vcf, unexpected_vcf", [
+    # Low depth, ALT only
     ("tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam", 
      "tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_0_1/expected_AD_0_1.vcf",
      "tests/data/test_ms_germline_risk/AD_0_1/unexpected_AD_0_1.vcf"),
+     # Low depth, REF only
      ("tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam", 
      "tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_1_0/expected_AD_1_0.vcf",
      "tests/data/test_ms_germline_risk/AD_1_0/unexpected_AD_1_0.vcf"),
+     # High depth, AF == 0.10
      ("tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam", 
      "tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_36_4/expected_AD_36_4.vcf",
@@ -144,10 +147,10 @@ def test_variant_edge_cases(tmp_path, deduped_bam, deduped_bai, expected_vcf, un
     assert success
 
     # Assert that output VCF matches expected VCF
-    with open(output_vcf), open(expected_vcf), open(unexpected_vcf):
-        output_variants = [parse_vcf_line(line) for line in output_vcf if not line.startswith("#")]
-        expected_variants = [parse_vcf_line(line) for line in expected_vcf if not line.startswith("#")]
-        unexpected_variants = [parse_vcf_line(line) for line in unexpected_vcf if not line.startswith("#")]
+    with open(output_vcf) as vcf_out, open(expected_vcf) as vcp_exp, open(unexpected_vcf) as vcf_unexp:
+        output_variants = [parse_vcf_line(line) for line in vcf_out if not line.startswith("#")]
+        expected_variants = [parse_vcf_line(line) for line in vcp_exp if not line.startswith("#")]
+        unexpected_variants = [parse_vcf_line(line) for line in vcf_unexp if not line.startswith("#")]
 
     missing_variants = [
     expected_variant for expected_variant in expected_variants
