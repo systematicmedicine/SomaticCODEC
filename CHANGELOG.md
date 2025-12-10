@@ -20,9 +20,10 @@ Types of changes:
 ### Changed
 
 - Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#270)
-- Changed uniformity_SNV_spacing system metric to use 10th percentile, updated thresholds based on buffy coat data (#272 and 273)
-- Increased non-negotiable upper threshold for uniformity_SNV_position system metric from 15 to 15.5 (#274 and 277)
+- Raised nn lower threshold for uniformity_SNV_spacing from 100 to 120 (#278)
+- Increased non-negotiable upper threshold for uniformity_SNV_position system metric from 15 to 20 (#278)
 - Modified ms_germline_mask.smk to include low depth, REF only records in germline risk BED (#276)
+- Updated various component metric thresholds based on current data percentiles (#278)
 
 ### Removed
 
