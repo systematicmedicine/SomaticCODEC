@@ -23,6 +23,7 @@ Types of changes:
 - Raised nn lower threshold for uniformity_SNV_spacing from 100 to 120 (# )
 - Increased non-negotiable upper threshold for uniformity_SNV_position system metric from 15 to 20 (# )
 - Modified ms_germline_mask.smk to include low depth, REF only records in germline risk BED (#276)
+- Updated various component metric thresholds based on current data percentiles (# )
 
 ### Removed
 
