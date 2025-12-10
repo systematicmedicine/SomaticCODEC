@@ -63,21 +63,26 @@ def test_germ_risk_variants_fit_criteria(lightweight_test_run):
                 )
             
 @pytest.mark.parametrize("deduped_bam, deduped_bai, expected_vcf, unexpected_vcf", [
-    # Low depth, ALT only
+    # Depth < 40, ALT VAF >= 0.10
     ("tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam", 
      "tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_0_1/expected_AD_0_1.vcf",
      "tests/data/test_ms_germline_risk/AD_0_1/unexpected_AD_0_1.vcf"),
-     # Low depth, REF only
+     # Depth < 40, ALT VAF < 0.10
      ("tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam", 
      "tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_1_0/expected_AD_1_0.vcf",
      "tests/data/test_ms_germline_risk/AD_1_0/unexpected_AD_1_0.vcf"),
-     # High depth, AF == 0.10
+     # Depth >= 40, ALT VAF >= 0.10
      ("tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam", 
      "tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_36_4/expected_AD_36_4.vcf",
-     "tests/data/test_ms_germline_risk/AD_36_4/unexpected_AD_36_4.vcf")
+     "tests/data/test_ms_germline_risk/AD_36_4/unexpected_AD_36_4.vcf"),
+     # Depth >= 40, ALT VAF < 0.10
+     ("tests/data/test_ms_germline_risk/AD_37_3/deduped_map_AD_37_3.bam", 
+     "tests/data/test_ms_germline_risk/AD_37_3/deduped_map_AD_37_3.bam.bai", 
+     "tests/data/test_ms_germline_risk/AD_37_3/expected_AD_37_3.vcf",
+     "tests/data/test_ms_germline_risk/AD_37_3/unexpected_AD_37_3.vcf")
 ])
 def test_variant_edge_cases(tmp_path, deduped_bam, deduped_bai, expected_vcf, unexpected_vcf):
 
