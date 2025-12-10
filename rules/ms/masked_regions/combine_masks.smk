@@ -9,9 +9,7 @@ rule combine_masks:
         precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
         excluded_chromosomes_bed = "tmp/downloads/excluded_chromosomes.bed",
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_del_bed = "tmp/{ms_sample}/{ms_sample}_germ_deletions.bed",
-        ms_germ_ins_bed = "tmp/{ms_sample}/{ms_sample}_germ_insertions.bed",
-        ms_germ_all_bed = "tmp/{ms_sample}/{ms_sample}_germ_all.bed",
+        ms_germ_risk_bed = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed"),
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai" 
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
@@ -32,9 +30,7 @@ rule combine_masks:
         cat {input.precomputed_masks} \
         {input.excluded_chromosomes_bed} \
         {input.ms_lowdepth_bed} \
-        {input.ms_germ_del_bed} \
-        {input.ms_germ_ins_bed} \
-        {input.ms_germ_all_bed} > {output.intermediate_cat} 2>> {log}
+        {input.ms_germ_risk_bed} > {output.intermediate_cat} 2>> {log}
 
         # Sort combined BED in the same order as the reference file       
         bedtools sort -faidx {input.fai} -i {output.intermediate_cat} > {output.intermediate_sorted} 2>> {log}
