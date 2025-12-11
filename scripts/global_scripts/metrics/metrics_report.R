@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-# ===========================================================================
-# metrics_report.R
+#
+# --- metrics_report.R ---
 #
 # Collate component level and system level metrics into respective reports
 #   - To be used exclusively with Snakemake parent rule create_metrics_report
@@ -9,7 +9,7 @@
 # Authors: 
 #   - Cameron Fraser
 #   - Joshua Johnstone
-# ===========================================================================
+#
 
 # ---------------------------------------------------------------------------
 # Setup environment

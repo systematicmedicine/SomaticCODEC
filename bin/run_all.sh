@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ==============================================================================
-# run_all.sh
+#
+# --- run_all.sh ---
 #
 # Master orchestration script to run the full bioinformatics pipeline:
 #   1. Download inputs from S3
@@ -22,7 +22,7 @@
 # Authors:
 #   - Cameron Fraser
 #   - ChatGPT
-# ==============================================================================
+#
 
 # -----------------------------------------------------------------------------
 # Setup

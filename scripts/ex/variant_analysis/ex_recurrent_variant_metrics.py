@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-# =======================================================================================
-# --- ex_recurrent_variant_metrics.py ---
-#
-# Identify SNVs that occur in multiple samples in the same batch.
-# 
-# Exclude germline variants present in the gnomAD database.
-#
-#Authors: 
-#    - Cameron Fraser
-#    - Chat-GPT
-# =======================================================================================
+"""
+--- ex_recurrent_variant_metrics.py ---
+
+Identify SNVs that occur in multiple samples in the same batch.
+
+Exclude germline variants present in the gnomAD database.
+
+Authors: 
+   - Cameron Fraser
+   - Chat-GPT
+"""
 
 # ---------------------------------------------------------------------------------------
 # Setup

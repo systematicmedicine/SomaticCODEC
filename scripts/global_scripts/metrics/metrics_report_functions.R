@@ -1,13 +1,13 @@
 #!/usr/bin/env Rscript
-# ===========================================================================
-# metrics_report_functions.R
+#
+# --- metrics_report_functions.R ---
 #
 # Functions used in metrics_report.R
 #
 # Authors: 
 #   - Cameron Fraser
 #   - Joshua Johnstone
-# ===========================================================================
+#
 
 library(jsonlite)
 library(ggplot2)

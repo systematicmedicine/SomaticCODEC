@@ -1,4 +1,6 @@
-# Creates index files from reference genome
+"""
+Creates index files from reference genome
+"""
 
 rule bwamem_index_files:
     input:

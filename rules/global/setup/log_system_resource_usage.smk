@@ -1,4 +1,6 @@
-# Logs disk space, memory, and cpu load at a defined interval
+"""
+Logs disk space, memory, and cpu load at a defined interval
+"""
 
 rule log_system_resource_usage:
     output:

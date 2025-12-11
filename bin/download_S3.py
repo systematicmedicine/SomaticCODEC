@@ -2,12 +2,12 @@
 --- download_S3.py ---
 
 Downloads data from S3 to the local EC2 instance:
-    * Downloads all data defined in /config/download_list.csv
-    * Assumes that the EC2 instance running this script has permission to access the data
+    - Downloads all data defined in /config/download_list.csv
+    - Assumes that the EC2 instance running this script has permission to access the data
 
 Authors:
-    * Chat-GPT
-    * Cameron Fraser
+    - Chat-GPT
+    - Cameron Fraser
 """
 
 print("[INFO] Starting download_s3.py")

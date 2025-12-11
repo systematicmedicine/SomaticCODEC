@@ -1,4 +1,6 @@
-# Generates a summary of key metrics for ms fastqc reports
+"""
+Generates a summary of key metrics for ms fastqc reports
+"""
 
 rule ms_fastqc_summary_metrics:
     input:

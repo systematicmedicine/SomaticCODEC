@@ -1,4 +1,6 @@
-# Generates MS alignment metrics
+"""
+Generates MS alignment metrics
+"""
 
 rule ms_alignment_metrics:
     input:
