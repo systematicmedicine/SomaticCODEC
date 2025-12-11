@@ -1,5 +1,7 @@
-# Creates a mask for chromosomes that will be excluded for variant calling 
-    # e.g. chrUn, chr*_random, chrM, chrEBV
+"""
+Creates a mask for chromosomes that will be excluded for variant calling 
+e.g. chrUn, chr*_random, chrM, chrEBV
+"""
 
 rule included_excluded_chromosomes_beds:
     input:

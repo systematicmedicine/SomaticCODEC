@@ -1,13 +1,8 @@
-# ----------------------------------------------------------------------------------------------
-#   RULE ms_germline_mask
-#
-#   Creates a BED file from germline risk VCF 
-# 
-#   Notes:
-#       - For deletions, the stop value of the BED region is determined by the length difference 
-#           between ALT and REF alleles. 
-#       - For insertions and SNV's, the BED region is length 1
-# ----------------------------------------------------------------------------------------------
+"""
+Creates a BED file from germline risk VCF 
+    - For deletions, the stop value of the BED region is determined by the length difference between ALT and REF alleles
+    - For insertions and SNV's, the BED region is length 1
+"""
 
 rule ms_germline_mask:
     input:

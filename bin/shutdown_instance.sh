@@ -1,4 +1,13 @@
 #!/bin/bash
+#
+# --- shutdown_instance.sh ---
+#
+# Shuts down EC2 instance following a successful or failed run.
+#
+# Authors:
+#   - Cameron Fraser
+#   - ChatGPT
+#
 set -euo pipefail
 
 echo "[INFO] Shutdown requested at: $(date -u)"

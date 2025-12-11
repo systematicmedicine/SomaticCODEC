@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-# ====================================================================
-# ex_snv_distance_metrics.py
-#
-# For each SNV, calculate the distance to the nearest SNV
-# Write a metrics file with percetiles of distances
-#
-# Authors:
-#   - Chat-GPT
-#   - Cameron Fraser
-#   - Joshua Johnstone
-# ====================================================================
+"""
+--- ex_snv_distance_metrics.py ---
+
+For each SNV, calculate the distance to the nearest SNV
+Write a metrics file with percetiles of distances
+
+Authors:
+  - Chat-GPT
+  - Cameron Fraser
+  - Joshua Johnstone
+"""
 
 # Load libraries
 import json

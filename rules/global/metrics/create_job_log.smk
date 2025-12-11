@@ -1,4 +1,6 @@
-# Creates a CSV of job start and finish times
+"""
+Creates a CSV of job start and finish times
+"""
 
 rule create_job_log:
     input:

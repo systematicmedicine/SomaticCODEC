@@ -1,13 +1,13 @@
-# ================================================================================
-# check_configs.py
-#
-# Checks that the pipeline configs are formatted correctly
-#
-# Authors:
-#   - Cameron Fraser
-#   - Chat-GPT
-#
-# ================================================================================
+"""
+--- check_configs.py ---
+
+Checks that the pipeline configs are formatted correctly
+
+Authors:
+  - Cameron Fraser
+  - Chat-GPT
+
+"""
 
 # --------------------------------------------------------------------------------
 # Setup
