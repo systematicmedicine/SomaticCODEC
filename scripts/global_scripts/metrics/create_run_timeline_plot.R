@@ -1,14 +1,13 @@
 #!/usr/bin/env Rscript
-# ===========================================================================
-# create_run_timeline_plot.R
+#
+# --- create_run_timeline_plot.R ---
 #
 # Create a plot of jobs and resource usage during the run
 #   - To be used exclusively with Snakemake parent rule create_run_timeline_plot
 #
 # Author:
 #   - Joshua Johnstone
-# ===========================================================================
-
+#
 
 # Load libraries
 library(dplyr)

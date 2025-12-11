@@ -1,16 +1,15 @@
-# =======================================================================================
-# test_ex_snv_position.py
-#
-# Tests the ex_snv_position.R script against 3 VCF cases:
-#   - zero_mad: one chromosome, uniform distribution
-#   - fifty_mad: one chromosome, 50 deviation
-#   - multi_chrom: multiple chromosomes
-#
-# Authors:
-#   - Chat-GPT 
-#   - Cameron Fraser
-# =======================================================================================
+"""
+--- test_ex_snv_position.py ---
 
+Tests the ex_snv_position.R script against 3 VCF cases:
+  - zero_mad: one chromosome, uniform distribution
+  - fifty_mad: one chromosome, 50 deviation
+  - multi_chrom: multiple chromosomes
+
+Authors:
+  - Chat-GPT 
+  - Cameron Fraser
+"""
 # --------------------------------------------------------------------------------------
 # Setup
 # --------------------------------------------------------------------------------------

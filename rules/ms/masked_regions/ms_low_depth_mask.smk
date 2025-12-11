@@ -1,12 +1,8 @@
-# ----------------------------------------------------------------------------------------------
-#   RULE ms_low_depth_mask
-#
-#   Creates a mask for genomic positions with low read depth in matched sample
-#
-#   Notes:
-#   - Deletions are counted towards depth (-J flag)   
-#   - Overlapping r1 and r2 reads are counted once only (-s flag)
-# ----------------------------------------------------------------------------------------------
+"""
+Creates a mask for genomic positions with low read depth in matched sample
+    - Deletions are counted towards depth (-J flag)   
+    - Overlapping r1 and r2 reads are counted once only (-s flag)
+"""
 
 rule ms_low_depth_mask:
     input:

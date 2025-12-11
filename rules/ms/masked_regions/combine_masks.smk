@@ -1,8 +1,6 @@
-# ----------------------------------------------------------------------------------------------
-#   RULE combine_masks
-#
-#   Combines all masks into a single BED file
-# ----------------------------------------------------------------------------------------------
+"""
+Combines all masks into a single BED file
+"""
 
 rule combine_masks:
     input:

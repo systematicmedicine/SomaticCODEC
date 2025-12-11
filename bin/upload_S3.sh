@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# ==============================================================================
-# upload_S3.sh
+# 
+# --- upload_S3.sh ---
 #
 # Script for uploading pipeline outputs to S3
 #
 # Authors:
 #   - Cameron Fraser
 #   - ChatGPT
-# ==============================================================================
+# 
 set -euo pipefail
 
 echo "[INFO] Starting upload_S3.sh: $(date)"

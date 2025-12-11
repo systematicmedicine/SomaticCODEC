@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# ==============================================================================
-# dryrun.sh
+#
+# --- dryrun.sh ---
 #
 # Checks the pipeline using Snakemake dryrun
 #
 # Authors:
 #   - Cameron Fraser
 #   - ChatGPT
-# ==============================================================================
+#
 set -euo pipefail
 
 # Check that this script is being run from the project root

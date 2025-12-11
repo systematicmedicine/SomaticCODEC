@@ -1,4 +1,6 @@
-# Creates a plot of jobs and resource usage during the run
+"""
+Creates a plot of jobs and resource usage during the run
+"""
 
 rule create_run_timeline_plot:
     input:

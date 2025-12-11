@@ -1,12 +1,7 @@
-# ----------------------------------------------------------------------------------------------
-#   RULE ms_germline_risk
-#
-#   Uses matched sample BAM to identify positions that may contain germline variants. 
-# 
-#   Notes:
-#       - Designed to favour sensitivty over specificity
-# ----------------------------------------------------------------------------------------------
-
+"""
+Uses matched sample BAM to identify positions that may contain germline variants. 
+    - Designed to favour sensitivty over specificity
+"""
 rule ms_germline_risk:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",

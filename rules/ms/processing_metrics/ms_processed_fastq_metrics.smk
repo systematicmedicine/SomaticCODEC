@@ -1,4 +1,6 @@
-# Generates a fastqc report for ms processed reads
+"""
+Generates a fastqc report for ms processed reads
+"""
 
 rule ms_processed_fastq_metrics:
     input:

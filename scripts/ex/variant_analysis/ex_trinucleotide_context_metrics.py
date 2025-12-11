@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
-# =====================================================================
-# ex_trinucleotide_context_metrics.py
-#
-# Calculate trinucleotide context for a sample, and compare to reference
-# contexts.
-#
-# Inputs:
-#   - Somatic variant VCF
-#   - Reference genome
-#   - Reference contexts in long format (Profile, Context, Proportion)
-#
-# Assumes that contexts are expressed in ATA>G format. Assumes proportions are
-# normalised so that they sum to 1 for any sample/reference context. Profile
-# referes to the names of the reference contexts.
-#
-# Outputs:
-#   - Trinucleotide context for sample
-#   - Consine similaries between sample and reference contexts
-#   - Plots comparing sample context to reference contexts
-#
-# Authors:
-#   - Chat-GPT
-#   - Cameron Fraser
-# =====================================================================
+"""
+--- ex_trinucleotide_context_metrics.py ---
+
+Calculate trinucleotide context for a sample, and compare to reference
+contexts.
+
+Inputs:
+  - Somatic variant VCF
+  - Reference genome
+  - Reference contexts in long format (Profile, Context, Proportion)
+
+Assumes that contexts are expressed in ATA>G format. Assumes proportions are
+normalised so that they sum to 1 for any sample/reference context. Profile
+referes to the names of the reference contexts.
+
+Outputs:
+  - Trinucleotide context for sample
+  - Consine similaries between sample and reference contexts
+  - Plots comparing sample context to reference contexts
+
+Authors:
+  - Chat-GPT
+  - Cameron Fraser
+"""
 
 # ---------------------------------------------------------------------
 # Setup

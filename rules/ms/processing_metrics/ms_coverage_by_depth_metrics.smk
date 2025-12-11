@@ -1,4 +1,6 @@
-# Generates a summary of genome coverage by depth
+"""
+Generates a summary of genome coverage by depth
+"""
 
 rule ms_coverage_by_depth_metrics:
     input:

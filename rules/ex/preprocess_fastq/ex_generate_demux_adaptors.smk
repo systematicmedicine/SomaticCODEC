@@ -18,7 +18,7 @@ rule ex_generate_demux_adaptors:
             region = ["r1_start", "r1_end", "r2_start", "r2_end"]
         )
     params:
-        config_json = json.dumps(config)
+        adapter_dict = json.dumps(md.get_ex_lane_adapter_dict(config))
     log:
         "logs/global_rules/ex_generate_demux_adaptors.log"
     benchmark:
@@ -32,7 +32,7 @@ rule ex_generate_demux_adaptors:
         
         # Generate adapter FASTA files
         ex_generate_demux_adaptors.py \
+            --adapter_dict '{params.adapter_dict}' \
             --adapter_fasta_outputs {output.adapter_fasta_outputs} \
-            --config '{params.config_json}' \
             --log {log} 2>> {log}
         """

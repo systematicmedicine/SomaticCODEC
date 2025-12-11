@@ -1,4 +1,7 @@
-# Aligns reads to reference genome
+"""
+Aligns reads to reference genome
+"""
+
 rule ms_map:
     input: 
         ref = config["sci_params"]["global"]["reference_genome"],

@@ -1,4 +1,6 @@
-# Creates index files for input VCFs
+"""
+Creates index files for input VCFs
+"""
 
 rule tabix_index_files:
     input:
