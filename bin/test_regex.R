@@ -1,13 +1,13 @@
 #!/usr/bin/env Rscript
-
-#   ---------------------------------------------------------------------------------------------------------------------------
-#   A utility script for testing regexes, before adding them to a metrics spreadsheet
 #
-#   Example usage:
+# --- test_regex.R ---
 #
-#   Rscript utils/test_regex.R "metrics/S004/S004_filter_metrics.txt" "^Pairs that were too short:\\s+\\d+\\s+\\((?P<percent>[\\d.]+)%\\)$"
+# A utility script for testing regexes, before adding them to a metrics spreadsheet
 #
-#   ---------------------------------------------------------------------------------------------------------------------------
+# Example usage:
+#
+# Rscript utils/test_regex.R "metrics/S004/S004_filter_metrics.txt" "^Pairs that were too short:\\s+\\d+\\s+\\((?P<percent>[\\d.]+)%\\)$"
+#
 
 args <- commandArgs(trailingOnly = TRUE)
 

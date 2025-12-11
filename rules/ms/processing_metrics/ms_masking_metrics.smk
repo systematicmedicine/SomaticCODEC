@@ -1,4 +1,6 @@
-# Generates metrics for each mask BED file
+"""
+Generates metrics for each mask BED file
+"""
 
 rule ms_masking_metrics:
     input:

@@ -1,4 +1,6 @@
-# Removes duplicate reads based on alignment and UMIs
+"""
+Removes duplicate reads based on alignment and UMIs
+"""
 
 rule ms_remove_duplicates:
     input:

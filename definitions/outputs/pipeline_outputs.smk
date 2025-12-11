@@ -1,10 +1,10 @@
-# ==============================================================================================
-#   pipeline_outputs.smk
-#
-#   Defines pipeline outputs, to be imported into top-level Snakefile
-#
-#   Authors: Cameron Fraser
-# ==============================================================================================
+"""
+--- pipeline_outputs.smk ---
+
+Defines pipeline outputs, to be imported into top-level Snakefile
+
+Authors: Cameron Fraser
+"""
 
 # Load libraries
 import helpers.get_metadata as md

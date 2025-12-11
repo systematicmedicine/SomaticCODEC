@@ -1,11 +1,6 @@
-# ==================================================================================
-#   rules/include_all.smk
-#
-#   Includes all rules within the rules/ subdirectories
-# 
-#   Author: Cameron Fraser
-#
-# ==================================================================================
+"""
+Includes all rules within the rules/ subdirectories
+"""
 
 import os
 import glob

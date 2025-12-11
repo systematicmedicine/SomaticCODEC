@@ -1,4 +1,6 @@
-# Ensures that run_pipeline.log has been created
+"""
+Ensures that run_pipeline.log has been created
+"""
 
 rule ensure_pipeline_log_exists:
     output:

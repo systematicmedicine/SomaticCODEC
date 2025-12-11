@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
---- ex_gnomAD_overlap.py
+--- ex_gnomAD_overlap.py ---
 
 Determines how many called somatic variants are present in dataset of common germline variants
 

@@ -1,4 +1,6 @@
-# Calulcates the number of bases at each depth level
+"""
+Calulcates the number of bases at each depth level
+"""
 
 rule ms_depth_histogram_metrics:
     input:
