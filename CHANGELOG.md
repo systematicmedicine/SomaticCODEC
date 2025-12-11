@@ -26,14 +26,14 @@ Types of changes:
 - Raised nn lower threshold for uniformity_SNV_spacing from 100 to 120 (#278)
 - Increased non-negotiable upper threshold for uniformity_SNV_position system metric from 15 to 20 (#278)
 - Updated various component metric thresholds based on current data percentiles (#278)
-- Added missing docstrings/comments and standardised style (#)
-- Removed hardcoded output paths in fastqc_summary_metrics.py, now passed to script by rules (#)
-- Passed individual parameters to ex_generate_demux_adaptors.py and ex_demux_counts_and_gini.py rather than all of config (#)
+- Added missing docstrings/comments and standardised style (#281)
+- Removed hardcoded output paths in fastqc_summary_metrics.py, now passed to script by rules (#281)
+- Passed individual parameters to ex_generate_demux_adaptors.py and ex_demux_counts_and_gini.py rather than all of config (#281)
 
 ### Removed
 
 - Removed gnomAD overlap rate calculation from ex_gnomAD_overlap.py (#275)
-- Removed unused dependency gatk4 from environment.yml (#)
+- Removed unused dependency gatk4 from environment.yml (#281)
 
 ## [2.2.0] - 2025-11-28
 
