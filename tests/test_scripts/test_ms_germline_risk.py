@@ -83,7 +83,17 @@ def test_germ_risk_variants_fit_criteria(lightweight_test_run):
      ("tests/data/test_ms_germline_risk/AD_37_3/deduped_map_AD_37_3.bam", 
      "tests/data/test_ms_germline_risk/AD_37_3/deduped_map_AD_37_3.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_37_3/expected_AD_37_3.vcf",
-     "tests/data/test_ms_germline_risk/AD_37_3/unexpected_AD_37_3.vcf")
+     "tests/data/test_ms_germline_risk/AD_37_3/unexpected_AD_37_3.vcf"),
+     # Depth >=40, summed ALT VAF >= 0.10
+     ("tests/data/test_ms_germline_risk/AD_36_2_2/deduped_map_AD_36_2_2.bam", 
+     "tests/data/test_ms_germline_risk/AD_36_2_2/deduped_map_AD_36_2_2.bam.bai", 
+     "tests/data/test_ms_germline_risk/AD_36_2_2/expected_AD_36_2_2.vcf",
+     "tests/data/test_ms_germline_risk/AD_36_2_2/unexpected_AD_36_2_2.vcf"),
+     # Depth >=40, summed ALT VAF < 0.10
+     ("tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam", 
+     "tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam.bai", 
+     "tests/data/test_ms_germline_risk/AD_37_2_1/expected_AD_37_2_1.vcf",
+     "tests/data/test_ms_germline_risk/AD_37_2_1/unexpected_AD_37_2_1.vcf")
 ])
 def test_variant_edge_cases(tmp_path, deduped_bam, deduped_bai, expected_vcf, unexpected_vcf):
 

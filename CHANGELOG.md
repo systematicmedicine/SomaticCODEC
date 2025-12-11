@@ -16,7 +16,7 @@ Types of changes:
 ### Added
 
 - Added depth filter to ms_germline_risk to mask low depth sites missed by samtools depth (#271)
-- Added additional unit tests for ms_germline_risk and ms_germline_mask (#280)
+- Added additional unit tests for ms_germline_risk and ms_germline_mask (#280 and )
 
 ### Changed
 
