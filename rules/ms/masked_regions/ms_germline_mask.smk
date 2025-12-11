@@ -14,6 +14,7 @@ rule ms_germline_mask:
         vcf = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf",
         ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
+        ms_germ_risk_bed = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed"),
         intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
         intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
         intermediate_all_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_all_unformatted.bed"),
@@ -58,4 +59,9 @@ rule ms_germline_mask:
         -b {params.indel_padding_bases} \
         -g {input.ref_fai} \
         -i {output.intermediate_ins_unpadded} > {output.ms_germ_ins_bed} 2>> {log}
+
+        # Combine all germline risk masks
+        cat {output.ms_germ_all_bed} \
+        {output.ms_germ_del_bed} \
+        {output.ms_germ_ins_bed} > {output.ms_germ_risk_bed} 2>> {log}
         """

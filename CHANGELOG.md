@@ -16,13 +16,15 @@ Types of changes:
 ### Added
 
 - Added depth filter to ms_germline_risk to mask low depth sites missed by samtools depth (#271)
+- Added additional unit tests for ms_germline_risk and ms_germline_mask (#280)
 
 ### Changed
 
+- Modified ms_germline_mask.smk to include low depth, REF only records in germline risk BED (#276)
+- Moved combination of germline risk masks from combine_masks.smk to ms_germline_mask.smk (#280)
 - Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#270)
 - Raised nn lower threshold for uniformity_SNV_spacing from 100 to 120 (#278)
 - Increased non-negotiable upper threshold for uniformity_SNV_position system metric from 15 to 20 (#278)
-- Modified ms_germline_mask.smk to include low depth, REF only records in germline risk BED (#276)
 - Updated various component metric thresholds based on current data percentiles (#278)
 
 ### Removed
