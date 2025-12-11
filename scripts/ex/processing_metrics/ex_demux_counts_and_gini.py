@@ -71,8 +71,7 @@ def main(args):
             adaptor_percentages[adapter] = 0.0
 
     # Calculate Gini coefficient for ex_samples
-    config = json.loads(args.config)
-    ex_sample_ids = md.get_ex_sample_ids(config)
+    ex_sample_ids = args.ex_sample_ids
 
     ex_samples_set = set(ex_sample_ids)
 
@@ -108,7 +107,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--demux_metrics", required=True)
     parser.add_argument("--demux_gini", required=True)
-    parser.add_argument("--config", required=True)
+    parser.add_argument("--ex_sample_ids", required=True, nargs="+")
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
     main(args=args)
