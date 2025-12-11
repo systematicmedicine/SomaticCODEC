@@ -8,11 +8,11 @@ rule ms_fastqc_summary_metrics:
         "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt",
         "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt",
         "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt" ]
-    output:       
-        ms_raw_summary_r1 = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json",
-        ms_raw_summary_r2 = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json",
-        ms_filter_summary_r1 = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json",
-        ms_filter_summary_r2 = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json"
+    output:
+        json_files = ["metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json",
+        "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json",
+        "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json",
+        "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json"]
     params:
         sample = "{ms_sample}"
     log:
@@ -29,6 +29,7 @@ rule ms_fastqc_summary_metrics:
         # Calculate fastqc summary metrics
         fastqc_summary_metrics.py \
             --fastqc_files {input.fastqc_files} \
+            --json_files {output.json_files} \
             --sample {params.sample} \
             --log {log} 2>> {log}
         """
