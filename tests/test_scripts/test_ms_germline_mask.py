@@ -77,10 +77,10 @@ def test_indel_padding_added(lightweight_test_run):
 
 # Test that variant edge cases are correctly included in germ risk BED   
 @pytest.mark.parametrize("germ_risk_vcf, expected_bed", [
-    # SNV, REF only
+    # Low depth, no SNV (REF only)
     ("tests/data/test_ms_germline_mask/snv_ref_only/snv_ref_only.vcf",
      "tests/data/test_ms_germline_mask/snv_ref_only/snv_ref_only_expected.bed"),
-     # SNV, ALT only
+     # Low depth, SNV (ALT only)
      ("tests/data/test_ms_germline_mask/snv_alt_only/snv_alt_only.vcf",
      "tests/data/test_ms_germline_mask/snv_alt_only/snv_alt_only_expected.bed"),
      # SNV, REF and ALT
@@ -101,9 +101,15 @@ def test_indel_padding_added(lightweight_test_run):
      # Deletion and SNV
      ("tests/data/test_ms_germline_mask/del_snv/del_snv.vcf",
      "tests/data/test_ms_germline_mask/del_snv/del_snv_expected.bed"),
-     # SNV multiallelic
+     # Multiallelic SNV
      ("tests/data/test_ms_germline_mask/snv_multi/snv_multi.vcf",
      "tests/data/test_ms_germline_mask/snv_multi/snv_multi_expected.bed"),
+     # Multiallelic insertion
+     ("tests/data/test_ms_germline_mask/ins_multi/ins_multi.vcf",
+     "tests/data/test_ms_germline_mask/ins_multi/ins_multi_expected.bed"),
+     # Multiallelic deletion
+     ("tests/data/test_ms_germline_mask/del_multi/del_multi.vcf",
+     "tests/data/test_ms_germline_mask/del_multi/del_multi_expected.bed")
 ])
 def test_variant_edge_cases(tmp_path, germ_risk_vcf, expected_bed):
 
