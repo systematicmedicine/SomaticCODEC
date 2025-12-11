@@ -60,7 +60,7 @@ rule ms_germline_mask:
         -g {input.ref_fai} \
         -i {output.intermediate_ins_unpadded} > {output.ms_germ_ins_bed} 2>> {log}
 
-        # Combine all variants BED with padded INDEL BED
+        # Combine all germline risk masks
         cat {output.ms_germ_all_bed} \
         {output.ms_germ_del_bed} \
         {output.ms_germ_ins_bed} > {output.ms_germ_risk_bed} 2>> {log}

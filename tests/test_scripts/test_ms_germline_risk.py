@@ -61,7 +61,8 @@ def test_germ_risk_variants_fit_criteria(lightweight_test_run):
                 f"Record values: DP={dp}, VAF={vaf}"
                 f"Criteria: min_depth < {min_depth} or min_alt_vaf >= {min_alt_vaf}"
                 )
-            
+
+# Test that allele depth edge cases are correctly included in germ risk VCF     
 @pytest.mark.parametrize("deduped_bam, deduped_bai, expected_vcf, unexpected_vcf", [
     # Depth < 40, ALT VAF >= 0.10
     ("tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam", 
