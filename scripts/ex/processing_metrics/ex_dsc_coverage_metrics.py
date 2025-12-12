@@ -2,19 +2,7 @@
 """
 --- ex_dsc_coverage_metrics.py ---
 
-Calculate duplex sequencing coverage metrics:
-
-1. Mean analyzable duplex depth across variant calling regions (selected per sample with include_bed)
-2. Percent of variant calling positions with >0x coverage (selected per sample with include_bed)
-3. Percent of whole genome positions with >0x coverage
-
-Only bases with high base quality scores (>= QUALITY_THRESHOLD, typically >=Q70) are considered for depth and coverage calculations (e.g. duplex bases made from 2 Q35 bases).
-
-Inputs:
-- Filtered DSC BAM file
-- Include BED file which excludes difficult to call regions (GIAB difficult regions), low depth germline regions, and germline mutations
-- MS low depth bed
-- Reference FAI file
+Calculates duplex sequencing coverage metrics
 
 Authors: 
     - James Phie
@@ -23,10 +11,10 @@ Authors:
 """
 # Import libraries
 import sys
-import subprocess
 import bisect
 import json
 import argparse
+import pysam
 
 def main(args):
 
@@ -36,113 +24,104 @@ def main(args):
     print("[INFO] Starting ex_dsc_coverage_metrics.py")
 
     # Load quality threshold
-    QUALITY_THRESHOLD = args.quality_threshold
+    BASE_QUALITY_THRESHOLD = int(args.base_quality_threshold)
 
     # Inputs from Snakemake
-    bam_ex_dsc = args.bam_ex_dsc
-    ms_depth = args.ms_depth
-    include_bed = args.include_bed
-    ref_fai = args.fai
+    bam_ex_dsc_path = args.bam_ex_dsc
+    include_bed_path = args.include_bed
+    ref_fai_path = args.ref_fai
     sample = args.sample
-    ms_depth_threshold = int(args.ms_depth_threshold)
 
     # Output path
-    json_out_path = args.metrics
+    json_out_path = args.json
 
-    # Load include BED intervals
-    def load_bed(path):
-        bed = {}
+    # Helper functions
+    # Loads BED intervals to dict
+    def load_bed_intervals(path):
+        bed_dict = {}
         with open(path) as f:
             for line in f:
+                # Skip empty lines
                 if not line.strip():
                     continue
+                # Extract chrom, start, end
                 chrom, start, end = line.split()[:3]
                 start, end = int(start), int(end)
-                bed.setdefault(chrom, []).append((start, end))
-        for chrom in bed:
-            bed[chrom].sort()
-        return bed
-
-    include_intervals = load_bed(include_bed)
-
-    # Get genome length from FAI
-    ref_lengths = {}
-    with open(ref_fai) as f:
-        for line in f:
-            chrom, length = line.split()[:2]
-            ref_lengths[chrom] = int(length)
-
-    total_genome_positions = sum(ref_lengths.values())
+                bed_dict.setdefault(chrom, []).append((start, end))
+        # Sort by start pos
+        for chrom in bed_dict:
+            bed_dict[chrom].sort()
+        return bed_dict
 
     # Checks if a position exists in BED intervals
     def in_intervals(chrom, pos, bed_dict):
         intervals = bed_dict.get(chrom, [])
+        # Get last interval with start <= pos
         i = bisect.bisect_right(intervals, (pos, float('inf'))) - 1
+        # Return TRUE if pos lies inside interval
         return i >= 0 and intervals[i][0] <= pos < intervals[i][1]
 
-    # Precompute BED total positions
-    include_bed_total_positions = sum(end - start for intervals in include_intervals.values() for start, end in intervals)
-
-    # Get MS depth > half depth threshold positions
-    ms_half_depth_threshold = ms_depth_threshold / 2
-    ms_depth_half_pos = {}
-
-    with open(ms_depth, "r") as f:
+    # Get total genome positions from FAI
+    ref_lengths = {}
+    with open(ref_fai_path) as f:
         for line in f:
-            chrom, pos_str, depth_str = line.split()
-            pos = int(pos_str)
-            depth = int(depth_str)
-            if depth > ms_half_depth_threshold:
-                ms_depth_half_pos.setdefault(chrom, set()).add(pos)
+            chrom, length = line.split()[:2]
+            ref_lengths[chrom] = int(length)
+    total_genome_positions = sum(ref_lengths.values())
 
-    # Get duplex depth >0 positions and compare overlap with MS
-    include_bed_total_depth = 0
-    genome_duplex_depth_positions = 0
-    include_bed_covered_positions = 0
-    ms_ex_overlap_bases = 0
-    ex_total_bases = 0
-    union_bases = 0
+    # Load include BED intervals
+    include_intervals = load_bed_intervals(include_bed_path)
+    
+    # Initialise counters
+    ex_dsc_coverage_bases = 0
+    ex_dsc_high_qual_bases = 0
+    ex_dsc_high_qual_unmasked_bases = 0
 
-    with open(args.log, "a") as log_file:
-        proc_ex = subprocess.Popen(
-        ["samtools", "depth", "-q", str(QUALITY_THRESHOLD), "-a", bam_ex_dsc],
-        stdout=subprocess.PIPE,
-        stderr=log_file,
-        text=True
-    )
+    # Stream DSC BAM and check criteria for each position
+    bam_ex_dsc = pysam.AlignmentFile(bam_ex_dsc_path, "rb")
 
-    for line in proc_ex.stdout:
-        chrom, pos_str, depth_str = line.split()
-        pos = int(pos_str) - 1
-        depth = int(depth_str)
+    for position_pileup in bam_ex_dsc.pileup(stepper = "all", truncate = True):
 
-        in_bed = in_intervals(chrom, pos, include_intervals)
-        in_ms = pos in ms_depth_half_pos.get(chrom, set())
+        # Extract position and read pileup for this position
+        chrom = position_pileup.reference_name
+        pos = position_pileup.reference_pos
+        depth = position_pileup.nsegments
+        reads = position_pileup.pileups
 
+        # Check each criterion for this position
+        ex_dsc_coverage_check = False
         if depth > 0:
-            ex_total_bases += 1
-            genome_duplex_depth_positions += 1
-            if in_ms:
-                ms_ex_overlap_bases += 1
+            ex_dsc_coverage_check = True
 
-        if in_ms or depth > 0:
-            union_bases += 1
+        ex_dsc_high_qual_check = False
+        if ex_dsc_coverage_check:
+            for read in reads:
+                if not read.is_del and not read.is_refskip:
+                    print(read.alignment.query_qualities[read.query_position])
+                    if read.alignment.query_qualities[read.query_position] >= BASE_QUALITY_THRESHOLD:
+                        ex_dsc_high_qual_check = True
+                        break
+        
+        ex_dsc_high_qual_unmasked_check = False
+        if ex_dsc_high_qual_check and in_intervals(chrom, pos, include_intervals):
+            ex_dsc_high_qual_unmasked_check = True
 
-        if in_bed:
-            include_bed_total_depth += depth
-            if depth > 0:
-                include_bed_covered_positions += 1
+        # Increment counters if criteria met
+        if ex_dsc_coverage_check:
+            ex_dsc_coverage_bases += 1
 
-    proc_ex.stdout.close()
-    proc_ex.wait()
+        if ex_dsc_high_qual_check:
+            ex_dsc_high_qual_bases += 1
+
+        if ex_dsc_high_qual_unmasked_check:
+            ex_dsc_high_qual_unmasked_bases += 1
+
+    bam_ex_dsc.close()
 
     # Calculate metrics
-    coverage_overlap_ex_ms = round((ms_ex_overlap_bases / union_bases * 100) if union_bases else 0, 2)
-    ex_duplex_coverage = round((genome_duplex_depth_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
-    include_bed_coverage = round((include_bed_total_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
-    ex_mean_analyzable_duplex_depth = round((include_bed_total_depth / include_bed_total_positions) if include_bed_total_positions else 0, 2)
-    ex_dsc_coverage_bedregions = round((include_bed_covered_positions / include_bed_total_positions * 100) if include_bed_total_positions else 0, 2)
-    ex_dsc_coverage_wholegenome = round((include_bed_covered_positions / total_genome_positions * 100) if total_genome_positions else 0, 2)
+    ex_dsc_coverage = round((ex_dsc_coverage_bases / total_genome_positions) * 100, ndigits = 2)
+    ex_dsc_high_qual = round((ex_dsc_high_qual_bases / total_genome_positions) * 100, ndigits = 2)
+    ex_dsc_high_qual_unmasked = round((ex_dsc_high_qual_unmasked_bases / total_genome_positions) * 100, ndigits = 2)
 
     # Write output
     output_data = {
@@ -150,23 +129,15 @@ def main(args):
         "Duplex sequencing coverage metrics.",
         "Definitions:",
         "total_genome_positions: Number of positions in the reference genome.",
-        "include_bed_total_positions: Number of positions in the include BED file.",
-        "include_bed_coverage: Percentage of genome positions in the include BED file.",
-        "ex_dsc_coverage_bedregions: Percentage of include BED positions with EX duplex depth > 0.",
-        "ex_duplex_coverage: Percentage of genome positions with duplex depth > 0.",
-        "coverage_overlap_ex_ms: Percentage of sequenced positions with 1. MS depth > half MS depth theshold and 2. EX duplex depth > 0.",
-        "ex_dsc_coverage_wholegenome: Percentage of genome positions eligible for variant calling (duplex depth > 0 & unmasked).",
-        "ex_mean_analyzable_duplex_depth: Mean duplex depth of positions eligible for variant calling (duplex depth > 0 & unmasked)."
+        "ex_dsc_coverage: Percentage of genome positions with DSC depth > 0.",
+        "ex_dsc_high_qual: Percentage of genome positions that meet ex_dsc_coverage AND have base quality >= min_base_quality.",
+        "ex_dsc_high_qual_unmasked: Percentage of genome positions that meet ex_dsc_high_qual AND are not masked.\nThese positions are eligible for variant calling."
         ),
         "sample": sample,
         "total_genome_positions": total_genome_positions,
-        "include_bed_total_positions": include_bed_total_positions,
-        "include_bed_coverage": include_bed_coverage,
-        "ex_dsc_coverage_bedregions": ex_dsc_coverage_bedregions,
-        "ex_duplex_coverage": ex_duplex_coverage,
-        "coverage_overlap_ex_ms": coverage_overlap_ex_ms,
-        "ex_dsc_coverage_wholegenome": ex_dsc_coverage_wholegenome,
-        "ex_mean_analyzable_duplex_depth": ex_mean_analyzable_duplex_depth        
+        "ex_dsc_coverage": ex_dsc_coverage,
+        "ex_dsc_high_qual": ex_dsc_high_qual,
+        "ex_dsc_high_qual_unmasked": ex_dsc_high_qual_unmasked
     }
 
     with open(json_out_path, "w") as out_f:
@@ -178,13 +149,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--bam_ex_dsc", required=True)
     parser.add_argument("--bai_ex_dsc", required=True)
-    parser.add_argument("--ms_depth", required=True)
-    parser.add_argument("--fai", required=True)
-    parser.add_argument("--metrics", required=True)
-    parser.add_argument("--quality_threshold", required=True)
     parser.add_argument("--include_bed", required=True)
+    parser.add_argument("--ref_fai", required=True)
+    parser.add_argument("--json", required=True)
+    parser.add_argument("--base_quality_threshold", required=True)
     parser.add_argument("--sample", required=True)
-    parser.add_argument("--ms_depth_threshold", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
     main(args=args)
