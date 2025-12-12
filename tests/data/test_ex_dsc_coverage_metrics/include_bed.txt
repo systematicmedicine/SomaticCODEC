@@ -1,8 +1,1 @@
-chr1	1	2
-chr2	1	2
-chr3	1	2
-chr4	1	2
-chr6	1	2
-chr7	1	2
-chr8	1	2
-chr9	1	2
+chr21	70	74

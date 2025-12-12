@@ -12,17 +12,12 @@ rule ex_dsc_coverage_metrics:
         bam_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
         bai_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
-        ms_depth = lambda wc: (
-            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_depth_per_base.txt"
-        ),
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
+        json = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
     params: 
-        quality_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
-        sample = "{ex_sample}",
-        ms_depth_threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
+        base_quality_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
+        sample = "{ex_sample}"
     log:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
@@ -39,11 +34,9 @@ rule ex_dsc_coverage_metrics:
             --bam_ex_dsc {input.bam_ex_dsc} \
             --bai_ex_dsc {input.bai_ex_dsc} \
             --include_bed {input.include_bed} \
-            --ms_depth {input.ms_depth} \
-            --fai {input.fai} \
-            --metrics {output.metrics} \
-            --quality_threshold {params.quality_threshold} \
+            --ref_fai {input.ref_fai} \
+            --json {output.json} \
+            --base_quality_threshold {params.base_quality_threshold} \
             --sample {params.sample} \
-            --ms_depth_threshold {params.ms_depth_threshold} \
             --log {log} 2>> {log}
         """
