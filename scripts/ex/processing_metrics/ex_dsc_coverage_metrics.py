@@ -2,10 +2,9 @@
 """
 --- ex_dsc_coverage_metrics.py ---
 
-Calculates duplex sequencing coverage metrics
+Calculates duplex coverage metrics
 
-Authors: 
-    - James Phie
+Authors:
     - Joshua Johnstone
     - Chat-GPT
 """
@@ -15,6 +14,7 @@ import bisect
 import json
 import argparse
 import pysam
+import plotly.graph_objects as go
 
 def main(args):
 
@@ -32,8 +32,9 @@ def main(args):
     ref_fai_path = args.ref_fai
     sample = args.sample
 
-    # Output path
+    # Output paths
     json_out_path = args.json
+    plot_out_path = args.plot
 
     # Helper functions
     # Loads BED intervals to dict
@@ -119,39 +120,97 @@ def main(args):
     bam_ex_dsc.close()
 
     # Calculate metrics
-    ex_dsc_coverage = round((ex_dsc_coverage_bases / total_genome_positions) * 100, ndigits = 2)
-    ex_dsc_high_qual = round((ex_dsc_high_qual_bases / total_genome_positions) * 100, ndigits = 2)
-    ex_dsc_high_qual_unmasked = round((ex_dsc_high_qual_unmasked_bases / total_genome_positions) * 100, ndigits = 2)
+    ex_dsc_coverage_pct = round((ex_dsc_coverage_bases / total_genome_positions) * 100, ndigits = 2)
+    ex_dsc_high_qual_pct = round((ex_dsc_high_qual_bases / total_genome_positions) * 100, ndigits = 2)
+    ex_dsc_high_qual_unmasked_pct = round((ex_dsc_high_qual_unmasked_bases / total_genome_positions) * 100, ndigits = 2)
 
-    # Write output
-    output_data = {
-        "description": (
-        "Duplex sequencing coverage metrics.",
-        "Definitions:",
-        "total_genome_positions: Number of positions in the reference genome.",
-        "ex_dsc_coverage: Percentage of genome positions with DSC depth > 0.",
-        "ex_dsc_high_qual: Percentage of genome positions that meet ex_dsc_coverage AND have base quality >= min_base_quality.",
-        "ex_dsc_high_qual_unmasked: Percentage of genome positions that meet ex_dsc_high_qual AND are not masked.\nThese positions are eligible for variant calling."
-        ),
+    # Fill JSON data
+    json_data = {
         "sample": sample,
-        "total_genome_positions": total_genome_positions,
-        "ex_dsc_coverage": ex_dsc_coverage,
-        "ex_dsc_high_qual": ex_dsc_high_qual,
-        "ex_dsc_high_qual_unmasked": ex_dsc_high_qual_unmasked
-    }
+        "total_genome_positions": {
+            "description": "Number of positions in the reference genome.",
+            "value": total_genome_positions
+            },
+        "ex_dsc_coverage_count": {
+            "description": "Number of genome positions with DSC depth > 0.",
+            "value": ex_dsc_coverage_bases
+            },
+            "ex_dsc_coverage_pct": {
+            "description": "Percentage of genome positions with DSC depth > 0.",
+            "value": ex_dsc_coverage_pct
+            },
+        "ex_dsc_high_qual_count": {
+            "description": "Number of genome positions that meet ex_dsc_coverage AND have base quality >= min_base_quality.",
+            "value": ex_dsc_high_qual_bases
+            },
+        "ex_dsc_high_qual_pct": {
+            "description": "Percentage of genome positions that meet ex_dsc_coverage AND have base quality >= min_base_quality.",
+            "value": ex_dsc_high_qual_pct
+            },
+        "ex_dsc_high_qual_unmasked_count": {
+            "description": "Number of genome positions that meet ex_dsc_high_qual AND are not masked.\nThese positions are eligible for variant calling.",
+            "value": ex_dsc_high_qual_unmasked_bases
+            },
+        "ex_dsc_high_qual_unmasked_pct": {
+            "description": "Percentage of genome positions that meet ex_dsc_high_qual AND are not masked.\nThese positions are eligible for variant calling.",
+            "value": ex_dsc_high_qual_unmasked_pct
+            }
+        }
 
+    # Write JSON
     with open(json_out_path, "w") as out_f:
-        json.dump(output_data, out_f, indent=4)
+        json.dump(json_data, out_f, indent=4)
+
+    # Create Sankey plot
+    sankey_plot = go.Figure(data=[go.Sankey(
+    node = dict(
+      pad = 40,
+      thickness = 15,
+      line = dict(color = "black", width = 0.5),
+      label = ["Reference genome positions", "DSC depth > 0", "No DSC depth",
+               f"BQ >= threshold ({BASE_QUALITY_THRESHOLD})", f"BQ < threshold ({BASE_QUALITY_THRESHOLD})", 
+               "Unmasked", "Masked"],
+      color = "blue",
+      x = [0.0, 0.4, 0.4, 0.7, 0.7, 1.0, 1.0],
+      y = [0.5, 0.2, 0.7, 0.3, 0.6, 0.4, 0.6]
+    ),
+    link = dict(
+      source = [0, 0, 1, 1, 3, 3],
+      target = [1, 2, 3, 4, 5, 6],
+      value = [ex_dsc_coverage_pct, (100 - ex_dsc_coverage_pct),
+               ex_dsc_high_qual_pct, (ex_dsc_coverage_pct - ex_dsc_high_qual_pct),
+               ex_dsc_high_qual_unmasked_pct, (ex_dsc_high_qual_pct - ex_dsc_high_qual_unmasked_pct)
+               ]
+  ))])
+
+    # Write Sankey plot
+    sankey_plot.update_layout(title_text = "EX DSC coverage", 
+                              font=dict(size=16, color='black')
+                              )
+    sankey_plot.add_annotation(
+        x = 0,
+        y = -0.1,
+        xref='paper',
+        yref='paper',
+        text="Definitions:<br>" \
+        "DSC depth: Duplex depth in the final DSC BAM.<br>" \
+        "BQ: Base quality in the final DSC BAM.<br>" \
+        "Unmasked/masked: Inside/not inside the include BED regions.",
+        showarrow=False,
+        font=dict(size=12, color='black'),
+        align='left'
+        )
+    sankey_plot.write_html(plot_out_path)
 
     print("[INFO] Completed ex_dsc_coverage_metrics.py")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--bam_ex_dsc", required=True)
-    parser.add_argument("--bai_ex_dsc", required=True)
     parser.add_argument("--include_bed", required=True)
     parser.add_argument("--ref_fai", required=True)
     parser.add_argument("--json", required=True)
+    parser.add_argument("--plot", required=True)
     parser.add_argument("--base_quality_threshold", required=True)
     parser.add_argument("--sample", required=True)
     parser.add_argument("--log", required=True)

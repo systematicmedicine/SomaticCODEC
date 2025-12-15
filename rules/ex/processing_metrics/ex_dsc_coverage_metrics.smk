@@ -10,11 +10,11 @@ import helpers.get_metadata as md
 rule ex_dsc_coverage_metrics:
     input:
         bam_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        bai_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
         ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
         json = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
+        plot = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_plot.html"
     params: 
         base_quality_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
         sample = "{ex_sample}"
@@ -32,10 +32,10 @@ rule ex_dsc_coverage_metrics:
         # Calculate DSC coverage metrics
         ex_dsc_coverage_metrics.py \
             --bam_ex_dsc {input.bam_ex_dsc} \
-            --bai_ex_dsc {input.bai_ex_dsc} \
             --include_bed {input.include_bed} \
             --ref_fai {input.ref_fai} \
             --json {output.json} \
+            --plot {output.plot} \
             --base_quality_threshold {params.base_quality_threshold} \
             --sample {params.sample} \
             --log {log} 2>> {log}
