@@ -7,7 +7,7 @@ rule combine_masks:
         precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
         excluded_chromosomes_bed = "tmp/downloads/excluded_chromosomes.bed",
         ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_risk_bed = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed"),
+        ms_germ_risk_bed = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed",
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai" 
     output:
         combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
