@@ -25,7 +25,7 @@ def main(args):
 
     # Define input paths
     ex_dsc_bam_path = args.ex_dsc_bam
-    ms_bam_path = args.ms_bam_path
+    ms_bam_path = args.ms_bam
     ref_fai_path = args.ref_fai
 
     # Define output paths
@@ -86,10 +86,10 @@ def main(args):
     ms_coverage = create_coverage_array(ms_bam_path, chrom_lengths, MS_DEPTH_THRESHOLD)
 
     # Compare EX and MS coverage
-    ex_or_ms_bases = np.sum(ex_coverage | ms_coverage)
-    ex_and_ms_bases = np.sum(ex_coverage & ms_coverage)
-    ex_only_bases = np.sum(ex_coverage & (~ms_coverage))
-    ms_only_bases = np.sum((~ex_coverage) & ms_coverage)
+    ex_or_ms_bases = int(np.sum(ex_coverage | ms_coverage))
+    ex_and_ms_bases = int(np.sum(ex_coverage & ms_coverage))
+    ex_only_bases = int(np.sum(ex_coverage & (~ms_coverage)))
+    ms_only_bases = int(np.sum((~ex_coverage) & ms_coverage))
     
     # Compute metrics
     ex_and_ms_pct = round((ex_and_ms_bases / ex_or_ms_bases) * 100, ndigits = 2)
@@ -102,30 +102,18 @@ def main(args):
             "description": "Number of bases with EX depth >= 1 or MS coverage >= MS depth threshold",
             "value": ex_or_ms_bases
             },
-        "ex_and_ms_bases": {
-            "description": "Number of bases with EX depth >= 1 and MS coverage >= MS depth threshold",
-            "value": ex_and_ms_bases
-            },
         "ex_and_ms_pct": {
             "description": "Percentage of ex_or_ms_bases with EX depth >= 1 and MS coverage >= MS depth threshold",
             "value": ex_and_ms_pct
             },
-        "ex_only_bases": {
-            "description": "Number of bases with EX depth >= 1 but MS coverage < MS depth threshold",
-            "value": ex_only_bases
-            },
-        "ex_only_bases": {
+        "ex_only_pct": {
             "description": "Percentage of ex_or_ms_bases with EX depth >= 1 but MS coverage < MS depth threshold",
             "value": ex_only_pct
-            },
-        "ms_only_bases": {
-            "description": "Number of bases with MS coverage >= MS depth threshold but no EX depth",
-            "value": ms_only_bases
             },
         "ms_only_pct": {
             "description": "Percentage of ex_or_ms_bases with MS coverage >= MS depth threshold but no EX depth",
             "value": ms_only_pct
-            }
+            }        
         }
 
     with open(json_out_path, "w") as out_f:
@@ -135,6 +123,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--bam_ex_dsc", required=True)
+    parser.add_argument("--ex_dsc_bam", required=True)
+    parser.add_argument("--ms_bam", required=True)
+    parser.add_argument("--ref_fai", required=True)
+    parser.add_argument("--json", required=True)
+    parser.add_argument("--ms_depth_threshold", required=True)
     args = parser.parse_args()
     main(args=args)

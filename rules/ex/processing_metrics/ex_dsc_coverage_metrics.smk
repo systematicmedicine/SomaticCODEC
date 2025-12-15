@@ -5,15 +5,13 @@ Calculate DSC coverage metrics
     - ex_duplex_coverage_wholegenome: Positions with >0x duplex depth in the include_bed region as a percentage of the whole genome
 """
 
-import helpers.get_metadata as md
-
 rule ex_dsc_coverage_metrics:
     input:
         bam_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
         ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        json = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
+        json = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json",
         plot = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_plot.html"
     params: 
         base_quality_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],

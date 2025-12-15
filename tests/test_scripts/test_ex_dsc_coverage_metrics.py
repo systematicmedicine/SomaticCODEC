@@ -24,7 +24,7 @@ from scripts.ex.processing_metrics.ex_dsc_coverage_metrics import main
 def test_ex_dsc_coverage_metrics(tmp_path, bam_ex_dsc, include_bed, ref_fai, expected_values):
 
     output_json = str(tmp_path / "dsc_coverage_metrics.json")
-    output_plot = str("dsc_coverage_plot.html")
+    output_plot = str(tmp_path / "dsc_coverage_plot.html")
     log = str(tmp_path / "log.log")
     base_quality_threshold = 70
     sample = "SEQ0001"
