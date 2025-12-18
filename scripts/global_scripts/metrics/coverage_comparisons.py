@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
---- coverage_matrix.py ---
+--- coverage_comparisons.py ---
 
 Compares overlap between various coverage metrics
 
@@ -20,7 +20,7 @@ def main(args):
     # Redirect stdout/stderr to Snakemake log
     sys.stdout = open(args.log, "a")
     sys.stderr = open(args.log, "a")
-    print("[INFO] Starting coverage_matrix.py")
+    print("[INFO] Starting coverage_comparisons.py")
 
     # Define input paths  
     difficult_regions_mask_path = args.difficult_regions_bed
@@ -32,7 +32,7 @@ def main(args):
     ref_fai_path = args.ref_fai
 
     # Define output paths
-    coverage_matrix_path = args.coverage_matrix
+    coverage_comparisons_path = args.comparisons_tsv
 
     # Define params
     MS_DEPTH_THRESHOLD = int(args.ms_depth_threshold)
@@ -61,6 +61,8 @@ def main(args):
     
     # Creates a boolean array for BED file coverage
     def coverage_array_bed(bed_path, chrom_lengths):
+
+        print(f"[INFO] Started creating coverage array for {bed_path}")
         
         # Get chromosome offsets to caclulate array indices
         offsets, genome_length = get_chrom_offsets(chrom_lengths)
@@ -68,6 +70,7 @@ def main(args):
         # Set coverage to False for all positions
         coverage_array = np.zeros(genome_length, dtype=bool)
 
+        # Mark BED-covered positions as True
         with open(bed_path) as bed:
             for line in bed:
                 if line.startswith("#") or not line.strip():
@@ -80,13 +83,16 @@ def main(args):
                 genome_start = offsets[chrom] + start
                 genome_end = offsets[chrom] + end
 
-                # Mark BED-covered positions as True
                 coverage_array[genome_start:genome_end] = True
+
+        print(f"[INFO] Finished creating coverage array for {bed_path}")
 
         return coverage_array
     
     # Creates a boolean array for coverage at each position (at a given depth and BQ threshold)
     def coverage_array_depth_BQ(bam_path, chrom_lengths, depth_threshold, BQ_threshold):
+
+        print(f"[INFO] Started creating coverage arrays for {bam_path}")
         
         # Get chromosome offsets to caclulate array indices
         offsets, genome_length = get_chrom_offsets(chrom_lengths)
@@ -107,10 +113,13 @@ def main(args):
             if depth >= depth_threshold:
                 coverage_array_depth[genome_index] = True
 
+            # If BQ >= threshold, set coverage to True
             for read in reads:
                 if not read.is_del and not read.is_refskip:
                         if read.alignment.query_qualities[read.query_position] >= BQ_threshold:
                             coverage_array_BQ[genome_index] = True
+
+        print(f"[INFO] Finished creating coverage arrays for {bam_path}")
 
         return coverage_array_depth, coverage_array_BQ
 
@@ -118,7 +127,7 @@ def main(args):
     chrom_lengths = get_chrom_lengths(ref_fai_path)
 
     # Get genome length
-    offsets, genome_length = get_chrom_offsets(chrom_lengths)
+    _, genome_length = get_chrom_offsets(chrom_lengths)
 
     # Create boolean arrays for BED files
     difficult_regions_coverage = coverage_array_bed(difficult_regions_mask_path, chrom_lengths)
@@ -153,13 +162,18 @@ def main(args):
             coverage_matrix[row_index, col_index] = 100 * np.sum(overlap) / genome_length
 
     # Write to TSV
-    with open(coverage_matrix_path, "w") as out:
-        out.write("\t" + "\t".join(coverage_metric_names) + "\n")
-        for i, name in enumerate(coverage_metric_names):
-            values = "\t".join(f"{coverage_matrix[i, j]:.2f}" for j in range(number_of_metrics))
-            out.write(f"{name}\t{values}\n")
+    with open(coverage_comparisons_path, "w") as out:
+        out.write("metric_a\tmetric_b\tpct_genome\n")
+        for metric_a_index, metric_a in enumerate(coverage_metric_names):
+            for metric_b_index, metric_b in enumerate(coverage_metric_names):
+                # Skip duplicate comparisons
+                if metric_b_index < metric_a_index:
+                    continue  
+                overlap = coverage_metrics_dict[metric_a] & coverage_metrics_dict[metric_b]
+                pct = 100.0 * np.sum(overlap) / genome_length
+                out.write(f"{metric_a}\t{metric_b}\t{pct:.2f}\n")
 
-    print("[INFO] Completed coverage_matrix.py")
+    print("[INFO] Completed coverage_comparisons.py")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -174,5 +188,7 @@ if __name__ == "__main__":
     parser.add_argument("--ex_depth_threshold", required=True)
     parser.add_argument("--ms_bq_threshold", required=True)
     parser.add_argument("--ex_bq_threshold", required=True)
-    parser.add_argument("--coverage_matrix", required=True)
+    parser.add_argument("--comparisons_tsv", required=True)
     parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
