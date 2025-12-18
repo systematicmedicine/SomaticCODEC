@@ -20,6 +20,7 @@ Types of changes:
 - Added sort and merge steps to ms_germline_mask to reduce BED size (#283)
 - Added Sankey plot to ex_dsc_coverage_metrics.py (#)
 - Added ex_ms_overlap_metrics.py and test (#)
+- Added coverage_matrix.py
 
 ### Changed
 
