@@ -32,7 +32,7 @@ rule ms_germline_mask:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
 
         # Create unformatted BED file for all records in VCF
-        vcf2bed < {input.vcf} > {output.intermediate_all_unformatted} 2>> {log}
+        vcf2bed --do-not-sort < {input.vcf} > {output.intermediate_all_unformatted} 2>> {log}
 
         # Create separate BED files for insertions and deletions (to allow padding)
         vcf2bed --deletions < {input.vcf} > {output.intermediate_del_unformatted} 2>> {log}
