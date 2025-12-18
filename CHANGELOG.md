@@ -17,7 +17,7 @@ Types of changes:
 
 - Added depth filter to ms_germline_risk to mask low depth sites missed by samtools depth (#271)
 - Added additional unit tests for ms_germline_risk and ms_germline_mask (#280 and 282)
-- Added sort and merge steps to ms_germline_mask to reduce BED size (#)
+- Added sort and merge steps to ms_germline_mask to reduce BED size (#283)
 
 ### Changed
 
