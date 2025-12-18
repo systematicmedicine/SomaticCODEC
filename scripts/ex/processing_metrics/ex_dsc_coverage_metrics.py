@@ -98,7 +98,6 @@ def main(args):
         if ex_dsc_coverage_check:
             for read in reads:
                 if not read.is_del and not read.is_refskip:
-                    print(read.alignment.query_qualities[read.query_position])
                     if read.alignment.query_qualities[read.query_position] >= BASE_QUALITY_THRESHOLD:
                         ex_dsc_high_qual_check = True
                         break

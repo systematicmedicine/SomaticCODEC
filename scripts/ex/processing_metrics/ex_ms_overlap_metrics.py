@@ -32,8 +32,8 @@ def main(args):
     json_out_path = args.json
 
     # Define params
-    EX_DEPTH_THRESHOLD = 1
-    MS_DEPTH_THRESHOLD = args.ms_depth_threshold
+    EX_DEPTH_THRESHOLD = int(args.ex_depth_threshold)
+    MS_DEPTH_THRESHOLD = int(args.ms_depth_threshold)
 
     # Helper functions
     # Returns a dict with [chrom][length] from FAI file
