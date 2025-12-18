@@ -17,7 +17,9 @@ rule ms_germline_mask:
         intermediate_ins_unpadded = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unpadded.bed"),
         ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
         ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-        ms_germ_all_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_all.bed")
+        ms_germ_all_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_all.bed"),
+        intermediate_cat_unsorted = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk_cat_unsorted.bed"),
+        intermediate_cat_unmerged = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk_cat_unmerged.bed")
     params:
         indel_padding_bases = config["sci_params"]["ms_germline_mask"]["indel_padding_bases"]
     log:
@@ -25,7 +27,7 @@ rule ms_germline_mask:
     benchmark:
         "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
         """   
         # Set memory limit
@@ -58,5 +60,11 @@ rule ms_germline_mask:
         # Combine all germline risk masks
         cat {output.ms_germ_all_bed} \
         {output.ms_germ_del_bed} \
-        {output.ms_germ_ins_bed} > {output.ms_germ_risk_bed} 2>> {log}
+        {output.ms_germ_ins_bed} > {output.intermediate_cat_unsorted} 2>> {log}
+
+        # Sort by chromosome then position
+        sort {output.intermediate_cat_unsorted} -k1,1V -k2,2n > {output.intermediate_cat_unmerged} 2>> {log}
+
+        # Merge adjacent regions
+        bedtools merge -i {output.intermediate_cat_unmerged} > {output.ms_germ_risk_bed} 2>> {log}
         """
