@@ -18,7 +18,8 @@ Types of changes:
 - Added depth filter to ms_germline_risk to mask low depth sites missed by samtools depth (#271)
 - Added additional unit tests for ms_germline_risk and ms_germline_mask (#280 and 282)
 - Added sort and merge steps to ms_germline_mask to reduce BED size (#283)
-- Added plot to ex_dsc_coverage_metrics.py (#)
+- Added Sankey plot to ex_dsc_coverage_metrics.py (#)
+- Added ex_ms_overlap_metrics.py and test (#)
 
 ### Changed
 
@@ -31,7 +32,7 @@ Types of changes:
 - Added missing docstrings/comments and standardised style (#281)
 - Removed hardcoded output paths in fastqc_summary_metrics.py, now passed to script by rules (#281)
 - Passed individual parameters to ex_generate_demux_adaptors.py and ex_demux_counts_and_gini.py rather than all of config (#281)
-- Rewrote ex_dsc_coverage_metrics.py (#)
+- Rewrote ex_dsc_coverage_metrics.py to reduce memory usage (#)
 
 ### Removed
 
