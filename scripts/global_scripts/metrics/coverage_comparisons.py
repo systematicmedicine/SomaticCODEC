@@ -12,14 +12,14 @@ Authors:
 # Import libraries
 import sys
 import argparse
-import pysam
 import numpy as np
+import subprocess
 
 def main(args):
 
     # Redirect stdout/stderr to Snakemake log
-    sys.stdout = open(args.log, "a")
-    sys.stderr = open(args.log, "a")
+    # sys.stdout = open(args.log, "a")
+    # sys.stderr = open(args.log, "a")
     print("[INFO] Starting coverage_comparisons.py")
 
     # Define input paths  
@@ -39,6 +39,7 @@ def main(args):
     EX_DEPTH_THRESHOLD = int(args.ex_depth_threshold)
     MS_BQ_THRESHOLD = int(args.ms_bq_threshold)
     EX_BQ_THRESHOLD = int(args.ex_bq_threshold)
+    THREADS = int(args.threads)
 
     # Helper functions
     # Returns a dict with [chrom][length] from FAI file
@@ -89,39 +90,85 @@ def main(args):
 
         return coverage_array
     
-    # Creates a boolean array for coverage at each position (at a given depth and BQ threshold)
-    def coverage_array_depth_BQ(bam_path, chrom_lengths, depth_threshold, BQ_threshold):
+    # Creates a boolean array for coverage at each position (at a given depth threshold)
+    def coverage_array_depth_threshold(bam_path, chrom_lengths, depth_threshold, threads):
 
-        print(f"[INFO] Started creating coverage arrays for {bam_path}")
+        print(f"[INFO] Started creating depth coverage array for {bam_path}")
         
         # Get chromosome offsets to caclulate array indices
         offsets, genome_length = get_chrom_offsets(chrom_lengths)
 
         # Set coverage to False for all positions
         coverage_array_depth = np.zeros(genome_length, dtype=bool)
+
+        cmd = [
+        "samtools", "depth",
+        "--threads", str(threads),
+        "-J",
+        "-s",
+        bam_path
+        ]
+
+        with subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        ) as proc:
+            for line in proc.stdout:
+                chrom, pos_str, depth_str = line.split()
+                pos = int(pos_str) - 1 # Convert position to 0-based
+                depth = int(depth_str)
+                genome_index = offsets[chrom] + pos
+
+                # If depth >= threshold, set coverage to True
+                if depth >= depth_threshold:
+                    coverage_array_depth[genome_index] = True
+
+        print(f"[INFO] Finished creating depth coverage array for {bam_path}")
+
+        return coverage_array_depth
+    
+    # Creates a boolean array for coverage at each position (at a given BQ threshold)
+    def coverage_array_BQ_threshold(bam_path, chrom_lengths, BQ_threshold, threads):
+
+        print(f"[INFO] Started creating BQ coverage array for {bam_path}")
+        
+        # Get chromosome offsets to caclulate array indices
+        offsets, genome_length = get_chrom_offsets(chrom_lengths)
+
+        # Set coverage to False for all positions
         coverage_array_BQ = np.zeros(genome_length, dtype=bool)
 
-        bam = pysam.AlignmentFile(bam_path, "rb")
-        for pileup in bam.pileup(stepper="all", truncate=True):
-            chrom = pileup.reference_name
-            pos = pileup.reference_pos
-            depth = pileup.nsegments
-            reads = pileup.pileups
-            genome_index = offsets[chrom] + pos
+        cmd = [
+        "samtools", "depth",
+        "--threads", str(threads),
+        "-J",
+        "-s",
+        "--min-BQ", str(BQ_threshold), # Only bases with BQ >= threshold count towards depth
+        bam_path
+        ]
 
-            # If depth >= threshold, set coverage to True
-            if depth >= depth_threshold:
-                coverage_array_depth[genome_index] = True
+        with subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        ) as proc:
 
-            # If BQ >= threshold, set coverage to True
-            for read in reads:
-                if not read.is_del and not read.is_refskip:
-                        if read.alignment.query_qualities[read.query_position] >= BQ_threshold:
-                            coverage_array_BQ[genome_index] = True
+            for line in proc.stdout:
+                chrom, pos_str, depth_str = line.split()
+                pos = int(pos_str) - 1 # Convert position to 0-based
+                depth = int(depth_str)
+                genome_index = offsets[chrom] + pos
 
-        print(f"[INFO] Finished creating coverage arrays for {bam_path}")
+                # If any depth with BQ >= threshold, set coverage to True
+                if depth > 0:
+                    coverage_array_BQ[genome_index] = True
 
-        return coverage_array_depth, coverage_array_BQ
+        print(f"[INFO] Finished creating BQ coverage array for {bam_path}")
+
+        return coverage_array_BQ
 
     # Get chromosome lengths from reference FAI
     chrom_lengths = get_chrom_lengths(ref_fai_path)
@@ -136,8 +183,11 @@ def main(args):
     include_bed_coverage = coverage_array_bed(include_bed_path, chrom_lengths)
 
     # Create boolean arrays for MS and EX coverage at given depth and BQ thresholds
-    ms_coverage_depth, ms_coverage_BQ = coverage_array_depth_BQ(ms_bam_path, chrom_lengths, MS_DEPTH_THRESHOLD, MS_BQ_THRESHOLD)
-    ex_coverage_depth, ex_coverage_BQ = coverage_array_depth_BQ(ex_dsc_bam_path, chrom_lengths, EX_DEPTH_THRESHOLD, EX_BQ_THRESHOLD)
+    ms_coverage_depth = coverage_array_depth_threshold(ms_bam_path, chrom_lengths, MS_DEPTH_THRESHOLD, THREADS)
+    ms_coverage_BQ = coverage_array_BQ_threshold(ms_bam_path, chrom_lengths, MS_BQ_THRESHOLD, THREADS)
+
+    ex_coverage_depth = coverage_array_depth_threshold(ex_dsc_bam_path, chrom_lengths, EX_DEPTH_THRESHOLD, THREADS)
+    ex_coverage_BQ = coverage_array_BQ_threshold(ex_dsc_bam_path, chrom_lengths, EX_BQ_THRESHOLD, THREADS)
 
     # Create dictionary for coverage metrics and arrays
     coverage_metrics_dict = {
@@ -177,6 +227,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--threads", required=True)
     parser.add_argument("--difficult_regions_bed", required=True)
     parser.add_argument("--repeat_masker_bed", required=True)
     parser.add_argument("--gnomAD_bed", required=True)
