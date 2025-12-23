@@ -26,17 +26,19 @@ def test_ex_dsc_coverage_metrics(tmp_path, bam_ex_dsc, include_bed, ref_fai, exp
     output_json = str(tmp_path / "dsc_coverage_metrics.json")
     output_plot = str(tmp_path / "dsc_coverage_plot.html")
     log = str(tmp_path / "log.log")
-    base_quality_threshold = 70
-    sample = "SEQ0001"
+    ex_depth_threshold = 1
+    ex_bq_threshold = 70
+    threads = 1
 
     args = types.SimpleNamespace(
-        bam_ex_dsc = bam_ex_dsc,
+        threads = threads,
+        ex_dsc_bam = bam_ex_dsc,
         include_bed = include_bed,
         ref_fai = ref_fai,
-        json = output_json,
-        plot = output_plot,
-        base_quality_threshold = base_quality_threshold,
-        sample = sample,
+        output_json = output_json,
+        output_plot = output_plot,
+        ex_depth_threshold = ex_depth_threshold,
+        ex_bq_threshold = ex_bq_threshold,
         log = log
     )
     main(args=args)

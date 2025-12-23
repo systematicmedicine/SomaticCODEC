@@ -1,8 +1,5 @@
 """
-Calculate DSC coverage metrics
-    - ex_mean_analyzable_duplex_depth: Total duplex bases in include_beg region divided by total positions in include_bed region
-    - ex_duplex_coverage_bedregions: Percentage of positions in include_bed region that have >0x duplex depth
-    - ex_duplex_coverage_wholegenome: Positions with >0x duplex depth in the include_bed region as a percentage of the whole genome
+Calculates DSC coverage metrics
 """
 
 rule ex_dsc_coverage_metrics:
@@ -14,12 +11,14 @@ rule ex_dsc_coverage_metrics:
         json = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json",
         plot = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_plot.html"
     params: 
-        base_quality_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
-        sample = "{ex_sample}"
+        ex_depth_threshold = 1,
+        ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
+    threads:
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
@@ -29,12 +28,13 @@ rule ex_dsc_coverage_metrics:
         
         # Calculate DSC coverage metrics
         ex_dsc_coverage_metrics.py \
-            --bam_ex_dsc {input.bam_ex_dsc} \
+            --threads {threads} \
+            --ex_dsc_bam {input.bam_ex_dsc} \
             --include_bed {input.include_bed} \
             --ref_fai {input.ref_fai} \
-            --json {output.json} \
-            --plot {output.plot} \
-            --base_quality_threshold {params.base_quality_threshold} \
-            --sample {params.sample} \
+            --output_json {output.json} \
+            --output_plot {output.plot} \
+            --ex_depth_threshold {params.ex_depth_threshold} \
+            --ex_bq_threshold {params.ex_bq_threshold} \
             --log {log} 2>> {log}
         """
