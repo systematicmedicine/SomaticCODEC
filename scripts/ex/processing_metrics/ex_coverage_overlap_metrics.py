@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
---- coverage_comparisons.py ---
+--- ex_coverage_overlap_metrics.py ---
 
 Compares overlap between various coverage metrics
 
@@ -14,25 +14,28 @@ import sys
 import argparse
 import numpy as np
 import subprocess
+import json
+from pathlib import Path
 
 def main(args):
 
     # Redirect stdout/stderr to Snakemake log
-    # sys.stdout = open(args.log, "a")
-    # sys.stderr = open(args.log, "a")
-    print("[INFO] Starting coverage_comparisons.py")
+    sys.stdout = open(args.log, "a")
+    sys.stderr = open(args.log, "a")
+    print("[INFO] Starting ex_coverage_overlap_metrics.py")
 
     # Define input paths  
-    difficult_regions_mask_path = args.difficult_regions_bed
-    repeat_masker_mask_path = args.repeat_masker_bed
-    gnomAD_mask_path = args.gnomAD_bed
+    precomputed_mask_paths = args.precomputed_masks
     ms_bam_path = args.ms_bam
+    lowdepth_bed_path = args.lowdepth_bed
+    germ_risk_bed_path = args.germ_risk_bed
+    combined_bed_path = args.combined_bed
     include_bed_path = args.include_bed
     ex_dsc_bam_path = args.ex_dsc_bam
     ref_fai_path = args.ref_fai
 
     # Define output paths
-    coverage_comparisons_path = args.comparisons_tsv
+    output_json_path = args.output_json
 
     # Define params
     MS_DEPTH_THRESHOLD = int(args.ms_depth_threshold)
@@ -90,7 +93,7 @@ def main(args):
 
         return coverage_array
     
-    # Creates a boolean array for coverage at each position (at a given depth threshold)
+    # Creates a boolean array for coverage at each BAM position (at a given depth threshold)
     def coverage_array_depth_threshold(bam_path, chrom_lengths, depth_threshold, threads):
 
         print(f"[INFO] Started creating depth coverage array for {bam_path}")
@@ -129,7 +132,7 @@ def main(args):
 
         return coverage_array_depth
     
-    # Creates a boolean array for coverage at each position (at a given BQ threshold)
+    # Creates a boolean array for coverage at each BAM position (at a given BQ threshold)
     def coverage_array_BQ_threshold(bam_path, chrom_lengths, BQ_threshold, threads):
 
         print(f"[INFO] Started creating BQ coverage array for {bam_path}")
@@ -176,11 +179,29 @@ def main(args):
     # Get genome length
     _, genome_length = get_chrom_offsets(chrom_lengths)
 
+    # Create boolean array for reference genome
+    ref_genome_coverage = np.ones(genome_length, dtype=bool)
+
     # Create boolean arrays for BED files
-    difficult_regions_coverage = coverage_array_bed(difficult_regions_mask_path, chrom_lengths)
-    repeat_masker_coverage = coverage_array_bed(repeat_masker_mask_path, chrom_lengths)
-    gnomAD_mask_coverage = coverage_array_bed(gnomAD_mask_path, chrom_lengths)
-    include_bed_coverage = coverage_array_bed(include_bed_path, chrom_lengths)
+    # Map mask names to BED files
+    bed_files = {}
+    bed_coverage_arrays = {}
+
+    # Name precomputed masks by file basename (without extension)
+    for bed_file in precomputed_mask_paths:
+        name = Path(bed_file).stem
+        bed_files[name] = bed_file
+
+    # Add other masks
+    bed_files.update({
+        "lowdepth": lowdepth_bed_path,
+        "ms_germ_risk": germ_risk_bed_path,
+        "combined_mask": combined_bed_path,
+        "include_bed": include_bed_path
+    })
+
+    for mask_name, bed_path in bed_files.items():
+        bed_coverage_arrays[mask_name] = coverage_array_bed(bed_path, chrom_lengths)
 
     # Create boolean arrays for MS and EX coverage at given depth and BQ thresholds
     ms_coverage_depth = coverage_array_depth_threshold(ms_bam_path, chrom_lengths, MS_DEPTH_THRESHOLD, THREADS)
@@ -190,56 +211,66 @@ def main(args):
     ex_coverage_BQ = coverage_array_BQ_threshold(ex_dsc_bam_path, chrom_lengths, EX_BQ_THRESHOLD, THREADS)
 
     # Create dictionary for coverage metrics and arrays
-    coverage_metrics_dict = {
-        "difficult_regions": difficult_regions_coverage,
-        "repeat_masker": repeat_masker_coverage,
-        "gnomAD_mask": gnomAD_mask_coverage,
-        "include_bed": include_bed_coverage,
+    coverage_metrics_dict = {}
+
+    for mask_name, coverage_array in bed_coverage_arrays.items():
+        coverage_metrics_dict[mask_name] = coverage_array
+
+    coverage_metrics_dict.update({
+        "ref_genome": ref_genome_coverage,
         "ms_depth": ms_coverage_depth,
         "ms_BQ": ms_coverage_BQ,
         "ex_depth": ex_coverage_depth,
         "ex_BQ": ex_coverage_BQ
-    }
+    })
 
-    # Create coverage matrix
+    # Compute overlaps and write to JSON
+    overlap_results = {}
+
     coverage_metric_names = list(coverage_metrics_dict.keys())
-    number_of_metrics = len(coverage_metric_names)
-    coverage_matrix = np.zeros((number_of_metrics, number_of_metrics), dtype=float)
 
-    for row_index, metric_a in enumerate(coverage_metric_names):
-        for col_index, metric_b in enumerate(coverage_metric_names):
+    for metric_a_index, metric_a in enumerate(coverage_metric_names):
+        for metric_b_index, metric_b in enumerate(coverage_metric_names):
+
+            if metric_b_index < metric_a_index:
+                continue # Skip duplicate comparisons
+
+            union = coverage_metrics_dict[metric_a] | coverage_metrics_dict[metric_b]
             overlap = coverage_metrics_dict[metric_a] & coverage_metrics_dict[metric_b]
-            coverage_matrix[row_index, col_index] = 100 * np.sum(overlap) / genome_length
 
-    # Write to TSV
-    with open(coverage_comparisons_path, "w") as out:
-        out.write("metric_a\tmetric_b\tpct_genome\n")
-        for metric_a_index, metric_a in enumerate(coverage_metric_names):
-            for metric_b_index, metric_b in enumerate(coverage_metric_names):
-                # Skip duplicate comparisons
-                if metric_b_index < metric_a_index:
-                    continue  
-                overlap = coverage_metrics_dict[metric_a] & coverage_metrics_dict[metric_b]
-                pct = 100.0 * np.sum(overlap) / genome_length
-                out.write(f"{metric_a}\t{metric_b}\t{pct:.2f}\n")
+            overlap_bases = int(np.sum(overlap))
+            union_bases = int(np.sum(union))
+            pct = 100 * overlap_bases / union_bases if union_bases > 0 else 0
 
-    print("[INFO] Completed coverage_comparisons.py")
+            key = f"{metric_a}_vs_{metric_b}"
+
+            overlap_results[key] = {
+                "union_bases": union_bases,
+                "overlap_bases": overlap_bases,
+                "pct_overlap": round(pct, 2)
+            }
+
+    with open(output_json_path, "w") as out:
+        json.dump(overlap_results, out, indent=2)
+
+    print("[INFO] Completed ex_coverage_overlap_metrics.py")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--threads", required=True)
-    parser.add_argument("--difficult_regions_bed", required=True)
-    parser.add_argument("--repeat_masker_bed", required=True)
-    parser.add_argument("--gnomAD_bed", required=True)
+    parser.add_argument("--precomputed_masks", required=True, nargs = "+")
     parser.add_argument("--include_bed", required=True)
     parser.add_argument("--ms_bam", required=True)
+    parser.add_argument("--lowdepth_bed", required=True)
+    parser.add_argument("--germ_risk_bed", required=True)
+    parser.add_argument("--combined_bed", required=True)
     parser.add_argument("--ex_dsc_bam", required=True)
     parser.add_argument("--ref_fai", required=True)
     parser.add_argument("--ms_depth_threshold", required=True)
     parser.add_argument("--ex_depth_threshold", required=True)
     parser.add_argument("--ms_bq_threshold", required=True)
     parser.add_argument("--ex_bq_threshold", required=True)
-    parser.add_argument("--comparisons_tsv", required=True)
+    parser.add_argument("--output_json", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
     main(args=args)
