@@ -1,31 +1,36 @@
 """
-Generates a summary of genome coverage by depth
+Generates depth metrics for the final EX DSC BAM
 """
 
-rule ms_coverage_by_depth_metrics:
+rule ex_depth_metrics:
     input:
-        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt"
+        bam_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
+        ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        coverage_by_depth = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
+        json = "metrics/{ex_sample}/{ex_sample}_depth_metrics.json"
     params:
-        sample = "{ms_sample}",
-        min_depth = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
+        ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:
-        "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
+        "logs/{ex_sample}/ex_depth_metrics.log"
     benchmark:
-        "logs/{ms_sample}/ms_coverage_by_depth_metrics.benchmark.txt"
+        "logs/{ex_sample}/ex_depth_metrics.benchmark.txt"
+    threads:
+        config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
         """
         # Set memory limit
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Generate coverage by depth metrics
-        ms_coverage_by_depth_metrics.py \
-            --depth_histogram {input.depth_histogram} \
-            --coverage_by_depth {output.coverage_by_depth} \
-            --min_depth {params.min_depth} \
-            --sample {params.sample} \
+        ex_depth_metrics.py \
+            --threads {threads} \
+            --ex_dsc_bam {input.bam_ex_dsc} \
+            --include_bed {input.include_bed} \
+            --ref_fai {input.ref_fai} \
+            --ex_bq_threshold {params.ex_bq_threshold} \
+            --output_json {output.json} \
             --log {log} 2>> {log}
         """
