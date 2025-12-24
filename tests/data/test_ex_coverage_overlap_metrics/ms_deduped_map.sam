@@ -1,0 +1,36 @@
+@HD	VN:1.6	SO:coordinate
+@SQ	SN:chr1	LN:1
+@SQ	SN:chr2	LN:1
+@SQ	SN:chr3	LN:1
+@SQ	SN:chr4	LN:1
+@SQ	SN:chr5	LN:1
+@SQ	SN:chr6	LN:1
+@SQ	SN:chr7	LN:1
+@SQ	SN:chr8	LN:1
+@SQ	SN:chr9	LN:1
+@SQ	SN:chr10	LN:1
+@SQ	SN:chr11	LN:1
+@SQ	SN:chr12	LN:1
+@SQ	SN:chr13	LN:1
+@SQ	SN:chr14	LN:1
+@SQ	SN:chr15	LN:1
+@SQ	SN:chr16	LN:1
+@SQ	SN:chr17	LN:1
+@SQ	SN:chr18	LN:1
+@SQ	SN:chr19	LN:1
+@SQ	SN:chr20	LN:1
+@SQ	SN:chr21	LN:46709983
+@SQ	SN:chr22	LN:1
+@SQ	SN:chrUn	LN:1
+@SQ	SN:chrX	LN:1
+@SQ	SN:chrY	LN:1
+@RG	ID:SEQ0004	LB:SEQ0004_lib	PL:ILLUMINA	SM:SEQ0004	PU:SEQ0004
+@PG	ID:bwa-mem2	PN:bwa-mem2	VN:2.2.1	CL:bwa-mem2 mem -t 2 -k 19 -w 100 -d 100 -r 1.5 -c 10000 -A 1 -B 4 -O 6 -E 1 -L 5 -U 9 -T 30 tmp/downloads/GRCh38_Chr21_plus_stubs.fa tmp/SEQ0004/SEQ0004_filter_r1.fastq.gz tmp/SEQ0004/SEQ0004_filter_r2.fastq.gz
+@PG	ID:samtools	PN:samtools	PP:bwa-mem2	VN:1.22.1	CL:samtools view -@ 2 --output-fmt bam --output-fmt-option level=1 -bS tmp/SEQ0004/SEQ0004_raw_map.sam
+@PG	ID:samtools.1	PN:samtools	PP:samtools	VN:1.22.1	CL:samtools collate -@ 2 --output-fmt bam --output-fmt-option level=1 -o tmp/SEQ0004/SEQ0004_read_group_map_collated.bam tmp/SEQ0004/SEQ0004_read_group_map.bam
+@PG	ID:samtools.2	PN:samtools	PP:samtools.1	VN:1.22.1	CL:samtools fixmate -@ 2 --output-fmt bam --output-fmt-option level=1 -m tmp/SEQ0004/SEQ0004_read_group_map_collated.bam tmp/SEQ0004/SEQ0004_fixmate_map_unsorted.bam
+@PG	ID:samtools.3	PN:samtools	PP:samtools.2	VN:1.22.1	CL:samtools sort -@ 2 --output-fmt bam --output-fmt-option level=1 -o tmp/SEQ0004/SEQ0004_annotated_map.bam tmp/SEQ0004/SEQ0004_fixmate_map_unsorted.bam
+@PG	ID:samtools.4	PN:samtools	PP:samtools.3	VN:1.22.1	CL:samtools markdup -@ 2 --output-fmt bam --output-fmt-option level=1 -r --json -f metrics/SEQ0004/SEQ0004_dedup_metrics.json --barcode-name --mode t -d 2500 tmp/SEQ0004/SEQ0004_annotated_map.bam tmp/SEQ0004/SEQ0004_deduped_map_unsorted.bam
+@PG	ID:samtools.5	PN:samtools	PP:samtools.4	VN:1.22.1	CL:samtools sort -@ 2 --output-fmt bam --output-fmt-option level=1 -o tmp/SEQ0004/SEQ0004_deduped_map.bam tmp/SEQ0004/SEQ0004_deduped_map_unsorted.bam
+@PG	ID:samtools.6	PN:samtools	PP:samtools.5	VN:1.22.1	CL:samtools view -h tests/data/test_ex_ms_overlap_metrics/ms_deduped_map.bam
+LH00406:338:2325Y5LT4:4:1106:4082:7376:TCGGTGGTGATA	99	chr21	100	51	99M2D48M	=	5062885	158	GGATTACAGGCATGCGCCACCACGCCTGGCTAATTTTTGTATTTTTAGTAGAGATGGGGTTTCACCCTGTTGGTCAGGCTGGTCTCGAACTCCTGACCTTGTGATCTGCCTGCCTTGGCCTCCCAAAGTGCTGGGATTACGGGCGTG	IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII	MD:Z:12C0C52A6C22T2^CA0G40A6	RG:Z:SEQ0004	NM:i:9	AS:i:104	XS:i:82	MQ:i:51	MC:Z:5S85M2D57M	ms:i:5864
