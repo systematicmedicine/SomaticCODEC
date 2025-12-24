@@ -96,6 +96,7 @@ ex_processing_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_plot.html", ex_sample = ex_sample_ids),
+    expand("metrics/{ex_sample}/{ex_sample}_depth_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_coverage_overlap_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json", ex_sample = ex_sample_ids),
