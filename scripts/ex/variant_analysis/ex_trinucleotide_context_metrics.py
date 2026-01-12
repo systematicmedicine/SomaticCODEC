@@ -22,6 +22,7 @@ Outputs:
 Authors:
   - Chat-GPT
   - Cameron Fraser
+  - Joshua Johnstone
 """
 
 # ---------------------------------------------------------------------
@@ -40,6 +41,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 from pypdf import PdfReader, PdfWriter
 import argparse
+import subprocess
 
 # ---------------------------------------------------------------------
 # Functions
@@ -59,9 +61,8 @@ def cosine_similarity_np(u, v):
     denom = np.linalg.norm(u) * np.linalg.norm(v)
     return num / denom if denom != 0 else 0.0
 
-
-def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
-    """Extract trinucleotide contexts from a VCF and return normalized proportions."""
+def get_sample_trinuc_context_counts(vcf_path, ref_genome):
+    """Extract mutation trinucleotide context counts from a VCF"""
     vcf = VCF(vcf_path)
     sample_contexts = []
 
@@ -92,9 +93,15 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
             continue
 
     context_counts = Counter(sample_contexts)
-    total = sum(context_counts.get(c, 0) for c in contexts)
+
+    return context_counts
+
+def get_sample_trinuc_context_proportions(sample_context_counts, contexts):
+    """Calculate trinucleotide context proportions from count data"""
+    total = sum(sample_context_counts.get(c, 0) for c in contexts)
+
     proportions = [
-        context_counts.get(c, 0) / total if total > 0 else 0.0
+        sample_context_counts.get(c, 0) / total if total > 0 else 0.0
         for c in contexts
     ]
 
@@ -103,41 +110,186 @@ def get_sample_trinuc_context(vcf_path, ref_genome, contexts):
         "Proportion": proportions
     })
 
+def calculate_cosine_similarities(sample_proportions_df, profiles, ref_df, contexts):
+    """Calculate cosine similarity between sample and reference proportions"""
+    sample_vector = sample_proportions_df["Proportion"].values
+    similarities = []
+
+    for profile in profiles:
+        ref_profile_df = ref_df[ref_df["Profile"] == profile].set_index("Context")
+        ref_vector = ref_profile_df.loc[contexts, "Proportion"].values
+        similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
+        similarities.append({
+            "Profile": profile,
+            "CosineSimilarity": similarity
+        })
+
+    similarity_df = pd.DataFrame(similarities).sort_values("CosineSimilarity", ascending=False)
+    similarity_dict = similarity_df.set_index("Profile")["CosineSimilarity"].to_dict()
+
+    return similarity_df, similarity_dict
+
+def get_variant_call_eligible_sequence(ref_fasta, include_bed, output_fasta):
+    """Extract sequences for variant call eligible regions using bedtools"""
+
+    cmd = [
+        "bedtools", "getfasta",
+        "-fi", ref_fasta,
+        "-bed", include_bed,
+        "-fo", output_fasta
+    ]
+
+    subprocess.run(cmd, check=True)
+
+def get_sequence_trinuc_proportions(sequence_fasta, ref_genome_length, threads):
+    """Extract trinucleotide proportions from a genomic sequence"""
+    counts = Counter()
+    hash_size = int(ref_genome_length) * 2
+
+    # Count trinucleotides in sequence
+    trinuc_counts_jf_file = sequence_fasta + ".jf"
+    subprocess.run([
+        "jellyfish", "count",
+        "--mer-len", "3",
+        "--size", str(hash_size),
+        "--threads", str(threads),
+        "--output", trinuc_counts_jf_file,
+        sequence_fasta
+    ], check=True)
+
+    # Dump counts into column format
+    result = subprocess.run([
+        "jellyfish", 
+        "dump", 
+        "-c", 
+        trinuc_counts_jf_file
+        ], capture_output=True, text=True, check=True)
+    
+    # Collapse context counts to pyrimidine-centred context
+    for line in result.stdout.strip().split("\n"):
+        trinuc, count_str = line.strip().split()
+        count = int(count_str)
+        center = trinuc[1]
+        if center in "AG":
+            trinuc = str(Seq(trinuc).reverse_complement())
+        counts[trinuc] += count
+
+    # Convert counts to proportions
+    total = sum(counts.values())
+    return {trinuc: count / total for trinuc, count in counts.items()}
+
+def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, mutation_context_counts, contexts):
+    """Normalise mutation trinucleotide context counts based on trinucleotide proportions in variant call eligible regions"""
+    normalized_counts = {}
+
+    for context, count in mutation_context_counts.items():
+        trinuc = context.split(">")[0] # Extract trinucleotide
+        if variant_call_eligible_trinuc_proportions.get(trinuc, 0) > 0:
+            # Calculate correction factor
+            correction_factor = (
+                ref_genome_trinuc_proportions.get(trinuc, 0)
+                / variant_call_eligible_trinuc_proportions[trinuc]
+            )
+        else:
+            correction_factor = 0
+
+        normalized_counts[context] = count * correction_factor
+
+    return normalized_counts
+
+def generate_comparison_plots(similarity_dict, ref_df, sample_proportions_df, sample_name, output_pdf, contexts):
+    print(f"[INFO] Generating comparison plots to {output_pdf}")
+    pages = []
+
+    with PdfPages(output_pdf) as pdf:
+        for profile in similarity_dict.keys():
+            ref_profile_df = ref_df[ref_df["Profile"] == profile]
+            similarity = similarity_dict[profile]
+
+            merged = pd.merge(
+                sample_proportions_df.rename(columns={"Proportion": sample_name}),
+                ref_profile_df[["Context", "Proportion"]].rename(columns={"Proportion": profile}),
+                on="Context",
+                how="left"
+            )
+
+            long_df = pd.melt(
+                merged,
+                id_vars="Context",
+                var_name="Source",
+                value_name="Proportion"
+            )
+            long_df["Context"] = pd.Categorical(long_df["Context"], categories=contexts, ordered=True)
+            long_df = long_df.sort_values("Context")
+
+            fig, ax = plt.subplots(figsize=(20, 6))
+            sns.barplot(data=long_df, x="Context", y="Proportion", hue="Source", ax=ax)
+
+            ax.set_title(f"{sample_name} vs {profile} (Cosine similarity: {similarity:.3f})", fontsize=12)
+            ax.set_xlabel("Context")
+            ax.set_ylabel("Proportion")
+            ax.tick_params(axis="x", rotation=90, labelsize=6)
+            plt.tight_layout()
+
+            pdf.savefig(fig)
+            plt.close()
+            pages.append(profile)
+
+    print("[INFO] Plot generation complete. Adding bookmarks...")
+
+    reader = PdfReader(output_pdf)
+    writer = PdfWriter()
+
+    for i, page in enumerate(reader.pages):
+        writer.add_page(page)
+        writer.add_outline_item(pages[i], i)
+
+    with open(output_pdf, "wb") as f_out:
+        writer.write(f_out)
+
+    print("[INFO] Bookmarks added successfully.")
+
 # ---------------------------------------------------------------------
 # Main logic
 # ---------------------------------------------------------------------
-if __name__ == "__main__":
 
-    # Snakemake parameter injection
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--vcf_path", required=True)
-    parser.add_argument("--ref_fasta_path", required=True)
-    parser.add_argument("--context_csv_path", required=True)
-    parser.add_argument("--sample_csv", required=True)
-    parser.add_argument("--similarities_csv", required=True)
-    parser.add_argument("--plot_pdf", required=True)
-    parser.add_argument("--sample", required=True)
-    parser.add_argument("--log", required=True)
-    args = parser.parse_args()
-
-    vcf_path = args.vcf_path
-    ref_fasta_path = args.ref_fasta_path
-    context_csv_path = args.context_csv_path
-    output_sample_csv = args.sample_csv
-    output_similarity_csv = args.similarities_csv
-    output_plot_pdf = args.plot_pdf
-    sample_name = args.sample
+def main(args):
 
     # Start logging
     sys.stdout = open(args.log, "a")
     sys.stderr = open(args.log, "a")
-    print("[INFO] Starting ex_trinuc_contexts.py")
+    print("[INFO] Starting ex_trinucleotide_context_metrics.py")
+
+    # Define inputs
+    vcf_path = args.vcf_path
+    ref_fasta_path = args.ref_fasta_path
+    ref_fai_path = args.ref_fai_path
+    include_bed_path = args.include_bed_path
+    ref_contexts_path = args.ref_contexts_path
+
+    # Define outputs
+    eligible_regions_fasta = args.eligible_regions_fasta
+    output_sample_csv_raw = args.sample_csv_raw
+    output_sample_csv_normalised = args.sample_csv_normalised
+    output_similarity_csv_raw = args.similarities_csv_raw
+    output_similarity_csv_normalised = args.similarities_csv_normalised
+    output_plot_pdf_raw = args.plot_pdf_raw
+    output_plot_pdf_normalised = args.plot_pdf_normalised
+
+    # Define params
+    SAMPLE_NAME = args.sample
+    THREADS = args.threads
 
     # Define contexts
     CONTEXTS = get_contexts()
 
+    # Calculate ref genome length
+    fai_df = pd.read_csv(ref_fai_path, sep="\t", header=None)
+    fai_df.columns = ["chrom", "length", "offset", "line_bases", "line_width"]
+    genome_length = fai_df["length"].sum()
+
     # Load reference contexts
-    ref_df = pd.read_csv(context_csv_path)
+    ref_df = pd.read_csv(ref_contexts_path)
     profiles = ref_df["Profile"].unique()
 
     # Validate all profiles include exactly the 96 canonical contexts
@@ -156,79 +308,56 @@ if __name__ == "__main__":
     # Load reference genome
     ref_genome = Fasta(ref_fasta_path, rebuild=False)
 
-    # Compute sample context proportions
-    sample_df = get_sample_trinuc_context(vcf_path, ref_genome, CONTEXTS)
-    sample_df.to_csv(output_sample_csv, index=False)
+    # Get raw mutation counts for each trinucleotide context
+    sample_counts_raw = get_sample_trinuc_context_counts(vcf_path, ref_genome)
 
-    # Compute cosine similarities
-    sample_vector = sample_df["Proportion"].values
-    similarities = []
+    # Get trinucleotide proportions in whole genome and in variant call eligible regions
+    ref_genome_trinuc_proportions = get_sequence_trinuc_proportions(ref_fasta_path, genome_length, THREADS)
 
-    for profile in profiles:
-        ref_profile_df = ref_df[ref_df["Profile"] == profile].set_index("Context")
-        ref_vector = ref_profile_df.loc[CONTEXTS, "Proportion"].values
-        similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
-        similarities.append({
-            "Profile": profile,
-            "CosineSimilarity": similarity
-        })
+    get_variant_call_eligible_sequence(ref_fasta_path, include_bed_path, eligible_regions_fasta)
+    variant_call_eligible_trinuc_proportions = get_sequence_trinuc_proportions(eligible_regions_fasta, genome_length, THREADS)
 
-    similarity_df = pd.DataFrame(similarities).sort_values("CosineSimilarity", ascending=False)
-    similarity_df.to_csv(output_similarity_csv, index=False)
-    sim_dict = similarity_df.set_index("Profile")["CosineSimilarity"].to_dict()
+    # Normalise trinucleotide mutation counts
+    sample_counts_normalised = normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, sample_counts_raw, CONTEXTS)
 
-    # ---------------------------------------------------------------------
+    # Compute sample context proportions and output to CSV
+    sample_proportions_raw = get_sample_trinuc_context_proportions(sample_counts_raw, CONTEXTS)
+    sample_proportions_normalised = get_sample_trinuc_context_proportions(sample_counts_normalised, CONTEXTS)
+    
+    sample_proportions_raw.to_csv(output_sample_csv_raw, index=False)
+    sample_proportions_normalised.to_csv(output_sample_csv_normalised, index=False)
+
+    # Compute cosine similarities and output to CSV
+    similarity_df_raw, similarity_dict_raw = calculate_cosine_similarities(sample_proportions_raw, profiles, ref_df, CONTEXTS)
+    similarity_df_normalised, similarity_dict_normalised = calculate_cosine_similarities(sample_proportions_normalised, profiles, ref_df, CONTEXTS)
+
+    similarity_df_raw.to_csv(output_similarity_csv_raw, index=False)
+    similarity_df_normalised.to_csv(output_similarity_csv_normalised, index=False)
+
     # Generate comparison plots
-    # ---------------------------------------------------------------------
+    generate_comparison_plots(similarity_dict_raw, ref_df, sample_proportions_raw, SAMPLE_NAME, output_plot_pdf_raw, CONTEXTS)
+    generate_comparison_plots(similarity_dict_normalised, ref_df, sample_proportions_normalised, SAMPLE_NAME, output_plot_pdf_normalised, CONTEXTS)
 
-    print(f"[INFO] Generating comparison plots to {output_plot_pdf}")
-    pages = []
+    print("[INFO] Finished ex_trinucleotide_context_metrics.py")
 
-    with PdfPages(output_plot_pdf) as pdf:
-        for profile in sim_dict.keys():
-            ref_profile_df = ref_df[ref_df["Profile"] == profile]
-            similarity = sim_dict[profile]
+if __name__ == "__main__":
 
-            merged = pd.merge(
-                sample_df.rename(columns={"Proportion": sample_name}),
-                ref_profile_df[["Context", "Proportion"]].rename(columns={"Proportion": profile}),
-                on="Context",
-                how="left"
-            )
-
-            long_df = pd.melt(
-                merged,
-                id_vars="Context",
-                var_name="Source",
-                value_name="Proportion"
-            )
-            long_df["Context"] = pd.Categorical(long_df["Context"], categories=CONTEXTS, ordered=True)
-            long_df = long_df.sort_values("Context")
-
-            fig, ax = plt.subplots(figsize=(20, 6))
-            sns.barplot(data=long_df, x="Context", y="Proportion", hue="Source", ax=ax)
-
-            ax.set_title(f"{sample_name} vs {profile} (Cosine similarity: {similarity:.3f})", fontsize=12)
-            ax.set_xlabel("Context")
-            ax.set_ylabel("Proportion")
-            ax.tick_params(axis="x", rotation=90, labelsize=6)
-            plt.tight_layout()
-
-            pdf.savefig(fig)
-            plt.close()
-            pages.append(profile)
-
-    print("[INFO] Plot generation complete. Adding bookmarks...")
-
-    reader = PdfReader(output_plot_pdf)
-    writer = PdfWriter()
-
-    for i, page in enumerate(reader.pages):
-        writer.add_page(page)
-        writer.add_outline_item(pages[i], i)
-
-    with open(output_plot_pdf, "wb") as f_out:
-        writer.write(f_out)
-
-    print("[INFO] Bookmarks added successfully.")
-    print("[INFO] Finished ex_trinuc_contexts.py")
+    # Snakemake parameter injection
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--threads", required=True)
+    parser.add_argument("--vcf_path", required=True)
+    parser.add_argument("--ref_fasta_path", required=True)
+    parser.add_argument("--ref_fai_path", required=True)
+    parser.add_argument("--include_bed_path", required=True)
+    parser.add_argument("--ref_contexts_path", required=True)
+    parser.add_argument("--eligible_regions_fasta", required=True)
+    parser.add_argument("--sample_csv_raw", required=True)
+    parser.add_argument("--sample_csv_normalised", required=True)
+    parser.add_argument("--similarities_csv_raw", required=True)
+    parser.add_argument("--similarities_csv_normalised", required=True)
+    parser.add_argument("--plot_pdf_raw", required=True)
+    parser.add_argument("--plot_pdf_normalised", required=True)
+    parser.add_argument("--sample", required=True)
+    parser.add_argument("--log", required=True)
+    args = parser.parse_args()
+    main(args=args)
