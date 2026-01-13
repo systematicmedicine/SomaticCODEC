@@ -15,21 +15,21 @@ from scripts.ex.variant_analysis.ex_trinucleotide_context_metrics import main
 import pytest
 import types
 from pathlib import Path
+from unittest.mock import patch
+import pandas as pd
 
-@pytest.mark.parametrize("vcf_path, ref_fasta_path, ref_fai_path, include_bed_path, ref_contexts_path, bam_path, expected_csv_raw, expected_csv_normalised", [
+@pytest.mark.parametrize("vcf_path, vcf_all_path, ref_fasta_path, ref_fai_path, ref_contexts_path, expected_csv_raw, expected_csv_normalised", [
     ("tests/data/test_ex_trinucleotide_context_metrics/S00X_variants.vcf",
+     "tests/data/test_ex_trinucleotide_context_metrics/S00X_all_positions.vcf",
      "tests/data/lightweight_test_run/GRCh38_Chr21_plus_stubs.fa",
      "tests/data/test_ex_trinucleotide_context_metrics/GRCh38_Chr21_plus_stubs.fa.fai",
-     "tests/data/test_ex_trinucleotide_context_metrics/include.bed",
      "tests/data/lightweight_test_run/2025-09-30_trinucleotide_contexts.csv",
-     "tests/data/lightweight_test_run/S00X_dsc_anno_filtered.bam",
-     "tests/expected/ex_trinuc_contexts/S00X_expected_context_raw.csv",
-     "tests/expected/ex_trinuc_contexts/S00X_expected_context_normalised.csv")
+     "tests/data/test_ex_trinucleotide_context_metrics/S00X_expected_context_raw.csv",
+     "tests/data/test_ex_trinucleotide_context_metrics/S00X_expected_context_normalised.csv")
 ])
-def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, ref_fai_path, include_bed_path, ref_contexts_path, bam_path, expected_csv_raw, expected_csv_normalised):
+def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_fasta_path, ref_fai_path, ref_contexts_path, expected_csv_raw, expected_csv_normalised):
   
   # Define tmp output paths
-  eligible_regions_fasta = tmp_path / "eligible_regions.fa"
   sample_csv_raw = tmp_path / "trinuc_context_raw.csv"
   sample_csv_normalised = tmp_path / "trinuc_context_normalised.csv"
   similarities_csv_raw = tmp_path / "trinuc_similarities_raw.csv"
@@ -41,18 +41,16 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, re
   # Define params
   sample = "S00X"
   threads = 2
-  ex_bq_threshold = 1
+  ex_bq_threshold = 0
 
-  # Run script with test data
+  # Pass test arguments
   args = types.SimpleNamespace(
         threads = str(threads),
         vcf_path = str(vcf_path),
+        vcf_all_path = str(vcf_all_path),
         ref_fasta_path = str(ref_fasta_path),
         ref_fai_path = str(ref_fai_path),
-        include_bed_path = str(include_bed_path),
         ref_contexts_path = str(ref_contexts_path),
-        ex_dsc_bam = str(bam_path),
-        eligible_regions_fasta = str(eligible_regions_fasta),
         sample_csv_raw = str(sample_csv_raw),
         sample_csv_normalised = str(sample_csv_normalised),
         similarities_csv_raw = str(similarities_csv_raw),
@@ -63,19 +61,13 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, re
         ex_bq_threshold = str(ex_bq_threshold),
         log = str(log)
     )
-  main(args=args)
-
-  # # --- Assertions ---
-  # # Ensure schema matches
-  # pd.testing.assert_index_equal(df.columns, expected_df.columns)
-
-  # # Ensure proportions match expected (tolerate tiny floating error)
-  # pd.testing.assert_series_equal(
-  #     df["Proportion"],
-  #     expected_df["Proportion"],
-  #     check_names=False,
-  #     atol=1e-8
-  # )
+  
+  # Mock PDF generation to reduce test time
+  with patch(
+        "scripts.ex.variant_analysis.ex_trinucleotide_context_metrics.generate_comparison_plots"
+    ):
+        # Run script with test data
+        main(args=args)
 
   # --- Clean up generated .fai index ---
   fai_path = Path(ref_fasta_path).with_suffix(Path(ref_fasta_path).suffix + ".fai")
@@ -87,4 +79,27 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, re
   if jf_path.exists():
       jf_path.unlink()
 
-    
+  # --- Assertions ---
+  # Ensure schema matches
+  raw_df = pd.read_csv(sample_csv_raw)
+  expected_raw_df = pd.read_csv(expected_csv_raw)
+  pd.testing.assert_index_equal(raw_df.columns, expected_raw_df.columns)
+
+  normalised_df = pd.read_csv(sample_csv_normalised)
+  expected_normalised_df = pd.read_csv(expected_csv_normalised)
+  pd.testing.assert_index_equal(normalised_df.columns, expected_normalised_df.columns)
+
+  # Ensure proportions match expected (tolerate tiny floating error)
+  pd.testing.assert_series_equal(
+      raw_df["Proportion"],
+      expected_raw_df["Proportion"],
+      check_names=False,
+      atol=1e-8
+  )
+
+  pd.testing.assert_series_equal(
+      normalised_df["Proportion"],
+      expected_normalised_df["Proportion"],
+      check_names=False,
+      atol=1e-8
+  )
