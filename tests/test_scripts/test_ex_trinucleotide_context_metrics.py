@@ -16,16 +16,17 @@ import pytest
 import types
 from pathlib import Path
 
-@pytest.mark.parametrize("vcf_path, ref_fasta_path, ref_fai_path, include_bed_path, ref_contexts_path, expected_csv_raw, expected_csv_normalised", [
+@pytest.mark.parametrize("vcf_path, ref_fasta_path, ref_fai_path, include_bed_path, ref_contexts_path, bam_path, expected_csv_raw, expected_csv_normalised", [
     ("tests/data/test_ex_trinucleotide_context_metrics/S00X_variants.vcf",
      "tests/data/lightweight_test_run/GRCh38_Chr21_plus_stubs.fa",
      "tests/data/test_ex_trinucleotide_context_metrics/GRCh38_Chr21_plus_stubs.fa.fai",
      "tests/data/test_ex_trinucleotide_context_metrics/include.bed",
      "tests/data/lightweight_test_run/2025-09-30_trinucleotide_contexts.csv",
+     "tests/data/lightweight_test_run/S00X_dsc_anno_filtered.bam",
      "tests/expected/ex_trinuc_contexts/S00X_expected_context_raw.csv",
      "tests/expected/ex_trinuc_contexts/S00X_expected_context_normalised.csv")
 ])
-def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, ref_fai_path, include_bed_path, ref_contexts_path, expected_csv_raw, expected_csv_normalised):
+def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, ref_fai_path, include_bed_path, ref_contexts_path, bam_path, expected_csv_raw, expected_csv_normalised):
   
   # Define tmp output paths
   eligible_regions_fasta = tmp_path / "eligible_regions.fa"
@@ -40,6 +41,7 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, re
   # Define params
   sample = "S00X"
   threads = 2
+  ex_bq_threshold = 1
 
   # Run script with test data
   args = types.SimpleNamespace(
@@ -49,6 +51,7 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, re
         ref_fai_path = str(ref_fai_path),
         include_bed_path = str(include_bed_path),
         ref_contexts_path = str(ref_contexts_path),
+        ex_dsc_bam = str(bam_path),
         eligible_regions_fasta = str(eligible_regions_fasta),
         sample_csv_raw = str(sample_csv_raw),
         sample_csv_normalised = str(sample_csv_normalised),
@@ -57,6 +60,7 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, ref_fasta_path, re
         plot_pdf_raw = str(plot_pdf_raw),
         plot_pdf_normalised = str(plot_pdf_normalised),
         sample = str(sample),
+        ex_bq_threshold = str(ex_bq_threshold),
         log = str(log)
     )
   main(args=args)

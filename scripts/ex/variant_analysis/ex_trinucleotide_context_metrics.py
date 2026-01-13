@@ -64,55 +64,6 @@ def cosine_similarity_np(u, v):
     denom = np.linalg.norm(u) * np.linalg.norm(v)
     return num / denom if denom != 0 else 0.0
 
-def get_sample_trinuc_context_counts(vcf_path, ref_genome):
-    """Extract mutation trinucleotide context counts from a VCF"""
-    vcf = VCF(vcf_path)
-    sample_contexts = []
-
-    for variant in vcf:
-        if not variant.ALT or len(variant.REF) != 1 or len(variant.ALT[0]) != 1:
-            continue  # Skip non-SNVs or malformed ALT
-
-        chrom = variant.CHROM
-        pos = variant.POS
-        ref_base = variant.REF.upper()
-        alt_base = variant.ALT[0].upper()
-
-        try:
-            left = ref_genome[chrom][pos - 2].seq.upper()
-            center = ref_base
-            right = ref_genome[chrom][pos].seq.upper()
-
-            if ref_base in ['C', 'T']:
-                context = f"{left}{ref_base}{right}>{alt_base}"
-            else:
-                trinuc = Seq(left + center + right).reverse_complement()
-                alt_rc = str(Seq(alt_base).reverse_complement())
-                context = f"{trinuc[0]}{trinuc[1]}{trinuc[2]}>{alt_rc}"
-
-            sample_contexts.append(context)
-
-        except (KeyError, IndexError):
-            continue
-
-    context_counts = Counter(sample_contexts)
-
-    return context_counts
-
-def get_sample_trinuc_context_proportions(sample_context_counts, contexts):
-    """Calculate trinucleotide context proportions from count data"""
-    total = sum(sample_context_counts.get(c, 0) for c in contexts)
-
-    proportions = [
-        sample_context_counts.get(c, 0) / total if total > 0 else 0.0
-        for c in contexts
-    ]
-
-    return pd.DataFrame({
-        "Context": contexts,
-        "Proportion": proportions
-    })
-
 def calculate_cosine_similarities(sample_proportions_df, profiles, ref_df, contexts):
     """Calculate cosine similarity between sample and reference proportions"""
     sample_vector = sample_proportions_df["Proportion"].values
@@ -131,18 +82,6 @@ def calculate_cosine_similarities(sample_proportions_df, profiles, ref_df, conte
     similarity_dict = similarity_df.set_index("Profile")["CosineSimilarity"].to_dict()
 
     return similarity_df, similarity_dict
-
-def get_variant_call_eligible_sequence(ref_fasta, include_bed, output_fasta):
-    """Extract sequences for variant call eligible regions using bedtools"""
-
-    cmd = [
-        "bedtools", "getfasta",
-        "-fi", ref_fasta,
-        "-bed", include_bed,
-        "-fo", output_fasta
-    ]
-
-    subprocess.run(cmd, check=True)
 
 def get_genome_trinuc_proportions(ref_fasta, ref_genome_length, threads):
     """Extract trinucleotide proportions from a reference genome sequence"""
@@ -181,8 +120,8 @@ def get_genome_trinuc_proportions(ref_fasta, ref_genome_length, threads):
     total = sum(counts.values())
     return {trinuc: count / total for trinuc, count in counts.items()}
 
-def get_sample_trinuc_proportions(depth_array, ref_fasta, include_bed, chrom_lengths):
-    """Extract depth-weighted sample trinucleotide proportions"""
+def get_variant_call_eligible_trinuc_proportions(depth_array, ref_fasta, include_bed, chrom_lengths):
+    """Extract depth-weighted trinucleotide proportions for variant call eligible regions"""
     counts = Counter()
 
     # Load chromosome position offsets
@@ -223,17 +162,52 @@ def get_sample_trinuc_proportions(depth_array, ref_fasta, include_bed, chrom_len
     proportions = {trinuc: count/total for trinuc, count in counts.items()}
     return proportions
 
-def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, sample_trinuc_proportions, mutation_context_counts):
+def get_sample_trinuc_context_counts(vcf_path, ref_genome):
+    """Extract mutation trinucleotide context counts from a VCF"""
+    vcf = VCF(vcf_path)
+    sample_contexts = []
+
+    for variant in vcf:
+        if not variant.ALT or len(variant.REF) != 1 or len(variant.ALT[0]) != 1:
+            continue  # Skip non-SNVs or malformed ALT
+
+        chrom = variant.CHROM
+        pos = variant.POS
+        ref_base = variant.REF.upper()
+        alt_base = variant.ALT[0].upper()
+
+        try:
+            left = ref_genome[chrom][pos - 2].seq.upper()
+            center = ref_base
+            right = ref_genome[chrom][pos].seq.upper()
+
+            if ref_base in ['C', 'T']:
+                context = f"{left}{ref_base}{right}>{alt_base}"
+            else:
+                trinuc = Seq(left + center + right).reverse_complement()
+                alt_rc = str(Seq(alt_base).reverse_complement())
+                context = f"{trinuc[0]}{trinuc[1]}{trinuc[2]}>{alt_rc}"
+
+            sample_contexts.append(context)
+
+        except (KeyError, IndexError):
+            continue
+
+    context_counts = Counter(sample_contexts)
+
+    return context_counts
+
+def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, mutation_context_counts):
     """Normalise mutation trinucleotide context counts based on trinucleotide proportions in variant call eligible regions"""
     normalized_counts = {}
 
     for context, count in mutation_context_counts.items():
         trinuc = context.split(">")[0] # Extract trinucleotide
-        if sample_trinuc_proportions.get(trinuc, 0) > 0:
+        if variant_call_eligible_trinuc_proportions.get(trinuc, 0) > 0:
             # Calculate correction factor
             correction_factor = (
                 ref_genome_trinuc_proportions.get(trinuc, 0)
-                / sample_trinuc_proportions[trinuc]
+                / variant_call_eligible_trinuc_proportions[trinuc]
             )
         else:
             correction_factor = 0
@@ -241,6 +215,20 @@ def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, sample
         normalized_counts[context] = count * correction_factor
 
     return normalized_counts
+
+def get_sample_trinuc_context_proportions(sample_context_counts, contexts):
+    """Calculate trinucleotide context proportions from count data"""
+    total = sum(sample_context_counts.get(c, 0) for c in contexts)
+
+    proportions = [
+        sample_context_counts.get(c, 0) / total if total > 0 else 0.0
+        for c in contexts
+    ]
+
+    return pd.DataFrame({
+        "Context": contexts,
+        "Proportion": proportions
+    })
 
 def generate_comparison_plots(similarity_dict, ref_df, sample_proportions_df, sample_name, output_pdf, contexts):
     print(f"[INFO] Generating comparison plots to {output_pdf}")
@@ -357,16 +345,16 @@ def main(args):
     # Get raw mutation counts for each trinucleotide context
     sample_counts_raw = get_sample_trinuc_context_counts(vcf_path, ref_genome)
 
-    # Get trinucleotide proportions in whole genome and in variant call eligible regions
+    # Get trinucleotide proportions in whole genome
     ref_genome_trinuc_proportions = get_genome_trinuc_proportions(ref_fasta_path, genome_length, THREADS)
 
-    #get_variant_call_eligible_sequence(ref_fasta_path, include_bed_path, eligible_regions_fasta)
+    # Get trinucleotide proportions in variant call eligible regions (depth-weighted)
     chrom_lengths = get_chrom_lengths(ref_fai_path)
     sample_depth_array = depth_array_BQ_bed(ex_dsc_bam_path, chrom_lengths, EX_BQ_THRESHOLD, include_bed_path, THREADS)
-    sample_trinuc_proportions = get_sample_trinuc_proportions(sample_depth_array, ref_fasta_path, include_bed_path, chrom_lengths)
+    variant_call_eligible_trinuc_proportions = get_variant_call_eligible_trinuc_proportions(sample_depth_array, ref_fasta_path, include_bed_path, chrom_lengths)
 
-    # Normalise trinucleotide mutation counts
-    sample_counts_normalised = normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, sample_trinuc_proportions, sample_counts_raw)
+    # Normalise sample trinucleotide mutation counts
+    sample_counts_normalised = normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, sample_counts_raw)
 
     # Compute sample context proportions and output to CSV
     sample_proportions_raw = get_sample_trinuc_context_proportions(sample_counts_raw, CONTEXTS)
