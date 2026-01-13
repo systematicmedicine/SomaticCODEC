@@ -36,15 +36,12 @@ from cyvcf2 import VCF
 from pyfaidx import Fasta
 from collections import Counter
 from Bio.Seq import Seq
-from Bio import SeqIO
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 from pypdf import PdfReader, PdfWriter
 import argparse
 import subprocess
-from helpers.fai_helpers import get_chrom_lengths, get_chrom_offsets
-from helpers.bam_helpers import depth_array_BQ_bed
 
 # ---------------------------------------------------------------------
 # Functions
@@ -120,46 +117,43 @@ def get_genome_trinuc_proportions(ref_fasta, ref_genome_length, threads):
     total = sum(counts.values())
     return {trinuc: count / total for trinuc, count in counts.items()}
 
-def get_variant_call_eligible_trinuc_proportions(depth_array, ref_fasta, include_bed, chrom_lengths):
+def get_variant_call_eligible_trinuc_proportions(ref_genome, vcf_all):
     """Extract depth-weighted trinucleotide proportions for variant call eligible regions"""
+    vcf = VCF(vcf_all)
     counts = Counter()
 
-    # Load chromosome position offsets
-    offsets, _ = get_chrom_offsets(chrom_lengths)
+    # Process each position that was eligible for variant calling 
+    for var in vcf:
+        chrom = var.CHROM
+        pos = var.POS - 1  # convert 1-based VCF to 0-based
+        ref_base = var.REF.upper()
+        dp = var.INFO.get("DP", 0)
+        
+        # Skip positions at ends of sequence (no flanking bases)
+        if pos == 0 or pos >= len(ref_genome[chrom]) - 1:
+            continue
 
-    # Load reference sequences
-    ref_seqs = {r.id: str(r.seq).upper() for r in SeqIO.parse(ref_fasta, "fasta")}
+        # Get reference sequence for bases flanking position
+        trinuc = ref_genome[chrom][pos-1:pos+2].seq.upper()
 
-    with open(include_bed) as bed:
-        # Get reference sequence for each BED region
-        for line in bed:
-            if line.startswith("#") or line.strip() == "":
-                continue
-            chrom, start, end = line.strip().split()[:3]
-            start = int(start)
-            end = int(end)
-            seq = ref_seqs[chrom][start:end]
+        # Skip trinucleotides containing N
+        if "N" in trinuc:
+            continue
+        if ref_base == "N":
+            continue
 
-            # Identify trinucleotides with 3bp sliding window
-            for i in range(1, len(seq)-1):
-                trinuc = seq[i-1:i+2]
-                center = trinuc[1]
-                # Convert to pyrimidine-centered
-                if center in "AG":
-                    trinuc = str(Seq(trinuc).reverse_complement())
-                    center = trinuc[1]
+        # Convert to pyrimidine-centered
+        center = trinuc[1]
+        if center in "AG":
+            trinuc = str(Seq(trinuc).reverse_complement())
+            center = trinuc[1]
 
-                # Get depth at central base
-                central_pos = start + i
-                genome_index = offsets[chrom] + central_pos
-                depth_at_pos = depth_array[genome_index]
+        # Weight trinucleotide count by depth
+        counts[trinuc] += dp
 
-                # Get depth-weighted trinucleotide count
-                counts[trinuc] += depth_at_pos
-
-    # Convert counts to proportions
     total = sum(counts.values())
-    proportions = {trinuc: count/total for trinuc, count in counts.items()}
+    proportions = {tri: count/total for tri, count in counts.items()}
+
     return proportions
 
 def get_sample_trinuc_context_counts(vcf_path, ref_genome):
@@ -221,7 +215,7 @@ def get_sample_trinuc_context_proportions(sample_context_counts, contexts):
     total = sum(sample_context_counts.get(c, 0) for c in contexts)
 
     proportions = [
-        sample_context_counts.get(c, 0) / total if total > 0 else 0.0
+        round(sample_context_counts.get(c, 0) / total, ndigits = 2) if total > 0 else 0.0
         for c in contexts
     ]
 
@@ -297,9 +291,8 @@ def main(args):
     vcf_path = args.vcf_path
     ref_fasta_path = args.ref_fasta_path
     ref_fai_path = args.ref_fai_path
-    include_bed_path = args.include_bed_path
     ref_contexts_path = args.ref_contexts_path
-    ex_dsc_bam_path = args.ex_dsc_bam
+    vcf_all_path = args.vcf_all_path
 
     # Define outputs
     output_sample_csv_raw = args.sample_csv_raw
@@ -312,15 +305,9 @@ def main(args):
     # Define params
     SAMPLE_NAME = args.sample
     THREADS = int(args.threads)
-    EX_BQ_THRESHOLD = int(args.ex_bq_threshold)
 
     # Define contexts
     CONTEXTS = get_contexts()
-
-    # Calculate ref genome length
-    fai_df = pd.read_csv(ref_fai_path, sep="\t", header=None)
-    fai_df.columns = ["chrom", "length", "offset", "line_bases", "line_width"]
-    genome_length = fai_df["length"].sum()
 
     # Load reference contexts
     ref_df = pd.read_csv(ref_contexts_path)
@@ -345,13 +332,16 @@ def main(args):
     # Get raw mutation counts for each trinucleotide context
     sample_counts_raw = get_sample_trinuc_context_counts(vcf_path, ref_genome)
 
+    # Calculate ref genome length
+    fai_df = pd.read_csv(ref_fai_path, sep="\t", header=None)
+    fai_df.columns = ["chrom", "length", "offset", "line_bases", "line_width"]
+    genome_length = fai_df["length"].sum()
+
     # Get trinucleotide proportions in whole genome
     ref_genome_trinuc_proportions = get_genome_trinuc_proportions(ref_fasta_path, genome_length, THREADS)
 
     # Get trinucleotide proportions in variant call eligible regions (depth-weighted)
-    chrom_lengths = get_chrom_lengths(ref_fai_path)
-    sample_depth_array = depth_array_BQ_bed(ex_dsc_bam_path, chrom_lengths, EX_BQ_THRESHOLD, include_bed_path, THREADS)
-    variant_call_eligible_trinuc_proportions = get_variant_call_eligible_trinuc_proportions(sample_depth_array, ref_fasta_path, include_bed_path, chrom_lengths)
+    variant_call_eligible_trinuc_proportions = get_variant_call_eligible_trinuc_proportions(ref_genome, vcf_all_path)
 
     # Normalise sample trinucleotide mutation counts
     sample_counts_normalised = normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, sample_counts_raw)
@@ -377,17 +367,14 @@ def main(args):
     print("[INFO] Finished ex_trinucleotide_context_metrics.py")
 
 if __name__ == "__main__":
-
     # Snakemake parameter injection
     parser = argparse.ArgumentParser()
     parser.add_argument("--threads", required=True)
     parser.add_argument("--vcf_path", required=True)
+    parser.add_argument("--vcf_all_path", required=True)
     parser.add_argument("--ref_fasta_path", required=True)
     parser.add_argument("--ref_fai_path", required=True)
-    parser.add_argument("--include_bed_path", required=True)
     parser.add_argument("--ref_contexts_path", required=True)
-    parser.add_argument("--ex_dsc_bam", required=True)
-    parser.add_argument("--eligible_regions_fasta", required=True)
     parser.add_argument("--sample_csv_raw", required=True)
     parser.add_argument("--sample_csv_normalised", required=True)
     parser.add_argument("--similarities_csv_raw", required=True)
@@ -395,7 +382,6 @@ if __name__ == "__main__":
     parser.add_argument("--plot_pdf_raw", required=True)
     parser.add_argument("--plot_pdf_normalised", required=True)
     parser.add_argument("--sample", required=True)
-    parser.add_argument("--ex_bq_threshold", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
     main(args=args)
