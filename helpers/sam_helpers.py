@@ -1,5 +1,5 @@
 """
---- sam_utils.py ---
+--- sam_helpers.py ---
 
 Functions for obtaining data from SAM files.
 
