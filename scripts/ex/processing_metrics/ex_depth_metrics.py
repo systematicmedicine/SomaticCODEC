@@ -13,8 +13,9 @@ Authors:
 import sys
 import argparse
 import numpy as np
-import subprocess
 import json
+from helpers.fai_helpers import get_chrom_lengths
+from helpers.bam_helpers import depth_array_BQ_bed
 
 def main(args):
 
@@ -35,66 +36,7 @@ def main(args):
     EX_BQ_THRESHOLD = int(args.ex_bq_threshold)
     THREADS = int(args.threads)
 
-    # Helper functions
-    # Returns a dict with [chrom][length] from FAI file
-    def get_chrom_lengths(fai_path):
-        chrom_lengths = {}
-        with open(fai_path) as f:
-            for line in f:
-                chrom, length = line.strip().split("\t")[:2]
-                chrom_lengths[chrom] = int(length)
-        return chrom_lengths
-
-    # Returns a dict with [chrom][start_index], and total genome length
-    def get_chrom_offsets(chrom_lengths):
-        offsets = {}
-        genome_length = 0
-        for chrom, length in chrom_lengths.items():
-            offsets[chrom] = genome_length
-            genome_length += length
-        return offsets, genome_length
-    
-    # Creates an array for depth at each BAM position (at a given BQ threshold and within a given BED)
-    def depth_array_BQ_BED(array_name, bam_path, chrom_lengths, BQ_threshold, BED_file, threads):
-
-        print(f"[INFO] Started creating {array_name} array for {bam_path}")
-        
-        # Get chromosome offsets to caclulate array indices
-        offsets, genome_length = get_chrom_offsets(chrom_lengths)
-
-        # Set coverage to 0 for all positions
-        depth_array = np.zeros(genome_length, dtype=int)
-
-        cmd = [
-        "samtools", "depth",
-        "--threads", str(threads),
-        "-J",
-        "-s",
-        "--min-BQ", str(BQ_threshold), # Only bases with BQ >= threshold count towards depth
-        "-b", str(BED_file), # Only bases within BED regions count towards depth
-        bam_path
-        ]
-
-        with subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        ) as proc:
-
-            for line in proc.stdout:
-                chrom, pos_str, depth_str = line.split()
-                pos = int(pos_str) - 1 # Convert position to 0-based
-                depth = int(depth_str)
-                genome_index = offsets[chrom] + pos
-
-                # Add depth value to array
-                depth_array[genome_index] = depth
-
-        print(f"[INFO] Finished creating {array_name} array for {bam_path}")
-
-        return depth_array
-    
+    # Helper functions    
     # Calculates the percentage of a BED file covered at each depth threshold
     def pct_bed_coverage_at_depth_threshold(depth_array, bed_length, thresholds):
 
@@ -144,7 +86,7 @@ def main(args):
     chrom_lengths = get_chrom_lengths(ref_fai_path)
 
     # Create depth array
-    ex_depth_high_qual_unmasked = depth_array_BQ_BED("ex_depth_high_qual_unmasked", ex_dsc_bam_path, chrom_lengths, EX_BQ_THRESHOLD, include_bed_path, THREADS)
+    ex_depth_high_qual_unmasked = depth_array_BQ_bed(ex_dsc_bam_path, chrom_lengths, EX_BQ_THRESHOLD, include_bed_path, THREADS)
 
     # Define depth thresholds
     depth_thresholds = [1, 2, 4, 6, 8, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100]

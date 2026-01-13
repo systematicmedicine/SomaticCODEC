@@ -1,5 +1,5 @@
 """
---- fastq_utils.py ---
+--- fastq_helpers.py ---
 
 Functions for obtaining data from FASTQ files.
 

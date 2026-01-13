@@ -36,12 +36,15 @@ from cyvcf2 import VCF
 from pyfaidx import Fasta
 from collections import Counter
 from Bio.Seq import Seq
+from Bio import SeqIO
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 from pypdf import PdfReader, PdfWriter
 import argparse
 import subprocess
+from helpers.fai_helpers import get_chrom_lengths, get_chrom_offsets
+from helpers.bam_helpers import depth_array_BQ_bed
 
 # ---------------------------------------------------------------------
 # Functions
@@ -141,20 +144,20 @@ def get_variant_call_eligible_sequence(ref_fasta, include_bed, output_fasta):
 
     subprocess.run(cmd, check=True)
 
-def get_sequence_trinuc_proportions(sequence_fasta, ref_genome_length, threads):
-    """Extract trinucleotide proportions from a genomic sequence"""
+def get_genome_trinuc_proportions(ref_fasta, ref_genome_length, threads):
+    """Extract trinucleotide proportions from a reference genome sequence"""
     counts = Counter()
     hash_size = int(ref_genome_length) * 2
 
     # Count trinucleotides in sequence
-    trinuc_counts_jf_file = sequence_fasta + ".jf"
+    trinuc_counts_jf_file = ref_fasta + ".jf"
     subprocess.run([
         "jellyfish", "count",
         "--mer-len", "3",
         "--size", str(hash_size),
         "--threads", str(threads),
         "--output", trinuc_counts_jf_file,
-        sequence_fasta
+        ref_fasta
     ], check=True)
 
     # Dump counts into column format
@@ -178,17 +181,59 @@ def get_sequence_trinuc_proportions(sequence_fasta, ref_genome_length, threads):
     total = sum(counts.values())
     return {trinuc: count / total for trinuc, count in counts.items()}
 
-def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, mutation_context_counts, contexts):
+def get_sample_trinuc_proportions(depth_array, ref_fasta, include_bed, chrom_lengths):
+    """Extract depth-weighted sample trinucleotide proportions"""
+    counts = Counter()
+
+    # Load chromosome position offsets
+    offsets, _ = get_chrom_offsets(chrom_lengths)
+
+    # Load reference sequences
+    ref_seqs = {r.id: str(r.seq).upper() for r in SeqIO.parse(ref_fasta, "fasta")}
+
+    with open(include_bed) as bed:
+        # Get reference sequence for each BED region
+        for line in bed:
+            if line.startswith("#") or line.strip() == "":
+                continue
+            chrom, start, end = line.strip().split()[:3]
+            start = int(start)
+            end = int(end)
+            seq = ref_seqs[chrom][start:end]
+
+            # Identify trinucleotides with 3bp sliding window
+            for i in range(1, len(seq)-1):
+                trinuc = seq[i-1:i+2]
+                center = trinuc[1]
+                # Convert to pyrimidine-centered
+                if center in "AG":
+                    trinuc = str(Seq(trinuc).reverse_complement())
+                    center = trinuc[1]
+
+                # Get depth at central base
+                central_pos = start + i
+                genome_index = offsets[chrom] + central_pos
+                depth_at_pos = depth_array[genome_index]
+
+                # Get depth-weighted trinucleotide count
+                counts[trinuc] += depth_at_pos
+
+    # Convert counts to proportions
+    total = sum(counts.values())
+    proportions = {trinuc: count/total for trinuc, count in counts.items()}
+    return proportions
+
+def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, sample_trinuc_proportions, mutation_context_counts):
     """Normalise mutation trinucleotide context counts based on trinucleotide proportions in variant call eligible regions"""
     normalized_counts = {}
 
     for context, count in mutation_context_counts.items():
         trinuc = context.split(">")[0] # Extract trinucleotide
-        if variant_call_eligible_trinuc_proportions.get(trinuc, 0) > 0:
+        if sample_trinuc_proportions.get(trinuc, 0) > 0:
             # Calculate correction factor
             correction_factor = (
                 ref_genome_trinuc_proportions.get(trinuc, 0)
-                / variant_call_eligible_trinuc_proportions[trinuc]
+                / sample_trinuc_proportions[trinuc]
             )
         else:
             correction_factor = 0
@@ -266,9 +311,9 @@ def main(args):
     ref_fai_path = args.ref_fai_path
     include_bed_path = args.include_bed_path
     ref_contexts_path = args.ref_contexts_path
+    ex_dsc_bam_path = args.ex_dsc_bam
 
     # Define outputs
-    eligible_regions_fasta = args.eligible_regions_fasta
     output_sample_csv_raw = args.sample_csv_raw
     output_sample_csv_normalised = args.sample_csv_normalised
     output_similarity_csv_raw = args.similarities_csv_raw
@@ -278,7 +323,8 @@ def main(args):
 
     # Define params
     SAMPLE_NAME = args.sample
-    THREADS = args.threads
+    THREADS = int(args.threads)
+    EX_BQ_THRESHOLD = int(args.ex_bq_threshold)
 
     # Define contexts
     CONTEXTS = get_contexts()
@@ -312,13 +358,15 @@ def main(args):
     sample_counts_raw = get_sample_trinuc_context_counts(vcf_path, ref_genome)
 
     # Get trinucleotide proportions in whole genome and in variant call eligible regions
-    ref_genome_trinuc_proportions = get_sequence_trinuc_proportions(ref_fasta_path, genome_length, THREADS)
+    ref_genome_trinuc_proportions = get_genome_trinuc_proportions(ref_fasta_path, genome_length, THREADS)
 
-    get_variant_call_eligible_sequence(ref_fasta_path, include_bed_path, eligible_regions_fasta)
-    variant_call_eligible_trinuc_proportions = get_sequence_trinuc_proportions(eligible_regions_fasta, genome_length, THREADS)
+    #get_variant_call_eligible_sequence(ref_fasta_path, include_bed_path, eligible_regions_fasta)
+    chrom_lengths = get_chrom_lengths(ref_fai_path)
+    sample_depth_array = depth_array_BQ_bed(ex_dsc_bam_path, chrom_lengths, EX_BQ_THRESHOLD, include_bed_path, THREADS)
+    sample_trinuc_proportions = get_sample_trinuc_proportions(sample_depth_array, ref_fasta_path, include_bed_path, chrom_lengths)
 
     # Normalise trinucleotide mutation counts
-    sample_counts_normalised = normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, sample_counts_raw, CONTEXTS)
+    sample_counts_normalised = normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, sample_trinuc_proportions, sample_counts_raw)
 
     # Compute sample context proportions and output to CSV
     sample_proportions_raw = get_sample_trinuc_context_proportions(sample_counts_raw, CONTEXTS)
@@ -350,6 +398,7 @@ if __name__ == "__main__":
     parser.add_argument("--ref_fai_path", required=True)
     parser.add_argument("--include_bed_path", required=True)
     parser.add_argument("--ref_contexts_path", required=True)
+    parser.add_argument("--ex_dsc_bam", required=True)
     parser.add_argument("--eligible_regions_fasta", required=True)
     parser.add_argument("--sample_csv_raw", required=True)
     parser.add_argument("--sample_csv_normalised", required=True)
@@ -358,6 +407,7 @@ if __name__ == "__main__":
     parser.add_argument("--plot_pdf_raw", required=True)
     parser.add_argument("--plot_pdf_normalised", required=True)
     parser.add_argument("--sample", required=True)
+    parser.add_argument("--ex_bq_threshold", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
     main(args=args)
