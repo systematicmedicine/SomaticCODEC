@@ -20,6 +20,8 @@ rule ex_trinucleotide_context_metrics:
         "logs/{ex_sample}/ex_trinuc_context.log"
     benchmark:
         "logs/{ex_sample}/ex_trinuc_context.benchmark.txt"
+    threads:
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
