@@ -10,10 +10,8 @@ rule ex_trinucleotide_context_metrics:
         ref_fai_path = config["sci_params"]["global"]["reference_genome"] + ".fai",
         ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"]
     output:
-        sample_csv_raw = "results/{ex_sample}/{ex_sample}_trinuc_context_raw.csv",
-        sample_csv_normalised = "results/{ex_sample}/{ex_sample}_trinuc_context_normalised.csv",
-        similarities_csv_raw = "results/{ex_sample}/{ex_sample}_trinuc_similarities_raw.csv",
-        similarities_csv_normalised = "results/{ex_sample}/{ex_sample}_trinuc_similarities_normalised.csv",
+        proportions_csv = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv",
+        similarities_csv = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
         plot_pdf_raw = "results/{ex_sample}/{ex_sample}_trinuc_plots_raw.pdf",
         plot_pdf_normalised = "results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf"
     params:
@@ -37,10 +35,8 @@ rule ex_trinucleotide_context_metrics:
             --ref_fasta_path {input.ref_fasta_path} \
             --ref_fai_path {input.ref_fai_path} \
             --ref_contexts_path {input.ref_contexts_path} \
-            --sample_csv_raw {output.sample_csv_raw} \
-            --sample_csv_normalised {output.sample_csv_normalised} \
-            --similarities_csv_raw {output.similarities_csv_raw} \
-            --similarities_csv_normalised {output.similarities_csv_normalised} \
+            --proportions_csv {output.proportions_csv} \
+            --similarities_csv {output.similarities_csv} \
             --plot_pdf_raw {output.plot_pdf_raw} \
             --plot_pdf_normalised {output.plot_pdf_normalised} \
             --sample {params.sample} \
