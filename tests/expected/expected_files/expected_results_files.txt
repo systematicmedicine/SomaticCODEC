@@ -1,8 +1,9 @@
 results/{ex_sample}/{ex_sample}_variants.vcf
 results/{ex_sample}/{ex_sample}_somatic_variant_rate.json
-results/{ex_sample}/{ex_sample}_trinuc_context.csv
+results/{ex_sample}/{ex_sample}_trinuc_proportions.csv
 results/{ex_sample}/{ex_sample}_trinuc_similarities.csv
-results/{ex_sample}/{ex_sample}_trinuc_plots.pdf
+results/{ex_sample}/{ex_sample}_trinuc_plots_raw.pdf
+results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf
 results/{ex_sample}/{ex_sample}_snv_distance.json
 results/{ex_sample}/{ex_sample}_snv_position_metrics.json
 results/{ex_sample}/{ex_sample}_snv_position_plot.pdf

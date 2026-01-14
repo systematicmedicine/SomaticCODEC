@@ -35,8 +35,8 @@ import numpy as np
 def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_fasta_path, ref_fai_path, ref_contexts_path, expected_props_csv, expected_similarities_csv):
   
   # Define tmp output paths
-  proportions_csv = "trinuc_proportions.csv"
-  similarities_csv = "trinuc_similarities.csv"
+  proportions_csv = tmp_path / "trinuc_proportions.csv"
+  similarities_csv = tmp_path / "trinuc_similarities.csv"
   plot_pdf_raw = tmp_path / "trinuc_plots_raw.pdf"
   plot_pdf_normalised = tmp_path / "trinuc_plots_normalised.pdf"
   log = tmp_path / "ex_trinucleotide_context_metrics.log"
