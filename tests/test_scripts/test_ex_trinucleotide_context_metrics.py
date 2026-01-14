@@ -22,17 +22,16 @@ from collections import Counter
 import numpy as np
 
 # Integration test - Tests that output CSVs with the correct columns are created from input files
-@pytest.mark.parametrize("vcf_path, vcf_all_path, ref_fasta_path, ref_fai_path, ref_contexts_path, expected_props_csv, expected_similarities_csv", [
+@pytest.mark.parametrize("vcf_path, vcf_all_path, ref_fasta_path, ref_contexts_path, expected_props_csv, expected_similarities_csv", [
     # Variant call eligible regions contain only one trinucleotide
     ("tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_variants.vcf",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_all_positions.vcf",
      "tests/data/lightweight_test_run/GRCh38_Chr21_plus_stubs.fa",
-     "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/GRCh38_Chr21_plus_stubs.fa.fai",
      "tests/data/lightweight_test_run/2025-09-30_trinucleotide_contexts.csv",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_props.csv",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_similarities.csv")
 ])
-def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_fasta_path, ref_fai_path, ref_contexts_path, expected_props_csv, expected_similarities_csv):
+def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_fasta_path, ref_contexts_path, expected_props_csv, expected_similarities_csv):
   
   # Define tmp output paths
   proportions_csv = tmp_path / "trinuc_proportions.csv"
@@ -51,7 +50,6 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_
         vcf_path = str(vcf_path),
         vcf_all_path = str(vcf_all_path),
         ref_fasta_path = str(ref_fasta_path),
-        ref_fai_path = str(ref_fai_path),
         ref_contexts_path = str(ref_contexts_path),
         proportions_csv = str(proportions_csv),
         similarities_csv = str(similarities_csv),
@@ -92,7 +90,6 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_
 def test_get_genome_trinuc_counts_props(tmp_path):
     # Define inputs
     ref_fasta_path = "tests/data/test_ex_trinucleotide_context_metrics/test_get_genome_trinuc_counts_props/ref.fa"
-    genome_length = 1e6
     expected_counts_props = "tests/data/test_ex_trinucleotide_context_metrics/test_get_genome_trinuc_counts_props/expected_counts_props.csv"
     THREADS = 1
     CONTEXTS = tcm.get_contexts()
@@ -101,7 +98,7 @@ def test_get_genome_trinuc_counts_props(tmp_path):
     output_counts_proportions_csv = tmp_path / "counts_proportions.csv"
 
     # Run function with test data
-    ref_trinuc_counts, ref_trinuc_proportions = tcm.get_genome_trinuc_counts_props(ref_fasta_path, genome_length, THREADS)
+    ref_trinuc_counts, ref_trinuc_proportions = tcm.get_genome_trinuc_counts_props(ref_fasta_path, THREADS)
 
     # Collate output data
     counts_proportions_rows = []

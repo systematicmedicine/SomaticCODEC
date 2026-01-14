@@ -55,17 +55,16 @@ def get_contexts():
         for right in "ACGT"
     ]
 
-def get_genome_trinuc_counts_props(ref_fasta, ref_genome_length, threads):
+def get_genome_trinuc_counts_props(ref_fasta, threads):
     """Extract trinucleotide proportions from a reference genome sequence"""
     counts = Counter()
-    hash_size = int(ref_genome_length) * 2
 
     # Count trinucleotides in sequence
     trinuc_counts_jf_file = ref_fasta + ".jf"
     subprocess.run([
         "jellyfish", "count",
-        "--mer-len", "3",
-        "--size", str(hash_size),
+        "--mer-len", "3", # Trinucleotides = 3-mers
+        "--size", "100", # Possible 3-mers = 64
         "--threads", str(threads),
         "--output", trinuc_counts_jf_file,
         ref_fasta
@@ -292,7 +291,6 @@ def main(args):
     # Define inputs
     vcf_path = args.vcf_path
     ref_fasta_path = args.ref_fasta_path
-    ref_fai_path = args.ref_fai_path
     ref_contexts_path = args.ref_contexts_path
     vcf_all_path = args.vcf_all_path
 
@@ -329,13 +327,8 @@ def main(args):
     # Load reference genome
     ref_genome = Fasta(ref_fasta_path, rebuild=False)
 
-    # Calculate ref genome length
-    fai_df = pd.read_csv(ref_fai_path, sep="\t", header=None)
-    fai_df.columns = ["chrom", "length", "offset", "line_bases", "line_width"]
-    genome_length = fai_df["length"].sum()
-
     # Get trinucleotide counts and proportions in whole genome
-    ref_genome_trinuc_counts, ref_genome_trinuc_proportions = get_genome_trinuc_counts_props(ref_fasta_path, genome_length, THREADS)
+    ref_genome_trinuc_counts, ref_genome_trinuc_proportions = get_genome_trinuc_counts_props(ref_fasta_path, THREADS)
 
     # Get trinucleotide counts and proportions in variant call eligible regions (weighted by depth)
     variant_call_eligible_trinuc_counts, variant_call_eligible_trinuc_proportions = get_variant_call_eligible_trinuc_counts_props(ref_genome, vcf_all_path)
@@ -411,7 +404,6 @@ if __name__ == "__main__":
     parser.add_argument("--vcf_path", required=True)
     parser.add_argument("--vcf_all_path", required=True)
     parser.add_argument("--ref_fasta_path", required=True)
-    parser.add_argument("--ref_fai_path", required=True)
     parser.add_argument("--ref_contexts_path", required=True)
     parser.add_argument("--proportions_csv", required=True)
     parser.add_argument("--similarities_csv", required=True)
