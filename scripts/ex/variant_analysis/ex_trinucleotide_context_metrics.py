@@ -170,7 +170,7 @@ def get_sample_trinuc_context_counts(vcf_path, ref_genome):
 
 def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, mutation_context_counts):
     """Normalise mutation trinucleotide context counts based on trinucleotide proportions in variant call eligible regions"""
-    normalized_counts = {}
+    normalised_counts = {}
 
     for context, count in mutation_context_counts.items():
         trinuc = context.split(">")[0] # Extract trinucleotide
@@ -183,9 +183,9 @@ def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, varian
         else:
             correction_factor = 0
 
-        normalized_counts[context] = count * correction_factor
+        normalised_counts[context] = count * correction_factor
 
-    return normalized_counts
+    return normalised_counts
 
 def get_sample_trinuc_context_proportions(sample_context_counts, contexts):
     """Calculate trinucleotide context proportions from count data"""
