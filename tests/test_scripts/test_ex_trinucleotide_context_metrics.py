@@ -18,8 +18,10 @@ from pathlib import Path
 from unittest.mock import patch
 import pandas as pd
 from pyfaidx import Fasta
+from collections import Counter
+import numpy as np
 
-# Tests that output CSVs with the correct structure are created
+# Integration test - Tests that output CSVs with the correct columns are created from input files
 @pytest.mark.parametrize("vcf_path, vcf_all_path, ref_fasta_path, ref_fai_path, ref_contexts_path, expected_props_csv, expected_similarities_csv", [
     # Variant call eligible regions contain only one trinucleotide
     ("tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_variants.vcf",
@@ -241,4 +243,86 @@ def test_get_sample_trinuc_context_counts(tmp_path):
         atol=1e-8
     )
 
-    
+# Tests that the function normalise_sample_trinuc_context_counts returns the expected output
+def test_normalise_sample_trinuc_context_counts():
+    # Define inputs
+    ref_genome_trinuc_proportions = {
+        "ACA": 0.1,
+        "ACG": 0.4,
+        "TCA": 0.5
+    }
+    variant_call_eligible_trinuc_proportions = {
+        "ACA": 0.2,
+        "ACG": 0.4,
+        "TCA": 0.4
+    }
+    sample_counts_raw = Counter({
+        "ACA>T": 10,
+        "ACG>A": 10,
+        "TCA>G": 10
+    })
+
+    # Define expected output
+    expected_sample_counts_norm = {
+        "ACA>T": 5,
+        "ACG>A": 10,
+        "TCA>G": 12.5
+    }
+
+    # Run function with test data
+    sample_counts_norm = tcm.normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, variant_call_eligible_trinuc_proportions, sample_counts_raw)
+
+    # Assert that output data matches expected data
+    assert sample_counts_norm == expected_sample_counts_norm, "Output data does not match expected data"
+
+# Tests that the function get_sample_trinuc_context_proportions returns the expected output
+def test_get_sample_trinuc_context_proportions():
+    # Define inputs
+    sample_context_counts = {
+        "ACA>T": 2,
+        "ACG>A": 3,
+        "TCA>G": 5
+    }
+    CONTEXTS = tcm.get_contexts()
+
+    # Define expected output data
+    expected_context_props = pd.read_csv("tests/data/test_ex_trinucleotide_context_metrics/test_get_sample_trinuc_context_proportions/expected_context_props.csv")
+
+    # Run function with test data
+    context_props = tcm.get_sample_trinuc_context_proportions(sample_context_counts, CONTEXTS)
+
+    # Assert that output data matches expected data
+    pd.testing.assert_series_equal(
+        context_props["Proportion"],
+        expected_context_props["Proportion"],
+        check_names=False,
+        atol=1e-8
+    )
+
+# Tests that the function calculate_cosine_similarities correctly calculates cosine similarity
+@pytest.mark.parametrize("sample_proportions_csv, expected_cosine_sim", [
+    # Sample proportions the same as reference context proportions
+    ("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/sample_proportions_matched.csv",
+     1),
+     # Sample proportions opposite to reference context proportions
+    ("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/sample_proportions_opposite.csv",
+     0),
+     # Sample proportions similar but not the same as reference context proportions
+    ("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/sample_proportions_similar.csv",
+     0.980581)
+])
+def test_calculate_cosine_similarities(tmp_path, sample_proportions_csv, expected_cosine_sim):
+    # Define inputs
+    ref_contexts = pd.read_csv("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/ref_contexts.csv")
+    profiles = ref_contexts["Profile"].unique()
+    CONTEXTS = ["ACA>A", "ACC>A", "ACG>A", "ACT>A"]
+    sample_proportions_df = pd.read_csv(sample_proportions_csv)
+
+    # Run function with test data
+    cosine_similarities, _ = tcm.calculate_cosine_similarities(sample_proportions_df, profiles, ref_contexts, CONTEXTS, "norm")
+
+    calculated_cosine_sim = cosine_similarities["cosine_sim_norm"][0]
+
+    # Assert that the correct cosine similarity is calculated
+    assert np.isclose(calculated_cosine_sim, expected_cosine_sim, rtol=0.001), \
+    f"Calculated cosine similarity {calculated_cosine_sim} does not match expected {expected_cosine_sim}"
