@@ -59,12 +59,12 @@ def get_genome_trinuc_counts_props(ref_fasta, threads):
     """Extract trinucleotide proportions from a reference genome sequence"""
     counts = Counter()
 
-    # Get count of each unique trinucleotide (3-mer) in reference sequence
+    # Get count of each unique trinucleotide (trimer) in reference sequence
     trinuc_counts_jf_file = ref_fasta + ".jf"
     subprocess.run([
         "jellyfish", "count",
-        "--mer-len", "3", # Trinucleotides = 3-mers
-        "--size", "100", # Possible 3-mers = 64
+        "--mer-len", "3", # Trinucleotides = trimers
+        "--size", "100", # Possible trimers = 64, 100 slots provided for overhead
         "--threads", str(threads),
         "--output", trinuc_counts_jf_file,
         ref_fasta
@@ -194,7 +194,7 @@ def get_sample_trinuc_context_proportions(sample_context_counts, contexts):
     total = sum(sample_context_counts.get(c, 0) for c in contexts)
 
     proportions = [
-        round(sample_context_counts.get(c, 0) / total, ndigits = 2) if total > 0 else 0.0
+        sample_context_counts.get(c, 0) / total if total > 0 else 0.0
         for c in contexts
     ]
 
@@ -220,7 +220,7 @@ def calculate_cosine_similarities(sample_proportions_df, profiles, ref_df, conte
         similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
         similarities.append({
             "Profile": profile,
-            f"cosine_sim_{raw_norm}": round(similarity, ndigits = 4)
+            f"cosine_sim_{raw_norm}": similarity
         })
 
     similarity_df = pd.DataFrame(similarities).sort_values(f"cosine_sim_{raw_norm}", ascending=False)
@@ -355,33 +355,33 @@ def main(args):
         trinuc = context.split(">")[0]
 
         genome_count = ref_genome_trinuc_counts.get(trinuc, 0)
-        genome_prop = round(ref_genome_trinuc_proportions.get(trinuc, 0), ndigits = 2)
+        genome_prop = ref_genome_trinuc_proportions.get(trinuc, 0)
 
         eligible_count = variant_call_eligible_trinuc_counts.get(trinuc, 0)
-        eligible_prop = round(variant_call_eligible_trinuc_proportions.get(trinuc, 0), ndigits = 2)
+        eligible_prop = variant_call_eligible_trinuc_proportions.get(trinuc, 0)
 
         correction_factor = (
             genome_prop / eligible_prop if eligible_prop > 0 else 0
         )
 
         snv_count_raw = sample_counts_raw.get(context, 0)
-        snv_prop_raw = round(snv_count_raw / total_snvs_raw, ndigits = 2) if total_snvs_raw > 0 else 0
+        snv_prop_raw = snv_count_raw / total_snvs_raw if total_snvs_raw > 0 else 0
 
-        snv_count_norm = round(sample_counts_normalised.get(context, 0), ndigits = 2)
-        snv_prop_norm = round(snv_count_norm / total_snvs_norm, ndigits = 2) if total_snvs_norm > 0 else 0
+        snv_count_norm = sample_counts_normalised.get(context, 0)
+        snv_prop_norm = snv_count_norm / total_snvs_norm if total_snvs_norm > 0 else 0
 
         proportions_csv_rows.append({
             "context": context,
             "trinucleotide": trinuc,
             "trinuc_genome_count": genome_count,
-            "trinuc_genome_prop": genome_prop,
+            "trinuc_genome_prop": round(genome_prop, ndigits = 4),
             "trinuc_var_call_eligible_count": eligible_count,
-            "trinuc_var_call_eligible_prop": eligible_prop,
-            "correction_factor": correction_factor,
+            "trinuc_var_call_eligible_prop": round(eligible_prop, ndigits = 4),
+            "correction_factor": round(correction_factor, ndigits = 4),
             "snv_count_raw": snv_count_raw,
-            "snv_prop_raw": snv_prop_raw,
-            "snv_count_norm": snv_count_norm,
-            "snv_prop_norm": snv_prop_norm
+            "snv_prop_raw": round(snv_prop_raw, ndigits = 4),
+            "snv_count_norm": round(snv_count_norm, ndigits = 4),
+            "snv_prop_norm": round(snv_prop_norm, ndigits = 4)
         })
 
     proportions_csv = pd.DataFrame(proportions_csv_rows)
