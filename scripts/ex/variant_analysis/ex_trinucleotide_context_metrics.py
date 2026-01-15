@@ -41,7 +41,6 @@ from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 from pypdf import PdfReader, PdfWriter
 import argparse
-import subprocess
 
 # ---------------------------------------------------------------------
 # Functions
@@ -55,37 +54,13 @@ def get_contexts():
         for right in "ACGT"
     ]
 
-def get_genome_trinuc_counts_props(ref_fasta, threads):
-    """Extract trinucleotide proportions from a reference genome sequence"""
-    counts = Counter()
+def get_genome_trinuc_counts_props(ref_trinuc_counts_path):
+    """Extract trinucleotide proportions from provided reference trinucleotide counts"""
+    # Load reference trinucleotide counts
+    ref_trinuc_counts = pd.read_csv(ref_trinuc_counts_path)
 
-    # Get count of each unique trinucleotide (trimer) in reference sequence
-    trinuc_counts_jf_file = ref_fasta + ".jf"
-    subprocess.run([
-        "jellyfish", "count",
-        "--mer-len", "3", # Trinucleotides = trimers
-        "--size", "100", # Possible trimers = 64, 100 slots provided for overhead
-        "--threads", str(threads),
-        "--output", trinuc_counts_jf_file,
-        ref_fasta
-    ], check=True)
-
-    # Dump counts into column format
-    result = subprocess.run([
-        "jellyfish", 
-        "dump", 
-        "-c", 
-        trinuc_counts_jf_file
-        ], capture_output=True, text=True, check=True)
-    
-    # Collapse context counts to pyrimidine-centred contexts
-    for line in result.stdout.strip().split("\n"):
-        trinuc, count_str = line.strip().split()
-        count = int(count_str)
-        center = trinuc[1]
-        if center in "AG":
-            trinuc = str(Seq(trinuc).reverse_complement())
-        counts[trinuc] += count
+    # Build counter object
+    counts = Counter(dict(zip(ref_trinuc_counts['trinucleotide'], ref_trinuc_counts['trinuc_genome_count'])))
 
     # Convert counts to proportions
     total = sum(counts.values())
@@ -135,7 +110,7 @@ def get_variant_call_eligible_trinuc_counts_props(ref_genome, vcf_all):
 def get_sample_trinuc_context_counts(vcf_path, ref_genome):
     """Extract mutation trinucleotide context counts from a VCF"""
     vcf = VCF(vcf_path)
-    sample_contexts = []
+    context_counts = Counter()
 
     for variant in vcf:
         if not variant.ALT or len(variant.REF) != 1 or len(variant.ALT[0]) != 1:
@@ -145,6 +120,10 @@ def get_sample_trinuc_context_counts(vcf_path, ref_genome):
         pos = variant.POS
         ref_base = variant.REF.upper()
         alt_base = variant.ALT[0].upper()
+        ad = variant.format("AD")
+
+        # Get alt depth for SNV
+        alt_depth = ad[0][1]
 
         # Find reference bases for positions flanking SNV
         try:
@@ -160,13 +139,11 @@ def get_sample_trinuc_context_counts(vcf_path, ref_genome):
                 alt_rc = str(Seq(alt_base).reverse_complement())
                 context = f"{trinuc[0]}{trinuc[1]}{trinuc[2]}>{alt_rc}"
 
-            sample_contexts.append(context)
+            # Increase context count by the number of alt reads
+            context_counts[context] += alt_depth
 
         except (KeyError, IndexError):
             continue
-
-    # Count number of SNVs per context
-    context_counts = Counter(sample_contexts)
 
     return context_counts
 
@@ -293,9 +270,10 @@ def main(args):
 
     # Define inputs
     vcf_path = args.vcf_path
+    vcf_all_path = args.vcf_all_path
     ref_fasta_path = args.ref_fasta_path
     ref_contexts_path = args.ref_contexts_path
-    vcf_all_path = args.vcf_all_path
+    ref_trinuc_counts_path = args.ref_trinuc_counts_path
 
     # Define outputs
     output_proportions_csv = args.proportions_csv
@@ -305,7 +283,6 @@ def main(args):
 
     # Define params
     SAMPLE_NAME = args.sample
-    THREADS = int(args.threads)
 
     # Define contexts
     CONTEXTS = get_contexts()
@@ -331,7 +308,7 @@ def main(args):
     ref_genome = Fasta(ref_fasta_path, rebuild=False)
 
     # Get trinucleotide counts and proportions in whole genome
-    ref_genome_trinuc_counts, ref_genome_trinuc_proportions = get_genome_trinuc_counts_props(ref_fasta_path, THREADS)
+    ref_genome_trinuc_counts, ref_genome_trinuc_proportions = get_genome_trinuc_counts_props(ref_trinuc_counts_path)
 
     # Get trinucleotide counts and proportions in variant call eligible regions (weighted by depth)
     variant_call_eligible_trinuc_counts, variant_call_eligible_trinuc_proportions = get_variant_call_eligible_trinuc_counts_props(ref_genome, vcf_all_path)
@@ -403,11 +380,11 @@ def main(args):
 if __name__ == "__main__":
     # Snakemake parameter injection
     parser = argparse.ArgumentParser()
-    parser.add_argument("--threads", required=True)
     parser.add_argument("--vcf_path", required=True)
     parser.add_argument("--vcf_all_path", required=True)
     parser.add_argument("--ref_fasta_path", required=True)
     parser.add_argument("--ref_contexts_path", required=True)
+    parser.add_argument("--ref_trinuc_counts_path", required=True)
     parser.add_argument("--proportions_csv", required=True)
     parser.add_argument("--similarities_csv", required=True)
     parser.add_argument("--plot_pdf_raw", required=True)
