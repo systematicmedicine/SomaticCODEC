@@ -7,7 +7,8 @@ rule ex_trinucleotide_context_metrics:
         vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
         vcf_all_path = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf",
         ref_fasta_path = config["sci_params"]["global"]["reference_genome"],
-        ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"]
+        ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"],
+        ref_trinuc_counts_path = config["sci_params"]["global"]["reference_genome_trinuc_counts"]
     output:
         proportions_csv = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv",
         similarities_csv = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
@@ -19,8 +20,6 @@ rule ex_trinucleotide_context_metrics:
         "logs/{ex_sample}/ex_trinucleotide_context_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_trinucleotide_context_metrics.benchmark.txt"
-    threads:
-        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
@@ -30,11 +29,11 @@ rule ex_trinucleotide_context_metrics:
         
         # Calculate trinucleotide contexts
         ex_trinucleotide_context_metrics.py \
-            --threads {threads} \
             --vcf_path {input.vcf_path} \
             --vcf_all_path {input.vcf_all_path} \
             --ref_fasta_path {input.ref_fasta_path} \
             --ref_contexts_path {input.ref_contexts_path} \
+            --ref_trinuc_counts_path {input.ref_trinuc_counts_path} \
             --proportions_csv {output.proportions_csv} \
             --similarities_csv {output.similarities_csv} \
             --plot_pdf_raw {output.plot_pdf_raw} \

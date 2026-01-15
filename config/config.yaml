@@ -26,6 +26,7 @@ sci_params:
   global:
     reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
     reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
+    reference_genome_trinuc_counts: tmp/downloads/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv
     known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
     precomputed_masks:
       - "tmp/downloads/GRCh38_alldifficultregions.bed"
