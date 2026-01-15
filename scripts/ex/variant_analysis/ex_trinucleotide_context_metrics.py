@@ -59,7 +59,7 @@ def get_genome_trinuc_counts_props(ref_fasta, threads):
     """Extract trinucleotide proportions from a reference genome sequence"""
     counts = Counter()
 
-    # Count trinucleotides in sequence
+    # Get count of each unique trinucleotide (3-mer) in reference sequence
     trinuc_counts_jf_file = ref_fasta + ".jf"
     subprocess.run([
         "jellyfish", "count",
@@ -78,7 +78,7 @@ def get_genome_trinuc_counts_props(ref_fasta, threads):
         trinuc_counts_jf_file
         ], capture_output=True, text=True, check=True)
     
-    # Collapse context counts to pyrimidine-centred context
+    # Collapse context counts to pyrimidine-centred contexts
     for line in result.stdout.strip().split("\n"):
         trinuc, count_str = line.strip().split()
         count = int(count_str)
@@ -101,7 +101,7 @@ def get_variant_call_eligible_trinuc_counts_props(ref_genome, vcf_all):
     # Process each position that was eligible for variant calling 
     for var in vcf:
         chrom = var.CHROM
-        pos = var.POS - 1  # convert 1-based VCF to 0-based
+        pos = var.POS - 1  # Convert 1-based VCF positions to 0-based
         ref_base = var.REF.upper()
         dp = var.INFO.get("DP", 0)
         
@@ -146,6 +146,7 @@ def get_sample_trinuc_context_counts(vcf_path, ref_genome):
         ref_base = variant.REF.upper()
         alt_base = variant.ALT[0].upper()
 
+        # Find reference bases for positions flanking SNV
         try:
             left = ref_genome[chrom][pos - 2].seq.upper()
             center = ref_base
@@ -154,6 +155,7 @@ def get_sample_trinuc_context_counts(vcf_path, ref_genome):
             if ref_base in ['C', 'T']:
                 context = f"{left}{ref_base}{right}>{alt_base}"
             else:
+                # Convert to pyrimidine-centered
                 trinuc = Seq(left + center + right).reverse_complement()
                 alt_rc = str(Seq(alt_base).reverse_complement())
                 context = f"{trinuc[0]}{trinuc[1]}{trinuc[2]}>{alt_rc}"
@@ -163,6 +165,7 @@ def get_sample_trinuc_context_counts(vcf_path, ref_genome):
         except (KeyError, IndexError):
             continue
 
+    # Count number of SNVs per context
     context_counts = Counter(sample_contexts)
 
     return context_counts
@@ -172,7 +175,7 @@ def normalise_sample_trinuc_context_counts(ref_genome_trinuc_proportions, varian
     normalised_counts = {}
 
     for context, count in mutation_context_counts.items():
-        trinuc = context.split(">")[0] # Extract trinucleotide
+        trinuc = context.split(">")[0] # Extract trinucleotide from full context
         if variant_call_eligible_trinuc_proportions.get(trinuc, 0) > 0:
             # Calculate correction factor
             correction_factor = (
@@ -217,7 +220,7 @@ def calculate_cosine_similarities(sample_proportions_df, profiles, ref_df, conte
         similarity = cosine_similarity_np(np.array(sample_vector), ref_vector)
         similarities.append({
             "Profile": profile,
-            f"cosine_sim_{raw_norm}": similarity
+            f"cosine_sim_{raw_norm}": round(similarity, ndigits = 4)
         })
 
     similarity_df = pd.DataFrame(similarities).sort_values(f"cosine_sim_{raw_norm}", ascending=False)

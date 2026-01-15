@@ -7,7 +7,6 @@ rule ex_trinucleotide_context_metrics:
         vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
         vcf_all_path = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf",
         ref_fasta_path = config["sci_params"]["global"]["reference_genome"],
-        ref_fai_path = config["sci_params"]["global"]["reference_genome"] + ".fai",
         ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"]
     output:
         proportions_csv = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv",
@@ -17,9 +16,9 @@ rule ex_trinucleotide_context_metrics:
     params:
         sample = "{ex_sample}"
     log:
-        "logs/{ex_sample}/ex_trinuc_context.log"
+        "logs/{ex_sample}/ex_trinucleotide_context_metrics.log"
     benchmark:
-        "logs/{ex_sample}/ex_trinuc_context.benchmark.txt"
+        "logs/{ex_sample}/ex_trinucleotide_context_metrics.benchmark.txt"
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:
@@ -35,7 +34,6 @@ rule ex_trinucleotide_context_metrics:
             --vcf_path {input.vcf_path} \
             --vcf_all_path {input.vcf_all_path} \
             --ref_fasta_path {input.ref_fasta_path} \
-            --ref_fai_path {input.ref_fai_path} \
             --ref_contexts_path {input.ref_contexts_path} \
             --proportions_csv {output.proportions_csv} \
             --similarities_csv {output.similarities_csv} \
