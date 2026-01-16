@@ -1,12 +1,11 @@
 #!/usr/bin/env Rscript
-# =============================================================================
-#   ex_snv_position.R
+#
+# --- ex_snv_position.R ---
 #
 #   Create a plot of the positional distribution of SNVs called by the pipeline
 #  
 #   Author: Cameron Fraser
 #
-# ==============================================================================
 
 
 # ------------------------------------------------------------------------------

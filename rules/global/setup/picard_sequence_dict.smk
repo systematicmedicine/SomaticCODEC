@@ -1,4 +1,6 @@
-# Creates reference .dict file
+"""
+Creates reference .dict file
+"""
 
 rule picard_sequence_dict:
     input:

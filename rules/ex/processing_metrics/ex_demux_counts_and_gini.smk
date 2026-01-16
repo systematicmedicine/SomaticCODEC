@@ -10,7 +10,7 @@ rule ex_demux_counts_and_gini:
     output:
         demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
     params:
-        config_json = json.dumps(config)        
+        ex_sample_ids = md.get_ex_sample_ids(config)
     log:
         "logs/{ex_lane}/ex_demux_counts_and_gini.log"
     benchmark:
@@ -26,6 +26,6 @@ rule ex_demux_counts_and_gini:
         ex_demux_counts_and_gini.py \
             --demux_metrics {input.demux_metrics} \
             --demux_gini {output.demux_gini} \
-            --config '{params.config_json}' \
+            --ex_sample_ids {params.ex_sample_ids} \
             --log {log} 2>> {log}
         """

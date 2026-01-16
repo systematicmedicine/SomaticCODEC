@@ -1,12 +1,7 @@
-# ----------------------------------------------------------------------------------------------
-#   RULE generate_include_bed
-#
-#   Generate a BED file of regions eligible for variant calling
-# 
-#   Notes:
-#       - Inverse of combined mask
-# ----------------------------------------------------------------------------------------------
-
+"""
+Generates a BED file of regions eligible for variant calling
+    - Inverse of combined mask
+"""
 import helpers.get_metadata as md
 
 rule generate_include_bed:

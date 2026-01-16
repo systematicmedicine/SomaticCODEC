@@ -11,7 +11,7 @@ import json
 import pytest
 import types
 from scripts.ex.processing_metrics.ex_demux_counts_and_gini import main
-from helpers.get_metadata import load_config
+from helpers.get_metadata import load_config, get_ex_sample_ids
 
 @pytest.mark.parametrize("demux_metrics, expected_gini", [
     ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.txt", 0.0),
@@ -20,15 +20,16 @@ from helpers.get_metadata import load_config
 ])
 def test_gini_coeff_calculation(tmp_path, demux_metrics, expected_gini):
 
-    # Create config JSON for script to use
+    # Load config
     config_yaml = load_config("config/config.yaml")
-    
-    config_json = json.dumps(config_yaml)  
+
+    # Get ex_sample IDs
+    ex_sample_ids = get_ex_sample_ids(config_yaml)  
     
     args = types.SimpleNamespace(
         demux_metrics=demux_metrics,
         demux_gini=str(tmp_path / "demux_gini.json"),
-        config=config_json,
+        ex_sample_ids=ex_sample_ids,
         log=str(tmp_path / "log.log")
     )
     main(args=args)

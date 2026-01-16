@@ -1,12 +1,6 @@
-# ====================================================================================
-# 
-#   create_metrics_report.smk
-#
-#   Generates a pass/fail report for component & system level metrics
-#
-#   Author: Cameron Fraser
-#
-# ====================================================================================
+"""
+Generates a pass/fail report for component & system level metrics
+"""
 
 # Rule depends on output lists defined in pipeline_outputs.smk
 include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")

@@ -29,12 +29,15 @@ tmp/{ms_sample}/{ms_sample}_ms_pileup.bcf
 tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf
 tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed
 tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed
-tmp/{ms_sample}/{ms_sample}_germ_snvs_unformatted.bed
+tmp/{ms_sample}/{ms_sample}_germ_all_unformatted.bed
 tmp/{ms_sample}/{ms_sample}_germ_deletions_unpadded.bed
 tmp/{ms_sample}/{ms_sample}_germ_insertions_unpadded.bed
 tmp/{ms_sample}/{ms_sample}_germ_deletions.bed
 tmp/{ms_sample}/{ms_sample}_germ_insertions.bed
-tmp/{ms_sample}/{ms_sample}_germ_snvs.bed
+tmp/{ms_sample}/{ms_sample}_germ_all.bed
+tmp/{ms_sample}/{ms_sample}_ms_germ_risk_cat_unsorted.bed
+tmp/{ms_sample}/{ms_sample}_ms_germ_risk_cat_unmerged.bed
+tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed
 tmp/{ms_sample}/{ms_sample}_lowdepth.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt
 tmp/{ms_sample}/{ms_sample}_lowdepth.bed

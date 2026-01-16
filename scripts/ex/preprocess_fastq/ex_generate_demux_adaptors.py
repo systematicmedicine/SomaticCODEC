@@ -26,7 +26,7 @@ import helpers.get_metadata as md
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--adapter_fasta_outputs", required=True, nargs="+")
-parser.add_argument("--config", required=True)
+parser.add_argument("--adapter_dict", required=True)
 parser.add_argument("--log", required=True)
 args = parser.parse_args()
 
@@ -35,12 +35,8 @@ sys.stdout = open(args.log, "a")
 sys.stderr = open(args.log, "a")
 print("[INFO] Starting ex_generate_demux_adaptors.py")
 
-# Load config
-config = json.loads(args.config)
-
 # Load nested dictionary of ex adapter sequences
-  # Assumes format: dict[ex_lane][ex_sample or ex_technical_control][region] -> adapter sequence (str)
-adapter_dict = md.get_ex_lane_adapter_dict(config)
+adapter_dict = json.loads(args.adapter_dict)
 
 # Define output paths
 output_paths = args.adapter_fasta_outputs

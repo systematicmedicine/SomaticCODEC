@@ -1,4 +1,6 @@
-# Generates ms insert size metrics
+"""
+Generates ms insert size metrics
+"""
 
 rule ms_insert_metrics:
     input:

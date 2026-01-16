@@ -1,4 +1,6 @@
-# Collates all benchmarks into a single CSV
+"""
+Collates all benchmarks into a single CSV
+"""
 
 rule collate_benchmarks:
     input:

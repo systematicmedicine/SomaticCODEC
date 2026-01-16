@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
---- ex_gnomAD_overlap.py
+--- ex_gnomAD_overlap.py ---
 
 Determines how many called somatic variants are present in dataset of common germline variants
 
@@ -25,7 +25,6 @@ def main(args):
 
     # Inputs
     somatic_vcf = Path(args.somatic_vcf)
-    somatic_all_vcf = Path(args.somatic_all_vcf)
     germline_vcf = Path(args.germline_vcf)
 
     # Outputs
@@ -51,7 +50,7 @@ def main(args):
         )
         total_variants = len(result.stdout.strip().splitlines()) if result.stdout.strip() else 0
 
-    # --- Intersect with germline VCF ---
+    # --- Intersect with gnomAD VCF ---
     germline_matches.parent.mkdir(parents=True, exist_ok=True)
     with open(args.log, "a") as log_file:
         subprocess.run(
@@ -62,7 +61,7 @@ def main(args):
             check=True
         )
 
-    # --- Count number of germline matches ---
+    # --- Count number of gnomAD overlapping SNVs ---
     with open(args.log, "a") as log_file:
         result = subprocess.run(
             ["bcftools", "view", "-H", str(germline_matches)],
@@ -73,32 +72,8 @@ def main(args):
         )
         num_matches = len(result.stdout.strip().splitlines()) if result.stdout.strip() else 0
 
-    # --- Count number of bases assessable for somatic calling ---
-    evaluated_bases = 0
-
-    with open(somatic_all_vcf) as f:
-    # Check through all lines of the complete vcf (variants and no variants) for the following:
-        # Evaluated bases - total bases assessed for variants (ie. denominator)
-        for line in f:
-            if line.startswith("#"):
-                continue
-
-            cols = line.strip().split("\t")
-            assert len(cols) >= 9, f"Malformed line with too few columns:\n{line}"
-
-            sample_fmt = cols[8].split(":")
-            sample_vals = cols[9].split(":")
-            fmt = dict(zip(sample_fmt, sample_vals))
-            dp_fmt = int(fmt.get("DP", 0))
-
-            if dp_fmt > 0:
-                evaluated_bases += 1
-
     # --- Calculate percent gnomAD overlap ---
     percent_gnomAD_overlap = round(100 * num_matches / total_variants, 2) if total_variants > 0 else 0
-
-    # --- Calculate rate of gnomAD overlap ---
-    rate_gnomAD_overlap = round(num_matches / evaluated_bases, 10) if evaluated_bases > 0 else 0
 
     # --- Write metrics JSON ---
     metrics_file.parent.mkdir(parents=True, exist_ok=True)
@@ -107,16 +82,12 @@ def main(args):
             "description": "Number and rate of called somatic variants that overlapp with known germline variants",
             "somatic_vcf": str(somatic_vcf),
             "gnomAD_vcf": str(germline_vcf),
-            "total_evaluated_bases": {"description": "Number of unmasked bases with DP > 0 and BQ > min_base_quality",
-                                      "value": evaluated_bases},
             "total_somatic_variants": {"description": "Number of called somatic variants",
                                       "value": total_variants},
             "total_gnomAD_matches": {"description": "Number of called somatic variants that overlap with gnomAD",
                                       "value": num_matches},
             "percent_gnomAD_overlap": {"description": "Percentage of called somatic variants that overlap with gnomAD",
                                       "value": percent_gnomAD_overlap},
-            "rate_gnomAD_overlap": {"description": "Rate of SNVs that overlap with gnomAD per evalulated base",
-                                      "value": rate_gnomAD_overlap},
         }, f, indent=2)
 
     print(f"[INFO] Completed ex_gnomAD_overlap.py")
@@ -124,7 +95,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--somatic_vcf", required=True)
-    parser.add_argument("--somatic_all_vcf", required=True)
     parser.add_argument("--germline_vcf", required=True)
     parser.add_argument("--intermediate_somatic_bgz", required=True)
     parser.add_argument("--intermediate_somatic_tbi", required=True)

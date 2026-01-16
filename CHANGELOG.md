@@ -11,6 +11,36 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [3.0.0] - 2026-01-12
+
+### Added
+
+- Added depth filter to ms_germline_risk.smk to mask low depth sites missed by samtools depth (#271)
+- Added additional unit tests for ms_germline_risk.smk and ms_germline_mask.smk (#280 and 282)
+- Added sort and merge steps to ms_germline_mask.smk to reduce BED size (#283)
+- Added Sankey plot to ex_dsc_coverage_metrics.py (#284)
+- Added ex_coverage_overlap_metrics.py and test (#284)
+- Added ex_depth_metrics.py and test (#284)
+
+### Changed
+
+- Modified ms_germline_mask.smk to include low depth, REF only records in germline risk BED (#276)
+- Moved combination of germline risk masks from combine_masks.smk to ms_germline_mask.smk (#280)
+- Increased non-negotiable upper threshold for cross_reactivity_gnomAD_overlap system metric from 5 to 10 (#270)
+- Raised nn lower threshold for uniformity_SNV_spacing from 100 to 120 (#278)
+- Increased non-negotiable upper threshold for uniformity_SNV_position system metric from 15 to 20 (#278)
+- Updated various component metric thresholds based on current data percentiles (#278)
+- Added missing docstrings/comments and standardised style (#281)
+- Removed hardcoded output paths in fastqc_summary_metrics.py, now passed to script by rules (#281)
+- Passed individual parameters to ex_generate_demux_adaptors.py and ex_demux_counts_and_gini.py rather than all of config (#281)
+- Moved overlap and depth metrics from ex_dsc_coverage_metrics.py into new scripts (#284)
+- Rewrote ex_dsc_coverage_metrics.py to reduce memory usage (#284)
+
+### Removed
+
+- Removed gnomAD overlap rate calculation from ex_gnomAD_overlap.py (#275)
+- Removed unused dependency gatk4 from environment.yml (#281)
+
 ## [2.2.0] - 2025-11-28
 
 ### Fixed
