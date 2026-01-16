@@ -6,8 +6,8 @@ rule ex_fastqc_raw_summary_metrics:
         fastqc_files = ["metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
         "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"]
     output:
-        ex_lane_raw_summary_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json",
-        ex_lane_raw_summary_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json"
+        json_files = ["metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json",
+        "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json"]
     params:
         sample = "{ex_lane}"
     log:
@@ -24,6 +24,7 @@ rule ex_fastqc_raw_summary_metrics:
         # Calculate fastqc summary metrics
         fastqc_summary_metrics.py \
             --fastqc_files {input.fastqc_files} \
+            --json_files {output.json_files} \
             --sample {params.sample} \
             --log {log} 2>> {log}
         """

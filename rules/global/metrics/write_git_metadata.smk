@@ -1,4 +1,6 @@
-# Write git metadata to file for version tracking
+"""
+Writes git metadata to file for version tracking
+"""
 
 rule write_git_metadata:
     output:

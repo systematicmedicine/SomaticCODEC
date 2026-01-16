@@ -1,4 +1,6 @@
-# Generates ms duplication metrics
+"""
+Generates ms duplication metrics
+"""
 
 rule ms_duplication_metrics:
     input:

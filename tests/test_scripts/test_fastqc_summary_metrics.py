@@ -42,14 +42,17 @@ def test_fastqc_summary_metrics(tmp_path, fastqc_file, expected_metrics):
     tmp_fastqc_path = sample_dir / "fastqc_data.txt"
     shutil.copy(fastqc_file, tmp_fastqc_path)
 
+    output_json_path = sample_dir / "fastqc_data_summary.json"
+
     args = types.SimpleNamespace(
         fastqc_files=[tmp_fastqc_path],
+        json_files=[output_json_path],
         sample="TestSample",
         log=str("log.txt")
     )
     main(args=args)
 
-    output_json_path = sample_dir / "fastqc_data_summary.json"
+    
 
     with open(output_json_path) as f:
         data = json.load(f)

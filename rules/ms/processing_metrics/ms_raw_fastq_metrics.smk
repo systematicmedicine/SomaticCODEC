@@ -1,14 +1,6 @@
-# ====================================================================================
-# 
-#   ms_raw_fastq_metrics.smk
-#
-#   Generates a fastqc report for demuxed ms FASTQs
-#
-#   Authors: 
-#        - Joshua Johnstone
-#        - Cameron Fraser
-#
-# ====================================================================================
+"""
+Generates a fastqc report for demuxed MS FASTQs
+"""
 
 # Rule depends on output lists defined in pipeline_outputs.smk
 include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")

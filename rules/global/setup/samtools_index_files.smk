@@ -1,4 +1,6 @@
-# Creates reference .fai file
+"""
+Creates reference .fai file
+"""
 
 rule samtools_index_files:
     input:

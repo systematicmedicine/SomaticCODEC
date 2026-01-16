@@ -1,4 +1,7 @@
-# Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
+"""
+Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
+"""
+
 rule check_included_chromosomes_present:
     input:
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai",

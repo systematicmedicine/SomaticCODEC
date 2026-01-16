@@ -1,4 +1,6 @@
-# Generates metrics for germline risk variants
+"""
+Generates metrics for germline risk variants
+"""
  
 rule ms_germ_risk_variant_metrics:
     input: 

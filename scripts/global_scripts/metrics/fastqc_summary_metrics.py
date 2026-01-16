@@ -46,19 +46,22 @@ def main(args):
             i += 1
         return modules
 
-    # Load sample name
+    # Define sample name
     sample = args.sample
 
-    # Load fastqc file paths
+    # Define input fastqc file paths
     fastqc_file_paths = args.fastqc_files
 
-    # For each fastqc_data file, pull out key metrics and output in json
-    for file_path in fastqc_file_paths:
-            
-        file_path = Path(file_path)
-        output_json = file_path.with_name(file_path.stem + "_summary.json")
+    # Define output json file paths
+    json_file_paths = args.json_files
 
-        modules = parse_fastqc_data(file_path)
+    # For each fastqc_data file, pull out key metrics and output in json
+    for fastqc_file, json_file in zip(fastqc_file_paths, json_file_paths):
+            
+        fastqc_file_path = Path(fastqc_file)
+        json_file_path = Path(json_file)
+
+        modules = parse_fastqc_data(fastqc_file_path)
 
         total_reads = int(modules["Basic Statistics"].set_index("Measure").loc["Total Sequences", "Value"])
 
@@ -99,7 +102,7 @@ def main(args):
 
         ),
         "sample": sample,
-        "fastqc_file": str(file_path),
+        "fastqc_file": str(fastqc_file_path),
         "total_reads": total_reads,
         "per_sequence_quality": per_sequence_quality,
         "per_base_quality": per_base_quality,
@@ -111,7 +114,7 @@ def main(args):
         "per_base_N_content": per_base_N_content
         }
 
-        with open(output_json, 'w') as f:
+        with open(json_file_path, 'w') as f:
             json.dump(result, f, indent=4)
 
     print("[INFO] Completed fastqc_summary_metrics.py")
@@ -119,6 +122,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--fastqc_files", required=True, nargs="+")
+    parser.add_argument("--json_files", required=True, nargs="+")
     parser.add_argument("--sample", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
