@@ -119,7 +119,6 @@ ex_variant_analysis = [
     expand("results/{ex_sample}/{ex_sample}_somatic_variant_rate.json", ex_sample = ex_sample_ids),
     expand("results/{ex_sample}/{ex_sample}_trinuc_proportions.csv", ex_sample = ex_sample_ids),
     expand("results/{ex_sample}/{ex_sample}_trinuc_similarities.csv", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_trinuc_plots_raw.pdf", ex_sample = ex_sample_ids),
     expand("results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf", ex_sample = ex_sample_ids),
     expand("results/{ex_sample}/{ex_sample}_snv_distance.json", ex_sample = ex_sample_ids),
     expand("results/{ex_sample}/{ex_sample}_snv_position_metrics.json", ex_sample = ex_sample_ids),

@@ -2,22 +2,10 @@
 """
 --- ex_trinucleotide_context_metrics.py ---
 
-Calculate trinucleotide context for a sample, and compare to reference
+Calculate normalised trinucleotide context for a sample, and compare to reference
 contexts.
 
-Inputs:
-  - Somatic variant VCF
-  - Reference genome
-  - Reference contexts in long format (Profile, Context, Proportion)
-
-Assumes that contexts are expressed in ATA>G format. Assumes proportions are
-normalised so that they sum to 1 for any sample/reference context. Profile
-referes to the names of the reference contexts.
-
-Outputs:
-  - Trinucleotide context for sample
-  - Consine similaries between sample and reference contexts
-  - Plots comparing sample context to reference contexts
+Designed to be used exclusively with rule "ex_trinucleotide_context_metrics.smk"
 
 Authors:
   - Chat-GPT
@@ -278,7 +266,6 @@ def main(args):
     # Define outputs
     output_proportions_csv = args.proportions_csv
     output_similarities_csv = args.similarities_csv
-    output_plot_pdf_raw = args.plot_pdf_raw
     output_plot_pdf_normalised = args.plot_pdf_normalised
 
     # Define params
@@ -372,7 +359,6 @@ def main(args):
     similarity_df.to_csv(output_similarities_csv, index=False)
 
     # Generate comparison plots
-    generate_comparison_plots(similarity_dict_raw, ref_df, sample_proportions_raw, SAMPLE_NAME, output_plot_pdf_raw, CONTEXTS)
     generate_comparison_plots(similarity_dict_normalised, ref_df, sample_proportions_normalised, SAMPLE_NAME, output_plot_pdf_normalised, CONTEXTS)
 
     print("[INFO] Finished ex_trinucleotide_context_metrics.py")
@@ -387,7 +373,6 @@ if __name__ == "__main__":
     parser.add_argument("--ref_trinuc_counts_path", required=True)
     parser.add_argument("--proportions_csv", required=True)
     parser.add_argument("--similarities_csv", required=True)
-    parser.add_argument("--plot_pdf_raw", required=True)
     parser.add_argument("--plot_pdf_normalised", required=True)
     parser.add_argument("--sample", required=True)
     parser.add_argument("--log", required=True)
