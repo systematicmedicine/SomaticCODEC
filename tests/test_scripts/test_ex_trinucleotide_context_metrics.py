@@ -71,11 +71,6 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_
   if fai_path.exists():
       fai_path.unlink()
 
-  # Clean up generated .jf file
-  jf_path = Path(ref_fasta_path).with_suffix(Path(ref_fasta_path).suffix + ".jf")
-  if jf_path.exists():
-      jf_path.unlink()
-
   # --- Assertions ---
   # Ensure CSV schema match expected
   props_df = pd.read_csv(proportions_csv)
