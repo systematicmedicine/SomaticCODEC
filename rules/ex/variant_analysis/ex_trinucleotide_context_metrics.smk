@@ -12,7 +12,6 @@ rule ex_trinucleotide_context_metrics:
     output:
         proportions_csv = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv",
         similarities_csv = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
-        plot_pdf_raw = "results/{ex_sample}/{ex_sample}_trinuc_plots_raw.pdf",
         plot_pdf_normalised = "results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf"
     params:
         sample = "{ex_sample}"
@@ -36,7 +35,6 @@ rule ex_trinucleotide_context_metrics:
             --ref_trinuc_counts_path {input.ref_trinuc_counts_path} \
             --proportions_csv {output.proportions_csv} \
             --similarities_csv {output.similarities_csv} \
-            --plot_pdf_raw {output.plot_pdf_raw} \
             --plot_pdf_normalised {output.plot_pdf_normalised} \
             --sample {params.sample} \
             --log {log} 2>> {log}
