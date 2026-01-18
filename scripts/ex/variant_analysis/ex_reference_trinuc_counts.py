@@ -61,7 +61,7 @@ def main(args):
             bases_processed += 1
             if bases_processed >= progress_step:
                 time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print(f"[{time_now}] [INFO] Processed {bases_processed / 1e6} million bases")
+                print(f"[{time_now}] [INFO] Processed {bases_processed / 1e6} million bases", flush = True)
                 progress_step += 10e6
 
     # Output counts as CSV
@@ -78,8 +78,8 @@ def main(args):
 if __name__ == "__main__":
     # Parameter injection
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ref_fasta_path", required=True)
-    parser.add_argument("--output_csv_path", required=True)
+    parser.add_argument("--ref_fasta", required=True)
+    parser.add_argument("--output_csv", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
     main(args=args)
