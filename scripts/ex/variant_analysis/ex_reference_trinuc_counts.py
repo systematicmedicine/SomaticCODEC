@@ -76,12 +76,10 @@ def main(args):
     print("[INFO] Finished ex_reference_trinuc_counts.py")
 
 if __name__ == "__main__":
-    # Snakemake parameter injection
+    # Parameter injection
     parser = argparse.ArgumentParser()
     parser.add_argument("--ref_fasta_path", required=True)
     parser.add_argument("--output_csv_path", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
     main(args=args)
-
-
