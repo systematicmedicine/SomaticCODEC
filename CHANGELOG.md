@@ -15,7 +15,7 @@ Types of changes:
 
 ### Added
 - Added intermediate_files.md with instructions for generating and storing intermediate files (#289)
-- Added additional unit tests for ex_reference_trinuc_counts.py (#)
+- Added additional unit tests for ex_reference_trinuc_counts.py (#290)
 
 ## [3.1.0] - 2026-01-19
 
