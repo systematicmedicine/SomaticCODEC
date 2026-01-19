@@ -40,6 +40,7 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
   - Software testing
 - **Developer guide (internal)**
   - [Versioning](docs/versioning.md)
+  - [Intermediate file generation](docs/intermediate_files.md)
 
 ### Maintainers
 
