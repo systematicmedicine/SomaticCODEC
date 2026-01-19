@@ -20,7 +20,7 @@ rule ex_trinucleotide_context_metrics:
     benchmark:
         "logs/{ex_sample}/ex_trinucleotide_context_metrics.benchmark.txt"
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         # Set memory limit
