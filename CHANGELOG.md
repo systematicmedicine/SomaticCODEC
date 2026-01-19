@@ -14,6 +14,11 @@ Types of changes:
 ## [Unreleased]
 
 ### Added
+- Added intermediate_files.md with instructions for generating and storing intermediate files (#)
+
+## [3.1.0] - 2026-01-19
+
+### Added
 - Added normalisation of trinucleotide counts to ex_trinucleotide_context_metrics.py (#288)
 
 ### Changed
