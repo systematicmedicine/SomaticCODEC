@@ -1,92 +1,92 @@
-Profile,CosineSimilarity
-SBS40a,0.596282841
-Abascal-2021-smooth-muscle,0.537276081
-Abascal-2021-granulocyte,0.5323
-SBS5,0.518813068
-gnomAD-v4-AF-0.1,0.517185566
-SBS92,0.507217777
-Abascal-2021-neurons-cortex,0.502812387
-SBS40c,0.483233485
-Abascal-2021-colon-crypts,0.478573444
-SBS94,0.451123101
-SBS8,0.449046757
-SBS3,0.439113352
-SBS95,0.423082024
-SBS40b,0.422309405
-SBS96,0.405827368
-SBS50,0.400763363
-SBS31,0.399294271
-SBS4,0.392723973
-SBS24,0.387521517
-SBS29,0.385771703
-SBS89,0.383823448
-SBS7b,0.379624645
-SBS52,0.373848595
-SBS30,0.372105988
-SBS51,0.369972059
-SBS23,0.348723231
-SBS42,0.340163594
-SBS18,0.335876956
-SBS7a,0.335707064
-SBS25,0.330033384
-SBS15,0.329866093
-SBS16,0.322404818
-SBS19,0.320558179
-SBS97,0.315789971
-SBS6,0.31567091
-SBS35,0.296924683
-SBS91,0.28714805
-SBS54,0.285948306
-SBS36,0.282064972
-SBS10d,0.268411322
-SBS1,0.26453222
-SBS11,0.263770327
-SBS58,0.263434926
-SBS93,0.262186315
-SBS32,0.242624625
-SBS44,0.240347695
-SBS10c,0.234406126
-SBS26,0.232189829
-SBS9,0.222780617
-SBS39,0.218950315
-SBS12,0.218440916
-SBS99,0.217936272
-SBS7c,0.213673761
-SBS87,0.210077705
-SBS56,0.207835527
-SBS46,0.206577008
-SBS10b,0.202490552
-SBS47,0.201055251
-SBS57,0.200058395
-SBS2,0.197696689
-SBS84,0.196575939
-SBS20,0.190110147
-SBS22b,0.188694675
-SBS37,0.185477493
-SBS88,0.171867983
-SBS98,0.17182891
-SBS45,0.168069348
-SBS41,0.167661798
-SBS85,0.150049885
-SBS14,0.116050413
-SBS22a,0.1129794
-SBS33,0.112606748
-SBS86,0.102016321
-SBS43,0.091472004
-SBS38,0.084670043
-SBS90,0.081898587
-SBS53,0.077433195
-SBS27,0.076490563
-SBS34,0.072503038
-SBS10a,0.068787703
-SBS7d,0.067929556
-SBS59,0.067056492
-SBS13,0.065875026
-SBS48,0.061946893
-SBS49,0.05147828
-SBS21,0.046553729
-SBS55,0.044242661
-SBS28,0.03735799
-SBS60,0.021673682
-SBS17b,0.013073453
-SBS17a,0.007489055
+Profile,cosine_sim_raw,cosine_sim_norm
+SBS19 - Unknown,0.56,0.5332
+SBS5 - Unknown (clock-like signature),0.5215,0.4712
+Abascal-2021-smooth-muscle,0.5037,0.4783
+Abascal-2021-neurons-cortex,0.4973,0.4571
+SBS40c - Unknown,0.4967,0.4386
+Abascal-2021-granulocyte,0.4941,0.4894
+gnomAD-v4-AF-0.1,0.4916,0.4509
+SBS30 - Defective DNA base excision repair due to NTHL1 mutations,0.4843,0.4241
+SBS97 - Unknown,0.4687,0.4207
+SBS92 - Tobacco smoking,0.45,0.3888
+SBS40a - Unknown,0.4359,0.3967
+SBS31 - Platinum chemotherapy treatment,0.4246,0.4074
+SBS54 - Sequencing artefact,0.4035,0.3051
+SBS23 - Unknown,0.3955,0.3855
+SBS32 - Azathioprine treatment,0.3749,0.3396
+SBS3 - Defective homologous recombination DNA damage repair,0.3634,0.327
+SBS44 - Defective DNA mismatch repair,0.3323,0.3067
+SBS7b - Ultraviolet light exposure,0.3229,0.3483
+SBS25 - Chemotherapy treatment,0.3057,0.2874
+SBS89 - Unknown,0.3055,0.2467
+SBS84 - Activity of activation-induced cytidine deaminase,0.2972,0.2933
+SBS40b - Unknown,0.2923,0.2387
+Abascal-2021-colon-crypts,0.2856,0.3222
+SBS7a - Ultraviolet light exposure,0.2767,0.263
+SBS26 - Defective DNA mismatch repair,0.2617,0.2048
+SBS42 - Haloalkane exposure,0.2586,0.2503
+SBS24 - Aflatoxin exposure,0.2526,0.272
+SBS96 - Unknown,0.2519,0.2012
+SBS46 - Sequencing artefact,0.2484,0.2076
+SBS11 - Temozolomide treatment,0.2458,0.2341
+SBS33 - Unknown,0.2441,0.198
+SBS10b - Polymerase epsilon exonuclease domain mutations,0.2372,0.4812
+SBS6 - Defective DNA mismatch repair,0.2368,0.2785
+SBS2 - APOBEC family of cytidine deaminases,0.2359,0.1706
+SBS12 - Unknown,0.232,0.1776
+SBS94 - Unknown,0.2303,0.2244
+SBS39 - Unknown,0.2226,0.194
+SBS99 - Melphalan exposure,0.2212,0.233
+SBS35 - Platinum chemotherapy treatment,0.2175,0.2169
+SBS58 - Sequencing artefact,0.1953,0.158
+SBS95 - Sequencing artefact,0.1946,0.1919
+SBS16 - Unknown,0.1731,0.1413
+SBS29 - Tobacco chewing,0.1702,0.192
+SBS57 - Sequencing artefact,0.1665,0.1456
+SBS20 - Concurrent POLD1 mutations and defective DNA mismatch repair,0.1663,0.15
+SBS86 - Unknown chemotherapy treatment,0.1631,0.1436
+SBS9 - Polymerase eta somatic hypermutation activity,0.1594,0.143
+SBS4 - Tobacco smoking,0.1526,0.1434
+SBS8 - Unknown,0.1433,0.1293
+SBS93 - Unknown,0.1346,0.1298
+SBS15 - Defective DNA mismatch repair,0.133,0.1563
+SBS37 - Unknown,0.1307,0.1089
+SBS21 - Defective DNA mismatch repair,0.1203,0.1061
+SBS87 - Thiopurine chemotherapy treatment,0.1125,0.167
+SBS41 - Unknown,0.1099,0.0974
+SBS18 - Damage by reactive oxygen species,0.1098,0.1149
+SBS10c - Polymerase epsilon exonuclease domain mutations,0.1054,0.1012
+SBS98 - Unknown,0.0992,0.1186
+SBS51 - Sequencing artefact,0.0868,0.0763
+SBS14 - Polymerase epsilon mutation and defective DNA mismatch repair,0.0804,0.0791
+SBS1 - Spontaneous deamination of 5mC,0.0783,0.1341
+SBS59 - Sequencing artefact,0.0739,0.0775
+SBS27 - Sequencing artefact,0.0735,0.068
+SBS50 - Sequencing artefact,0.072,0.0659
+SBS53 - Sequencing artefact,0.0719,0.0724
+SBS22b - Aristolochic acid exposure,0.0688,0.0571
+SBS36 - Defective DNA base excision repair due to MUTYH mutations,0.0627,0.0598
+SBS91 - Unknown,0.0585,0.0482
+SBS7c - Ultraviolet light exposure,0.0572,0.0493
+SBS85 - Indirect effects of activation-induced cytidine deaminase,0.0495,0.0391
+SBS7d - Ultraviolet light exposure,0.0457,0.0382
+SBS88 - Colibactin exposure,0.0401,0.0414
+SBS10d - Polymerase epsilon exonuclease domain mutations,0.035,0.0361
+SBS47 - Sequencing artefact,0.0316,0.0278
+SBS55 - Sequencing artefact,0.0274,0.0281
+SBS38 - Indirect effect of ultraviolet light,0.0257,0.0247
+SBS22a - Aristolochic acid exposure,0.0244,0.02
+SBS56 - Sequencing artefact,0.0195,0.0155
+SBS45 - Sequencing artefact,0.018,0.0174
+SBS52 - Sequencing artefact,0.0166,0.0163
+SBS13 - Activity of APOBEC family of cytidine deaminases,0.0153,0.0137
+SBS28 - Unknown,0.0113,0.0114
+SBS34 - Unknown,0.01,0.0082
+SBS17a - Unknown,0.0078,0.0073
+SBS60 - Sequencing artefact,0.0056,0.0058
+SBS43 - Sequencing artefact,0.0054,0.0052
+SBS90 - Duocarmycin exposure,0.004,0.0034
+SBS10a - Polymerase epsilon exonuclease domain mutations,0.0036,0.0041
+SBS49 - Sequencing artefact,0.0029,0.0033
+SBS48 - Sequencing artefact,0.0014,0.0014
+SBS17b - Unknown,0.0012,0.001

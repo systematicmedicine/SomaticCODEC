@@ -1,5 +1,5 @@
 """
---- bcf_utils.py ---
+--- bcf_helpers.py ---
 
 Functions for obtaining data from BCF files.
 

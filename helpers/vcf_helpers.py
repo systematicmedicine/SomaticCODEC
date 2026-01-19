@@ -1,5 +1,5 @@
 """
---- vcf_utils.py ---
+--- vcf_helpers.py ---
 
 Functions for obtaining data from VCF files.
 

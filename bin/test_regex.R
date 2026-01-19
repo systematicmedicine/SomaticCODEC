@@ -6,7 +6,7 @@
 #
 # Example usage:
 #
-# Rscript utils/test_regex.R "metrics/S004/S004_filter_metrics.txt" "^Pairs that were too short:\\s+\\d+\\s+\\((?P<percent>[\\d.]+)%\\)$"
+# Rscript bin/test_regex.R "metrics/S004/S004_filter_metrics.txt" "^Pairs that were too short:\\s+\\d+\\s+\\((?P<percent>[\\d.]+)%\\)$"
 #
 
 args <- commandArgs(trailingOnly = TRUE)

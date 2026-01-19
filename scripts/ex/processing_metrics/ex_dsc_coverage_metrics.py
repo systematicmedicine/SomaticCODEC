@@ -16,6 +16,7 @@ import numpy as np
 import subprocess
 import json
 import plotly.graph_objects as go
+from helpers.fai_helpers import get_chrom_lengths, get_chrom_offsets
 
 def main(args):
 
@@ -38,25 +39,7 @@ def main(args):
     EX_BQ_THRESHOLD = int(args.ex_bq_threshold)
     THREADS = int(args.threads)
 
-    # Helper functions
-    # Returns a dict with [chrom][length] from FAI file
-    def get_chrom_lengths(fai_path):
-        chrom_lengths = {}
-        with open(fai_path) as f:
-            for line in f:
-                chrom, length = line.strip().split("\t")[:2]
-                chrom_lengths[chrom] = int(length)
-        return chrom_lengths
-
-    # Returns a dict with [chrom][start_index], and total genome length
-    def get_chrom_offsets(chrom_lengths):
-        offsets = {}
-        genome_length = 0
-        for chrom, length in chrom_lengths.items():
-            offsets[chrom] = genome_length
-            genome_length += length
-        return offsets, genome_length
-    
+    # Helper functions    
     # Creates a boolean array for BED file coverage
     def coverage_array_bed(bed_path, chrom_lengths):
 
