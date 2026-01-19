@@ -1,5 +1,5 @@
 """
---- fasta_utils.py ---
+--- fasta_helpers.py ---
 
 Functions for obtaining data from FASTA files.
 

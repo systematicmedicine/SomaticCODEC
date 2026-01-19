@@ -1,5 +1,5 @@
 """
---- bam_utils.py ---
+--- bam_helpers.py ---
 
 Functions for obtaining data from BAM files.
 
@@ -10,6 +10,8 @@ Authors:
 import subprocess
 import pysam
 from helpers.get_metadata import load_config
+from helpers.fai_helpers import get_chrom_offsets
+import numpy as np
 
 # Counts the number of reads in a BAM file
 def count_bam_data_points(path):
@@ -78,3 +80,40 @@ def print_bam_first_n_lines(path, n_lines):
                 break
             lines.append(str(read).rstrip())
     return "\n".join(lines)
+
+# Creates an array for depth at each BAM position (at a given BQ threshold and within a given BED)
+def depth_array_BQ_bed(bam_path, chrom_lengths, BQ_threshold, BED_file, threads):
+    
+    # Get chromosome offsets to caclulate array indices
+    offsets, genome_length = get_chrom_offsets(chrom_lengths)
+
+    # Set coverage to 0 for all positions
+    depth_array = np.zeros(genome_length, dtype=int)
+
+    cmd = [
+    "samtools", "depth",
+    "--threads", str(threads),
+    "-J",
+    "-s",
+    "--min-BQ", str(BQ_threshold), # Only bases with BQ >= threshold count towards depth
+    "-b", str(BED_file), # Only bases within BED regions count towards depth
+    bam_path
+    ]
+
+    with subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    ) as proc:
+
+        for line in proc.stdout:
+            chrom, pos_str, depth_str = line.split()
+            pos = int(pos_str) - 1 # Convert position to 0-based
+            depth = int(depth_str)
+            genome_index = offsets[chrom] + pos
+
+            # Add depth value to array
+            depth_array[genome_index] = depth
+
+    return depth_array
