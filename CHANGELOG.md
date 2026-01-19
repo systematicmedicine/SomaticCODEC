@@ -14,7 +14,7 @@ Types of changes:
 ## [Unreleased]
 
 ### Added
-- Added intermediate_files.md with instructions for generating and storing intermediate files (#)
+- Added intermediate_files.md with instructions for generating and storing intermediate files (#289)
 
 ## [3.1.0] - 2026-01-19
 
