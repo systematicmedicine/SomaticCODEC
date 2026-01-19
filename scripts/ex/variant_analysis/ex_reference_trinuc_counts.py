@@ -6,7 +6,6 @@ Counts trinucleotides in a reference genome FASTA file using a 3bp sliding windo
 
 Authors:
   - Chat-GPT
-  - Cameron Fraser
   - Joshua Johnstone
 """
 

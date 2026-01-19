@@ -5,7 +5,7 @@ GRCh38-gnomad-variants-AF-0.01_10lines.bed,s3://sm-unrestricted-team-a/ref/test_
 GCRh38_repeat_masker_10lines.bed,s3://sm-unrestricted-team-a/ref/test_data/lightweight_test_run/,tmp/downloads,b04d51c45573bb74b0fee51fe452c6d9
 gnomad-chr21-micro.vcf.bgz,s3://sm-unrestricted-team-a/ref/test_data/lightweight_test_run/,tmp/downloads,fe47d5353992fd019966b721cf9fa550
 2025-09-30_trinucleotide_contexts.csv,s3://sm-unrestricted-team-a/ref/trinucleotide-contexts/2025-09-30-combined-contexts/,tmp/downloads,ba87bb2d38f03402f2f6f42fb34b215c
-UCSC-GCRh38-p14-filtered-trinucleotide-counts,s3://sm-unrestricted-team-a/ref/trinucleotide-counts/UCSC-GCRh38-p14-filtered/,tmp/downloads,4362e6608cebfa39e8a7d49f3f988eb8
+UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv,s3://sm-unrestricted-team-a/ref/trinucleotide-counts/UCSC-GCRh38-p14-filtered/,tmp/downloads,b386b0e26007d88d856c8d9e3ef18794
 ex_lane1_Chr21_10000reads_r1.fastq.gz,s3://sm-unrestricted-team-a/ref/test_data/lightweight_test_run/,tmp/downloads,900afac2a4a890e0c079be9aa62d96c2
 ex_lane1_Chr21_10000reads_r2.fastq.gz,s3://sm-unrestricted-team-a/ref/test_data/lightweight_test_run/,tmp/downloads,faca4e64491872b1edd47d3ab32303b4
 ex_lane2_Chr21_5000reads_r1.fastq.gz,s3://sm-unrestricted-team-a/ref/test_data/lightweight_test_run/,tmp/downloads,d92d7ffaed3110756ac46132f285295b
