@@ -19,7 +19,7 @@ Instuctions for setting up codec-opensource pipeline on Amazon EC2
     * Allow SSH traffic: My IP
     * Configure storage: 
         * Volume type: gp3
-        * Size (GiB): 1000 per EX or MS sample
+        * Size (GiB): 500 per EX or MS sample
         * IOPS: 8000
         * Throughput (MiB/s): 2000
     * IAM instance profile: A profile with read access to the bucket where the sequencing data is stored, and write access to the bucket where the outputs will be uploaded
@@ -42,7 +42,7 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 curl -fsSL https://get.docker.com | sudo bash
 sudo usermod -aG docker "$USER"
 
-# Clone codec-opensource repository
+# Clone SomaticCODEC repository
 
 aws s3 cp s3://sm-unrestricted-team-a/key/codec-opensource-deploy-key/codec-opensource-deploy-key ~/.ssh/codec-opensource-deploy-key
 chmod 600 ~/.ssh/codec-opensource-deploy-key
