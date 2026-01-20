@@ -14,19 +14,23 @@ Types of changes:
 ## [Unreleased]
 
 ### Added
+
 - Added intermediate_files.md with instructions for generating and storing intermediate files (#289)
 - Added additional unit tests for ex_reference_trinuc_counts.py (#290)
 
 ### Changed
-- Updated component metric thresholds for EX depth and coverage metrics ()
+
+- Updated thresholds for EX depth and coverage component metrics (#291)
 
 ## [3.1.0] - 2026-01-19
 
 ### Added
+
 - Added normalisation of trinucleotide counts to ex_trinucleotide_context_metrics.py (#288)
 - Added additional unit tests for ex_trinucleotide_context_metrics.py (#288)
 
 ### Changed
+
 - Moved various helper functions from individual scripts into the helpers directory (#288)
 
 ## [3.0.0] - 2026-01-12
