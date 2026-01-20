@@ -24,7 +24,7 @@ Types of changes:
 
 ### Removed
 
-- Temporarily removed ms_germline_risk_masking_rate from automated component metrics report ()
+- Temporarily removed ms_germline_risk_masking_rate from automated component metrics report (#294)
 
 ## [3.1.0] - 2026-01-19
 
