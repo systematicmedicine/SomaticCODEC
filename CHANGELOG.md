@@ -11,7 +11,7 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [3.1.0] - 2026-01-19
+## [Unreleased]
 
 ### Added
 
@@ -21,6 +21,10 @@ Types of changes:
 ### Changed
 
 - Updated thresholds for EX depth and coverage component metrics (#291)
+
+### Removed
+
+- Temporarily removed ms_germline_risk_masking_rate from automated component metrics report ()
 
 ## [3.1.0] - 2026-01-19
 
