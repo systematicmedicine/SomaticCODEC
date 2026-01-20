@@ -1,5 +1,5 @@
 """
---- bed_utils.py ---
+--- bed_helpers.py ---
 
 Functions for obtaining data from BED files.
 

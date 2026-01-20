@@ -5,20 +5,22 @@ Calculate trinucleotide contexts for called somatic mutations
 rule ex_trinucleotide_context_metrics:
     input:
         vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        vcf_all_path = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf",
         ref_fasta_path = config["sci_params"]["global"]["reference_genome"],
-        context_csv_path = config["sci_params"]["global"]["reference_tri_contexts"]
+        ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"],
+        ref_trinuc_counts_path = config["sci_params"]["global"]["reference_genome_trinuc_counts"]
     output:
-        sample_csv = "results/{ex_sample}/{ex_sample}_trinuc_context.csv",
+        proportions_csv = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv",
         similarities_csv = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
-        plot_pdf = "results/{ex_sample}/{ex_sample}_trinuc_plots.pdf"
+        plot_pdf_normalised = "results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf"
     params:
         sample = "{ex_sample}"
     log:
-        "logs/{ex_sample}/ex_trinuc_context.log"
+        "logs/{ex_sample}/ex_trinucleotide_context_metrics.log"
     benchmark:
-        "logs/{ex_sample}/ex_trinuc_context.benchmark.txt"
+        "logs/{ex_sample}/ex_trinucleotide_context_metrics.benchmark.txt"
     resources:
-        memory = config["infrastructure"]["memory"]["light"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         # Set memory limit
@@ -27,11 +29,13 @@ rule ex_trinucleotide_context_metrics:
         # Calculate trinucleotide contexts
         ex_trinucleotide_context_metrics.py \
             --vcf_path {input.vcf_path} \
+            --vcf_all_path {input.vcf_all_path} \
             --ref_fasta_path {input.ref_fasta_path} \
-            --context_csv_path {input.context_csv_path} \
-            --sample_csv {output.sample_csv} \
+            --ref_contexts_path {input.ref_contexts_path} \
+            --ref_trinuc_counts_path {input.ref_trinuc_counts_path} \
+            --proportions_csv {output.proportions_csv} \
             --similarities_csv {output.similarities_csv} \
-            --plot_pdf {output.plot_pdf} \
+            --plot_pdf_normalised {output.plot_pdf_normalised} \
             --sample {params.sample} \
             --log {log} 2>> {log}
         """

@@ -11,6 +11,14 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [3.1.0] - 2026-01-19
+
+### Added
+- Added normalisation of trinucleotide counts to ex_trinucleotide_context_metrics.py (#288)
+
+### Changed
+- Moved various helper functions from individual scripts into the helpers directory (#288)
+
 ## [3.0.0] - 2026-01-12
 
 ### Added
