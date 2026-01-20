@@ -14,9 +14,15 @@ import types
 import pandas as pd
 
 @pytest.mark.parametrize("ref_fasta_path, expected_counts_csv", [
-    # 
-    ("tests/data/test_ex_reference_trinuc_counts/ref.fa",
-     "tests/data/test_ex_reference_trinuc_counts/expected_counts.csv")
+  # One chromosome
+  ("tests/data/test_ex_reference_trinuc_counts/one_chrom/ref.fa",
+   "tests/data/test_ex_reference_trinuc_counts/one_chrom/expected_counts.csv"),
+  # Multiple chromosomes
+  ("tests/data/test_ex_reference_trinuc_counts/multiple_chroms/ref.fa",
+   "tests/data/test_ex_reference_trinuc_counts/multiple_chroms/expected_counts.csv"),
+  # All Ns
+  ("tests/data/test_ex_reference_trinuc_counts/all_n/ref.fa",
+   "tests/data/test_ex_reference_trinuc_counts/all_n/expected_counts.csv")
 ])
 def test_ex_reference_trinuc_counts(tmp_path, ref_fasta_path, expected_counts_csv):
   
