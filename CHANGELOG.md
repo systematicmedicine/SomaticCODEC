@@ -11,7 +11,7 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [Unreleased]
+## [3.1.0] - 2026-01-19
 
 ### Added
 
