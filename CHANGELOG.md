@@ -11,6 +11,12 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [Unreleased]
+
+### Changed
+
+- Updated intermediate_files.md to improve clarity (#297)
+
 ## [3.1.1] - 2026-01-20
 
 ### Added
