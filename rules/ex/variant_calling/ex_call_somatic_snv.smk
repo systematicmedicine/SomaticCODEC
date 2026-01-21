@@ -23,6 +23,7 @@ rule ex_call_somatic_snv:
     params:
         max_base_quality = config["sci_params"]["ex_call_somatic_snv"]["max_base_quality"],
         min_base_quality = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
+        min_mapping_quality = config["sci_params"]["ex_call_somatic_snv"]["min_mapping_quality"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
         "logs/{ex_sample}/ex_call_somatic_snv.log"
@@ -45,7 +46,7 @@ rule ex_call_somatic_snv:
             --count-orphans \
             --max-BQ {params.max_base_quality} \
             --min-BQ {params.min_base_quality} \
-            --min-MQ 0 \
+            --min-MQ {params.min_mapping_quality} \
             --no-BAQ \
             --annotate AD,DP \
             --regions-file {input.include_bed} \
