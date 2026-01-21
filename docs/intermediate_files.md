@@ -7,7 +7,7 @@ Following each **MAJOR** version release, generate a set of representative inter
 1. Create config files for a set of 4 EX/MS sample pairs
 
 2. Set up EC2 instance as per the [EC2 setup guide](docs/ec2_setup.md), with the following change:
-    * Allocate 5000GiB gp3 storage per EX/MS sample pair (20000GiB total for 4 EX/MS sample pairs)
+    * Allocate 20000GiB gp3 storage (5000GiB per EX/MS sample pair)
 
 3. Create tmux session and run docker as per the [Run pipeline](docs/run_pipeline.md) document
 
@@ -26,27 +26,38 @@ snakemake \
 
 5. Run pipeline as per the [Run pipeline](docs/run_pipeline.md) document
 
-6. Following successful completion of the pipeline, upload select intermediate files to s3:
+6. Following successful completion of the pipeline, the instance will shut down
+
+7. Start the instance
+
+8. Create a new tmux session and start the existing docker container
 
 ```
-aws s3 cp ./ \
+tmux new -s file-transfer
+
+docker start -ai codec-container
+```
+
+9. Upload select intermediate files to s3:
+
+```
+aws s3 cp tmp/ \
 s3://sm-restricted-stvincents-hrec-130-22/tmp/SomaticCODEC-intermediate-files/{version}/ \
 --recursive \
 --exclude "*" \
-include "*_filter.fastq.gz" \
-include "*_map_umi_grouped.bam" \
-include "*_map_dsc_anno_filtered.bam" \
-include "*_map_dsc_anno_filtered.bam.bai" \
-include "*_all_positions.vcf" \
-include "*_filter_r1.fastq.gz" \
-include "*_filter_r2.fastq.gz" \
-include "*_deduped_map.bam" \
-include "*_deduped_map.bam.bai" \
-include "*_ms_germ_risk.vcf" \
-include "*_ms_germ_risk.bed" \
-include "*_lowdepth.bed" \
-include "*_combined_mask.bed" \
-include "*_include.bed"
+--include "*_filter_r1.fastq.gz" \
+--include "*_filter_r2.fastq.gz" \
+--include "*_deduped_map.bam" \
+--include "*_deduped_map.bam.bai" \
+--include "*_lowdepth.bed" \
+--include "*_ms_germ_risk.bed" \
+--include "*_combined_mask.bed" \
+--include "*_include.bed" \
+--include "*_filter.fastq.gz" \
+--include "*_map_umi_grouped.bam" \
+--include "*_map_dsc_anno_filtered.bam" \
+--include "*_map_dsc_anno_filtered.bam.bai" \
+--include "*_all_positions.vcf"
 ```
 
-7. Once the files are uploaded, delete intermediate files generated with the previous **MAJOR** version (these are now obselete)
+10. Once the files are uploaded, delete the s3 folder with intermediate files from the previous **MAJOR** version (these are now obselete)
