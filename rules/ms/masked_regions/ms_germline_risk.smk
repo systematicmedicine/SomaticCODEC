@@ -5,6 +5,7 @@ Uses matched sample BAM to identify positions that may contain germline variants
 rule ms_germline_risk:
     input:
         bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
+        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai",
         ref = config["sci_params"]["global"]["reference_genome"],
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
         included_chromsomes_bed = "tmp/downloads/included_chromosomes.bed"
