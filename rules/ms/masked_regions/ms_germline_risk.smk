@@ -11,7 +11,7 @@ rule ms_germline_risk:
         included_chromsomes_bed = "tmp/downloads/included_chromosomes.bed"
     output:
         intermediate_pileup = temp("tmp/{ms_sample}/{ms_sample}_ms_pileup.bcf"),
-        vcf_germ = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf"
+        vcf_germ = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf")
     params:
         max_base_qual = config["sci_params"]["ms_germline_risk"]["max_base_qual"],
         max_depth = config["sci_params"]["ms_germline_risk"]["max_depth"],

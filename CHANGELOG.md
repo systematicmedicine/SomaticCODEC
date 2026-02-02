@@ -11,6 +11,12 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [Unreleased]
+
+### Fixed
+
+- Germline risk VCF is now a temp file (#303)
+
 ## [3.1.2] - 2026-02-02
 
 ### Changed
