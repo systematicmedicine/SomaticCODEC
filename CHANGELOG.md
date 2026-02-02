@@ -11,12 +11,12 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [Unreleased]
+## [3.1.2] - 2026-02-02
 
 ### Changed
 
 - Updated intermediate_files.md to improve clarity (#297)
-- Added min-MQ parameter for ex_call_somatic_snv.smk to config.yaml (#298)
+- Moved setting of min-MQ parameter from ex_call_somatic_snv.smk to config.yaml (#298)
 
 ### Removed
 
