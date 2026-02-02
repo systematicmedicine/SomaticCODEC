@@ -18,6 +18,10 @@ Types of changes:
 - Updated intermediate_files.md to improve clarity (#297)
 - Added min-MQ parameter for ex_call_somatic_snv.smk to config.yaml (#298)
 
+### Fixed
+
+- Made implicit BAM index inputs explicit for multiple rules (#299)
+
 ## [3.1.1] - 2026-01-20
 
 ### Added
