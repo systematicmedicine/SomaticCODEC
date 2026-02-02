@@ -18,6 +18,10 @@ Types of changes:
 - Updated intermediate_files.md to improve clarity (#297)
 - Added min-MQ parameter for ex_call_somatic_snv.smk to config.yaml (#298)
 
+### Removed
+
+- Removed deprecated ms_germ_risk_variant_metrics and ms_germ_risk_variant_metrics_summary (#)
+
 ### Fixed
 
 - Made implicit BAM index inputs explicit for multiple rules (#299)
