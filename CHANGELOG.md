@@ -20,7 +20,7 @@ Types of changes:
 
 ### Removed
 
-- Removed deprecated ms_germ_risk_variant_metrics and ms_germ_risk_variant_metrics_summary (#)
+- Removed deprecated ms_germ_risk_variant_metrics and ms_germ_risk_variant_metrics_summary (#300)
 
 ### Fixed
 
