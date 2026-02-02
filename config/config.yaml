@@ -52,6 +52,7 @@ sci_params:
   ex_call_somatic_snv:
     max_base_quality: 150
     min_base_quality: 70
+    min_mapping_quality: 0
 
   ex_demultiplex_fastq:
     max_error_rate: 0.1

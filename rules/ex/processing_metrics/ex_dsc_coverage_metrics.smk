@@ -5,6 +5,7 @@ Calculates DSC coverage metrics
 rule ex_dsc_coverage_metrics:
     input:
         bam_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        bai_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
         ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
