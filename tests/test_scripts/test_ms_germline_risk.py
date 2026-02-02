@@ -125,12 +125,25 @@ def test_variant_edge_cases(tmp_path, deduped_bam, deduped_bai, expected_vcf, un
     shutil.copy(deduped_bam, copied_bam_path)
     shutil.copy(deduped_bai, copied_bai_path)
 
-    # Copy ref file to temporary directory
+    # Copy ref FASTA and FAI to temporary directory
     ref_file = Path("tests/data/lightweight_test_run/GRCh38_Chr21_plus_stubs.fa")
     expected_ref_path = Path(f"tmp/downloads/UCSC-GCRh38-p14-filtered.fa")
     copied_ref_path = tmp_path / expected_ref_path
     copied_ref_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(ref_file, copied_ref_path)
+
+    ref_fai = Path("tests/data/test_ms_germline_risk/GRCh38_Chr21_plus_stubs.fa.fai")
+    expected_fai_path = Path(f"tmp/downloads/UCSC-GCRh38-p14-filtered.fa.fai")
+    copied_fai_path = tmp_path / expected_fai_path
+    copied_fai_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(ref_fai, copied_fai_path)
+
+    # Copy included chromosomes BED to temporary directory
+    included_chroms_bed = Path("tests/data/test_ms_germline_risk/included_chromosomes.bed")
+    expected_inc_chroms_path = Path(f"tmp/downloads/included_chromosomes.bed")
+    copied_inc_chroms_path = tmp_path / expected_inc_chroms_path
+    copied_inc_chroms_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy(included_chroms_bed, copied_inc_chroms_path)
 
     # Define target VCF
     target_vcf = f"tmp/SEQ0001/SEQ0001_ms_germ_risk.vcf"
@@ -156,7 +169,8 @@ def test_variant_edge_cases(tmp_path, deduped_bam, deduped_bai, expected_vcf, un
         targets=[target_vcf],
         cores=1,
         verbose=True,
-        workdir=str(tmp_path)
+        workdir=str(tmp_path),
+        allowed_rules=["ms_germline_risk"]
         )
 
     # Assert that rule succeeded
