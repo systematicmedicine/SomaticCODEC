@@ -11,6 +11,21 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [3.1.2] - 2026-02-02
+
+### Changed
+
+- Updated intermediate_files.md to improve clarity (#297)
+- Moved setting of min-MQ parameter from ex_call_somatic_snv.smk to config.yaml (#298)
+
+### Removed
+
+- Removed deprecated ms_germ_risk_variant_metrics and ms_germ_risk_variant_metrics_summary (#300)
+
+### Fixed
+
+- Made implicit BAM index inputs explicit for multiple rules (#299)
+
 ## [3.1.1] - 2026-01-20
 
 ### Added
