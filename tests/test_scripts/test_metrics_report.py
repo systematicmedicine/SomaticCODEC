@@ -68,12 +68,20 @@ def test_expected_metrics_present(lightweight_test_run, metrics_df):
     missing = sorted(expected - reported)
     assert not missing, f"[{report_type}] Missing metrics (expected but not found): {missing}"
 
-def test_grade_na_ratio(lightweight_test_run, metrics_df):
+def test_value_all_numeric_no_na(lightweight_test_run, metrics_df):
     report_type = metrics_df["report_type"].iloc[0]
-    na_ratio = (metrics_df["Grade"] == "NA").mean()
-    assert na_ratio <= 0.20, (
-        f"[{report_type}] Too many 'NA' grades: {na_ratio:.2%} of entries"
+
+    # Value should be present and numeric
+    assert metrics_df["Value"].notna().all(), f"[{report_type}] Found NA in Value column"
+    assert pd.api.types.is_numeric_dtype(metrics_df["Value"]), (
+        f"[{report_type}] Value column is not numeric dtype (got {metrics_df['Value'].dtype})"
     )
+
+def test_grade_no_missing(lightweight_test_run, metrics_df):
+    report_type = metrics_df["report_type"].iloc[0]
+
+    # Grade should not contain missing values (NaN/None)
+    assert metrics_df["Grade"].notna().all(), f"[{report_type}] Found missing values in Grade column"
 
 # -------------------------------------------------------------------------------------
 # Component-only tests
