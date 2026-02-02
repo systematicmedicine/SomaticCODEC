@@ -198,10 +198,10 @@ assess_metric <- function(metric) {
   # Extract values from the input
   metric_name <- metric[["Name"]]
   stage <- metric[["Stage"]]
-  nn_lower <- metric["nn_lower"]
-  nn_upper <- metric["nn_upper"]
-  ideal_lower <- metric["ideal_lower"]
-  ideal_upper <- metric["ideal_upper"]
+  nn_lower <- metric[["nn_lower"]]
+  nn_upper <- metric[["nn_upper"]]
+  ideal_lower <- metric[["ideal_lower"]]
+  ideal_upper <- metric[["ideal_upper"]]
   file_pattern <- metric[["file_pattern"]]
   value_pattern <- metric[["value_pattern"]]
  

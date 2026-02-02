@@ -83,6 +83,9 @@ for (i in seq_along(report_types)) {
   meta <- read.xlsx(metrics_path, sheet = "Metrics") %>%
     coerce_types(METRICS_FILE_SCHEMA)
 
+  # Filter for included metrics
+  meta <- filter(meta, include_automated_report == TRUE)
+
   # Assess metrics
   report_list <- lapply(split(meta, seq_len(nrow(meta))), assess_metric)
   report_df <- bind_rows(report_list)
