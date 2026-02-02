@@ -8,6 +8,7 @@ rule ex_coverage_overlap_metrics:
     input:
         precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
         ex_dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
+        ex_dsc_bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
         include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
         ms_bam = lambda wc: (
             f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
