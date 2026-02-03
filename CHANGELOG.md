@@ -28,8 +28,6 @@ Types of changes:
 - Germline risk VCF is now a temp file (#303)
 - Include flag now works for metrics report (#304)
 
-
-
 ## [3.1.2] - 2026-02-02
 
 ### Changed
