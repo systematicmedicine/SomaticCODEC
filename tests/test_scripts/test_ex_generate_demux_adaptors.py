@@ -21,7 +21,7 @@ def test_fasta_structure_correct(lightweight_test_run):
     for fasta in fasta_files:
         check_fasta_structure(fasta)
 
-# Tests that that there are 4 FASTA entries per ex sample and ex technical control (r1 start/end, r2 start/end)
+# Tests that that there are 2 FASTA entries per ex sample and ex technical control (r1 start, r2 start)
 def test_fasta_entries_per_sample(lightweight_test_run):
     # Locate all FASTA files
     fasta_files = glob.glob("tmp/*/*.fasta")
@@ -41,8 +41,8 @@ def test_fasta_entries_per_sample(lightweight_test_run):
 
     total_samples_controls = ex_sample_count + ex_technical_control_count
 
-    # Assert that there are 4 FASTA entries per sample (r1 start/end, r2 start/end)
-    assert total_fasta_entries / total_samples_controls == 4, (
-    f"Expected 4 FASTA entries per sample/technical control, actual entries: {total_fasta_entries / total_samples_controls}"
+    # Assert that there are 2 FASTA entries per sample (r1 start, r2 start)
+    assert total_fasta_entries / total_samples_controls == 2, (
+    f"Expected 2 FASTA entries per sample/technical control, actual entries: {total_fasta_entries / total_samples_controls}"
     )
 

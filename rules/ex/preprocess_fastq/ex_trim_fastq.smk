@@ -13,6 +13,9 @@ rule ex_trim_fastq:
     input:
         r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
         r2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
+        ex_samples = config["metadata"]["ex_samples_metadata"],
+        ex_technical_controls = config["metadata"]["ex_technical_controls_metadata"],
+        ex_adapters = config["metadata"]["ex_adapters_metadata"],
     output:
         r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
         r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
