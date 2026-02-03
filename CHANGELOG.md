@@ -20,6 +20,7 @@ Types of changes:
 
 ### Changed
 
+- Removed hard coded cofig overrides from conftest.py (#308)
 - Change to packaged outputs directory structure (#306)
 
 ### Fixed
