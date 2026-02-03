@@ -15,6 +15,7 @@ import subprocess
 import pytest
 from pathlib import Path
 import pytest
+from conftest import PROJECT_ROOT
 
 # Pytest marking
 pytestmark = [
@@ -27,12 +28,11 @@ ALLOWED_EXTS = {".py", ".sh", ".R"}
 EXEMPT_FILES = {".gitkeep"}
 
 # Directories to check
-project_root = Path(__file__).resolve().parent.parent.parent
 check_dirs = [
-    project_root / "scripts",
-    project_root / "helpers",
-    project_root / "tests/test_scripts",
-    project_root / "bin"
+    PROJECT_ROOT / "scripts",
+    PROJECT_ROOT / "helpers",
+    PROJECT_ROOT / "tests/test_scripts",
+    PROJECT_ROOT / "bin"
 ]
 
 # Helper to collect files with optional extension filter
