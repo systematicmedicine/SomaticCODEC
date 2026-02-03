@@ -15,6 +15,7 @@ Types of changes:
 
 ### Added
 
+- Added script for visualising rulegraphs (#307)
 - Additional test cases for metrics report (#304)
 
 ### Changed

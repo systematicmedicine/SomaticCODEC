@@ -1,4 +1,3 @@
-
 """
 --- Snakefile ---
 
@@ -49,3 +48,11 @@ rule all:
         ex_variant_analysis +
         global_metrics
 
+# ---------------------------------------------------------------------------------------------
+# For DAG generation
+# ---------------------------------------------------------------------------------------------
+
+# Define minimal pipeline outputs
+rule called_variants:
+    input:
+        ex_variant_calling
