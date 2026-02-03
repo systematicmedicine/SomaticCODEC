@@ -16,6 +16,17 @@ from datetime import datetime
 import yaml
 import tempfile
 
+# Recursively update dict 'base' with values from dict 'override'. Nested dicts are merged; other values are replaced.
+def deep_update(base: dict, override: dict) -> dict:
+    if override is None:
+        return base
+    for k, v in override.items():
+        if isinstance(v, dict) and isinstance(base.get(k), dict):
+            deep_update(base[k], v)
+        else:
+            base[k] = v
+    return base
+
 # Deletes all files from metrics, results, logs, tmp and .snakemake directories
 def clean_workspace():
     for folder in ["metrics", "results", "tmp", "logs", ".snakemake"]:
@@ -61,33 +72,18 @@ def lightweight_test_run():
     for file_path in files_to_copy:
         shutil.copy2(src_dir / file_path.name, dst_dir / file_path.name)
 
-    # Create modified config.yaml with test parameters and file paths
-    config = Path("config/config.yaml")
-    with config.open("r", encoding="utf-8") as f:
-        config_data = yaml.safe_load(f)
+    # Load base config
+    with Path("config/config.yaml").open("r", encoding="utf-8") as f:
+        config_data = yaml.safe_load(f) or {}
 
-    config_data["run_name"] = "lightweight_test_run"
+    # Merge in config.dev.yaml (if present)
+    dev_config = Path("config/config.dev.yaml")
+    if dev_config.exists():
+        with dev_config.open("r", encoding="utf-8") as f:
+            dev_data = yaml.safe_load(f) or {}
+        config_data = deep_update(config_data, dev_data)
 
-    config_data["sci_params"]["global"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    config_data["sci_params"]["global"]["precomputed_masks"] = [
-        "tmp/downloads/GRCh38_alldifficultregions_10lines.bed", 
-        "tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed",
-        "tmp/downloads/GCRh38_repeat_masker_10lines.bed"
-        ]
-    config_data["sci_params"]["global"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
-
-    config_data["sci_params"]["ms_low_depth_mask"]["min_depth"] = 1
-
-    config_data["infrastructure"]["memory"]["extra_heavy"] = 6
-    config_data["infrastructure"]["memory"]["heavy"] = 6
-    config_data["infrastructure"]["memory"]["moderate"] = 4
-    config_data["infrastructure"]["memory"]["light"] = 2
-    config_data["infrastructure"]["threads"]["heavy"] = 2
-    config_data["infrastructure"]["threads"]["moderate"] = 2
-    config_data["infrastructure"]["threads"]["light"] = 1
-    config_data["infrastructure"]["compression"]["gzip_level"] = 1
-
-
+    # Write merged config to temp file
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:
         yaml.safe_dump(config_data, f)
