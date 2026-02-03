@@ -2,8 +2,7 @@
 # Development configuration
 #
 # To be used in conjunction with config.yaml.
-# These values override defaults to enable fast local development runs using
-# reduced but structurally representative reference data.
+# These values override defaults for use in a development environment
 # ------------------------------------------------------------------------------
 
 run_name: lightweight_test_run
