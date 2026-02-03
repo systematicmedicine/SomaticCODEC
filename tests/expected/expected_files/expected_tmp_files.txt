@@ -47,9 +47,7 @@ tmp/{ms_sample}/{ms_sample}_combined_mask.bed
 tmp/{ms_sample}/{ms_sample}_masks_sorted.txt
 tmp/{ms_sample}/{ms_sample}_masks_merged.txt
 tmp/{ex_lane}/{ex_lane}_r1_start.fasta
-tmp/{ex_lane}/{ex_lane}_r1_end.fasta
 tmp/{ex_lane}/{ex_lane}_r2_start.fasta
-tmp/{ex_lane}/{ex_lane}_r2_end.fasta
 tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz
 tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz
