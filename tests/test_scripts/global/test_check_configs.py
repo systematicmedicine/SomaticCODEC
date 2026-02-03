@@ -14,9 +14,6 @@ import yaml
 import copy
 from unittest.mock import patch
 
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.insert(0, str(project_root))
-
 import bin.check_configs as cc
 
 # Load defined expected adapter lengths

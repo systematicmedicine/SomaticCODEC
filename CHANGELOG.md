@@ -22,6 +22,8 @@ Types of changes:
 
 - Removed hard coded cofig overrides from conftest.py (#308)
 - Change to packaged outputs directory structure (#306)
+- Refactored test_script directory (#309)
+- Project root and package discovery now handled by conftest instead of individual test scripts (#309)
 
 ### Fixed
 
