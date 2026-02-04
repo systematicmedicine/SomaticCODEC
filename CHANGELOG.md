@@ -25,7 +25,7 @@ Types of changes:
 - Refactored test_script directory (#309)
 - Project root and package discovery now handled by conftest instead of individual test scripts (#309)
 - Rules that use a single thread now explicitly declare this (#310)
-- Updated thresholds for DNA fragment size component metrics (#)
+- Updated thresholds for DNA fragment size component metrics (#311)
 
 ### Fixed
 
