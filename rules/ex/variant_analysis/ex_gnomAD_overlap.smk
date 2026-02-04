@@ -15,6 +15,8 @@ rule ex_gnomAD_overlap:
         "logs/{ex_sample}/ex_gnomAD_overlap.log"
     benchmark:
         "logs/{ex_sample}/ex_gnomAD_overlap.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

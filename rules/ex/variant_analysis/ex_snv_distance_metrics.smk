@@ -10,6 +10,8 @@ rule ex_snv_distance_metrics:
         "logs/{ex_sample}/ex_snv_distance_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_snv_distance_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

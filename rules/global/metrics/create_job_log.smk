@@ -15,6 +15,8 @@ rule create_job_log:
         "logs/global_rules/create_job_log.log"
     benchmark:
         "logs/global_rules/create_job_log.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -10,6 +10,8 @@ rule ex_softclipping_metrics:
         "logs/{ex_sample}/ex_softclipping_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_softclipping_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

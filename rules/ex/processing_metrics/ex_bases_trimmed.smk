@@ -15,6 +15,8 @@ rule ex_bases_trimmed:
         "logs/{ex_sample}/ex_bases_trimmed.log"
     benchmark:
         "logs/{ex_sample}/ex_bases_trimmed.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

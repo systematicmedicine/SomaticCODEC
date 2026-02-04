@@ -14,6 +14,8 @@ rule check_included_chromosomes_present:
         "logs/global_rules/check_included_chromosomes_present.log"
     benchmark:
         "logs/global_rules/check_included_chromosomes_present.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

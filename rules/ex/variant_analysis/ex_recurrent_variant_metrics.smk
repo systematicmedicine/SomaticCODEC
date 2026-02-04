@@ -15,6 +15,8 @@ rule ex_recurrent_variant_metrics:
         "logs/global_rules/batch_ex_recurrent_variant_metrics.log"
     benchmark:
         "logs/global_rules/batch_ex_recurrent_variant_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -11,6 +11,8 @@ rule picard_sequence_dict:
         "logs/global_rules/picard_sequence_dict.log"
     benchmark:
         "logs/global_rules/picard_sequence_dict.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
