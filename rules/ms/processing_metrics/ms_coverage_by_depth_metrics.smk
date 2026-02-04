@@ -14,6 +14,8 @@ rule ms_coverage_by_depth_metrics:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

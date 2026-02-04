@@ -11,6 +11,8 @@ rule samtools_index_files:
         "logs/global_rules/samtools_index_files.log"
     benchmark:
         "logs/global_rules/samtools_index_files.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

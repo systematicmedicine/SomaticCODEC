@@ -15,6 +15,8 @@ rule included_excluded_chromosomes_beds:
         "logs/global_rules/included_excluded_chromosomes_beds.log"
     benchmark:
         "logs/global_rules/included_excluded_chromosomes_beds.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

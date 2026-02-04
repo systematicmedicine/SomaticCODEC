@@ -11,6 +11,8 @@ rule ex_insert_metrics:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_insert_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

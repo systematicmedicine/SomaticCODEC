@@ -17,6 +17,8 @@ rule create_run_timeline_plot:
         "logs/global_rules/create_run_timeline_plot.log"
     benchmark:
         "logs/global_rules/create_run_timeline_plot.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

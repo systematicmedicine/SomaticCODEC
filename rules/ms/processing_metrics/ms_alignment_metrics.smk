@@ -11,6 +11,8 @@ rule ms_alignment_metrics:
         "logs/{ms_sample}/ms_alignment_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_alignment_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

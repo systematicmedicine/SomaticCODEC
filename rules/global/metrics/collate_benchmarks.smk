@@ -10,6 +10,8 @@ rule collate_benchmarks:
         combined_benchmarks = "logs/global_rules/combined_benchmarks.csv"
     log:
         "logs/global_rules/collate_benchmarks.log"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
