@@ -24,6 +24,7 @@ Types of changes:
 - Change to packaged outputs directory structure (#306)
 - Refactored test_script directory (#309)
 - Project root and package discovery now handled by conftest instead of individual test scripts (#309)
+- Rules that use a single thread now explicitly declare this (#310)
 
 ### Fixed
 
