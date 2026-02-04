@@ -19,6 +19,8 @@ rule ms_fastqc_summary_metrics:
         "logs/{ms_sample}/ms_fastqc_summary_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_fastqc_summary_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

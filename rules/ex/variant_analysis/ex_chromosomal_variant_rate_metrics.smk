@@ -13,6 +13,8 @@ rule ex_chromosomal_variant_rate_metrics:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

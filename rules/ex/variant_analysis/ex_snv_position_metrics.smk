@@ -15,6 +15,8 @@ rule ex_snv_position_metrics:
         "logs/{ex_sample}/ex_snv_position_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_snv_position_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -15,6 +15,8 @@ rule ex_demux_counts_and_gini:
         "logs/{ex_lane}/ex_demux_counts_and_gini.log"
     benchmark:
         "logs/{ex_lane}/ex_demux_counts_and_gini.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

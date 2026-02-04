@@ -14,6 +14,8 @@ rule ex_fastqc_raw_summary_metrics:
         "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.log"
     benchmark:
         "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

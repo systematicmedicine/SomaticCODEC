@@ -21,6 +21,8 @@ rule ms_low_depth_mask:
         "logs/{ms_sample}/ms_low_depth_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

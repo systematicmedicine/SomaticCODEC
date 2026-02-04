@@ -13,6 +13,8 @@ rule ex_call_dsc_metrics:
         "logs/{ex_sample}/ex_call_dsc_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_call_dsc_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

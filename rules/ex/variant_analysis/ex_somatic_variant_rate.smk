@@ -10,6 +10,8 @@ rule ex_somatic_variant_rate:
         "logs/{ex_sample}/ex_somatic_variant_rate.log"
     benchmark:
         "logs/{ex_sample}/ex_somatic_variant_rate.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
