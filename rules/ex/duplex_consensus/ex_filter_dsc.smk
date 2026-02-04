@@ -16,6 +16,8 @@ rule ex_filter_dsc:
         "logs/{ex_sample}/ex_filter_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
