@@ -17,6 +17,8 @@ rule combine_masks:
         "logs/{ms_sample}/combine_masks.log"
     benchmark:
         "logs/{ms_sample}/combine_masks.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

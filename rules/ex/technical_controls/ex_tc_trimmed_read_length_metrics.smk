@@ -13,7 +13,9 @@ rule ex_tc_trimmed_read_length_metrics:
     log:
         "logs/{ex_technical_control}/ex_tc_trimmed_read_length_metrics.log"
     benchmark:
-        "logs/{ex_technical_control}/ex_tc_trimmed_read_length_metrics.benchmark.txt" 
+        "logs/{ex_technical_control}/ex_tc_trimmed_read_length_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

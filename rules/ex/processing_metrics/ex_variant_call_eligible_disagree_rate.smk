@@ -16,6 +16,8 @@ rule ex_variant_call_eligible_disagree_rate:
         "logs/{ex_sample}/ex_variant_call_eligible_disagree_rate.log"
     benchmark:
         "logs/{ex_sample}/ex_variant_call_eligible_disagree_rate.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -24,6 +24,8 @@ rule create_metrics_report:
         "logs/global_rules/create_metrics_report.log"
     benchmark:
         "logs/global_rules/create_metrics_report.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

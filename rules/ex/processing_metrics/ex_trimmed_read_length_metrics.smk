@@ -12,7 +12,9 @@ rule ex_trimmed_read_length_metrics:
     log:
         "logs/{ex_sample}/ex_trimmed_read_length_metrics.log"
     benchmark:
-        "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt" 
+        "logs/{ex_sample}/ex_trimmed_read_length_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

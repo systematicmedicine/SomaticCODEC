@@ -21,6 +21,8 @@ rule ex_generate_demux_adaptors:
         "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}_{region}.log"
     benchmark:
         "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}_{region}.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -14,6 +14,8 @@ rule ex_total_read_loss:
         "logs/{ex_sample}/ex_total_read_loss.log"
     benchmark:
         "logs/{ex_sample}/ex_total_read_loss.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

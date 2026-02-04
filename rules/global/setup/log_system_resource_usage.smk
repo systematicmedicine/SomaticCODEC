@@ -13,6 +13,8 @@ rule log_system_resource_usage:
         "logs/global_rules/log_system_resource_usage.log"
     benchmark:
         "logs/global_rules/log_system_resource_usage.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

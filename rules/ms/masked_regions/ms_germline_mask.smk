@@ -26,6 +26,8 @@ rule ms_germline_mask:
         "logs/{ms_sample}/ms_germline_variants_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:

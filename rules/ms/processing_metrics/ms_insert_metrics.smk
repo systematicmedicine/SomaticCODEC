@@ -12,6 +12,8 @@ rule ms_insert_metrics:
         "logs/{ms_sample}/ms_insert_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_insert_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

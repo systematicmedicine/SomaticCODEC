@@ -9,6 +9,8 @@ rule write_git_metadata:
         "logs/global_rules/write_git_metadata.log"
     benchmark:
         "logs/global_rules/write_git_metadata.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

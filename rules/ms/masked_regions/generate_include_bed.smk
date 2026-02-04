@@ -18,6 +18,8 @@ rule generate_include_bed:
         "logs/{ex_sample}/generate_include_bed.log"
     benchmark:
         "logs/{ex_sample}/generate_include_bed.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
