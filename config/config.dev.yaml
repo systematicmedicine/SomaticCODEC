@@ -5,8 +5,28 @@
 # These values override defaults for use in a development environment
 # ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
+# Run name
+# ------------------------------------------------------------------------------
 run_name: lightweight_test_run
 
+# ------------------------------------------------------------------------------
+# Metadata
+# ------------------------------------------------------------------------------
+metadata:
+
+  ex_samples_metadata: tests/data/lightweight_test_run/config/ex_samples.csv
+  ex_technical_controls_metadata: tests/data/lightweight_test_run/config/ex_technical_controls.csv
+  ex_lanes_metadata: tests/data/lightweight_test_run/config/ex_lanes.csv
+  ex_adapters_metadata: tests/data/lightweight_test_run/config/ex_adapters.csv
+  ms_samples_metadata: tests/data/lightweight_test_run/config/ms_samples.csv
+  component_metrics_metadata: config/component_level_metrics.xlsx
+  system_metrics_metadata: config/system_level_metrics.xlsx
+  download_list: tests/data/lightweight_test_run/config/download_list.csv
+
+# ------------------------------------------------------------------------------
+# Scientific parameters
+# ------------------------------------------------------------------------------
 sci_params:
   global:
     reference_genome: tmp/downloads/GRCh38_Chr21_plus_stubs.fa
@@ -21,6 +41,9 @@ sci_params:
   ms_low_depth_mask:
     min_depth: 1
 
+# ------------------------------------------------------------------------------
+# Infrastructure
+# ------------------------------------------------------------------------------
 infrastructure:
   memory:
     extra_heavy: 6

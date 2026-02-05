@@ -13,7 +13,7 @@ from helpers.get_metadata import load_config, get_ex_sample_ids
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):
-    config = load_config("config/config.yaml")
+    config = load_config(lightweight_test_run["test_config_path"])
     ex_samples = get_ex_sample_ids(config)
 
     for ex_sample in ex_samples:
