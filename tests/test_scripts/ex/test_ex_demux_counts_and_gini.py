@@ -18,10 +18,10 @@ from helpers.get_metadata import load_config, get_ex_sample_ids
     ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.25.txt", 0.25),
     ("tests/data/test_ex_demux_counts_and_gini/demux_metrics_gini_0.5.txt", 0.5),
 ])
-def test_gini_coeff_calculation(tmp_path, demux_metrics, expected_gini):
+def test_gini_coeff_calculation(lightweight_test_run, tmp_path, demux_metrics, expected_gini):
 
     # Load config
-    config_yaml = load_config("config/config.yaml")
+    config_yaml = load_config(lightweight_test_run["test_config_path"])
 
     # Get ex_sample IDs
     ex_sample_ids = get_ex_sample_ids(config_yaml)  

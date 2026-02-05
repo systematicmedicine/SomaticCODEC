@@ -17,7 +17,7 @@ from pathlib import Path
 from helpers.get_metadata import load_config, get_ms_sample_ids, get_ex_lane_ids, get_ex_sample_ids, get_ex_technical_control_ids
 from helpers.count_data_points import count_data_points
 
-pytestmark = pytest.mark.order(7)
+pytestmark = pytest.mark.order(8)
 
 """ (1) Test that all expected files exist"""
 def test_expected_outputs_exist(lightweight_test_run, expected_files_list):
@@ -96,7 +96,7 @@ def test_no_unexpected_outputs(lightweight_test_run, expected_files_list):
 
 """ (Fixture) Load list of expected files, and expand with sample wildcards """
 @pytest.fixture(scope="module")
-def expected_files_list():
+def expected_files_list(lightweight_test_run):
     
     # Load lists of expected files (generic wildcards)
     source_files = [
@@ -107,7 +107,7 @@ def expected_files_list():
     expected_files_generic = sum([Path(f).read_text().splitlines() for f in source_files], [])
 
     # Load sample IDs
-    config = load_config("config/config.yaml")
+    config = load_config(lightweight_test_run["test_config_path"])
     ms_samples = get_ms_sample_ids(config)
     ex_lanes = get_ex_lane_ids(config)
     ex_samples = get_ex_sample_ids(config)

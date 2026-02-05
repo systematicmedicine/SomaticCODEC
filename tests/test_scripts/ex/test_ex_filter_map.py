@@ -15,7 +15,7 @@ from helpers.bam_helpers import count_bam_data_points
 
 # Test that filtered read count is not greater than aligned read count
 def test_filtered_reads_less_than_aligned_reads(lightweight_test_run):
-    config = load_config("config/config.yaml")
+    config = load_config(lightweight_test_run["test_config_path"])
     ex_samples = get_ex_sample_ids(config)
 
     for ex_sample in ex_samples:
@@ -46,7 +46,7 @@ def test_flags_filtering(lightweight_test_run):
     FLAG_SECONDARY = 0x100
     FLAG_SUPPLEMENTARY = 0x800
     
-    config = load_config("config/config.yaml")
+    config = load_config(lightweight_test_run["test_config_path"])
     ex_samples = get_ex_sample_ids(config)
 
     for ex_sample in ex_samples:

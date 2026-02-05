@@ -1,0 +1,4 @@
+ex_sample,ex_lane,ex_adapter,ms_sample,donor_id,comments
+SEQ0001,LN001,QD001,SEQ0004,R1234,"buffy coat, 18 years old"
+SEQ0002,LN001,QD002,SEQ0005,R0101,"buffy coat, 80 years old"
+SEQ0003,LN002,QD003,SEQ0004,R1234,"whole blood, 18 years old, sperm matched sample"

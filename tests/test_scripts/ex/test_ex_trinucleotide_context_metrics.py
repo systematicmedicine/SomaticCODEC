@@ -26,9 +26,9 @@ import numpy as np
     # Variant call eligible regions contain only one trinucleotide
     ("tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_variants.vcf",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_all_positions.vcf",
-     "tests/data/lightweight_test_run/GRCh38_Chr21_plus_stubs.fa",
-     "tests/data/lightweight_test_run/2025-09-30_trinucleotide_contexts.csv",
-     "tests/data/lightweight_test_run/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv",
+     "tests/data/lightweight_test_run/downloads/GRCh38_Chr21_plus_stubs.fa",
+     "tests/data/lightweight_test_run/downloads/2025-09-30_trinucleotide_contexts.csv",
+     "tests/data/lightweight_test_run/downloads/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_props.csv",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_similarities.csv")
 ])
