@@ -120,7 +120,7 @@ def test_variant_edge_cases(tmp_path, germ_risk_vcf, expected_bed):
     shutil.copy(germ_risk_vcf, copied_vcf_path)
 
     # Copy ref file to temporary directory
-    ref_file = Path("tests/data/lightweight_test_run/GRCh38_Chr21_plus_stubs.fa")
+    ref_file = Path("tests/data/lightweight_test_run/downloads/GRCh38_Chr21_plus_stubs.fa")
     expected_ref_path = Path(f"tmp/downloads/UCSC-GCRh38-p14-filtered.fa")
     copied_ref_path = tmp_path / expected_ref_path
     copied_ref_path.parent.mkdir(parents=True, exist_ok=True)

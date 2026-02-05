@@ -39,7 +39,7 @@ def test_snakemake_dryrun():
     dst_dir = PROJECT_ROOT / "tmp" / "downloads"
     dst_dir.mkdir(exist_ok=True, parents=True)
 
-    test_data_folder = PROJECT_ROOT / "tests" / "data" / "lightweight_test_run"
+    test_data_folder = PROJECT_ROOT / "tests" / "data" / "lightweight_test_run" / "downloads"
     files_to_create = [f for f in test_data_folder.glob("*") if f.name != ".gitkeep"]
 
     for src in files_to_create:
