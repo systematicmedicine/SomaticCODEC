@@ -79,12 +79,11 @@ def lightweight_test_run():
     clean_workspace()
     
     # Copy test files to tmp/downloads
-    src_dir = PROJECT_ROOT / "tests/data/lightweight_test_run"
+    src_dir = PROJECT_ROOT / "tests/data/lightweight_test_run/downloads"
     dst_dir = PROJECT_ROOT /"tmp/downloads"
     dst_dir.mkdir(exist_ok=True)
 
-    test_data_folder = PROJECT_ROOT / "tests/data/lightweight_test_run"
-    files_to_copy = [f for f in test_data_folder.glob("*") if f.name != ".gitkeep"]
+    files_to_copy = [f for f in src_dir.glob("*") if f.name != ".gitkeep"]
 
     for file_path in files_to_copy:
         shutil.copy2(src_dir / file_path.name, dst_dir / file_path.name)

@@ -14,7 +14,7 @@ from helpers.fastq_helpers import count_fastq_data_points
 
 # Test that aligned read count is not greater than input read count
 def test_aligned_reads_less_than_input_reads(lightweight_test_run):
-    config = load_config("config/config.yaml")
+    config = load_config(lightweight_test_run["test_config_path"])
     ms_samples = get_ms_sample_ids(config)
 
     for ms_sample in ms_samples:

@@ -1,0 +1,3 @@
+ex_lane,fastq1,fastq2
+LN001,tmp/downloads/ex_lane1_Chr21_10000reads_r1.fastq.gz,tmp/downloads/ex_lane1_Chr21_10000reads_r2.fastq.gz
+LN002,tmp/downloads/ex_lane2_Chr21_5000reads_r1.fastq.gz,tmp/downloads/ex_lane2_Chr21_5000reads_r2.fastq.gz
