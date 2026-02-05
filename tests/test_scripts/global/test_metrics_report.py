@@ -19,8 +19,8 @@ import helpers.get_metadata as md
 # -------------------------------------------------------------------------------------
 
 @pytest.fixture(scope="module")
-def config():
-    return md.load_config("config/config.yaml")
+def config(lightweight_test_run):
+    return md.load_config(lightweight_test_run["test_config_path"])
 
 @pytest.fixture(scope="module", params=["component", "system"])
 def metrics_df(request):

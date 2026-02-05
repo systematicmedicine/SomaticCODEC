@@ -31,7 +31,7 @@ def test_fasta_entries_per_sample(lightweight_test_run):
     total_fasta_entries = sum(fasta_entries.values())
 
     # Get number of ex samples
-    config = load_config("config/config.yaml")
+    config = load_config(lightweight_test_run["test_config_path"])
     ex_samples = get_ex_sample_ids(config)
     ex_sample_count = len(ex_samples)
 

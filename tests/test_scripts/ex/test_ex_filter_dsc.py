@@ -35,7 +35,7 @@ def test_mapq_under_min_mapq_removed(lightweight_test_run):
     post_files = glob.glob("tmp/*/*_map_dsc_anno_filtered.bam")
     post_counts = {Path(f).name: count_bam_reads_under_min_mapq(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
-    config = load_config("config/config.yaml")
+    config = load_config(lightweight_test_run["test_config_path"])
     min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"]
 
     # # Assert no reads with MAPQ < min_mapq after filtering

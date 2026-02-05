@@ -33,6 +33,7 @@ import helpers.get_metadata as md
 @patch("subprocess.run")
 def test_read_loss_cases(
     mock_subprocess_run,
+    lightweight_test_run,
     total_reads,
     mapped_reads,
     over_min_mapq_reads,
@@ -57,7 +58,7 @@ def test_read_loss_cases(
     with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp_out:
         json_out_path = tmp_out.name
 
-    config = md.load_config("config/config.yaml")
+    config = md.load_config(lightweight_test_run["test_config_path"])
 
     args = types.SimpleNamespace(
         bam = "fake.bam",
