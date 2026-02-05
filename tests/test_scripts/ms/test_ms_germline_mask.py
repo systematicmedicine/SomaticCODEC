@@ -12,11 +12,7 @@ import pandas as pd
 import pytest
 import shutil
 from snakemake import snakemake
-import yaml
 from helpers.get_metadata import load_config, get_ms_sample_ids
-
-# SKIP MODULE
-pytest.skip("Temporarily disabled (refactor in progress)", allow_module_level=True)
 
 # Test that germline variant BEDs have the correct structure
 def test_bed_structure_correct(lightweight_test_run):
@@ -117,6 +113,9 @@ def test_indel_padding_added(lightweight_test_run):
 
 def test_variant_edge_cases(lightweight_test_run, tmp_path, germ_risk_vcf, expected_bed):
 
+    # Load config
+    config = load_config(lightweight_test_run["test_config_path"])
+    
     # Copy input VCF to temporary directory
     expected_vcf_path = Path(f"tmp/SEQ0001/SEQ0001_ms_germ_risk.vcf")
     copied_vcf_path = tmp_path / expected_vcf_path
@@ -125,7 +124,7 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, germ_risk_vcf, expec
 
     # Copy ref file to temporary directory
     ref_file = Path("tests/data/lightweight_test_run/downloads/GRCh38_Chr21_plus_stubs.fa")
-    expected_ref_path = Path(f"tmp/downloads/UCSC-GCRh38-p14-filtered.fa")
+    expected_ref_path = config["sci_params"]["global"]["reference_genome"]
     copied_ref_path = tmp_path / expected_ref_path
     copied_ref_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(ref_file, copied_ref_path)
@@ -140,17 +139,13 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, germ_risk_vcf, expec
     shutil.copy("Snakefile", tmp_path / "Snakefile")
     shutil.copytree("scripts", tmp_path / "scripts")
     shutil.copytree("rules", tmp_path / "rules")
-    shutil.copytree("config", tmp_path / "config")
+    shutil.copytree("tests/data/lightweight_test_run/config", tmp_path / "tests/data/lightweight_test_run/config")
     shutil.copytree("definitions", tmp_path / "definitions")
 
     # Run snakemake inside temporary directory
-    # Load config
-    with open(lightweight_test_run["test_config_path"]) as f:
-        config_dict = yaml.safe_load(f)
-
     success = snakemake(
         snakefile=str(tmp_path / "Snakefile"),
-        config=config_dict,
+        config=config,
         targets=[target_bed],
         cores=1,
         verbose=True,
