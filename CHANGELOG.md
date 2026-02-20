@@ -35,6 +35,7 @@ Types of changes:
 - Unused *_end.fasta files no longer created by rule ex_generate_demux_adaptors (#305)
 - Germline risk VCF is now a temp file (#303)
 - Include flag now works for metrics report (#304)
+- Fixed test case in test_ms_germline_risk.py following changes to test config (#314)
 
 ## [3.1.2] - 2026-02-02
 
