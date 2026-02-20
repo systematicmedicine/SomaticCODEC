@@ -122,13 +122,6 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, germ_risk_vcf, expec
     copied_vcf_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(germ_risk_vcf, copied_vcf_path)
 
-    # Copy ref file to temporary directory
-    ref_file = Path("tests/data/lightweight_test_run/downloads/GRCh38_Chr21_plus_stubs.fa")
-    expected_ref_path = config["sci_params"]["global"]["reference_genome"]
-    copied_ref_path = tmp_path / expected_ref_path
-    copied_ref_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(ref_file, copied_ref_path)
-
     # Define target BED
     target_bed = f"tmp/SEQ0001/SEQ0001_ms_germ_risk.bed"
 
@@ -139,6 +132,7 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, germ_risk_vcf, expec
     shutil.copy("Snakefile", tmp_path / "Snakefile")
     shutil.copytree("scripts", tmp_path / "scripts")
     shutil.copytree("rules", tmp_path / "rules")
+    shutil.copytree("tmp/downloads", tmp_path / "tmp/downloads")
     shutil.copytree("tests/data/lightweight_test_run/config", tmp_path / "tests/data/lightweight_test_run/config")
     shutil.copytree("definitions", tmp_path / "definitions")
 
