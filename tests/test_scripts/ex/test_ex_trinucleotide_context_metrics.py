@@ -20,20 +20,24 @@ import pandas as pd
 from pyfaidx import Fasta
 from collections import Counter
 import numpy as np
+from helpers.get_metadata import load_config
 
 # Integration test - Tests that output CSVs with the correct columns are created from input files
-@pytest.mark.parametrize("vcf_path, vcf_all_path, ref_fasta_path, ref_contexts_path, ref_trinuc_counts_path, expected_props_csv, expected_similarities_csv", [
+@pytest.mark.parametrize("vcf_path, vcf_all_path, expected_props_csv, expected_similarities_csv", [
     # Variant call eligible regions contain only one trinucleotide
     ("tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_variants.vcf",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_all_positions.vcf",
-     "tests/data/lightweight_test_run/downloads/GRCh38_Chr21_plus_stubs.fa",
-     "tests/data/lightweight_test_run/downloads/2025-09-30_trinucleotide_contexts.csv",
-     "tests/data/lightweight_test_run/downloads/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_props.csv",
      "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_similarities.csv")
 ])
-def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_fasta_path, ref_contexts_path, ref_trinuc_counts_path, expected_props_csv, expected_similarities_csv):
+def test_ex_trinucleotide_context_metrics(lightweight_test_run, tmp_path, vcf_path, vcf_all_path, expected_props_csv, expected_similarities_csv):
   
+  # Load reference file paths from config
+  config = load_config(lightweight_test_run["test_config_path"])
+  ref_fasta_path = config["sci_params"]["global"]["reference_genome"]
+  ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"]
+  ref_trinuc_counts_path = config["sci_params"]["global"]["reference_genome_trinuc_counts"]
+
   # Define tmp output paths
   proportions_csv = tmp_path / "trinuc_proportions.csv"
   similarities_csv = tmp_path / "trinuc_similarities.csv"
@@ -60,9 +64,7 @@ def test_ex_trinucleotide_context_metrics(tmp_path, vcf_path, vcf_all_path, ref_
     )
   
   # Mock PDF generation to reduce test time
-  with patch(
-        "scripts.ex.variant_analysis.ex_trinucleotide_context_metrics.generate_comparison_plots"
-    ):
+  with patch.object(tcm, "generate_comparison_plots"):
         # Run script with test data
         tcm.main(args=args)
 
