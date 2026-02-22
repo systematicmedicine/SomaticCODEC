@@ -27,7 +27,7 @@ Types of changes:
 - Rules that use a single thread now explicitly declare this (#310)
 - Updated thresholds for DNA fragment size component metrics (#311)
 - Sample metadata for internal testing and external use now decoupled (#312)
-- Removed hard coded paths from test_scripts (#312)
+- Removed hard coded paths from test_scripts (#312 and 315)
 
 ### Fixed
 
