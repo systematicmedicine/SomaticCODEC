@@ -5,14 +5,15 @@ Filter reads
 """
 
 import helpers.get_metadata as md
+from definitions.paths.io.ex import core as C
 
 rule ex_filter_fastq:
     input: 
-        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
-        r2 = "tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz",  
+        r1 = C.TRIMMED_FASTQ_R1,
+        r2 = C.TRIMMED_FASTQ_R2,  
     output:
-        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz"),
-        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz"),
+        r1 = temp(C.FILTERED_FASTQ_R1),
+        r2 = temp(C.FILTERED_FASTQ_R2),
         filter_metrics = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
     params:
         average_quality_threshold = config["sci_params"]["ex_filter_fastq"]["average_quality_threshold"],

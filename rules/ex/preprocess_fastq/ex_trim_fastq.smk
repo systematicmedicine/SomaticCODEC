@@ -8,24 +8,35 @@ Trim reads so that only inserts are remaining
 """
 
 import helpers.get_metadata as md
+from definitions.paths.io.ex import core as C
 
 rule ex_trim_fastq:
     input:
-        r1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
-        r2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
+        # Demultiplexed FASTQs
+        r1 = C.DEMUXD_FASTQ_R1,
+        r2 = C.DEMUXD_FASTQ_R2,
+
+        # Sample metadata
         ex_samples = config["metadata"]["ex_samples_metadata"],
         ex_technical_controls = config["metadata"]["ex_technical_controls_metadata"],
         ex_adapters = config["metadata"]["ex_adapters_metadata"],
+
     output:
-        r1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"),
-        r2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim.fastq.gz"),
+        # Trimmed FASTQs
+        r1 = temp(C.TRIMMED_FASTQ_R1),
+        r2 = temp(C.TRIMMED_FASTQ_R2),
+
+        # Metrics files
         trim5primejson = "metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json",
         r1_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json",
         r2_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json",
-        intermediate_r1_1 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters.fastq.gz"),
-        intermediate_r2_1 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters.fastq.gz"),
-        intermediate_r1_2 = temp("tmp/{ex_sample}/{ex_sample}_r1_trim_adapters2.fastq.gz"),
-        intermediate_r2_2 = temp("tmp/{ex_sample}/{ex_sample}_r2_trim_adapters2.fastq.gz")
+
+        # Intermediate files
+        int1_r1 = temp(C.EX_TRIM_FASTQ_INT1_R1),
+        int1_r2 = temp(C.EX_TRIM_FASTQ_INT1_R2),
+        int2_r1 = temp(C.EX_TRIM_FASTQ_INT2_R1),
+        int2_r2 = temp(C.EX_TRIM_FASTQ_INT2_R2),
+
     params:
         max_error_rate = config["sci_params"]["ex_trim_fastq"]["max_error_rate"],
         min_adapter_overlap = config["sci_params"]["ex_trim_fastq"]["min_adapter_overlap"],
@@ -58,8 +69,8 @@ rule ex_trim_fastq:
           --error-rate {params.max_error_rate} \
           -g ^{params.r1_start} \
           -G ^{params.r2_start} \
-          -o {output.intermediate_r1_1} \
-          -p {output.intermediate_r2_1} \
+          -o {output.int1_r1} \
+          -p {output.int1_r2} \
           --compression-level {params.compression_level} \
           {input.r1} {input.r2} \
           --json={output.trim5primejson} 2>> {log}
@@ -70,9 +81,9 @@ rule ex_trim_fastq:
           --error-rate {params.max_error_rate} \
           --overlap {params.min_adapter_overlap} \
           -b {params.r1_end} \
-          -o {output.intermediate_r1_2} \
+          -o {output.int2_r1} \
           --compression-level {params.compression_level} \
-          {output.intermediate_r1_1} \
+          {output.int1_r1} \
           --json={output.r1_trim3primejson} 2>> {log}
 
         # Trim 3' adapter sequences from R2
@@ -81,9 +92,9 @@ rule ex_trim_fastq:
           --error-rate {params.max_error_rate} \
           --overlap {params.min_adapter_overlap} \
           -b {params.r2_end} \
-          -o {output.intermediate_r2_2} \
+          -o {output.int2_r2} \
           --compression-level {params.compression_level} \
-          {output.intermediate_r2_1} \
+          {output.int1_r2} \
           --json={output.r2_trim3primejson} 2>> {log}
 
         # Trim additional bases and low quality bases
@@ -97,5 +108,5 @@ rule ex_trim_fastq:
           -o {output.r1} \
           -p {output.r2} \
           --compression-level {params.compression_level} \
-          {output.intermediate_r1_2} {output.intermediate_r2_2} 2>> {log}
+          {output.int2_r1} {output.int2_r2} 2>> {log}
         """ 
