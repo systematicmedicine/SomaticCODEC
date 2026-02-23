@@ -5,21 +5,25 @@ Moves the read pair UMI to readname
     - Append read 2 3bp UMI sequence after read 1 UMI in read 1 and read 2
 """ 
 
-# Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
-
 import helpers.get_metadata as md
+from definitions.paths.io.ex import core as C
 
 # Rule
 rule ex_extract_fastq_umis:
     input:
-        global_setup = global_setup,
-        ex_lanes = config["metadata"]["ex_lanes_metadata"],
+        # Raw FASTQs
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
-        fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1]
+        fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
+
+        # Sample metadata
+        ex_lanes = config["metadata"]["ex_lanes_metadata"],
+
+        # All setup complete before rule can run
+        global_setup = global_setup
+
     output:
-        fastq1 = temp("tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz"),
-        fastq2 = temp("tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz")
+        fastq1 = temp(C.UMIXD_FASTQ_R1),
+        fastq2 = temp(C.UMIXD_FASTQ_R2)
     params:
         umi_length = config["sci_params"]["ex_extract_fastq_umis"]["umi_length"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
