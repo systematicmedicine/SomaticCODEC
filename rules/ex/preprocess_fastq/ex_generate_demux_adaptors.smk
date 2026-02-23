@@ -3,6 +3,7 @@ Generates adapter FASTA files for demultiplexing
 """
 
 import helpers.get_metadata as md
+from definitions.paths.io.ex.core import ADAPTORS_R1_START, ADAPTORS_R2_START
 import json
 
 rule ex_generate_demux_adaptors:
@@ -12,15 +13,14 @@ rule ex_generate_demux_adaptors:
         ex_technical_controls = config["metadata"]["ex_technical_controls_metadata"],
         ex_adapters = config["metadata"]["ex_adapters_metadata"]
     output:
-        "tmp/{ex_lane}/{ex_lane}_{region}.fasta"
-    wildcard_constraints:
-        region="r1_start|r2_start"
+        r1_start = ADAPTORS_R1_START,
+        r2_start = ADAPTORS_R2_START
     params:
         adapter_dict = json.dumps(md.get_ex_lane_adapter_dict(config))
     log:
-        "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}_{region}.log"
+        "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}.log"
     benchmark:
-        "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}_{region}.benchmark.txt"
+        "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}.benchmark.txt"
     threads:
         1
     resources:
@@ -34,7 +34,7 @@ rule ex_generate_demux_adaptors:
         ex_generate_demux_adaptors.py \
           --adapter_dict '{params.adapter_dict}' \
           --lane '{wildcards.ex_lane}' \
-          --region '{wildcards.region}' \
-          --output '{output}' \
+          --r1_start '{output.r1_start}' \
+          --r2_start '{output.r2_start}' \
           --log {log} 2>> {log}
         """
