@@ -115,15 +115,18 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, germ_risk_vcf, expec
 
     # Load config
     config = load_config(lightweight_test_run["test_config_path"])
+
+    # Set test sample ID as first MS sample
+    test_sample_ID = get_ms_sample_ids(config)[0]
     
     # Copy input VCF to temporary directory
-    expected_vcf_path = Path(f"tmp/SEQ0001/SEQ0001_ms_germ_risk.vcf")
+    expected_vcf_path = Path(f"tmp/{test_sample_ID}/{test_sample_ID}_ms_germ_risk.vcf")
     copied_vcf_path = tmp_path / expected_vcf_path
     copied_vcf_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy(germ_risk_vcf, copied_vcf_path)
 
     # Define target BED
-    target_bed = f"tmp/SEQ0001/SEQ0001_ms_germ_risk.bed"
+    target_bed = f"tmp/{test_sample_ID}/{test_sample_ID}_ms_germ_risk.bed"
 
     # Define output BED
     output_bed = Path(tmp_path, target_bed)

@@ -114,12 +114,15 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, deduped_bam, deduped
     # Load config
     config = load_config(lightweight_test_run["test_config_path"])
 
+    # Set test sample ID as first MS sample
+    test_sample_ID = get_ms_sample_ids(config)[0]
+
     # Set MS depth threshold higher to allow for testing of depth filter
     config["sci_params"]["ms_low_depth_mask"]["min_depth"] = 40
 
     # Copy input BAM and BAI to temporary directory
-    expected_bam_path = Path(f"tmp/SEQ0001/SEQ0001_deduped_map.bam")
-    expected_bai_path = Path(f"tmp/SEQ0001/SEQ0001_deduped_map.bam.bai")
+    expected_bam_path = Path(f"tmp/{test_sample_ID}/{test_sample_ID}_deduped_map.bam")
+    expected_bai_path = Path(f"tmp/{test_sample_ID}/{test_sample_ID}_deduped_map.bam.bai")
 
     copied_bam_path = tmp_path / expected_bam_path
     copied_bai_path = tmp_path / expected_bai_path
@@ -131,7 +134,7 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, deduped_bam, deduped
     shutil.copy(deduped_bai, copied_bai_path)
 
     # Define target VCF
-    target_vcf = f"tmp/SEQ0001/SEQ0001_ms_germ_risk.vcf"
+    target_vcf = f"tmp/{test_sample_ID}/{test_sample_ID}_ms_germ_risk.vcf"
 
     # Define output VCF
     output_vcf = Path(tmp_path, target_vcf)
