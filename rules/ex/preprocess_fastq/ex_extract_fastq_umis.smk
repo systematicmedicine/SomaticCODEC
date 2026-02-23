@@ -5,6 +5,9 @@ Moves the read pair UMI to readname
     - Append read 2 3bp UMI sequence after read 1 UMI in read 1 and read 2
 """ 
 
+# Rule depends on output lists defined in pipeline_outputs.smk
+include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
+
 import helpers.get_metadata as md
 from definitions.paths.io.ex import core as C
 
