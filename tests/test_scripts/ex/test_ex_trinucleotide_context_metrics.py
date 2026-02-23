@@ -68,11 +68,6 @@ def test_ex_trinucleotide_context_metrics(lightweight_test_run, tmp_path, vcf_pa
         # Run script with test data
         tcm.main(args=args)
 
-  # Clean up generated .fai index
-  fai_path = Path(ref_fasta_path).with_suffix(Path(ref_fasta_path).suffix + ".fai")
-  if fai_path.exists():
-      fai_path.unlink()
-
   # --- Assertions ---
   # Ensure CSV schema match expected
   props_df = pd.read_csv(proportions_csv)
