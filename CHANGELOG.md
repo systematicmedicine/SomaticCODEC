@@ -17,6 +17,7 @@ Types of changes:
 
 - Added script for visualising rulegraphs (#307)
 - Additional test cases for metrics report (#304)
+- Added component metrics for median fragment length during library prep (#316) 
 
 ### Changed
 
