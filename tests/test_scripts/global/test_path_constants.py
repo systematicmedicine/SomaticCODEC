@@ -3,24 +3,20 @@
 
 Simple guardrail for centralised path constants.
 
-For all uppercase string constants in definitions.paths.io:
-    - Skip constants starting with "MET" (metrics files)
-    - If name contains BAM   → ".bam"   must be in the string
-    - If name contains SAM   → ".sam"   must be in the string
-    - If name contains FASTQ → ".fastq" must be in the string
-    - If name contains VCF   → ".vcf"   must be in the string
-    - If name contains BED   → ".bed"   must be in the string
+Rules:
+- Skip constants starting with "MET" (metrics files)
+- If name contains BAM   → ".bam"   must be in the string
+- If name contains SAM   → ".sam"   must be in the string
+- If name contains DSC   → ".bam"   must be in the string 
+- If name contains FASTQ → ".fastq" must be in the string
+- If name contains VCF   → ".vcf"   must be in the string
+- If name contains BED   → ".bed"   must be in the string
+- If name contains R1    → value must contain "r1" and NOT "r2"
+- If name contains R2    → value must contain "r2" and NOT "r1"
 """
 
 import importlib
 import pkgutil
-import pytest
-
-# Pytest marking
-pytestmark = [
-    pytest.mark.quicktests,
-    pytest.mark.order(6)
-]
 
 
 def load_all_path_modules():
@@ -34,7 +30,7 @@ def load_all_path_modules():
     return modules
 
 
-def test_path_constant_extensions():
+def test_path_constant_extensions_and_read_labels():
 
     modules = load_all_path_modules()
     offenders = []
@@ -48,14 +44,17 @@ def test_path_constant_extensions():
             if not isinstance(value, str):
                 continue
 
-            # Skip metrics constants
             if name.startswith("MET"):
                 continue
 
+            # Extension checks
             if "BAM" in name and ".bam" not in value:
                 offenders.append(f"{module.__name__}.{name} = {value}")
 
             if "SAM" in name and ".sam" not in value:
+                offenders.append(f"{module.__name__}.{name} = {value}")
+
+            if "DSC" in name and ".bam" not in value:
                 offenders.append(f"{module.__name__}.{name} = {value}")
 
             if "FASTQ" in name and ".fastq" not in value:
@@ -67,7 +66,16 @@ def test_path_constant_extensions():
             if "BED" in name and ".bed" not in value:
                 offenders.append(f"{module.__name__}.{name} = {value}")
 
+            # R1 / R2 checks
+            if "R1" in name:
+                if "r1" not in value or "r2" in value:
+                    offenders.append(f"{module.__name__}.{name} = {value}")
+
+            if "R2" in name:
+                if "r2" not in value or "r1" in value:
+                    offenders.append(f"{module.__name__}.{name} = {value}")
+
     assert not offenders, (
-        "Path constants with mismatched extensions:\n" +
+        "Path constants with mismatches:\n" +
         "\n".join(offenders)
     )
