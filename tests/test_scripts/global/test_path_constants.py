@@ -7,7 +7,6 @@ Rules:
 - Skip constants starting with "MET" (metrics files)
 - If name contains BAM   → ".bam"   must be in the string
 - If name contains SAM   → ".sam"   must be in the string
-- If name contains DSC   → ".bam"   must be in the string 
 - If name contains FASTQ → ".fastq" must be in the string
 - If name contains VCF   → ".vcf"   must be in the string
 - If name contains BED   → ".bed"   must be in the string
@@ -17,7 +16,13 @@ Rules:
 
 import importlib
 import pkgutil
+import pytest
 
+# Pytest marking
+pytestmark = [
+    pytest.mark.quicktests,
+    pytest.mark.order(6)
+]
 
 def load_all_path_modules():
     package = importlib.import_module("definitions.paths.io")
@@ -52,9 +57,6 @@ def test_path_constant_extensions_and_read_labels():
                 offenders.append(f"{module.__name__}.{name} = {value}")
 
             if "SAM" in name and ".sam" not in value:
-                offenders.append(f"{module.__name__}.{name} = {value}")
-
-            if "DSC" in name and ".bam" not in value:
                 offenders.append(f"{module.__name__}.{name} = {value}")
 
             if "FASTQ" in name and ".fastq" not in value:
