@@ -17,7 +17,7 @@ from pathlib import Path
 from helpers.get_metadata import load_config, get_ms_sample_ids, get_ex_lane_ids, get_ex_sample_ids, get_ex_technical_control_ids
 from helpers.count_data_points import count_data_points
 
-pytestmark = pytest.mark.order(8)
+pytestmark = pytest.mark.order(9)
 
 """ (1) Test that all expected files exist"""
 def test_expected_outputs_exist(lightweight_test_run, expected_files_list):
