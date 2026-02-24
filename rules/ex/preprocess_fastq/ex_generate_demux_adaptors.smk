@@ -3,7 +3,7 @@ Generates adapter FASTA files for demultiplexing
 """
 
 import helpers.get_metadata as md
-from definitions.paths.io.ex import core as C
+from definitions.paths.io import ex as EX
 import json
 
 rule ex_generate_demux_adaptors:
@@ -13,8 +13,8 @@ rule ex_generate_demux_adaptors:
         ex_technical_controls = config["metadata"]["ex_technical_controls_metadata"],
         ex_adapters = config["metadata"]["ex_adapters_metadata"]
     output:
-        r1_start = C.ADAPTOR_R1_START,
-        r2_start = C.ADAPTOR_R2_START
+        r1_start = EX.ADAPTOR_R1_START,
+        r2_start = EX.ADAPTOR_R2_START
     params:
         adapter_dict = json.dumps(md.get_ex_lane_adapter_dict(config))
     log:

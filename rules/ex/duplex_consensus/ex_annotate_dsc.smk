@@ -2,17 +2,23 @@
 Add metadata to the DSC
     - Replace metadata lost during alignment
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_annotate_dsc: 
     input:
-        mapped = "tmp/{ex_sample}/{ex_sample}_map_dsc.bam",
-        unmapped = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
+        # DSCs
+        mapped = EX.REALIGNED_DSC,
+        unmapped = EX.RAW_DSC,
+
+        # Reference genome
         ref = config["sci_params"]["global"]["reference_genome"],
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
         dictf = os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"),
-        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam.bai"),
-        intermediate_anno = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_unsorted_tmp.bam")
+        intermediate_anno = temp(EX.ANNOTATE_DSC_INT1),
+        bam = temp(EX.ANNOTATED_DSC),
+        bai = temp(EX.ANNOTATED_DSC_INDEX),
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:

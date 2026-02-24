@@ -8,13 +8,13 @@ Trim reads so that only inserts are remaining
 """
 
 import helpers.get_metadata as md
-from definitions.paths.io.ex import core as C
+from definitions.paths.io import ex as EX
 
 rule ex_trim_fastq:
     input:
         # Demultiplexed FASTQs
-        r1 = C.DEMUXD_FASTQ_R1,
-        r2 = C.DEMUXD_FASTQ_R2,
+        r1 = EX.DEMUXD_FASTQ_R1,
+        r2 = EX.DEMUXD_FASTQ_R2,
 
         # Sample metadata
         ex_samples = config["metadata"]["ex_samples_metadata"],
@@ -23,19 +23,19 @@ rule ex_trim_fastq:
 
     output:
         # Trimmed FASTQs
-        r1 = temp(C.TRIMMED_FASTQ_R1),
-        r2 = temp(C.TRIMMED_FASTQ_R2),
+        r1 = temp(EX.TRIMMED_FASTQ_R1),
+        r2 = temp(EX.TRIMMED_FASTQ_R2),
 
         # Metrics files
-        trim5primejson = "metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json",
-        r1_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json",
-        r2_trim3primejson = "metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json",
+        trim5primejson = EX.MET_TRIM_FASTQ_TRIM5P,
+        r1_trim3primejson = EX.MET_TRIM_FASTQ_TRIM3PR1,
+        r2_trim3primejson = EX.MET_TRIM_FASTQ_TRIM3PR2, 
 
         # Intermediate files
-        int1_r1 = temp(C.EX_TRIM_FASTQ_INT1_R1),
-        int1_r2 = temp(C.EX_TRIM_FASTQ_INT1_R2),
-        int2_r1 = temp(C.EX_TRIM_FASTQ_INT2_R1),
-        int2_r2 = temp(C.EX_TRIM_FASTQ_INT2_R2),
+        int1_r1 = temp(EX.TRIM_FASTQ_INT1_R1),
+        int1_r2 = temp(EX.TRIM_FASTQ_INT1_R2),
+        int2_r1 = temp(EX.TRIM_FASTQ_INT2_R1),
+        int2_r2 = temp(EX.TRIM_FASTQ_INT2_R2),
 
     params:
         max_error_rate = config["sci_params"]["ex_trim_fastq"]["max_error_rate"],

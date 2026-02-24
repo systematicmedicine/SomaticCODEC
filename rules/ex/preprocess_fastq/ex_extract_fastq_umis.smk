@@ -9,7 +9,7 @@ Moves the read pair UMI to readname
 include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
-from definitions.paths.io.ex import core as C
+from definitions.paths.io import ex as EX
 
 # Rule
 rule ex_extract_fastq_umis:
@@ -25,8 +25,8 @@ rule ex_extract_fastq_umis:
         global_setup = global_setup
 
     output:
-        fastq1 = temp(C.UMIXD_FASTQ_R1),
-        fastq2 = temp(C.UMIXD_FASTQ_R2)
+        fastq1 = temp(EX.UMIXD_FASTQ_R1),
+        fastq2 = temp(EX.UMIXD_FASTQ_R2)
     params:
         umi_length = config["sci_params"]["ex_extract_fastq_umis"]["umi_length"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]

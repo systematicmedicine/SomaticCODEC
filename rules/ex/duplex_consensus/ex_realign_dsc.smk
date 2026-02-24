@@ -3,9 +3,15 @@ Realign the DSC to the reference genome
     - This is required because the consensus sequence may differ from the sequences previously used for alignment
     - Single stranded overhangs are present in this BAM to assist with alignment (ideally filtered later)
 """
-rule ex_remap_dsc:
+
+from definitions.paths.io import ex as EX
+
+rule ex_realign_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam",
+        # Raw DSC
+        bam = EX.RAW_DSC,
+
+        # Reference genome
         ref = config["sci_params"]["global"]["reference_genome"],
         amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
         ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
@@ -13,10 +19,13 @@ rule ex_remap_dsc:
         pac = config["sci_params"]["global"]["reference_genome"] + ".pac",
         sa = config["sci_params"]["global"]["reference_genome"] + ".0123"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc.bam"),
-        intermediate_fastq = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc_tmp.fastq"),
-        intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.sam"),
-        unsorted_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_unsorted_tmp.bam")
+        # Intermediate files
+        intermediate_fastq = temp(EX.REALIGN_DSC_INT1),
+        intermediate_sam = temp(EX.REALIGN_DSC_INT2),
+        unsorted_bam = temp(EX.REALIGN_DSC_INT3),
+        
+        # Rule output
+        bam = temp(EX.REALIGNED_DSC),
     params:
         band_width = config["sci_params"]["ex_remap_dsc"]["band_width"],
         clipping_penalty = config["sci_params"]["ex_remap_dsc"]["clipping_penalty"],

@@ -9,6 +9,7 @@ Trims FASTQ files
 include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
+from definitions.paths.io import ms as MS
 
 rule ms_trim_fastq:
     input:
@@ -17,11 +18,11 @@ rule ms_trim_fastq:
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
-        intermediate_spacer_removed_r1 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r1.fastq.gz"),
-        intermediate_spacer_removed_r2 = temp("tmp/{ms_sample}/{ms_sample}_spacer_removed_r2.fastq.gz"),
-        r1 = temp("tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz"),
-        r2 = temp("tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz"),
-        report = "metrics/{ms_sample}/{ms_sample}_trim_metrics.txt"
+        intermediate_spacer_removed_r1 = temp(MS.TRIM_FASTQ_INT_R1),
+        intermediate_spacer_removed_r2 = temp(MS.TRIM_FASTQ_INT_R2),
+        r1 = temp(MS.TRIMMED_FASTQ_R1),
+        r2 = temp(MS.TRIMMED_FASTQ_R2),
+        report = MS.MET_TRIM_FASTQ
     params:
         adaptor_1 = config["sci_params"]["ms_trim_fastq"]["adaptor_1"],
         adaptor_2 = config["sci_params"]["ms_trim_fastq"]["adaptor_2"],

@@ -4,17 +4,17 @@ Demultiplex each lane FASTQ into sample FASTQs
 """
 
 import helpers.get_metadata as md
-from definitions.paths.io.ex import core as C
+from definitions.paths.io import ex as EX
 
 rule ex_demultiplex_fastq:
     input:
         # UMI extracted FASTQs
-        umixd_r1 = expand(C.UMIXD_FASTQ_R1, ex_lane = md.get_ex_lane_ids(config)),
-        umixd_r2 = expand(C.UMIXD_FASTQ_R2, ex_lane = md.get_ex_lane_ids(config)),
+        umixd_r1 = expand(EX.UMIXD_FASTQ_R1, ex_lane = md.get_ex_lane_ids(config)),
+        umixd_r2 = expand(EX.UMIXD_FASTQ_R2, ex_lane = md.get_ex_lane_ids(config)),
 
         # Demultiplex adaptors
-        r1_start = expand(C.ADAPTOR_R1_START, ex_lane = md.get_ex_lane_ids(config)),
-        r2_start = expand(C.ADAPTOR_R2_START, ex_lane = md.get_ex_lane_ids(config)),
+        r1_start = expand(EX.ADAPTOR_R1_START, ex_lane = md.get_ex_lane_ids(config)),
+        r2_start = expand(EX.ADAPTOR_R2_START, ex_lane = md.get_ex_lane_ids(config)),
 
         # Sample metadata
         ex_lanes = config["metadata"]["ex_lanes_metadata"],
@@ -23,14 +23,14 @@ rule ex_demultiplex_fastq:
     output:
         # Demultiplexed FASTQs
         demuxed_r1 = 
-            temp(expand(C.DEMUXD_FASTQ_R1, ex_sample = md.get_ex_sample_ids(config))) + 
+            temp(expand(EX.DEMUXD_FASTQ_R1, ex_sample = md.get_ex_sample_ids(config))) + 
             temp(expand("tmp/{ex_technical_control}/{ex_technical_control}_r1_demux.fastq.gz", ex_technical_control = md.get_ex_technical_control_ids(config))),
         demuxed_r2 = 
-            temp(expand(C.DEMUXD_FASTQ_R2, ex_sample = md.get_ex_sample_ids(config))) + 
+            temp(expand(EX.DEMUXD_FASTQ_R2, ex_sample = md.get_ex_sample_ids(config))) + 
             temp(expand("tmp/{ex_technical_control}/{ex_technical_control}_r2_demux.fastq.gz", ex_technical_control = md.get_ex_technical_control_ids(config))),
         
         # Metrics files
-        metrics = expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = md.get_ex_lane_ids(config))
+        metrics = expand(EX.MET_DEMULIPLEX_FASTQ, ex_lane = md.get_ex_lane_ids(config))
         
     params:
         max_error_rate = config["sci_params"]["ex_demultiplex_fastq"]["max_error_rate"],

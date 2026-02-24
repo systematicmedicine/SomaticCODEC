@@ -8,18 +8,25 @@ Call somatic SNVs
 is insufficient)
 """
 
+from definitions.paths.io import ex as EX
+from definitions.paths.io import ms as MS
+
 rule ex_call_somatic_snv:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
+        bam = EX.FILTERED_DSC,
+        bai = EX.FILTERED_DSC_INDEX,
         ref = config["sci_params"]["global"]["reference_genome"],
-        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+        include_bed = MS.INCLUDE_BED
     output:
-        vcf_all = temp("tmp/{ex_sample}/{ex_sample}_all_positions.vcf"), # Pileup of every unmasked position (except positions where indels present)
-        vcf_snvs = protected("results/{ex_sample}/{ex_sample}_variants.vcf"), # Subset of vcf_all, where SNVs have been called
-        intermediate_mpileup = temp("tmp/{ex_sample}/{ex_sample}_bcf_mpileup.bcf"),
-        intermediate_called = temp("tmp/{ex_sample}/{ex_sample}_bcf_called.bcf"),
-        intermediate_biallelic = temp("tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf")
+        # Intermediate files
+        intermediate_mpileup = temp(EX.CALL_SOMATIC_SNV_INT1),
+        intermediate_called = temp(EX.CALL_SOMATIC_SNV_INT2 ),
+        vcf_all = temp(EX.CALL_SOMATIC_SNV_INT3),
+        intermediate_biallelic = temp(EX.CALL_SOMATIC_SNV_INT4),
+
+        # Rule output
+        vcf_snvs = protected(EX.CALLED_SNVS)
+
     params:
         max_base_quality = config["sci_params"]["ex_call_somatic_snv"]["max_base_quality"],
         min_base_quality = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
