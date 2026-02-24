@@ -5,16 +5,16 @@ Filter reads
 """
 
 import helpers.get_metadata as md
-from definitions.paths.io.ex import core as C
+from definitions.paths.io import ex as EX
 
 rule ex_filter_fastq:
     input: 
-        r1 = C.TRIMMED_FASTQ_R1,
-        r2 = C.TRIMMED_FASTQ_R2,  
+        r1 = EX.TRIMMED_FASTQ_R1,
+        r2 = EX.TRIMMED_FASTQ_R2,  
     output:
-        r1 = temp(C.FILTERED_FASTQ_R1),
-        r2 = temp(C.FILTERED_FASTQ_R2),
-        filter_metrics = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
+        r1 = temp(EX.FILTERED_FASTQ_R1),
+        r2 = temp(EX.FILTERED_FASTQ_R2),
+        filter_metrics = EX.MET_FILTER_FASTQ
     params:
         average_quality_threshold = config["sci_params"]["ex_filter_fastq"]["average_quality_threshold"],
         min_read_length = config["sci_params"]["ex_filter_fastq"]["min_read_length"]

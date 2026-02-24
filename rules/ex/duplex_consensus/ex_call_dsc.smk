@@ -5,12 +5,15 @@ Create duplex consensus (DSC)
     - Single stranded overhangs are retained for alignment purposes, but a Q of 2 is assigned to all single strand bases
     - Reads with >3 disagreements between overlapping paired end reads are excluded
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_call_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_umi_grouped.bam"
+        bam = EX.UMI_GROUPED_BAM
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_unmap_dsc.bam"),
-        metrics = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
+        bam = temp(EX.RAW_DSC),
+        metrics = EX.MET_CALL_DSC
     params:
         error_rate_pre_umi = config["sci_params"]["ex_call_dsc"]["error_rate_pre_umi"],
         error_rate_post_umi = config["sci_params"]["ex_call_dsc"]["error_rate_post_umi"],
