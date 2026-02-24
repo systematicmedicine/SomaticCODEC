@@ -21,7 +21,7 @@ from conftest import PROJECT_ROOT, clean_workspace, deep_update
 # Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(6)
+    pytest.mark.order(7)
 ]
 
 
