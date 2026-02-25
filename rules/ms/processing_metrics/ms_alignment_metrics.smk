@@ -2,11 +2,13 @@
 Generates MS alignment metrics
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_alignment_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam"
+        bam = MS.DEDUPED_BAM
     output:
-        stats = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt"
+        stats = MS.MET_ALIGNMENT
     log:
         "logs/{ms_sample}/ms_alignment_metrics.log"
     benchmark:

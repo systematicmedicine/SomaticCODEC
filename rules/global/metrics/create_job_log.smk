@@ -2,12 +2,14 @@
 Creates a CSV of job start and finish times
 """
 
+from definitions.paths.io import shared as S
+
 rule create_job_log:
     input:
-        component_metrics_csv = "metrics/component_metrics_report.csv",
-        component_metrics_png = "metrics/component_metrics_heatmap.png",
-        system_metrics_csv = "results/system_metrics_report.csv",
-        system_metrics_png = "results/system_metrics_heatmap.png",
+        component_metrics_csv = S.MET_COMPONENT_METRICS_REPORT,
+        component_metrics_png = S.MET_COMPONENT_METRICS_HEATMAP,
+        system_metrics_csv = S.MET_SYSTEM_METRICS_REPORT,
+        system_metrics_png = S.MET_SYSTEM_METRICS_HEATMAP,
         run_pipeline_log = ancient("logs/bin_scripts/run_pipeline.log")
     output:
         job_log_csv = "logs/global_rules/job_log.csv"

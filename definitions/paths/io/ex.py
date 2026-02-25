@@ -7,7 +7,9 @@ Abbreviations:
     - INT (Intermediate file)
     - MET (Metrics file)
 
-Author: Cameron Fraser
+Authors: 
+    - Cameron Fraser
+    - Joshua Johnstone
 
 """
 
@@ -143,3 +145,24 @@ MET_TOTAL_READ_LOSS = "metrics/{ex_sample}/{ex_sample}_total_read_loss.json"
 MET_VAR_CALL_DISAGREE = "metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json"
 
 # Variant calling
+
+MET_SOMATIC_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.json"
+MET_CHROM_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
+
+MET_GNOMAD_OVERLAP_VCF = "results/{ex_sample}/{ex_sample}_germline_matches.vcf"
+MET_GNOMAD_OVERLAP_JSON = "results/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json"
+MET_GNOMAD_OVERLAP_INT_BGZ = "tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"
+MET_GNOMAD_OVERLAP_INT_TBI = "tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"
+
+MET_RECURRENT_VARIANTS_VCF = "results/batch/batch_recurrent_variants.vcf"
+MET_RECURRENT_VARIANTS_JSON = "results/batch/batch_recurrent_variant_metrics.json"
+
+MET_SNV_DISTANCE = "results/{ex_sample}/{ex_sample}_snv_distance.json"
+MET_SNV_POSITION_JSON = "results/{ex_sample}/{ex_sample}_snv_position_metrics.json"
+MET_SNV_POSITION_PDF = "results/{ex_sample}/{ex_sample}_snv_position_plot.pdf"
+
+MET_SNV_GERMLINE_CONTEXT = "results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
+
+MET_TRINUC_PROPORTIONS = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv"
+MET_TRINUC_SIMILARITIES = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv"
+MET_TRINUC_PLOTS = "results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf"

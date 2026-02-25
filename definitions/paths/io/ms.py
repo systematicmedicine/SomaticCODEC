@@ -7,7 +7,9 @@ Abbreviations:
     - INT (Intermediate file)
     - MET (Metrics file)
 
-Author: Cameron Fraser
+Authors: 
+    - Cameron Fraser
+    - Joshua Johnstone
 
 """
 
@@ -76,12 +78,45 @@ INCLUDE_BED = "tmp/{ex_sample}/{ex_sample}_include.bed"
 
 # Preprocess FASTQ
 
+MET_FASTQC_RAW_HTML_R1 = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html"
+MET_FASTQC_RAW_HTML_R2 = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html"
+MET_FASTQC_RAW_TXT_R1 = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt"
+MET_FASTQC_RAW_TXT_R2 = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt"
+MET_FASTQC_RAW_INT_R1 = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip"
+MET_FASTQC_RAW_INT_R2 = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip"
+MET_FASTQC_RAW_SUMMARY_R1 = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json"
+MET_FASTQC_RAW_SUMMARY_R2 = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json"
+
 MET_TRIM_FASTQ = "metrics/{ms_sample}/{ms_sample}_trim_metrics.txt"
 
 MET_FILTER_FASTQ = "metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt"
 
+MET_FASTQC_FILTER_HTML_R1 = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html"
+MET_FASTQC_FILTER_HTML_R2 = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html"
+MET_FASTQC_FILTER_TXT_R1 = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt"
+MET_FASTQC_FILTER_TXT_R2 = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt"
+MET_FASTQC_FILTER_INT_R1 = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip"
+MET_FASTQC_FILTER_INT_R2 = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip"
+MET_FASTQC_FILTER_SUMMARY_R1 = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json"
+MET_FASTQC_FILTER_SUMMARY_R2 = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json"
+
 # Alignment
 
 MET_REMOVE_DUPLICATES = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.json"
+MET_DUPLICATION = "metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json"
+
+MET_ALIGNMENT = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt"
+
+MET_INSERT_SIZE_TXT = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt"
+MET_INSERT_SIZE_PDF = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
+
+MET_DEPTH_HIST = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt"
+MET_DEPTH_HIST_INT1 = "tmp/{ms_sample}/{ms_sample}_depth_values.txt"
+MET_DEPTH_HIST_INT2 = "tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt"
+MET_COVERAGE_BY_DEPTH = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
 
 # Masked regions
+
+MET_MASKING = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json"
+MET_MASKING_INT1 = "tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"
+MET_MASKING_INT2 = "tmp/{ms_sample}/{ms_sample}_masks_merged.txt"

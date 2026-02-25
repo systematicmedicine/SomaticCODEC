@@ -1,13 +1,16 @@
 """
 Positional distribution of called SNVs
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_snv_position_metrics:
     input:
-        vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        vcf_path = EX.CALLED_SNVS,
         index_path = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        metrics_json = "results/{ex_sample}/{ex_sample}_snv_position_metrics.json",
-        metrics_plot = "results/{ex_sample}/{ex_sample}_snv_position_plot.pdf"
+        metrics_json = EX.MET_SNV_POSITION_JSON,
+        metrics_plot = EX.MET_SNV_POSITION_PDF
     params:
         included_chroms = config["sci_params"]["global"]["included_chromosomes"],
         run_name = config["run_name"]
