@@ -1,13 +1,16 @@
 """
 Duplication rate calculated based on unique UMI families output from ex_groupbyumi.
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_duplication_metrics:
     input:
-        umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt"
+        umi_metrics = EX.MET_GROUP_BY_UMI
     params:
         sample = "{ex_sample}"
     output:
-        json = "metrics/{ex_sample}/{ex_sample}_duplication_metrics.json"
+        json = EX.MET_DUPLICATION
     log:
         "logs/{ex_sample}/ex_duplication_metrics.log"
     benchmark:

@@ -1,11 +1,14 @@
 """
-Quantifies how much soft clipping is present in final DSC
+Quantifies soft clipping in final DSC
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_softclipping_metrics:
     input:
-        dsc_final = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
+        dsc_final = EX.FILTERED_DSC
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json"
+        metrics = EX.MET_SOFTCLIPPING
     log:
         "logs/{ex_sample}/ex_softclipping_metrics.log"
     benchmark:

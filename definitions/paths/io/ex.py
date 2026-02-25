@@ -83,31 +83,63 @@ CALLED_SNVS = "results/{ex_sample}/{ex_sample}_variants.vcf"
 
 # Preprocess FASTQ
 
-MET_DEMULIPLEX_FASTQ = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
+MET_FASTQC_RAW_HTML_R1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html"
+MET_FASTQC_RAW_HTML_R2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html"
+MET_FASTQC_RAW_TXT_R1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt"
+MET_FASTQC_RAW_TXT_R2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"
+MET_FASTQC_RAW_INT_R1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.zip"
+MET_FASTQC_RAW_INT_R2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.zip"
 
+MET_FASTQC_RAW_SUMMARY_R1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json"
+MET_FASTQC_RAW_SUMMARY_R2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json"
+
+MET_DEMULIPLEX_FASTQ = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
 MET_DEMUX_COUNTS_GINI = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
 
 MET_TRIM_FASTQ_TRIM5P = "metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json"
 MET_TRIM_FASTQ_TRIM3PR1 = "metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json"
 MET_TRIM_FASTQ_TRIM3PR2 = "metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json"
-
+MET_TRIM_READ_LENGTHS = "metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json"
 MET_BASES_TRIMMED = "metrics/{ex_sample}/{ex_sample}_bases_trimmed.json"
 
 MET_FILTER_FASTQ = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
+MET_FASTQC_FILTER_HTML_R1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html"
+MET_FASTQC_FILTER_HTML_R2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html"
+MET_FASTQC_FILTER_TXT_R1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt"
+MET_FASTQC_FILTER_TXT_R2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt"
+MET_FASTQC_FILTER_INT_R1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.zip"
+MET_FASTQC_FILTER_INT_R2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.zip"
+MET_FASTQC_FILTER_SUMMARY_R1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics_summary.json"
+MET_FASTQC_FILTER_SUMMARY_R2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics_summary.json"
 
 # Alignment
 
+MET_ALIGNMENT = "metrics/{ex_sample}/{ex_sample}_map_metrics.txt"
+MET_INSERT_SIZE_TXT = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt"
+MET_INSERT_SIZE_PDF = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf"
+
 MET_GROUP_BY_UMI = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt"
+
+MET_DUPLICATION = "metrics/{ex_sample}/{ex_sample}_duplication_metrics.json"
 
 # Duplex consensus
 
 MET_CALL_DSC = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
-
 MET_READS_LOST_CALL_DSC = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json"
 
-MET_DSC_DEPTH = "metrics/{ex_sample}/{ex_sample}_depth_metrics.json"
+MET_DSC_REMAP = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
 
+MET_DUPLEX_OVERLAP = "metrics/{ex_sample}/{ex_sample}_duplex_overlap_metrics.json"
+
+MET_DSC_DEPTH = "metrics/{ex_sample}/{ex_sample}_depth_metrics.json"
 MET_DSC_COVERAGE_JSON = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
 MET_DSC_COVERAGE_PLOT = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_plot.html"
+MET_COVERAGE_OVERLAP = "metrics/{ex_sample}/{ex_sample}_coverage_overlap_metrics.json"
+
+MET_SOFTCLIPPING = "metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json"
+
+MET_TOTAL_READ_LOSS = "metrics/{ex_sample}/{ex_sample}_total_read_loss.json"
+
+MET_VAR_CALL_DISAGREE = "metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json"
 
 # Variant calling
