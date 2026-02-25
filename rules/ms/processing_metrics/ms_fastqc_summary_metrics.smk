@@ -2,17 +2,19 @@
 Generates a summary of key metrics for ms fastqc reports
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_fastqc_summary_metrics:
     input:
-        fastqc_files = ["metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt",
-        "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt",
-        "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt",
-        "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt" ]
+        fastqc_files = [MS.MET_FASTQC_RAW_TXT_R1,
+        MS.MET_FASTQC_RAW_TXT_R2,
+        MS.MET_FASTQC_FILTER_TXT_R1,
+        MS.MET_FASTQC_FILTER_TXT_R2]
     output:
-        json_files = ["metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json",
-        "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json",
-        "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json",
-        "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json"]
+        json_files = [MS.MET_FASTQC_RAW_SUMMARY_R1,
+        MS.MET_FASTQC_RAW_SUMMARY_R2,
+        MS.MET_FASTQC_FILTER_SUMMARY_R1,
+        MS.MET_FASTQC_FILTER_SUMMARY_R2]
     params:
         sample = "{ms_sample}"
     log:

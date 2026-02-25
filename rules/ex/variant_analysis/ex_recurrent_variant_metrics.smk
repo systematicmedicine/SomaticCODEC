@@ -3,14 +3,15 @@ Identify somatic variants present in multiple samples in a batch
 """
 
 import helpers.get_metadata as md
+from definitions.paths.io import ex as EX
 
 rule ex_recurrent_variant_metrics:
     input:
-        somatic_vcfs = expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = md.get_ex_sample_ids(config)),
-        germ_contaminant_vcfs = expand("results/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = md.get_ex_sample_ids(config))
+        somatic_vcfs = expand(EX.CALLED_SNVS, ex_sample = md.get_ex_sample_ids(config)),
+        germ_contaminant_vcfs = expand(EX.MET_GNOMAD_OVERLAP_VCF, ex_sample = md.get_ex_sample_ids(config))
     output:
-        vcf_path = "results/batch/batch_recurrent_variants.vcf",
-        metrics_path = "results/batch/batch_recurrent_variant_metrics.json"
+        vcf_path = EX.MET_RECURRENT_VARIANTS_VCF,
+        metrics_path = EX.MET_RECURRENT_VARIANTS_JSON
     log:
         "logs/global_rules/batch_ex_recurrent_variant_metrics.log"
     benchmark:

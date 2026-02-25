@@ -7,7 +7,9 @@ Abbreviations:
     - INT (Intermediate file)
     - MET (Metrics file)
 
-Author: Cameron Fraser
+Authors: 
+    - Cameron Fraser
+    - Joshua Johnstone
 
 """
 
@@ -21,3 +23,9 @@ INCLUDED_CHROMS_BED = "tmp/downloads/included_chromosomes.bed"
 # ---------------------------------------------------------------------------------------------------------------
 # Metrics
 # ---------------------------------------------------------------------------------------------------------------
+
+MET_COMPONENT_METRICS_REPORT = "metrics/component_metrics_report.csv"
+MET_COMPONENT_METRICS_HEATMAP = "metrics/component_metrics_heatmap.png"
+
+MET_SYSTEM_METRICS_REPORT = "results/system_metrics_report.csv"
+MET_SYSTEM_METRICS_HEATMAP = "results/system_metrics_heatmap.png"
