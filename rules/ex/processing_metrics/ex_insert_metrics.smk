@@ -1,12 +1,15 @@
 """
 Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of R2) for correctly paired (same chr, within 500bp) reads 
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_insert_metrics:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam",
+        bam = EX.FILTERED_BAM,
     output:
-        txt = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt",
-        hist = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf"
+        txt = EX.MET_INSERT_SIZE_TXT,
+        hist = EX.MET_INSERT_SIZE_PDF
     log:
         "logs/{ex_sample}/ex_insert_metrics.log"
     benchmark:

@@ -2,13 +2,16 @@
 Calculates the Watson vs Crick base disagreement rate at positions that would be eligible for somatic variant calling if disagreements were not present
 """
 
+from definitions.paths.io import ex as EX
+from definitions.paths.io import ms as MS
+
 rule ex_variant_call_eligible_disagree_rate:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
-        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+        bam = EX.FILTERED_DSC,
+        bai = EX.FILTERED_DSC_INDEX,
+        include_bed = MS.INCLUDE_BED
     output:
-        metrics_json = "metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json"
+        metrics_json = EX.MET_VAR_CALL_DISAGREE
     params:
         required_Q = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
         number_of_reads = config["sci_params"]["ex_variant_call_disagree_metrics"]["number_of_reads"],
