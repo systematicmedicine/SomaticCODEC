@@ -85,9 +85,13 @@ CALLED_SNVS = "results/{ex_sample}/{ex_sample}_variants.vcf"
 
 MET_DEMULIPLEX_FASTQ = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
 
+MET_DEMUX_COUNTS_GINI = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
+
 MET_TRIM_FASTQ_TRIM5P = "metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json"
 MET_TRIM_FASTQ_TRIM3PR1 = "metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json"
 MET_TRIM_FASTQ_TRIM3PR2 = "metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json"
+
+MET_BASES_TRIMMED = "metrics/{ex_sample}/{ex_sample}_bases_trimmed.json"
 
 MET_FILTER_FASTQ = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
 
@@ -98,5 +102,12 @@ MET_GROUP_BY_UMI = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt"
 # Duplex consensus
 
 MET_CALL_DSC = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
+
+MET_READS_LOST_CALL_DSC = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json"
+
+MET_DSC_DEPTH = "metrics/{ex_sample}/{ex_sample}_depth_metrics.json"
+
+MET_DSC_COVERAGE_JSON = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json"
+MET_DSC_COVERAGE_PLOT = "metrics/{ex_sample}/{ex_sample}_dsc_coverage_plot.html"
 
 # Variant calling

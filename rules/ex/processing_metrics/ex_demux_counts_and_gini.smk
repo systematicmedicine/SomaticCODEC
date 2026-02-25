@@ -3,12 +3,13 @@ Generates a summary file with demuxed adaptor counts and Gini coefficient for in
 """
 
 import json
+from definitions.paths.io import ex as EX
 
 rule ex_demux_counts_and_gini:
     input:
-        demux_metrics = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
+        demux_metrics = EX.MET_DEMULIPLEX_FASTQ
     output:
-        demux_gini = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
+        demux_gini = EX.MET_DEMUX_COUNTS_GINI
     params:
         ex_sample_ids = md.get_ex_sample_ids(config)
     log:
