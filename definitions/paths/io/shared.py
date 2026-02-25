@@ -18,8 +18,6 @@ Author: Cameron Fraser
 EXCLUDED_CHROMS_BED = "tmp/downloads/excluded_chromosomes.bed"
 INCLUDED_CHROMS_BED = "tmp/downloads/included_chromosomes.bed"
 
-
-
 # ---------------------------------------------------------------------------------------------------------------
 # Metrics
 # ---------------------------------------------------------------------------------------------------------------
