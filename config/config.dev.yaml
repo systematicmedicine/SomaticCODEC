@@ -16,7 +16,6 @@ run_name: lightweight_test_run
 metadata:
 
   ex_samples_metadata: tests/data/lightweight_test_run/config/ex_samples.csv
-  ex_technical_controls_metadata: tests/data/lightweight_test_run/config/ex_technical_controls.csv
   ex_lanes_metadata: tests/data/lightweight_test_run/config/ex_lanes.csv
   ex_adapters_metadata: tests/data/lightweight_test_run/config/ex_adapters.csv
   ms_samples_metadata: tests/data/lightweight_test_run/config/ms_samples.csv

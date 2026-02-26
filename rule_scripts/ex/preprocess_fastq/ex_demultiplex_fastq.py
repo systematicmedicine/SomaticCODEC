@@ -2,7 +2,7 @@
 """
 --- ex_demultiplex_fastq.py ---
 
-Demultiplex each lane specific FASTQ pair into sample and technical control FASTQ pairs
+Demultiplex each lane specific FASTQ pair into sample FASTQ pairs
 
 To be used exclusively with rule ex_demultiplex_fastq
 
@@ -10,7 +10,7 @@ Inputs:
   - Raw lane FASTQ files
 
 Outputs:
-  - FASTQ pairs for each sample and technical control
+  - FASTQ pairs for each sample
   - Metrics file
 
 Authors:

@@ -86,7 +86,7 @@ def main(args):
     # Collate counts, percentages, and Gini coefficient
     output_data = {
         "description": (
-            "Summary of adaptor counts for ex samples and ex technical controls.",
+            "Summary of adaptor counts for ex samples",
             "Gini coefficient for inequality between ex_samples"
         ),
         "total_input_pairs": total_input_pairs,
