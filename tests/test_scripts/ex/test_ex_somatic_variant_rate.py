@@ -12,7 +12,7 @@ import pytest
 import os
 import json
 import types
-from scripts.ex.variant_analysis.ex_somatic_variant_rate import main
+from rule_scripts.ex.variant_analysis.ex_somatic_variant_rate import main
 @pytest.mark.parametrize(
     "vcf_path, expected_metrics",
     [

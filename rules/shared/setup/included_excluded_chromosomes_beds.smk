@@ -7,16 +7,16 @@ from definitions.paths.io import shared as S
 
 rule included_excluded_chromosomes_beds:
     input:
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai",
     output:
         exclude_bed = temp(S.EXCLUDED_CHROMS_BED),
         include_bed = temp(S.INCLUDED_CHROMS_BED)
     params:
-        included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
+        included_chromosomes = config["sci_params"]["shared"]["included_chromosomes"]
     log:
-        "logs/global_rules/included_excluded_chromosomes_beds.log"
+        "logs/shared_rules/included_excluded_chromosomes_beds.log"
     benchmark:
-        "logs/global_rules/included_excluded_chromosomes_beds.benchmark.txt"
+        "logs/shared_rules/included_excluded_chromosomes_beds.benchmark.txt"
     threads:
         1
     resources:

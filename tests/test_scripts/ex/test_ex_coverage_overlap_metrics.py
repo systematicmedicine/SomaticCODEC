@@ -10,7 +10,7 @@ Authors:
 import pytest
 import types
 import json
-from scripts.ex.processing_metrics.ex_coverage_overlap_metrics import main
+from rule_scripts.ex.processing_metrics.ex_coverage_overlap_metrics import main
 
 @pytest.mark.parametrize("precomputed_masks, ex_dsc_bam, include_bed, ms_bam, lowdepth_bed, germ_risk_bed, combined_bed, ref_fai, expected_values", [
     (

@@ -12,7 +12,7 @@ from unittest.mock import patch, MagicMock
 import tempfile
 import json
 import os
-from scripts.ex.processing_metrics.ex_call_dsc_metrics import main
+from rule_scripts.ex.processing_metrics.ex_call_dsc_metrics import main
 import argparse
 
 @pytest.mark.parametrize("pre_out, post_out, expected, expect_error", [

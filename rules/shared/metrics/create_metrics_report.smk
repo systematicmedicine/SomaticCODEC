@@ -23,9 +23,9 @@ rule create_metrics_report:
     params:
         run_name = config["run_name"]
     log:
-        "logs/global_rules/create_metrics_report.log"
+        "logs/shared_rules/create_metrics_report.log"
     benchmark:
-        "logs/global_rules/create_metrics_report.benchmark.txt"
+        "logs/shared_rules/create_metrics_report.benchmark.txt"
     threads:
         1
     resources:

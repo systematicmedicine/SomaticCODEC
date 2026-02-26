@@ -12,9 +12,9 @@ rule ex_annotate_dsc:
         unmapped = EX.RAW_DSC,
 
         # Reference genome
-        ref = config["sci_params"]["global"]["reference_genome"],
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
-        dictf = os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict"
+        ref = config["sci_params"]["shared"]["reference_genome"],
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai",
+        dictf = os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict"
     output:
         intermediate_anno = temp(EX.ANNOTATE_DSC_INT1),
         bam = temp(EX.ANNOTATED_DSC),

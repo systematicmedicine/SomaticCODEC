@@ -10,7 +10,7 @@ Authors:
 import pytest
 import json
 import types
-from scripts.ex.processing_metrics.ex_depth_metrics import main
+from rule_scripts.ex.processing_metrics.ex_depth_metrics import main
 
 @pytest.mark.parametrize("bam_ex_dsc, include_bed, ref_fai, expected_depth_percentiles, expected_pct_coverage", [
     ("tests/data/test_ex_depth_metrics/ex_dsc_anno_filtered.bam",

@@ -16,7 +16,7 @@ def test_log_system_resource_usage(tmp_path):
     
     # Run the script in the background
     proc = subprocess.Popen(
-        ["bash", "scripts/global_scripts/metrics/log_system_resource_usage.sh"],
+        ["bash", "rule_scripts/shared/metrics/log_system_resource_usage.sh"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env={**os.environ, 

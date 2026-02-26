@@ -4,11 +4,11 @@ Writes git metadata to file for version tracking
 
 rule write_git_metadata:
     output:
-        json = "logs/global_rules/git_metadata.json"
+        json = "logs/shared_rules/git_metadata.json"
     log:
-        "logs/global_rules/write_git_metadata.log"
+        "logs/shared_rules/write_git_metadata.log"
     benchmark:
-        "logs/global_rules/write_git_metadata.benchmark.txt"
+        "logs/shared_rules/write_git_metadata.benchmark.txt"
     threads:
         1
     resources:

@@ -12,7 +12,7 @@ import csv
 import pytest
 import shutil
 import types
-from scripts.global_scripts.metrics.create_job_log import main
+from rule_scripts.shared.metrics.create_job_log import main
 
 @pytest.mark.parametrize(
     "log_file_path, expected_num_jobs",

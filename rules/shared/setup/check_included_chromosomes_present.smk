@@ -4,16 +4,16 @@ Checks that chromosomes included for variant calling are present in reference an
 
 rule check_included_chromosomes_present:
     input:
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
-        precomputed_masks = config["sci_params"]["global"]["precomputed_masks"]
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai",
+        precomputed_masks = config["sci_params"]["shared"]["precomputed_masks"]
     output:
-        done_file = "logs/global_rules/check_included_chromosomes_present.done"
+        done_file = "logs/shared_rules/check_included_chromosomes_present.done"
     params:
-        included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
+        included_chromosomes = config["sci_params"]["shared"]["included_chromosomes"]
     log:
-        "logs/global_rules/check_included_chromosomes_present.log"
+        "logs/shared_rules/check_included_chromosomes_present.log"
     benchmark:
-        "logs/global_rules/check_included_chromosomes_present.benchmark.txt"
+        "logs/shared_rules/check_included_chromosomes_present.benchmark.txt"
     threads:
         1
     resources:
