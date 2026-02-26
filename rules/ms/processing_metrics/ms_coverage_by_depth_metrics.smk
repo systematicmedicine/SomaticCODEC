@@ -11,7 +11,7 @@ rule ms_coverage_by_depth_metrics:
         coverage_by_depth = MS.MET_COVERAGE_BY_DEPTH
     params:
         sample = "{ms_sample}",
-        min_depth = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
+        min_depth = config["sci_params"]["ms_pileup"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
     benchmark:
