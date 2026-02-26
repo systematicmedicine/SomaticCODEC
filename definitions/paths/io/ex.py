@@ -91,7 +91,6 @@ MET_FASTQC_RAW_TXT_R1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt"
 MET_FASTQC_RAW_TXT_R2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"
 MET_FASTQC_RAW_INT_R1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.zip"
 MET_FASTQC_RAW_INT_R2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.zip"
-
 MET_FASTQC_RAW_SUMMARY_R1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json"
 MET_FASTQC_RAW_SUMMARY_R2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json"
 
@@ -105,6 +104,7 @@ MET_TRIM_READ_LENGTHS = "metrics/{ex_sample}/{ex_sample}_trimmed_read_length_met
 MET_BASES_TRIMMED = "metrics/{ex_sample}/{ex_sample}_bases_trimmed.json"
 
 MET_FILTER_FASTQ = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
+
 MET_FASTQC_FILTER_HTML_R1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html"
 MET_FASTQC_FILTER_HTML_R2 = "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html"
 MET_FASTQC_FILTER_TXT_R1 = "metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt"
@@ -127,7 +127,7 @@ MET_DUPLICATION = "metrics/{ex_sample}/{ex_sample}_duplication_metrics.json"
 # Duplex consensus
 
 MET_CALL_DSC = "metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt"
-MET_READS_LOST_CALL_DSC = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json"
+MET_CALL_DSC_2 = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json"
 
 MET_DSC_REMAP = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
 
@@ -149,20 +149,22 @@ MET_VAR_CALL_DISAGREE = "metrics/{ex_sample}/{ex_sample}_variant_call_disagree_m
 MET_SOMATIC_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.json"
 MET_CHROM_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
 
-MET_GNOMAD_OVERLAP_VCF = "results/{ex_sample}/{ex_sample}_germline_matches.vcf"
-MET_GNOMAD_OVERLAP_JSON = "results/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json"
-MET_GNOMAD_OVERLAP_INT_BGZ = "tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"
-MET_GNOMAD_OVERLAP_INT_TBI = "tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"
-
-MET_RECURRENT_VARIANTS_VCF = "results/batch/batch_recurrent_variants.vcf"
-MET_RECURRENT_VARIANTS_JSON = "results/batch/batch_recurrent_variant_metrics.json"
+MET_TRINUC_PROPORTIONS = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv"
+MET_TRINUC_SIMILARITIES = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv"
+MET_TRINUC_PLOTS = "results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf"
 
 MET_SNV_DISTANCE = "results/{ex_sample}/{ex_sample}_snv_distance.json"
 MET_SNV_POSITION_JSON = "results/{ex_sample}/{ex_sample}_snv_position_metrics.json"
 MET_SNV_POSITION_PDF = "results/{ex_sample}/{ex_sample}_snv_position_plot.pdf"
 
+MET_GNOMAD_OVERLAP_VCF = "results/{ex_sample}/{ex_sample}_germline_matches.vcf"
+MET_GNOMAD_OVERLAP_JSON = "results/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json"
+MET_GNOMAD_OVERLAP_INT_BGZ = "tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"
+MET_GNOMAD_OVERLAP_INT_TBI = "tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"
+
 MET_SNV_GERMLINE_CONTEXT = "results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
 
-MET_TRINUC_PROPORTIONS = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv"
-MET_TRINUC_SIMILARITIES = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv"
-MET_TRINUC_PLOTS = "results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf"
+MET_RECURRENT_VARIANTS_VCF = "results/batch/batch_recurrent_variants.vcf"
+MET_RECURRENT_VARIANTS_JSON = "results/batch/batch_recurrent_variant_metrics.json"
+
+
