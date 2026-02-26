@@ -2,7 +2,7 @@
 Combines all masks into a single BED file
 """
 
-import get_metadata as md
+import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
 from definitions.paths.io import shared as S
 

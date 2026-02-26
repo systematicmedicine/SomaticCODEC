@@ -8,7 +8,7 @@ from definitions.paths.io import ms as MS
 
 rule ex_somatic_variant_germline_contexts:
     input:
-        ms_pileup_bcf = lambda wc: MS.GERMLINE_RISK_INT.format(
+        ms_pileup_bcf = lambda wc: MS.PILEUP_INT.format(
             ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
             ),
         ex_somatic_vcf = EX.CALLED_SNVS

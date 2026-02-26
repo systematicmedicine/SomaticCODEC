@@ -13,7 +13,7 @@ rule ms_germline_risk:
         ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
         # Intermediate files
-        intermediate_alt_vcf = temp(MS.GERMLINE_RISK_INT1)
+        intermediate_alt_vcf = temp(MS.GERMLINE_RISK_INT1),
         intermediate_del_unformatted = temp(MS.GERMLINE_RISK_INT2),
         intermediate_ins_unformatted = temp(MS.GERMLINE_RISK_INT3),
         intermediate_all_unformatted = temp(MS.GERMLINE_RISK_INT4),

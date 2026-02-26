@@ -28,7 +28,7 @@ rule ex_coverage_overlap_metrics:
     output:
         output_json = EX.MET_COVERAGE_OVERLAP
     params: 
-        ms_depth_threshold = config["sci_params"]["ms_call_germline_risk"]["ms_pileup"],
+        ms_depth_threshold = config["sci_params"]["ms_pileup"]["min_depth"],
         ex_depth_threshold = config["sci_params"]["ex_dsc_coverage_metrics"]["ex_depth_threshold"],
         ms_bq_threshold = config["sci_params"]["ms_pileup"]["min_base_qual"],
         ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
