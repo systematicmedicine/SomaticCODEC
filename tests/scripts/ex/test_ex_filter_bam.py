@@ -1,7 +1,7 @@
 """
---- test_ex_filter_map.py
+--- test_ex_filter_bam.py
 
-Tests the rule ex_filter_map
+Tests the rule ex_filter_bam
 
 Authors:
     - Chat-GPT
