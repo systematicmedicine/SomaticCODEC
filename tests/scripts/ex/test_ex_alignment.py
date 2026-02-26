@@ -1,7 +1,7 @@
 """
---- test_ex_map.py
+--- test_ex_alignment.py
 
-Tests the rule ex_map
+Tests the rule ex_alignment
 
 Authors:
     - Chat-GPT
