@@ -31,7 +31,7 @@ EXEMPT_FILES = {".gitkeep"}
 check_dirs = [
     PROJECT_ROOT / "rule_scripts",
     PROJECT_ROOT / "helpers",
-    PROJECT_ROOT / "tests/test_scripts",
+    PROJECT_ROOT / "tests/scripts",
     PROJECT_ROOT / "bin"
 ]
 

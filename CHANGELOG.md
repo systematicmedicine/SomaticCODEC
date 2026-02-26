@@ -33,6 +33,7 @@ Types of changes:
 - Renamed scripts directory to rule_scripts (#318)
 - Renamed "global" to "shared" throughout directories, rules, and config (#318)
 - Refactored ex_demultiplex_fastq.py to avoid passing file paths as params (#320)
+- Renamed tests/test_scripts directory to tests/scripts (#321)
 
 ### Removed
 - Removed rules and associated files for EX technical controls (#319)
