@@ -1,13 +1,16 @@
 """
-Calculate the total read loss between raw FASTQ, and DSC immediately before variant calling
+Calculates the total read loss between raw FASTQ, and DSC immediately before variant calling
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_total_read_loss:
     input:
-        input_fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz",
-        input_fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_demux.fastq.gz",
-        dsc_final = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
+        input_fastq1 = EX.DEMUXD_FASTQ_R1,
+        input_fastq2 = EX.DEMUXD_FASTQ_R2,
+        dsc_final = EX.FILTERED_DSC
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_total_read_loss.json"
+        metrics = EX.MET_TOTAL_READ_LOSS
     params:
         sample = "{ex_sample}"
     log:

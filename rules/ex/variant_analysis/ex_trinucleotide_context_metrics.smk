@@ -2,17 +2,20 @@
 Calculate trinucleotide contexts for called somatic mutations
     - Compare to reference contexts using cosine similarity
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_trinucleotide_context_metrics:
     input:
-        vcf_path = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        vcf_all_path = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf",
+        vcf_path = EX.CALLED_SNVS,
+        vcf_all_path = EX.CALL_SOMATIC_SNV_INT3,
         ref_fasta_path = config["sci_params"]["global"]["reference_genome"],
         ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"],
         ref_trinuc_counts_path = config["sci_params"]["global"]["reference_genome_trinuc_counts"]
     output:
-        proportions_csv = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv",
-        similarities_csv = "results/{ex_sample}/{ex_sample}_trinuc_similarities.csv",
-        plot_pdf_normalised = "results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf"
+        proportions_csv = EX.MET_TRINUC_PROPORTIONS,
+        similarities_csv = EX.MET_TRINUC_SIMILARITIES,
+        plot_pdf_normalised = EX.MET_TRINUC_PLOTS
     params:
         sample = "{ex_sample}"
     log:

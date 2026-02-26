@@ -2,14 +2,17 @@
 Generates depth metrics for the final EX DSC BAM
 """
 
+from definitions.paths.io import ex as EX
+from definitions.paths.io import ms as MS
+
 rule ex_depth_metrics:
     input:
-        bam_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        bai_ex_dsc = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
-        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
+        bam_ex_dsc = EX.FILTERED_DSC,
+        bai_ex_dsc = EX.FILTERED_DSC_INDEX,
+        include_bed = MS.INCLUDE_BED,
         ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        json = "metrics/{ex_sample}/{ex_sample}_depth_metrics.json"
+        json = EX.MET_DSC_DEPTH
     params:
         ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:

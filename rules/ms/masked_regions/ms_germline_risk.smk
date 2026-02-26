@@ -2,16 +2,20 @@
 Uses matched sample BAM to identify positions that may contain germline variants. 
     - Designed to favour sensitivty over specificity
 """
+
+from definitions.paths.io import ms as MS
+from definitions.paths.io import shared as S
+
 rule ms_germline_risk:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai",
+        bam = MS.DEDUPED_BAM,
+        bai = MS.DEDUPED_BAM_INDEX,
         ref = config["sci_params"]["global"]["reference_genome"],
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
-        included_chromsomes_bed = "tmp/downloads/included_chromosomes.bed"
+        included_chromsomes_bed = S.INCLUDED_CHROMS_BED
     output:
-        intermediate_pileup = temp("tmp/{ms_sample}/{ms_sample}_ms_pileup.bcf"),
-        vcf_germ = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf")
+        intermediate_pileup = temp(MS.GERMLINE_RISK_INT),
+        vcf_germ = temp(MS.GERMLINE_RISK_VCF)
     params:
         max_base_qual = config["sci_params"]["ms_germline_risk"]["max_base_qual"],
         max_depth = config["sci_params"]["ms_germline_risk"]["max_depth"],

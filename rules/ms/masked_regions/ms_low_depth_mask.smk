@@ -4,15 +4,17 @@ Creates a mask for genomic positions with low read depth in matched sample
     - Overlapping r1 and r2 reads are counted once only (-s flag)
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_low_depth_mask:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"
+        bam = MS.DEDUPED_BAM,
+        bai = MS.DEDUPED_BAM_INDEX
     output:
-        bed = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.bed"),
-        intermediate_depth_per_base = temp("tmp/{ms_sample}/{ms_sample}_depth_per_base.txt"),
-        intermediate_lowdepth = temp("tmp/{ms_sample}/{ms_sample}_lowdepth.txt"),
-        intermediate_lowdepth_sorted = temp("tmp/{ms_sample}/{ms_sample}_lowdepth_sorted.txt")
+        intermediate_depth_per_base = temp(MS.LOW_DEPTH_MASK_INT1),
+        intermediate_lowdepth = temp(MS.LOW_DEPTH_MASK_INT2),
+        intermediate_lowdepth_sorted = temp(MS.LOW_DEPTH_MASK_INT3),
+        bed = temp(MS.LOW_DEPTH_MASK)
     params:
         min_base_qual = config["sci_params"]["ms_germline_risk"]["min_base_qual"],
         min_map_qual = config["sci_params"]["ms_germline_risk"]["min_map_qual"],

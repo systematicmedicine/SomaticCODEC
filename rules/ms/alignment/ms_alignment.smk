@@ -2,19 +2,25 @@
 Aligns reads to reference genome
 """
 
-rule ms_map:
-    input: 
+from definitions.paths.io import ms as MS
+
+rule ms_alignment:
+    input:
+        # FASTQ
+        r1_processed = MS.FILTERED_FASTQ_R1,
+        r2_processed = MS.FILTERED_FASTQ_R2,
+
+        # Refrence genome
         ref = config["sci_params"]["global"]["reference_genome"],
         amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
         ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
         bwt = config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
         pac = config["sci_params"]["global"]["reference_genome"]+ ".pac",
         sa = config["sci_params"]["global"]["reference_genome"] + ".0123",
-        r1_processed = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
-        r2_processed = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
+
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.bam"),
-        intermediate_sam = temp("tmp/{ms_sample}/{ms_sample}_raw_map.sam")
+        intermediate_sam = temp(MS.RAW_SAM),
+        bam = temp(MS.RAW_BAM)
     params:
         band_width = config["sci_params"]["ms_map"]["band_width"],
         clipping_penalty = config["sci_params"]["ms_map"]["clipping_penalty"],

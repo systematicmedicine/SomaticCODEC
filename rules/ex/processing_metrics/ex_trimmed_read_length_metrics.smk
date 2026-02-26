@@ -1,12 +1,15 @@
 """
 Calculates the length of reads post trimming, outputs percentiles and zero-length reads
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_trimmed_read_length_metrics:
     input:
-        r1 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz",
-        r2 = "tmp/{ex_sample}/{ex_sample}_r1_trim.fastq.gz"
+        r1 = EX.TRIMMED_FASTQ_R1,
+        r2 = EX.TRIMMED_FASTQ_R2
     output:
-        json = "metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json"
+        json = EX.MET_TRIM_READ_LENGTHS
     params:
         sample = "{ex_sample}"
     log:
