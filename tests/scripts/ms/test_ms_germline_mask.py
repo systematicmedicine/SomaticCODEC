@@ -6,6 +6,7 @@ Tests the rule ms_germline_mask
 Authors:
     - Chat-GPT
     - Joshua Johnstone
+    - Cameron Fraser
 """
 from pathlib import Path
 import pandas as pd
@@ -13,6 +14,7 @@ import pytest
 import shutil
 from snakemake import snakemake
 from helpers.get_metadata import load_config, get_ms_sample_ids
+from definitions.paths.io import ms as MS
 
 # Test that germline variant BEDs have the correct structure
 def test_bed_structure_correct(lightweight_test_run):
@@ -20,9 +22,9 @@ def test_bed_structure_correct(lightweight_test_run):
     ms_samples = get_ms_sample_ids(config)
 
     for ms_sample in ms_samples:
-        bed_files = [Path(f"tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-                     Path(f"tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
-                     Path(f"tmp/{ms_sample}/{ms_sample}_germ_all.bed")]
+        bed_files = [Path(MS.GERMLINE_MASK_INT7.format(ms_sample=ms_sample)),
+                     Path(MS.GERMLINE_MASK_INT6.format(ms_sample=ms_sample)),
+                     Path(MS.GERMLINE_MASK_INT8.format(ms_sample=ms_sample))]
         
         for bed_file in bed_files:
             with bed_file.open() as f:
@@ -52,12 +54,12 @@ def test_indel_padding_added(lightweight_test_run):
 
     for ms_sample in ms_samples:
         pre_padding_files = [
-            Path(f"tmp/{ms_sample}/{ms_sample}_germ_insertions_unpadded.bed"),
-            Path(f"tmp/{ms_sample}/{ms_sample}_germ_deletions_unpadded.bed"),
+            Path(MS.GERMLINE_MASK_INT5.format(ms_sample=ms_sample)),
+            Path(MS.GERMLINE_MASK_INT4.format(ms_sample=ms_sample)),
         ]
         post_padding_files = [
-            Path(f"tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-            Path(f"tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
+            Path(MS.GERMLINE_MASK_INT7.format(ms_sample=ms_sample)),
+            Path(MS.GERMLINE_MASK_INT6.format(ms_sample=ms_sample)),
         ]
 
         for pre_path, post_path in zip(pre_padding_files, post_padding_files):
