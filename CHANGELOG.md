@@ -30,8 +30,11 @@ Types of changes:
 - Sample metadata for internal testing and external use now decoupled (#312)
 - Removed hard coded paths from test_scripts (#312 and 315)
 - Centralised rule file paths to definitions/paths directory (#317)
-- Renamed scripts directory to rule_scripts (#)
-- Renamed "global" to "shared" throughout directories, rules, and config (#)
+- Renamed scripts directory to rule_scripts (#318)
+- Renamed "global" to "shared" throughout directories, rules, and config (#318)
+
+### Removed
+- Removed rules and associated files for EX technical controls (#319)
 
 ### Fixed
 

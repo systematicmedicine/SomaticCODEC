@@ -12,7 +12,6 @@ import helpers.get_metadata as md
 # Get lists of sample ids
 ex_lane_ids = md.get_ex_lane_ids(config)
 ex_sample_ids = md.get_ex_sample_ids(config)
-ex_technical_control_ids = md.get_ex_technical_control_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
 # ---------------------------------------------------------------------------------------------
@@ -98,8 +97,7 @@ ex_processing_metrics = [
     expand("metrics/{ex_sample}/{ex_sample}_coverage_overlap_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
     expand("metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_duplex_overlap_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids)
+    expand("metrics/{ex_sample}/{ex_sample}_duplex_overlap_metrics.json", ex_sample = ex_sample_ids)
 ]
 
 # ---------------------------------------------------------------------------------------------
