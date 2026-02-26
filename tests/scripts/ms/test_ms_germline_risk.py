@@ -6,6 +6,7 @@ Tests the rule ms_germline_risk
 Authors:
     - Chat-GPT
     - Joshua Johnstone
+    - Cameron Fraser
 """
 
 # Import libraries
@@ -16,6 +17,7 @@ import shutil
 from snakemake import snakemake
 from helpers.get_metadata import load_config, get_ms_sample_ids
 from helpers.vcf_helpers import check_vcf_structure
+from definitions.paths.io import ms as MS
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):
@@ -24,7 +26,7 @@ def test_vcf_structure_correct(lightweight_test_run):
 
     for ms_sample in ms_samples:
         # Locate VCF file
-        vcf_file = Path(f"tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf")
+        vcf_file = Path(MS.GERMLINE_RISK_VCF.format(ms_sample=ms_sample))
 
         # Check for correct VCF structure
         check_vcf_structure(vcf_file)
@@ -40,7 +42,7 @@ def test_germ_risk_variants_fit_criteria(lightweight_test_run):
 
     for ms_sample in ms_samples:
         # Locate VCF file
-        vcf_file_path = Path(f"tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf")
+        vcf_file_path = Path(MS.GERMLINE_RISK_VCF.format(ms_sample=ms_sample))
 
         # Open VCF with pysam
         vcf_file = pysam.VariantFile(vcf_file_path)
