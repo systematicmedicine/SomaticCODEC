@@ -7,11 +7,11 @@ from definitions.paths.io import shared as S
 
 rule combine_masks:
     input:
-        precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["shared"]["precomputed_masks"]),
         excluded_chromosomes_bed = S.EXCLUDED_CHROMS_BED,
         ms_lowdepth_bed = MS.LOW_DEPTH_MASK,
         ms_germ_risk_bed = MS.GERMLINE_RISK_MASK,
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai" 
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai" 
     output:
         combined_bed = temp(MS.COMBINED_MASK),
         intermediate_cat = temp(MS.COMBINE_MASKS_INT1),

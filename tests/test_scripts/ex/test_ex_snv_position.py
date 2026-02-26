@@ -22,7 +22,7 @@ import pytest
 
 # Setup paths
 TEST_DATA = Path("tests/data/test_ex_snv_position")
-SCRIPT_PATH = Path("scripts/ex/variant_analysis/ex_snv_position.R")
+SCRIPT_PATH = Path("rule_scripts/ex/variant_analysis/ex_snv_position.R")
 
 FAI_PATH = TEST_DATA / "GRCh38_mock.fa.fai"
 VCF_CASES = {

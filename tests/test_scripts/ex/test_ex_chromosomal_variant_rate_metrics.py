@@ -11,7 +11,7 @@ import json
 import pytest
 import os
 import types
-from scripts.ex.variant_analysis.ex_chromosomal_variant_rate_metrics import main
+from rule_scripts.ex.variant_analysis.ex_chromosomal_variant_rate_metrics import main
 
 @pytest.mark.parametrize("vcf_path, expected_gini", [
     ("tests/data/test_ex_chromosomal_variant_rate_metrics/gini_0.vcf", 0.0),

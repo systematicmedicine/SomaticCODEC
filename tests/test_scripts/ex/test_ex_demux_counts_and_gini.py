@@ -10,7 +10,7 @@ Authors:
 import json
 import pytest
 import types
-from scripts.ex.processing_metrics.ex_demux_counts_and_gini import main
+from rule_scripts.ex.processing_metrics.ex_demux_counts_and_gini import main
 from helpers.get_metadata import load_config, get_ex_sample_ids
 
 @pytest.mark.parametrize("demux_metrics, expected_gini", [

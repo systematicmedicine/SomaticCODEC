@@ -12,7 +12,7 @@ import pytest
 import os
 import shutil
 import types
-from scripts.global_scripts.metrics.fastqc_summary_metrics import main
+from rule_scripts.shared.metrics.fastqc_summary_metrics import main
 
 @pytest.mark.parametrize(
     "fastqc_file, expected_metrics",

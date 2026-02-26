@@ -4,13 +4,13 @@ Creates index files for input VCFs
 
 rule tabix_index_files:
     input:
-        germline_vcf = config["sci_params"]["global"]["known_germline_variants"]
+        germline_vcf = config["sci_params"]["shared"]["known_germline_variants"]
     output:
-        germline_tbi = config["sci_params"]["global"]["known_germline_variants"] + ".tbi"
+        germline_tbi = config["sci_params"]["shared"]["known_germline_variants"] + ".tbi"
     log:
-        "logs/global_rules/tabix_index_files.log"
+        "logs/shared_rules/tabix_index_files.log"
     benchmark:
-        "logs/global_rules/tabix_index_files.benchmark.txt"
+        "logs/shared_rules/tabix_index_files.benchmark.txt"
     threads:
         1
     resources:

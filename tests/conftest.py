@@ -21,9 +21,9 @@ def find_project_root(start: Path) -> Path:
     start = start.resolve()
     for p in [start, *start.parents]:
         # Use multiple sentinels to avoid false-positives
-        if (p / "config").is_dir() and (p / "helpers").is_dir() and (p / "scripts").is_dir():
+        if (p / "config").is_dir() and (p / "helpers").is_dir() and (p / "rule_scripts").is_dir():
             return p
-    raise RuntimeError("Could not find repo root (config/, helpers/, scripts/).")
+    raise RuntimeError("Could not find repo root (config/, helpers/, rule_scripts/).")
 
 # Insert PROJECT_ROOT into path
 PROJECT_ROOT = find_project_root(Path(__file__))

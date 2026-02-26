@@ -10,7 +10,7 @@ Authors:
 import pytest
 import json
 import types
-from scripts.ms.processing_metrics.ms_coverage_by_depth_metrics import main
+from rule_scripts.ms.processing_metrics.ms_coverage_by_depth_metrics import main
 
 @pytest.mark.parametrize("depth_histogram, expected_pct_depth_40X", [
     ("tests/data/test_ms_coverage_by_depth_metrics/depth_histogram.txt", 20)

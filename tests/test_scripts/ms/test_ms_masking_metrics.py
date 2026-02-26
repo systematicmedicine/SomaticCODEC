@@ -10,7 +10,7 @@ Authors:
 import json
 import types
 import pytest
-from scripts.ms.processing_metrics.ms_masking_metrics import main 
+from rule_scripts.ms.processing_metrics.ms_masking_metrics import main 
 
 @pytest.mark.parametrize("input_files, expected_percentages", [
     (

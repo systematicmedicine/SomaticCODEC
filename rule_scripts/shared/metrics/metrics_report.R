@@ -19,7 +19,7 @@
 library(dplyr)
 library(openxlsx)
 library(argparse)
-source("scripts/global_scripts/metrics/metrics_report_functions.R")
+source("rule_scripts/shared/metrics/metrics_report_functions.R")
 
 # Snakemake-injected paths
 parser <- ArgumentParser()

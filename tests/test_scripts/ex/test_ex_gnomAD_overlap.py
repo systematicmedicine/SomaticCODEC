@@ -10,7 +10,7 @@ Authors:
 import pytest
 import json
 import types
-from scripts.ex.variant_analysis.ex_gnomAD_overlap import main
+from rule_scripts.ex.variant_analysis.ex_gnomAD_overlap import main
 
 @pytest.mark.parametrize(
     "somatic_path, somatic_all_path, germline_path, expected_matches",

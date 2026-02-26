@@ -4,13 +4,13 @@ Creates reference .fai file
 
 rule samtools_index_files:
     input:
-        reference = config["sci_params"]["global"]["reference_genome"]
+        reference = config["sci_params"]["shared"]["reference_genome"]
     output:
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     log:
-        "logs/global_rules/samtools_index_files.log"
+        "logs/shared_rules/samtools_index_files.log"
     benchmark:
-        "logs/global_rules/samtools_index_files.benchmark.txt"
+        "logs/shared_rules/samtools_index_files.benchmark.txt"
     threads:
         1
     resources:

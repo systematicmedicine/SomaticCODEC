@@ -4,13 +4,13 @@ Creates reference .dict file
 
 rule picard_sequence_dict:
     input:
-        ref = config["sci_params"]["global"]["reference_genome"]
+        ref = config["sci_params"]["shared"]["reference_genome"]
     output:
-        dictf = os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict"
+        dictf = os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict"
     log:
-        "logs/global_rules/picard_sequence_dict.log"
+        "logs/shared_rules/picard_sequence_dict.log"
     benchmark:
-        "logs/global_rules/picard_sequence_dict.benchmark.txt"
+        "logs/shared_rules/picard_sequence_dict.benchmark.txt"
     threads:
         1
     resources:

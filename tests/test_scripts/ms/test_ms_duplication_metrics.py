@@ -10,7 +10,7 @@ Authors:
 import pytest
 import json
 import types
-from scripts.ms.processing_metrics.ms_duplication_metrics import main
+from rule_scripts.ms.processing_metrics.ms_duplication_metrics import main
 
 @pytest.mark.parametrize("dedup_metrics, expected_dedup_rate", [
     ("tests/data/test_ms_duplication_metrics/dedup_metrics.json", 0.05)

@@ -18,18 +18,18 @@ ms_sample_ids = md.get_ms_sample_ids(config)
 # ---------------------------------------------------------------------------------------------
 # Setup files
 # ---------------------------------------------------------------------------------------------
-global_setup = [
-    config["sci_params"]["global"]["reference_genome"] + ".amb",
-    config["sci_params"]["global"]["reference_genome"] + ".ann",
-    config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
-    config["sci_params"]["global"]["reference_genome"] + ".pac",
-    config["sci_params"]["global"]["reference_genome"] + ".0123",
-    config["sci_params"]["global"]["reference_genome"] + ".fai",
-    os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict",
-    config["sci_params"]["global"]["known_germline_variants"] + ".tbi",
+shared_setup = [
+    config["sci_params"]["shared"]["reference_genome"] + ".amb",
+    config["sci_params"]["shared"]["reference_genome"] + ".ann",
+    config["sci_params"]["shared"]["reference_genome"] + ".bwt.2bit.64",
+    config["sci_params"]["shared"]["reference_genome"] + ".pac",
+    config["sci_params"]["shared"]["reference_genome"] + ".0123",
+    config["sci_params"]["shared"]["reference_genome"] + ".fai",
+    os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict",
+    config["sci_params"]["shared"]["known_germline_variants"] + ".tbi",
     "tmp/downloads/excluded_chromosomes.bed",
-    "logs/global_rules/check_included_chromosomes_present.done",
-    "logs/global_rules/log_system_resource_usage.done",
+    "logs/shared_rules/check_included_chromosomes_present.done",
+    "logs/shared_rules/log_system_resource_usage.done",
     "logs/bin_scripts/run_pipeline.log"
 ]
 
@@ -130,16 +130,16 @@ ex_variant_analysis = [
 ]
 
 # ---------------------------------------------------------------------------------------------
-# Global metrics
+# Shared metrics
 # ---------------------------------------------------------------------------------------------
-global_metrics = [
-    "logs/global_rules/git_metadata.json",
+shared_metrics = [
+    "logs/shared_rules/git_metadata.json",
     "metrics/component_metrics_report.csv",
     "metrics/component_metrics_heatmap.png",
     "results/system_metrics_report.csv",
     "results/system_metrics_heatmap.png",
-    "logs/global_rules/combined_benchmarks.csv",
-    "logs/global_rules/system_resource_usage.csv",
-    "logs/global_rules/job_log.csv",
-    "logs/global_rules/create_run_timeline_plot.log"
+    "logs/shared_rules/combined_benchmarks.csv",
+    "logs/shared_rules/system_resource_usage.csv",
+    "logs/shared_rules/job_log.csv",
+    "logs/shared_rules/create_run_timeline_plot.log"
 ]

@@ -11,7 +11,7 @@ Authors:
 """
 
 # Import libraries
-import scripts.ex.variant_analysis.ex_trinucleotide_context_metrics as tcm
+import rule_scripts.ex.variant_analysis.ex_trinucleotide_context_metrics as tcm
 import pytest
 import types
 from pathlib import Path
@@ -34,9 +34,9 @@ def test_ex_trinucleotide_context_metrics(lightweight_test_run, tmp_path, vcf_pa
   
   # Load reference file paths from config
   config = load_config(lightweight_test_run["test_config_path"])
-  ref_fasta_path = config["sci_params"]["global"]["reference_genome"]
-  ref_contexts_path = config["sci_params"]["global"]["reference_tri_contexts"]
-  ref_trinuc_counts_path = config["sci_params"]["global"]["reference_genome_trinuc_counts"]
+  ref_fasta_path = config["sci_params"]["shared"]["reference_genome"]
+  ref_contexts_path = config["sci_params"]["shared"]["reference_tri_contexts"]
+  ref_trinuc_counts_path = config["sci_params"]["shared"]["reference_genome_trinuc_counts"]
 
   # Define tmp output paths
   proportions_csv = tmp_path / "trinuc_proportions.csv"

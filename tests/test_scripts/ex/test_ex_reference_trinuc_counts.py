@@ -8,7 +8,7 @@ Authors:
   - Joshua Johnstone
 """
 
-from scripts.ex.variant_analysis.ex_reference_trinuc_counts import main
+from rule_scripts.ex.variant_analysis.ex_reference_trinuc_counts import main
 import pytest
 import types
 import pandas as pd

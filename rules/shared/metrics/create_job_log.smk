@@ -12,11 +12,11 @@ rule create_job_log:
         system_metrics_png = S.MET_SYSTEM_METRICS_HEATMAP,
         run_pipeline_log = ancient("logs/bin_scripts/run_pipeline.log")
     output:
-        job_log_csv = "logs/global_rules/job_log.csv"
+        job_log_csv = "logs/shared_rules/job_log.csv"
     log:
-        "logs/global_rules/create_job_log.log"
+        "logs/shared_rules/create_job_log.log"
     benchmark:
-        "logs/global_rules/create_job_log.benchmark.txt"
+        "logs/shared_rules/create_job_log.benchmark.txt"
     threads:
         1
     resources:

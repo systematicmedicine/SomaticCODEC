@@ -7,11 +7,11 @@ from definitions.paths.io import ex as EX
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = EX.CALLED_SNVS,
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
         metrics = EX.MET_CHROM_VARIANT_RATE
     params:
-        included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
+        included_chromosomes = config["sci_params"]["shared"]["included_chromosomes"]
     log:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
     benchmark:

@@ -11,7 +11,7 @@ import json
 import pytest
 import os
 import types
-from scripts.ex.processing_metrics.ex_duplex_overlap_metrics import main
+from rule_scripts.ex.processing_metrics.ex_duplex_overlap_metrics import main
 
 @pytest.mark.parametrize("bam_path, expected_0th, expected_50th, expected_100th", [
     ("tests/data/test_ex_duplex_overlap_metrics/dsc.bam", 0, 5, 10)

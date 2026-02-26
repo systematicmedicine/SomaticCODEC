@@ -9,7 +9,7 @@ from definitions.paths.io import ms as MS
 rule ms_germline_mask:
     input:
         vcf = MS.GERMLINE_RISK_VCF,
-        ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
         # Intermediate files
         intermediate_del_unformatted = temp(MS.GERMLINE_MASK_INT1),
