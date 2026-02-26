@@ -83,7 +83,7 @@ def main():
         "metrics": "Processed data/metrics",
         "logs": "Processed data/logs",
         "rules": "Methods/rules",
-        "scripts": "Methods/scripts",
+        "rule_scripts": "Methods/rule_scripts",
         "config": "Methods/config",
         "Snakefile": "Methods/Snakefile",
         "bin": "Methods/bin",

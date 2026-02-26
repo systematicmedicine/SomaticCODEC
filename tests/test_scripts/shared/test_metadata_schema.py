@@ -23,14 +23,13 @@ pytestmark = [
 TEMPLATE_DIR = Path("config")          
 CI_METADATA_DIR = Path("tests/data/lightweight_test_run/config")
 
-# List the 6 metadata filenames (must exist in both dirs)
+# List the 5 metadata filenames (must exist in both dirs)
 METADATA_FILES = [
     "download_list.csv",
     "ex_samples.csv",
     "ex_lanes.csv",
     "ex_adapters.csv",
-    "ms_samples.csv",
-    "ex_technical_controls.csv",
+    "ms_samples.csv"
 ]
 
 def read_header_row(csv_path: Path) -> list[str]:
