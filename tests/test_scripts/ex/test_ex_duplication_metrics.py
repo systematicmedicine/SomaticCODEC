@@ -11,7 +11,7 @@ import json
 import pytest
 import os
 import types
-from scripts.ex.processing_metrics.ex_duplication_metrics import main
+from rule_scripts.ex.processing_metrics.ex_duplication_metrics import main
 
 @pytest.mark.parametrize("hist_path, expected_dup_rate, expected_pct_unique", [
     ("tests/data/test_ex_duplication_metrics/map_umi_metrics_100pct_unique.txt", 0, 100),

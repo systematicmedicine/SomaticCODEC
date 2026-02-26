@@ -133,7 +133,7 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, germ_risk_vcf, expec
 
     # Copy snakemake files to temporary directory
     shutil.copy("Snakefile", tmp_path / "Snakefile")
-    shutil.copytree("scripts", tmp_path / "scripts")
+    shutil.copytree("rule_scripts", tmp_path / "rule_scripts")
     shutil.copytree("rules", tmp_path / "rules")
     shutil.copytree("tmp/downloads", tmp_path / "tmp/downloads")
     shutil.copytree("tests/data/lightweight_test_run/config", tmp_path / "tests/data/lightweight_test_run/config")

@@ -11,7 +11,7 @@ import json
 import pytest
 import os
 import types
-from scripts.ex.processing_metrics.ex_softclipping_metrics import main
+from rule_scripts.ex.processing_metrics.ex_softclipping_metrics import main
 
 @pytest.mark.parametrize(
     "bam_path, expected_total_reads, expected_0th_percentile, expected_90th_percentile, expected_100th_percentile",

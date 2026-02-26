@@ -23,7 +23,7 @@ metadata:
 # ------------------------------------------------------------------------------
 sci_params:
   
-  global:
+  shared:
     reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
     reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
     reference_genome_trinuc_counts: tmp/downloads/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv

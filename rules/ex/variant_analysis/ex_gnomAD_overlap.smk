@@ -7,8 +7,8 @@ from definitions.paths.io import ex as EX
 rule ex_gnomAD_overlap:
     input:
         somatic_vcf = EX.CALLED_SNVS,
-        germline_vcf = config["sci_params"]["global"]["known_germline_variants"],
-        germline_tbi = config["sci_params"]["global"]["known_germline_variants"] + ".tbi"
+        germline_vcf = config["sci_params"]["shared"]["known_germline_variants"],
+        germline_tbi = config["sci_params"]["shared"]["known_germline_variants"] + ".tbi"
     output:
         intermediate_somatic_bgz = temp(EX.MET_GNOMAD_OVERLAP_INT_BGZ),
         intermediate_somatic_tbi = temp(EX.MET_GNOMAD_OVERLAP_INT_TBI),

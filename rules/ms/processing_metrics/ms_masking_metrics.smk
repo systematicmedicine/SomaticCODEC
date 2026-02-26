@@ -6,11 +6,11 @@ from definitions.paths.io import ms as MS
 
 rule ms_masking_metrics:
     input:
-        precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["shared"]["precomputed_masks"]),
         ms_lowdepth_bed = MS.LOW_DEPTH_MASK,
         ms_germ_risk_bed = MS.GERMLINE_RISK_MASK,
         combined_bed = MS.COMBINED_MASK,
-        ref_index = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        ref_index = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
         mask_metrics = MS.MET_MASKING,
         intermediate_sorted = temp(MS.MET_MASKING_INT1),

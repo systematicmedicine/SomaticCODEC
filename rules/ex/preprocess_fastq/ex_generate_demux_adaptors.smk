@@ -18,9 +18,9 @@ rule ex_generate_demux_adaptors:
     params:
         adapter_dict = json.dumps(md.get_ex_lane_adapter_dict(config))
     log:
-        "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}.log"
+        "logs/shared_rules/ex_generate_demux_adaptors/{ex_lane}.log"
     benchmark:
-        "logs/global_rules/ex_generate_demux_adaptors/{ex_lane}.benchmark.txt"
+        "logs/shared_rules/ex_generate_demux_adaptors/{ex_lane}.benchmark.txt"
     threads:
         1
     resources:

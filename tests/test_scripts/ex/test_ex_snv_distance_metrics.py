@@ -9,7 +9,7 @@ Authors:
 """
 
 # Setup
-from scripts.ex.variant_analysis.ex_snv_distance_metrics import calculate_nearest_snv_percentiles
+from rule_scripts.ex.variant_analysis.ex_snv_distance_metrics import calculate_nearest_snv_percentiles
 
 # Define hard coded variables
 VCF_PATH = "tests/data/test_ex_snv_distance_metrics/S00X_variants.vcf"

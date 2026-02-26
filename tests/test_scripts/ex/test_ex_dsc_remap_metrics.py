@@ -14,7 +14,7 @@ import tempfile
 import json
 import os
 import types
-from scripts.ex.processing_metrics.ex_dsc_remap_metrics import main
+from rule_scripts.ex.processing_metrics.ex_dsc_remap_metrics import main
 import helpers.get_metadata as md
 
 

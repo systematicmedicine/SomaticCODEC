@@ -49,7 +49,7 @@ resources_log <- read.csv(resources_log_path)
 
 # Create jobs plot
 date <- format(Sys.Date(), "%Y-%m-%d")
-pipeline_version <- fromJSON("logs/global_rules/git_metadata.json")$git_tag
+pipeline_version <- fromJSON("logs/shared_rules/git_metadata.json")$git_tag
 title <- paste0(exp_name, " timeline")
 subtitle <- paste0(date, ", ", pipeline_version)
 

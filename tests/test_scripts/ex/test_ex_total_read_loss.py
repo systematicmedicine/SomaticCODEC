@@ -11,7 +11,7 @@ import pytest
 import json
 from unittest.mock import patch
 import types
-from scripts.ex.processing_metrics.ex_total_read_loss import main
+from rule_scripts.ex.processing_metrics.ex_total_read_loss import main
 
 @pytest.mark.parametrize(
     "fastq1, fastq2, bam_file, expected_paired_reads, expected_final_dsc_reads, expected_percent_lost",
@@ -48,7 +48,7 @@ def test_total_read_loss(tmp_path, fastq1, fastq2, bam_file, expected_paired_rea
         elif fastq_file.endswith("input_R2.fastq"):
             return MockCompletedProcess("tests/data/test_ex_total_read_loss/mock_seqkit_output_R2.txt")
 
-    with patch("scripts.ex.processing_metrics.ex_total_read_loss.subprocess.run", side_effect=mock_run):
+    with patch("rule_scripts.ex.processing_metrics.ex_total_read_loss.subprocess.run", side_effect=mock_run):
         main(args)
 
     with open(output_file) as f:

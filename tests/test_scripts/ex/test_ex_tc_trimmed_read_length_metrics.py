@@ -11,7 +11,7 @@ import pytest
 import json
 import tempfile
 import types
-from scripts.ex.processing_metrics.ex_trimmed_read_length_metrics import main
+from rule_scripts.ex.processing_metrics.ex_trimmed_read_length_metrics import main
 
 @pytest.mark.parametrize(
     "r1_path, r2_path, expected_0th_percentile, expected_50th_percentile, expected_100th_percentile, expected_percent_zero_length",

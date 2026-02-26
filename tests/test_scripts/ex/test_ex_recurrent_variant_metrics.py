@@ -11,7 +11,7 @@ Authors:
 import json
 from math import isclose
 import types
-from scripts.ex.variant_analysis.ex_recurrent_variant_metrics import main
+from rule_scripts.ex.variant_analysis.ex_recurrent_variant_metrics import main
 
 # Create dictionary of paths to test data
 DATA_DIR = "tests/data/test_ex_recurrent_variant_metrics/"

@@ -11,7 +11,7 @@
 set -e
 
 # Define parameters
-LOG_FILE="${LOG_FILE:-logs/global_rules/system_resource_usage.csv}"
+LOG_FILE="${LOG_FILE:-logs/shared_rules/system_resource_usage.csv}"
 SLEEP_INTERVAL="${SLEEP_INTERVAL:-60}"
 TOTAL_CORES="${TOTAL_CORES:?TOTAL_CORES must be set}"
 

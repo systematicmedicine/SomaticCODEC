@@ -4,12 +4,12 @@ Collates all benchmarks into a single CSV
 
 rule collate_benchmarks:
     input:
-        git_metadata = "logs/global_rules/git_metadata.json",
-        timeline_plot = "logs/global_rules/run_timeline.pdf"
+        git_metadata = "logs/shared_rules/git_metadata.json",
+        timeline_plot = "logs/shared_rules/run_timeline.pdf"
     output:
-        combined_benchmarks = "logs/global_rules/combined_benchmarks.csv"
+        combined_benchmarks = "logs/shared_rules/combined_benchmarks.csv"
     log:
-        "logs/global_rules/collate_benchmarks.log"
+        "logs/shared_rules/collate_benchmarks.log"
     threads:
         1
     resources:
