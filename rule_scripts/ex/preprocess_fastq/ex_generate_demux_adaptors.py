@@ -11,7 +11,7 @@ To be used with the (non-wildcarded-by-region) Snakemake rule ex_generate_demux_
 
 Inputs:
   --adapter_dict : JSON string with structure
-      dict[ex_lane][ex_sample or ex_technical_control][region] -> adapter sequence
+      dict[ex_lane][ex_sample][region] -> adapter sequence
   --lane         : lane ID (must match keys in adapter_dict)
   --r1_start     : output FASTA path for r1_start
   --r2_start     : output FASTA path for r2_start

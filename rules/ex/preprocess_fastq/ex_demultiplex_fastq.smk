@@ -22,12 +22,8 @@ rule ex_demultiplex_fastq:
 
     output:
         # Demultiplexed FASTQs
-        demuxed_r1 = 
-            temp(expand(EX.DEMUXD_FASTQ_R1, ex_sample = md.get_ex_sample_ids(config))) + 
-            temp(expand("tmp/{ex_technical_control}/{ex_technical_control}_r1_demux.fastq.gz", ex_technical_control = md.get_ex_technical_control_ids(config))),
-        demuxed_r2 = 
-            temp(expand(EX.DEMUXD_FASTQ_R2, ex_sample = md.get_ex_sample_ids(config))) + 
-            temp(expand("tmp/{ex_technical_control}/{ex_technical_control}_r2_demux.fastq.gz", ex_technical_control = md.get_ex_technical_control_ids(config))),
+        demuxed_r1 = temp(expand(EX.DEMUXD_FASTQ_R1, ex_sample = md.get_ex_sample_ids(config))),
+        demuxed_r2 = temp(expand(EX.DEMUXD_FASTQ_R2, ex_sample = md.get_ex_sample_ids(config))),
         
         # Metrics files
         metrics = expand(EX.MET_DEMULIPLEX_FASTQ, ex_lane = md.get_ex_lane_ids(config))

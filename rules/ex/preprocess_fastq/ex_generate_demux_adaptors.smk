@@ -10,7 +10,6 @@ rule ex_generate_demux_adaptors:
     input:
         ex_lanes = config["metadata"]["ex_lanes_metadata"],
         ex_samples = config["metadata"]["ex_samples_metadata"],
-        ex_technical_controls = config["metadata"]["ex_technical_controls_metadata"],
         ex_adapters = config["metadata"]["ex_adapters_metadata"]
     output:
         r1_start = EX.ADAPTOR_R1_START,
