@@ -11,7 +11,13 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [Unreleased]
+## [Unrealeased]
+
+### Changed
+
+- Test scripts now used centralised paths (#323)
+
+## [RC4.0.0]
 
 ### Added
 
