@@ -6,9 +6,9 @@ from definitions.paths.io import ms as MS
 
 rule ms_duplication_metrics:
     input:
-        dedup_metrics = MS.MET_REMOVE_DUPLICATES
+        dedup_metrics = MS.MET_DUPLICATION_1
     output:
-        duplication_metrics = MS.MET_DUPLICATION
+        duplication_metrics = MS.MET_DUPLICATION_2
     params:
         sample = "{ms_sample}"
     log:

@@ -9,7 +9,7 @@ rule ex_call_dsc_metrics:
         pre_call_bam = EX.MATE_INFO_BAM,
         post_call_bam = EX.RAW_DSC
     output:
-        call_dsc_metrics = EX.MET_READS_LOST_CALL_DSC
+        call_dsc_metrics = EX.MET_CALL_DSC_2
     params:
         sample = "{ex_sample}"
     log:
