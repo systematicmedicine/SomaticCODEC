@@ -11,7 +11,7 @@ import json
 import pytest
 import types
 
-from scripts.ex.processing_metrics.ex_bases_trimmed import main
+from rule_scripts.ex.processing_metrics.ex_bases_trimmed import main
 
 @pytest.mark.parametrize("pre_r1, pre_r2, post_r1, post_r2, expected_trimmed, expected_pct", [
     ("tests/data/test_ex_bases_trimmed/pre_r1.fq", 

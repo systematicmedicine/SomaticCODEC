@@ -11,7 +11,7 @@ Authors:
 from pathlib import Path
 import pytest
 import types
-from scripts.global_scripts.setup.check_included_chromosomes_present import main
+from rule_scripts.shared.setup.check_included_chromosomes_present import main
 
 @pytest.mark.parametrize(
     "fai_path, bed_path, chroms, expect_exit, expect_done, expect_error_chrom",

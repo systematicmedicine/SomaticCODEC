@@ -8,12 +8,12 @@ rule ex_alignment:
     input:
         fastq1 = EX.FILTERED_FASTQ_R1,
         fastq2 = EX.FILTERED_FASTQ_R2,
-        ref = config["sci_params"]["global"]["reference_genome"],
-        amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
-        ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
-        bwt = config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
-        pac = config["sci_params"]["global"]["reference_genome"] + ".pac",
-        sa = config["sci_params"]["global"]["reference_genome"] + ".0123"
+        ref = config["sci_params"]["shared"]["reference_genome"],
+        amb = config["sci_params"]["shared"]["reference_genome"] + ".amb",
+        ann = config["sci_params"]["shared"]["reference_genome"] + ".ann",
+        bwt = config["sci_params"]["shared"]["reference_genome"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["shared"]["reference_genome"] + ".pac",
+        sa = config["sci_params"]["shared"]["reference_genome"] + ".0123"
     output:
         intermediate_sam = temp(EX.RAW_SAM),
         bam = temp(EX.RAW_BAM),

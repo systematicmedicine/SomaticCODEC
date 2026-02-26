@@ -41,9 +41,9 @@ rule ex_demultiplex_fastq:
         out_dir = "tmp",
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/global_rules/ex_demultiplex_fastq.log"
+        "logs/shared_rules/ex_demultiplex_fastq.log"
     benchmark:
-        "logs/global_rules/ex_demultiplex_fastq.benchmark.txt"
+        "logs/shared_rules/ex_demultiplex_fastq.benchmark.txt"
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

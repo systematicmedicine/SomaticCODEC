@@ -7,12 +7,12 @@ from definitions.paths.io import ex as EX
 rule ex_snv_position_metrics:
     input:
         vcf_path = EX.CALLED_SNVS,
-        index_path = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        index_path = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
         metrics_json = EX.MET_SNV_POSITION_JSON,
         metrics_plot = EX.MET_SNV_POSITION_PDF
     params:
-        included_chroms = config["sci_params"]["global"]["included_chromosomes"],
+        included_chroms = config["sci_params"]["shared"]["included_chromosomes"],
         run_name = config["run_name"]
     log:
         "logs/{ex_sample}/ex_snv_position_metrics.log"

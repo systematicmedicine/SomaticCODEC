@@ -1,7 +1,7 @@
 """
 --- test_script_syntax.py
 
-Tests scripts in the /scripts directory for syntax errors
+Tests scripts for syntax errors
     - Tests .py, .R and .sh scripts
     - Test fails if any scripts have other file extenstions
 
@@ -29,7 +29,7 @@ EXEMPT_FILES = {".gitkeep"}
 
 # Directories to check
 check_dirs = [
-    PROJECT_ROOT / "scripts",
+    PROJECT_ROOT / "rule_scripts",
     PROJECT_ROOT / "helpers",
     PROJECT_ROOT / "tests/test_scripts",
     PROJECT_ROOT / "bin"

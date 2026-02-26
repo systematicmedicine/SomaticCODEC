@@ -10,7 +10,7 @@ from definitions.paths.io import ms as MS
 
 rule ms_raw_fastq_metrics:
     input:
-        global_setup = global_setup,
+        shared_setup = shared_setup,
         ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]

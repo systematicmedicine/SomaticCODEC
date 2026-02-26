@@ -8,7 +8,7 @@ from definitions.paths.io import ms as MS
 
 rule ex_coverage_overlap_metrics:
     input:
-        precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["shared"]["precomputed_masks"]),
         ex_dsc_bam = EX.FILTERED_DSC,
         ex_dsc_bai = EX.FILTERED_DSC_INDEX,
         include_bed = MS.INCLUDE_BED,
@@ -24,7 +24,7 @@ rule ex_coverage_overlap_metrics:
         combined_bed = lambda wc: MS.COMBINED_MASK.format(
             ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
             ),
-        ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
         output_json = EX.MET_COVERAGE_OVERLAP
     params: 

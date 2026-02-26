@@ -22,7 +22,7 @@ rule ex_extract_fastq_umis:
         ex_lanes = config["metadata"]["ex_lanes_metadata"],
 
         # All setup complete before rule can run
-        global_setup = global_setup
+        shared_setup = shared_setup
 
     output:
         fastq1 = temp(EX.UMIXD_FASTQ_R1),

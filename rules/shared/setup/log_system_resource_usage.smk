@@ -4,15 +4,15 @@ Logs disk space, memory, and cpu load at a defined interval
 
 rule log_system_resource_usage:
     output:
-        log = "logs/global_rules/system_resource_usage.csv",
-        done_file = "logs/global_rules/log_system_resource_usage.done"
+        log = "logs/shared_rules/system_resource_usage.csv",
+        done_file = "logs/shared_rules/log_system_resource_usage.done"
     params:
         sleep_interval = config["infrastructure"]["log_system_resource_usage"]["sleep_interval"],
         total_cores = int(os.popen("nproc").read().strip()) - config["infrastructure"]["threads"]["global_buffer"]
     log:
-        "logs/global_rules/log_system_resource_usage.log"
+        "logs/shared_rules/log_system_resource_usage.log"
     benchmark:
-        "logs/global_rules/log_system_resource_usage.benchmark.txt"
+        "logs/shared_rules/log_system_resource_usage.benchmark.txt"
     threads:
         1
     resources:

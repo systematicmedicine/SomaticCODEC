@@ -111,9 +111,9 @@ def main(args):
             rule_name = file.name.replace(".benchmark.txt", "")
             try:
                 relative_parts = file.relative_to(logs_dir).parts
-                scope = relative_parts[0] if len(relative_parts) > 1 else "global"
+                scope = relative_parts[0] if len(relative_parts) > 1 else "shared"
             except ValueError:
-                scope = "global"
+                scope = "shared"
             source = os.path.relpath(file, Path.cwd())
 
             df.insert(0, "rule", rule_name)

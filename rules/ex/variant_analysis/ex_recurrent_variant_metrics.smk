@@ -13,9 +13,9 @@ rule ex_recurrent_variant_metrics:
         vcf_path = EX.MET_RECURRENT_VARIANTS_VCF,
         metrics_path = EX.MET_RECURRENT_VARIANTS_JSON
     log:
-        "logs/global_rules/batch_ex_recurrent_variant_metrics.log"
+        "logs/shared_rules/batch_ex_recurrent_variant_metrics.log"
     benchmark:
-        "logs/global_rules/batch_ex_recurrent_variant_metrics.benchmark.txt"
+        "logs/shared_rules/batch_ex_recurrent_variant_metrics.benchmark.txt"
     threads:
         1
     resources:
