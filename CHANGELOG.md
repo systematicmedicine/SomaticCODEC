@@ -17,6 +17,10 @@ Types of changes:
 
 - Test scripts now used centralised paths (#323)
 
+### Fixed
+
+- Test script names updated to match new rule names (#324)
+
 ## [RC4.0.0]
 
 ### Added

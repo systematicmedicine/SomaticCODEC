@@ -1,7 +1,7 @@
 """
---- test_ms_map.py
+--- test_ms_alignment.py
 
-Tests the rule ms_map
+Tests the rule ms_alignment
 
 Authors:
     - Chat-GPT

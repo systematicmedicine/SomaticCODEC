@@ -1,7 +1,7 @@
 """
---- test_ex_remap_dsc.py
+--- test_ex_realign_dsc.py
 
-Tests the rule ex_remap_dsc
+Tests the rule ex_realign_dsc
 
 Authors:
     - Chat-GPT
