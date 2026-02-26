@@ -1,10 +1,13 @@
 """
 Map reads to reference genome
 """
-rule ex_map:
+
+from definitions.paths.io import ex as EX
+
+rule ex_alignment:
     input:
-        fastq1 = "tmp/{ex_sample}/{ex_sample}_r1_filter.fastq.gz",
-        fastq2 = "tmp/{ex_sample}/{ex_sample}_r2_filter.fastq.gz",
+        fastq1 = EX.FILTERED_FASTQ_R1,
+        fastq2 = EX.FILTERED_FASTQ_R2,
         ref = config["sci_params"]["global"]["reference_genome"],
         amb = config["sci_params"]["global"]["reference_genome"] + ".amb",
         ann = config["sci_params"]["global"]["reference_genome"] + ".ann",
@@ -12,8 +15,8 @@ rule ex_map:
         pac = config["sci_params"]["global"]["reference_genome"] + ".pac",
         sa = config["sci_params"]["global"]["reference_genome"] + ".0123"
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map.bam"),
-        intermediate_sam = temp("tmp/{ex_sample}/{ex_sample}_map_tmp.sam")
+        intermediate_sam = temp(EX.RAW_SAM),
+        bam = temp(EX.RAW_BAM),
     params:
         band_width = config["sci_params"]["ex_map"]["band_width"],
         clipping_penalty = config["sci_params"]["ex_map"]["clipping_penalty"],

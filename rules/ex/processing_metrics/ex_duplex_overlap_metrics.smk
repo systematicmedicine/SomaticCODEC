@@ -1,11 +1,14 @@
 """
 Calculate duplex overlap metrics
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_duplex_overlap_metrics:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"
+        bam = EX.FILTERED_DSC
     output:
-        metrics = "metrics/{ex_sample}/{ex_sample}_duplex_overlap_metrics.json"
+        metrics = EX.MET_DUPLEX_OVERLAP
     log:
         "logs/{ex_sample}/ex_duplex_overlap_metrics.log"
     benchmark:

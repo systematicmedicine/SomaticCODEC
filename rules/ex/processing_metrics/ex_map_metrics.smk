@@ -1,11 +1,14 @@
 """
 Collects alignment metrics from the experimental bam mapped to the reference genome
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_map_metrics:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
+        bam = EX.RAW_BAM
     output:
-        txt = "metrics/{ex_sample}/{ex_sample}_map_metrics.txt"
+        txt = EX.MET_ALIGNMENT
     log:
         "logs/{ex_sample}/ex_map_metrics.log"
     benchmark:

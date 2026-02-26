@@ -2,12 +2,14 @@
 Generates ms insert size metrics
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_insert_metrics:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_deduped_map.bam"
+        bam = MS.DEDUPED_BAM
     output:
-        insert_metrics = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt",
-        insert_hist = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
+        insert_metrics = MS.MET_INSERT_SIZE_TXT,
+        insert_hist = MS.MET_INSERT_SIZE_PDF
     log:
         "logs/{ms_sample}/ms_insert_metrics.log"
     benchmark:

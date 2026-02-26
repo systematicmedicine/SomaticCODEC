@@ -58,6 +58,9 @@ sci_params:
     max_error_rate: 0.1
     min_adapter_overlap: 8
 
+  ex_dsc_coverage_metrics:
+    ex_depth_threshold: 1
+
   ex_extract_fastq_umis:
     umi_length: 3
 

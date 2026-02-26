@@ -9,11 +9,14 @@ Filter mapped reads
         - Supplementary alignments
         - Unmapped reads
 """
-rule ex_filter_map:
+
+from definitions.paths.io import ex as EX
+
+rule ex_filter_bam:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map.bam"
+        bam = EX.RAW_BAM
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_correct.bam")
+        bam = temp(EX.FILTERED_BAM)
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:

@@ -2,17 +2,19 @@
 Generates metrics for each mask BED file
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_masking_metrics:
     input:
         precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
-        ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_risk_bed = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed",
-        combined_bed = "tmp/{ms_sample}/{ms_sample}_combined_mask.bed",
+        ms_lowdepth_bed = MS.LOW_DEPTH_MASK,
+        ms_germ_risk_bed = MS.GERMLINE_RISK_MASK,
+        combined_bed = MS.COMBINED_MASK,
         ref_index = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        mask_metrics = "metrics/{ms_sample}/{ms_sample}_mask_metrics.json",
-        intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"),
-        intermediate_merged = temp("tmp/{ms_sample}/{ms_sample}_masks_merged.txt")
+        mask_metrics = MS.MET_MASKING,
+        intermediate_sorted = temp(MS.MET_MASKING_INT1),
+        intermediate_merged = temp(MS.MET_MASKING_INT2)
     params:
         sample = "{ms_sample}"
     log:

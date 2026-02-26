@@ -4,14 +4,16 @@ Filters FASTQ files
     - Reads with low average quality
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_filter_fastq:
     input:
-        r1 = "tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz",    
+        r1 = MS.TRIMMED_FASTQ_R1,
+        r2 = MS.TRIMMED_FASTQ_R2,    
     output:
-        r1 = temp("tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz"),
-        r2 = temp("tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"),
-        filter_metrics = "metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt"
+        r1 = temp(MS.FILTERED_FASTQ_R1),
+        r2 = temp(MS.FILTERED_FASTQ_R2),
+        filter_metrics = MS.MET_FILTER_FASTQ
     params:
         min_read_length = config["sci_params"]["ms_filter_fastq"]["min_read_length"],
         average_quality_threshold = config["sci_params"]["ms_filter_fastq"]["average_quality_threshold"]

@@ -1,12 +1,15 @@
 """
 Compares variant rate between chromosomes
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_chromosomal_variant_rate_metrics:
     input:
-        vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        vcf = EX.CALLED_SNVS,
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
     output:
-        metrics = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
+        metrics = EX.MET_CHROM_VARIANT_RATE
     params:
         included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
     log:

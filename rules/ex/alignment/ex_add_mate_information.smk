@@ -1,12 +1,15 @@
 """
  Adds read mate information to flags/CIGAR strings of mapped reads
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_add_mate_information:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_read_group.bam"
+        bam = EX.READ_GROUP_BAM
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_anno.bam"),
-        intermediate_collated = temp("tmp/{ex_sample}/{ex_sample}_map_collated_tmp.bam")
+        intermediate_collated = temp(EX.ADD_MATE_INFORMATION_INT),
+        bam = temp(EX.MATE_INFO_BAM),
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:

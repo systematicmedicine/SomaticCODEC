@@ -3,12 +3,14 @@ Creates a mask for chromosomes that will be excluded for variant calling
 e.g. chrUn, chr*_random, chrM, chrEBV
 """
 
+from definitions.paths.io import shared as S
+
 rule included_excluded_chromosomes_beds:
     input:
         fai = config["sci_params"]["global"]["reference_genome"] + ".fai",
     output:
-        exclude_bed = temp("tmp/downloads/excluded_chromosomes.bed"),
-        include_bed = temp("tmp/downloads/included_chromosomes.bed")
+        exclude_bed = temp(S.EXCLUDED_CHROMS_BED),
+        include_bed = temp(S.INCLUDED_CHROMS_BED)
     params:
         included_chromosomes = config["sci_params"]["global"]["included_chromosomes"]
     log:
