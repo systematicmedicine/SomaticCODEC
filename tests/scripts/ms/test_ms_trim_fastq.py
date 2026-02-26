@@ -14,7 +14,7 @@ Authors:
 from pathlib import Path
 from helpers.get_metadata import load_config, get_ms_sample_fastqs
 from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
-
+from definitions.paths.io import ms as MS
 
 # Test that the total number of reads does not change
 def test_read_counts_preserved(lightweight_test_run):
@@ -22,8 +22,8 @@ def test_read_counts_preserved(lightweight_test_run):
     ms_fastq_dict = get_ms_sample_fastqs(config)
 
     for ms_sample, (input_r1, input_r2) in ms_fastq_dict.items():
-        output_r1 = Path(f"tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz")
-        output_r2 = Path(f"tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz")
+        output_r1 = Path(MS.TRIMMED_FASTQ_R1.format(ms_sample=ms_sample))
+        output_r2 = Path(MS.TRIMMED_FASTQ_R2.format(ms_sample=ms_sample))
 
         assert output_r1.exists(), f"Missing output file: {output_r1}"
         assert output_r2.exists(), f"Missing output file: {output_r2}"
@@ -39,8 +39,8 @@ def test_sequences_are_shorter(lightweight_test_run):
     ms_fastq_dict = get_ms_sample_fastqs(config)
 
     for ms_sample, (input_r1, input_r2) in ms_fastq_dict.items():
-        output_r1 = Path(f"tmp/{ms_sample}/{ms_sample}_trim_r1.fastq.gz")
-        output_r2 = Path(f"tmp/{ms_sample}/{ms_sample}_trim_r2.fastq.gz")
+        output_r1 = Path(MS.TRIMMED_FASTQ_R1.format(ms_sample=ms_sample))
+        output_r2 = Path(MS.TRIMMED_FASTQ_R2.format(ms_sample=ms_sample))
 
         assert output_r1.exists(), f"Missing output file: {output_r1}"
         assert output_r2.exists(), f"Missing output file: {output_r2}"

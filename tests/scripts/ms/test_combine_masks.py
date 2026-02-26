@@ -6,23 +6,28 @@ Tests the rule combine_masks
 Authors:
     - Chat-GPT
     - Joshua Johnstone
+    - Cameron Fraser
 """
 
 import pandas as pd
 from pathlib import Path
 from helpers.get_metadata import load_config, get_ms_sample_ids
 from helpers.bed_helpers import merge_bed_intervals, read_bed
+from definitions.paths.io import ms as MS
+from definitions.paths.io import shared as S
 
 # Assert that combined BED matches expected merge of individual beds
 def assert_correctly_merged(ms_sample):
+
+    # Load config
+    config = load_config(lightweight_test_run["test_config_path"])
+
     # Load individual BED files
     pre_files = [
-        Path(f"tmp/{ms_sample}/{ms_sample}_lowdepth.bed"),
-        Path(f"tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed"),
-        Path("tmp/downloads/GRCh38_alldifficultregions_10lines.bed"),
-        Path("tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed"),
-        Path("tmp/downloads/GCRh38_repeat_masker_10lines.bed"),
-        Path("tmp/downloads/excluded_chromosomes.bed")
+        MS.LOW_DEPTH_MASK.format(ms_sample=ms_sample),
+        MS.GERMLINE_RISK_MASK.format(ms_sample=ms_sample),
+        *config["sci_params"]["shared"]["precomputed_masks"],
+        S.EXCLUDED_CHROMS_BED
         ]
     pre_dfs = [read_bed(f) for f in pre_files]
 
@@ -33,7 +38,7 @@ def assert_correctly_merged(ms_sample):
     merged_df = merge_bed_intervals(combined_df)
 
     # Load actual bedtools merge output
-    output_df = read_bed(Path(f"tmp/{ms_sample}/{ms_sample}_combined_mask.bed"))
+    output_df = read_bed(Path(MS.COMBINED_MASK.format(ms_sample=ms_sample)))
 
     # Assert pandas merge and bedtools merge outputs match
     pd.testing.assert_frame_equal(
@@ -53,7 +58,7 @@ def test_combined_bed_matches_individual_beds(lightweight_test_run):
 # Assert that the chromosome order of the combined BED matches the reference order
 def assert_combined_bed_order_matches_ref(lightweight_test_run, ms_sample):
     # Load combined BED file
-    bed_df = read_bed(Path(f"tmp/{ms_sample}/{ms_sample}_combined_mask.bed"))
+    bed_df = read_bed(Path(MS.COMBINED_MASK.format(ms_sample=ms_sample)))
 
     # Load reference fai file and get chromosome order as a list
     config = load_config(lightweight_test_run["test_config_path"])

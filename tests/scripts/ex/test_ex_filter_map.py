@@ -12,6 +12,7 @@ from pathlib import Path
 import pysam
 from helpers.get_metadata import load_config, get_ex_sample_ids
 from helpers.bam_helpers import count_bam_data_points
+from definitions.paths.io import ex as EX
 
 # Test that filtered read count is not greater than aligned read count
 def test_filtered_reads_less_than_aligned_reads(lightweight_test_run):
@@ -21,11 +22,11 @@ def test_filtered_reads_less_than_aligned_reads(lightweight_test_run):
     for ex_sample in ex_samples:
         
         # Get aligned read count
-        pre_file = Path(f"tmp/{ex_sample}/{ex_sample}_map.bam")
+        pre_file = Path(EX.RAW_BAM.format(ex_sample=ex_sample))
         pre_count = count_bam_data_points(pre_file)
 
         # Get filtered read count       
-        post_file = Path(f"tmp/{ex_sample}/{ex_sample}_map_correct.bam")
+        post_file = Path(EX.FILTERED_BAM.format(ex_sample=ex_sample))
         post_count = count_bam_data_points(post_file)
 
         # Assert total reads pre marking duplicates <= total reads post marking duplicates
@@ -51,7 +52,7 @@ def test_flags_filtering(lightweight_test_run):
 
     for ex_sample in ex_samples:
 
-        output_bam_path = Path(f"tmp/{ex_sample}/{ex_sample}_map_correct.bam")
+        output_bam_path = Path(EX.FILTERED_BAM.format(ex_sample=ex_sample))
 
         with pysam.AlignmentFile(output_bam_path, "rb") as bam:
             for read in bam:
