@@ -4,7 +4,7 @@ Collects alignment metrics from the experimental bam mapped to the reference gen
 
 from definitions.paths.io import ex as EX
 
-rule ex_map_metrics:
+rule ex_alignment_metrics:
     input:
         bam = EX.RAW_BAM
     output:
