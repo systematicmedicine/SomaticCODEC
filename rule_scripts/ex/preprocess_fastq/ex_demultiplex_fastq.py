@@ -22,20 +22,21 @@ import subprocess
 from pathlib import Path
 import argparse
 import sys
+import helpers.get_metadata as md
 
+# Parse arguments
 parser = argparse.ArgumentParser(description="Demultiplex FASTQs")
 parser.add_argument("--raw_r1", required=True, nargs="+")
 parser.add_argument("--raw_r2", required=True, nargs="+")
 parser.add_argument("--r1_start", required=True, nargs="+")
 parser.add_argument("--r2_start", required=True, nargs="+")
+parser.add_argument("--demuxed_r1", required=True, nargs="+")
+parser.add_argument("--demuxed_r2", required=True, nargs="+")
 parser.add_argument("--metrics", required=True, nargs="+")
 parser.add_argument("--max_error_rate", required=True)
 parser.add_argument("--min_adapter_overlap", required=True)
-parser.add_argument("--lane_ids", required=True, nargs="+")
-parser.add_argument("--suffix_r1", required=True)
-parser.add_argument("--suffix_r2", required=True)
-parser.add_argument("--out_dir", required=True)
 parser.add_argument("--compression_level", required=True)
+parser.add_argument("--ex_samples", required=True, nargs="+")
 parser.add_argument("--threads", required=True)
 parser.add_argument("--log", required=True)
 args = parser.parse_args()
@@ -43,7 +44,7 @@ args = parser.parse_args()
 # Initiate logging
 sys.stdout = open(args.log, "a")
 sys.stderr = open(args.log, "a")
-print("[INFO] Starting ex_demultiplex.py")
+print("[INFO] Starting ex_demultiplex_fastq.py")
 
 # Define inputs
 raw_r1_files = {Path(file).parent.name: file for file in args.raw_r1}
@@ -52,20 +53,23 @@ r1_start_files = {Path(file).parent.name: file for file in args.r1_start}
 r2_start_files = {Path(file).parent.name: file for file in args.r2_start}
 
 # Define params
-lane_ids = args.lane_ids
 max_error_rate = float(args.max_error_rate)
 min_adapter_overlap = int(args.min_adapter_overlap)
-suffix_r1 = args.suffix_r1
-suffix_r2 = args.suffix_r2
-out_dir = args.out_dir
+ex_samples = args.ex_samples
 compression_level = int(args.compression_level)
 threads = int(args.threads)
 
 # Define outputs
+demuxed_r1_files = {Path(file).parent.name: file for file in args.demuxed_r1}
+demuxed_r2_files = {Path(file).parent.name: file for file in args.demuxed_r2}
 metrics_files = {Path(file).parent.name: file for file in args.metrics}
 
+# Create output file templates where {ex_sample} is replaced with {name} to enable cutadapt wildcarding
+output_template_r1 = demuxed_r1_files[ex_samples[0]].replace(ex_samples[0], "{name}")
+output_template_r2 = demuxed_r2_files[ex_samples[0]].replace(ex_samples[0], "{name}")
+
 # Loop over each lane
-for lane in lane_ids:
+for lane in raw_r1_files:
     raw_r1 = raw_r1_files[lane]
     raw_r2 = raw_r2_files[lane]
     r1_fasta = r1_start_files[lane]
@@ -83,8 +87,8 @@ for lane in lane_ids:
         "--report=full",
         "--action=none",
         "--discard-untrimmed",
-        "-o", f"{out_dir}/{{name}}/{{name}}_{suffix_r1}",
-        "-p", f"{out_dir}/{{name}}/{{name}}_{suffix_r2}",
+        "-o", str(output_template_r1),
+        "-p", str(output_template_r2),
         "--compression-level", str(compression_level),
         raw_r1,
         raw_r2
@@ -93,4 +97,4 @@ for lane in lane_ids:
     with open(metrics_file, "w") as report_file, open(args.log, "a") as log_file:
         subprocess.run(cmd, stdout=report_file, stderr=log_file, text=True, check=True)
 
-print("[INFO] Completed ex_demultiplex.py")
+print("[INFO] Completed ex_demultiplex_fastq.py")
