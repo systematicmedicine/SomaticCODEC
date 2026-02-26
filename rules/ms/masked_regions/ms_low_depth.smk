@@ -10,7 +10,7 @@ rule ms_low_depth:
         pileup_depth_vcf = MS.PILEUP_DEPTH,
         ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
-        intermediate_bed = MS.LOW_DEPTH_MASK_INT1,
+        intermediate_bed = temp(MS.LOW_DEPTH_MASK_INT1),
         lowdepth_bed = temp(MS.LOW_DEPTH_MASK)
     log:
         "logs/{ms_sample}/ms_low_depth.log"
@@ -29,5 +29,5 @@ rule ms_low_depth:
         vcf2bed --do-not-sort < {input.pileup_depth_vcf} > {output.intermediate_bed} 2>> {log}
 
         # Invert positions with depth to obtain low depth BED
-        bedtools complement -i {input.intermediate_bed} -g {input.ref_fai} > {output.lowdepth_bed} 2>> {log}
+        bedtools complement -i {output.intermediate_bed} -g {input.ref_fai} > {output.lowdepth_bed} 2>> {log}
         """
