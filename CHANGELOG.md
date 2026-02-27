@@ -20,6 +20,7 @@ Types of changes:
 ### Changed
 
 - Test scripts now used centralised paths (#323)
+- Germline risk positions identified in any sample are now masked across all samples (#327)
 
 ### Fixed
 
