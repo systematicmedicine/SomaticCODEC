@@ -16,12 +16,11 @@ Types of changes:
 ### Added
 
 - Added test to check that all rules have a test (#325)
-- Added additional tests for ms_pileup.smk, ms_germline_risk.smk, and ms_lowdepth.smk (#327 and 328)
 
 ### Changed
 
 - Test scripts now used centralised paths (#323)
-- Germline risk positions identified in any sample are now masked across all samples (#327)
+- Changed file paths for ex pipeline to improve readability (#329)
 
 ### Fixed
 
