@@ -1,7 +1,7 @@
 """
---- test_ms_low_depth_mask.py
+--- test_ms_low_depth.py
 
-Tests the rule ms_low_depth_mask
+Tests the rule ms_low_depth
 
 Authors:
     - Chat-GPT
@@ -29,4 +29,4 @@ def test_bed_structure_correct(lightweight_test_run):
                 end = int(cols[2])
 
                 # Assertion 2: Start position is before end position
-                assert start < end, f"Start >= end on line {linenum}: {line}"    
+                assert start < end, f"Start >= end on line {linenum}: {line}"

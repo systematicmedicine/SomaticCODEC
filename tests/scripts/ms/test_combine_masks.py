@@ -15,6 +15,7 @@ from helpers.get_metadata import load_config, get_ms_sample_ids
 from helpers.bed_helpers import merge_bed_intervals, read_bed
 from definitions.paths.io import ms as MS
 from definitions.paths.io import shared as S
+import helpers.get_metadata as md
 
 # Assert that combined BED matches expected merge of individual beds
 def assert_correctly_merged(lightweight_test_run, ms_sample):
@@ -25,7 +26,8 @@ def assert_correctly_merged(lightweight_test_run, ms_sample):
     # Load individual BED files
     pre_files = [
         MS.LOW_DEPTH_MASK.format(ms_sample=ms_sample),
-        MS.GERMLINE_RISK_MASK.format(ms_sample=ms_sample),
+        *[MS.GERMLINE_RISK_MASK.format(ms_sample=ms_sample)
+          for ms_sample in md.get_ms_sample_ids(config)],
         *config["sci_params"]["shared"]["precomputed_masks"],
         S.EXCLUDED_CHROMS_BED
         ]
