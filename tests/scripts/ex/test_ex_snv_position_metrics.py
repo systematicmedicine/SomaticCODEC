@@ -1,5 +1,5 @@
 """
---- test_ex_snv_position.py ---
+--- test_ex_snv_position_metrics.py ---
 
 Tests the ex_snv_position.R script against 3 VCF cases:
   - zero_mad: one chromosome, uniform distribution
