@@ -24,6 +24,7 @@ import subprocess
 REFERENCE_FILES = [
     "sci_params.shared.reference_genome",
     "sci_params.shared.reference_tri_contexts",
+    "sci_params.shared.reference_genome_trinuc_counts",
     "sci_params.shared.known_germline_variants",
     "sci_params.shared.precomputed_masks",  # list-valued
 ]

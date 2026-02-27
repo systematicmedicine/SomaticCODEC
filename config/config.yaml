@@ -117,17 +117,15 @@ sci_params:
     average_quality_threshold: 30
     min_read_length: 100
 
-  ms_germline_mask:
-    indel_padding_bases: 5
-
   ms_germline_risk:
+    indel_padding_bases: 5
+    min_alt_vaf: 0.10
+
+  ms_pileup:
     max_base_qual: 60
     max_depth: 250
-    min_alt_vaf: 0.10
     min_base_qual: 20
     min_map_qual: 0
-
-  ms_low_depth_mask:
     min_depth: 40
 
   ms_map:
