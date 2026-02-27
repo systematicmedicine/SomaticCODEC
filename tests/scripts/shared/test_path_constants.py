@@ -55,13 +55,12 @@ def iter_path_constants():
 
 def test_path_constants_are_unique():
     """
-    No two non-metrics path constants should share the same value.
+    No two path constants may share the same string value.
     """
+
     value_to_names = defaultdict(list)
 
     for fq, name, value in iter_path_constants():
-        if name.startswith("MET"):
-            continue
         value_to_names[value].append(fq)
 
     duplicates = {v: nms for v, nms in value_to_names.items() if len(nms) > 1}
@@ -71,7 +70,9 @@ def test_path_constants_are_unique():
         for value in sorted(duplicates.keys()):
             names = ", ".join(sorted(duplicates[value]))
             lines.append(f"{value}  <-  {names}")
-        raise AssertionError("Duplicate path constant values found:\n" + "\n".join(lines))
+        raise AssertionError(
+            "Duplicate path constant values found:\n" + "\n".join(lines)
+        )
 
 
 def test_path_constants_follow_filename_rules():
