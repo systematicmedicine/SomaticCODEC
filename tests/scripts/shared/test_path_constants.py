@@ -1,9 +1,12 @@
 """
 --- test_path_constants.py ---
 
-Simple guardrail for centralised path constants.
+Guardrails for centralised path constants in definitions.paths.io.
 
-Rules:
+Test 1: Uniqueness
+- No two path constants (excluding MET*) may have the same string value.
+
+Test 2: Naming rules (skipping certain names)
 - Skip constants starting with "MET" (metrics files)
 - If name contains BAM   → ".bam"   must be in the string
 - If name contains SAM   → ".sam"   must be in the string
@@ -16,68 +19,96 @@ Rules:
 
 import importlib
 import pkgutil
+from collections import defaultdict
+
 import pytest
 
-# Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(6)
+    pytest.mark.order(6),
 ]
+
 
 def load_all_path_modules():
     package = importlib.import_module("definitions.paths.io")
     modules = []
-
     for module_info in pkgutil.iter_modules(package.__path__):
         full_name = f"definitions.paths.io.{module_info.name}"
         modules.append(importlib.import_module(full_name))
-
     return modules
 
 
-def test_path_constant_extensions_and_read_labels():
-
-    modules = load_all_path_modules()
-    offenders = []
-
-    for module in modules:
+def iter_path_constants():
+    """
+    Yield (fully_qualified_name, name, value) for uppercase string constants
+    defined in definitions.paths.io.* modules.
+    """
+    for module in load_all_path_modules():
         for name, value in vars(module).items():
-
             if not name.isupper():
                 continue
-
             if not isinstance(value, str):
                 continue
+            fq = f"{module.__name__}.{name}"
+            yield fq, name, value
 
-            if name.startswith("MET"):
-                continue
 
-            # Extension checks
-            if "BAM" in name and ".bam" not in value:
-                offenders.append(f"{module.__name__}.{name} = {value}")
+def test_path_constants_are_unique():
+    """
+    No two non-metrics path constants should share the same value.
+    """
+    value_to_names = defaultdict(list)
 
-            if "SAM" in name and ".sam" not in value:
-                offenders.append(f"{module.__name__}.{name} = {value}")
+    for fq, name, value in iter_path_constants():
+        if name.startswith("MET"):
+            continue
+        value_to_names[value].append(fq)
 
-            if "FASTQ" in name and ".fastq" not in value:
-                offenders.append(f"{module.__name__}.{name} = {value}")
+    duplicates = {v: nms for v, nms in value_to_names.items() if len(nms) > 1}
 
-            if "VCF" in name and ".vcf" not in value:
-                offenders.append(f"{module.__name__}.{name} = {value}")
+    if duplicates:
+        lines = []
+        for value in sorted(duplicates.keys()):
+            names = ", ".join(sorted(duplicates[value]))
+            lines.append(f"{value}  <-  {names}")
+        raise AssertionError("Duplicate path constant values found:\n" + "\n".join(lines))
 
-            if "BED" in name and ".bed" not in value:
-                offenders.append(f"{module.__name__}.{name} = {value}")
 
-            # R1 / R2 checks
-            if "R1" in name:
-                if "r1" not in value or "r2" in value:
-                    offenders.append(f"{module.__name__}.{name} = {value}")
+def test_path_constants_follow_filename_rules():
+    """
+    Enforce extension and read-label conventions (skipping MET*).
+    """
+    offenders = []
 
-            if "R2" in name:
-                if "r2" not in value or "r1" in value:
-                    offenders.append(f"{module.__name__}.{name} = {value}")
+    for fq, name, value in iter_path_constants():
+        if name.startswith("MET"):
+            continue
+
+        # Extension checks
+        if "BAM" in name and ".bam" not in value:
+            offenders.append(f"{fq} = {value}")
+
+        if "SAM" in name and ".sam" not in value:
+            offenders.append(f"{fq} = {value}")
+
+        if "FASTQ" in name and ".fastq" not in value:
+            offenders.append(f"{fq} = {value}")
+
+        if "VCF" in name and ".vcf" not in value:
+            offenders.append(f"{fq} = {value}")
+
+        if "BED" in name and ".bed" not in value:
+            offenders.append(f"{fq} = {value}")
+
+        # R1 / R2 checks
+        if "R1" in name:
+            if "r1" not in value or "r2" in value:
+                offenders.append(f"{fq} = {value}")
+
+        if "R2" in name:
+            if "r2" not in value or "r1" in value:
+                offenders.append(f"{fq} = {value}")
 
     assert not offenders, (
-        "Path constants with mismatches:\n" +
-        "\n".join(offenders)
+        "Path constants with filename mismatches:\n" + "\n".join(offenders)
     )
