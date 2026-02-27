@@ -47,7 +47,7 @@ rule ms_germline_risk:
         # Filter for alt VAF >= min_alt_vaf
         bcftools view \
         --threads {threads} \
-        --include '(SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= {params.min_alt_vaf}' \
+        --include '((SUM(AD[0:*]) - AD[0:0]) / SUM(AD[0:*])) >= {params.min_alt_vaf}' \
         --output {output.intermediate_alt_vcf} \
         {input.vcf} 2>> {log}
 
