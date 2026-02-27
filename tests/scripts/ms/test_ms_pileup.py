@@ -57,52 +57,52 @@ def test_depth_filter(lightweight_test_run):
 # Test that allele depth edge cases are correctly included in pileup depth VCF     
 @pytest.mark.parametrize("deduped_bam, deduped_bai, expected_vcf, unexpected_vcf", [
     # Depth < 40, REF only
-    ("tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam", 
-    "tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam.bai", 
-    "tests/data/test_ms_germline_risk/AD_1_0/expected_AD_1_0.vcf",
-    "tests/data/test_ms_germline_risk/AD_1_0/unexpected_AD_1_0.vcf"),
+    ("tests/data/test_ms_pileup/AD_1_0/deduped_map_AD_1_0.bam", 
+    "tests/data/test_ms_pileup/AD_1_0/deduped_map_AD_1_0.bam.bai", 
+    "tests/data/test_ms_pileup/AD_1_0/expected_AD_1_0.vcf",
+    "tests/data/test_ms_pileup/AD_1_0/unexpected_AD_1_0.vcf"),
 
     # Depth >= 40, REF only
-    ("tests/data/test_ms_germline_risk/AD_40_0/deduped_map_AD_40_0.bam", 
-    "tests/data/test_ms_germline_risk/AD_40_0/deduped_map_AD_40_0.bam.bai", 
-    "tests/data/test_ms_germline_risk/AD_40_0/expected_AD_40_0.vcf",
-    "tests/data/test_ms_germline_risk/AD_40_0/unexpected_AD_40_0.vcf"),
+    ("tests/data/test_ms_pileup/AD_40_0/deduped_map_AD_40_0.bam", 
+    "tests/data/test_ms_pileup/AD_40_0/deduped_map_AD_40_0.bam.bai", 
+    "tests/data/test_ms_pileup/AD_40_0/expected_AD_40_0.vcf",
+    "tests/data/test_ms_pileup/AD_40_0/unexpected_AD_40_0.vcf"),
 
     # Depth < 40, ALT only
-    ("tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam", 
-     "tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam.bai", 
-     "tests/data/test_ms_germline_risk/AD_0_1/expected_AD_0_1.vcf",
-     "tests/data/test_ms_germline_risk/AD_0_1/unexpected_AD_0_1.vcf"),
+    ("tests/data/test_ms_pileup/AD_0_1/deduped_map_AD_0_1.bam", 
+     "tests/data/test_ms_pileup/AD_0_1/deduped_map_AD_0_1.bam.bai", 
+     "tests/data/test_ms_pileup/AD_0_1/expected_AD_0_1.vcf",
+     "tests/data/test_ms_pileup/AD_0_1/unexpected_AD_0_1.vcf"),
 
     # Depth >= 40, ALT only
-    ("tests/data/test_ms_germline_risk/AD_0_40/deduped_map_AD_0_40.bam", 
-     "tests/data/test_ms_germline_risk/AD_0_40/deduped_map_AD_0_40.bam.bai", 
-     "tests/data/test_ms_germline_risk/AD_0_40/expected_AD_0_40.vcf",
-     "tests/data/test_ms_germline_risk/AD_0_40/unexpected_AD_0_40.vcf"),
+    ("tests/data/test_ms_pileup/AD_0_40/deduped_map_AD_0_40.bam", 
+     "tests/data/test_ms_pileup/AD_0_40/deduped_map_AD_0_40.bam.bai", 
+     "tests/data/test_ms_pileup/AD_0_40/expected_AD_0_40.vcf",
+     "tests/data/test_ms_pileup/AD_0_40/unexpected_AD_0_40.vcf"),
 
     # Depth < 40, REF and ALT
-    ("tests/data/test_ms_germline_risk/AD_36_3/deduped_map_AD_36_3.bam", 
-    "tests/data/test_ms_germline_risk/AD_36_3/deduped_map_AD_36_3.bam.bai", 
-    "tests/data/test_ms_germline_risk/AD_36_3/expected_AD_36_3.vcf",
-    "tests/data/test_ms_germline_risk/AD_36_3/unexpected_AD_36_3.vcf"),
+    ("tests/data/test_ms_pileup/AD_36_3/deduped_map_AD_36_3.bam", 
+    "tests/data/test_ms_pileup/AD_36_3/deduped_map_AD_36_3.bam.bai", 
+    "tests/data/test_ms_pileup/AD_36_3/expected_AD_36_3.vcf",
+    "tests/data/test_ms_pileup/AD_36_3/unexpected_AD_36_3.vcf"),
 
     # Depth >= 40, REF and ALT
-    ("tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam", 
-    "tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam.bai", 
-    "tests/data/test_ms_germline_risk/AD_36_4/expected_AD_36_4.vcf",
-    "tests/data/test_ms_germline_risk/AD_36_4/unexpected_AD_36_4.vcf"),
+    ("tests/data/test_ms_pileup/AD_36_4/deduped_map_AD_36_4.bam", 
+    "tests/data/test_ms_pileup/AD_36_4/deduped_map_AD_36_4.bam.bai", 
+    "tests/data/test_ms_pileup/AD_36_4/expected_AD_36_4.vcf",
+    "tests/data/test_ms_pileup/AD_36_4/unexpected_AD_36_4.vcf"),
 
     # Depth < 40, multiple ALTs
-    ("tests/data/test_ms_germline_risk/AD_36_2_1/deduped_map_AD_36_2_1.bam", 
-    "tests/data/test_ms_germline_risk/AD_36_2_1/deduped_map_AD_36_2_1.bam.bai", 
-    "tests/data/test_ms_germline_risk/AD_36_2_1/expected_AD_36_2_1.vcf",
-    "tests/data/test_ms_germline_risk/AD_36_2_1/unexpected_AD_36_2_1.vcf"),
+    ("tests/data/test_ms_pileup/AD_36_2_1/deduped_map_AD_36_2_1.bam", 
+    "tests/data/test_ms_pileup/AD_36_2_1/deduped_map_AD_36_2_1.bam.bai", 
+    "tests/data/test_ms_pileup/AD_36_2_1/expected_AD_36_2_1.vcf",
+    "tests/data/test_ms_pileup/AD_36_2_1/unexpected_AD_36_2_1.vcf"),
 
     # Depth >= 40, multiple ALTs
-    ("tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam", 
-    "tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam.bai", 
-    "tests/data/test_ms_germline_risk/AD_37_2_1/expected_AD_37_2_1.vcf",
-    "tests/data/test_ms_germline_risk/AD_37_2_1/unexpected_AD_37_2_1.vcf")
+    ("tests/data/test_ms_pileup/AD_37_2_1/deduped_map_AD_37_2_1.bam", 
+    "tests/data/test_ms_pileup/AD_37_2_1/deduped_map_AD_37_2_1.bam.bai", 
+    "tests/data/test_ms_pileup/AD_37_2_1/expected_AD_37_2_1.vcf",
+    "tests/data/test_ms_pileup/AD_37_2_1/unexpected_AD_37_2_1.vcf")
 ])
 def test_variant_edge_cases_vcf(lightweight_test_run, tmp_path, deduped_bam, deduped_bai, expected_vcf, unexpected_vcf):
 
@@ -165,7 +165,7 @@ def test_variant_edge_cases_vcf(lightweight_test_run, tmp_path, deduped_bam, ded
         cores=1,
         verbose=True,
         workdir=str(tmp_path),
-        allowed_rules=["ms_germline_risk"]
+        allowed_rules=["ms_pileup"]
         )
 
     # Assert that rule succeeded

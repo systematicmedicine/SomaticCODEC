@@ -49,4 +49,4 @@
 ##bcftools_viewVersion=1.22+htslib-1.22.1
 ##bcftools_viewCommand=view --threads 2 --include '(SUM(AD[0:*]) - AD[0:0]) / FMT/DP >= 0.1 || FMT/DP < 1' --output tmp/SEQ0005/SEQ0005_ms_germ_risk.vcf tmp/SEQ0005/SEQ0005_ms_pileup.bcf; Date=Wed Dec 10 03:13:29 2025
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SEQ0005
-chr21	5027399	.	A	T,C,<*>	0	.	DP=2;I16=0,0,0,1,0,0,60,3600,0,0,0,0,0,0,25,625;QS=0,1,0;SGB=-0.379885;MQ0F=0.5	PL:DP:AD	4,3,0,4,3,4:1:37,2,1,0
+chr21	5027399	.	A	T,C,<*>	0	.	DP=40;I16=0,0,0,1,0,0,60,3600,0,0,0,0,0,0,25,625;QS=0,1,0;SGB=-0.379885;MQ0F=0.5	PL:DP:AD	4,3,0,4,3,4:1:37,2,1,0
