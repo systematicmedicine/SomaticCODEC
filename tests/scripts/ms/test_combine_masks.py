@@ -17,7 +17,7 @@ from definitions.paths.io import ms as MS
 from definitions.paths.io import shared as S
 import helpers.get_metadata as md
 
-# Assert that combined BED matches expected merge of individual beds
+# Helper function to assert that combined BED matches expected merge of individual beds
 def assert_correctly_merged(lightweight_test_run, ms_sample):
 
     # Load config
@@ -57,7 +57,7 @@ def test_combined_bed_matches_individual_beds(lightweight_test_run):
     for ms_sample in ms_samples:
         assert_correctly_merged(lightweight_test_run, ms_sample)
 
-# Assert that the chromosome order of the combined BED matches the reference order
+# Function to assert that the chromosome order of the combined BED matches the reference order
 def assert_combined_bed_order_matches_ref(lightweight_test_run, ms_sample):
     # Load combined BED file
     bed_df = read_bed(Path(MS.COMBINED_MASK.format(ms_sample=ms_sample)))
