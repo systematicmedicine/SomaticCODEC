@@ -36,7 +36,11 @@ EXCLUDED_RULES: Set[str] = {
     "write_git_metadata",
     "ex_fastqc_filter_summary_metrics", # One test multiple rules
     "ex_fastqc_raw_summary_metrics", # One test multiple rules
-    "ms_fastqc_summary_metrics" # One test multiple rules
+    "ms_fastqc_summary_metrics", # One test multiple rules
+    "ex_fastqcfilter_metrics",
+    "ex_fastqcraw_metrics",
+    "ms_raw_fastq_metrics",
+    "ms_processed_fastq_metrics"
 }
 
 # Tests that do not correspond to a single rule name (e.g. multi-rule tests)
