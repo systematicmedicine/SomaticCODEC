@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
---- ex_call_dsc_metrics.py ---
+--- ex_call_dsc_read_loss.py ---
 
 Generates a summary file with the percentage of reads lost during ex_call_dsc
 
-To be used with rule ex_call_dsc_metrics
+To be used with rule ex_call_dsc_read_loss
 
 Authors:
     - Chat-GPT
     - Joshua Johnstone
+    - Cameron Fraser
 """
 import subprocess
 import json
@@ -19,7 +20,7 @@ def main(args):
     # Redirect stdout and stderr to log file
     sys.stdout = open(args.log, "a")
     sys.stderr = open(args.log, "a")
-    print("[INFO] Starting ex_call_dsc_metrics.py")
+    print("[INFO] Starting ex_call_dsc_read_loss.py")
 
     # Load Snakemake inputs
     pre_call_bam_path = args.pre_call_bam
