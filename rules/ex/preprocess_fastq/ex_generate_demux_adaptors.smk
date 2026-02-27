@@ -12,8 +12,8 @@ rule ex_generate_demux_adaptors:
         ex_samples = config["metadata"]["ex_samples_metadata"],
         ex_adapters = config["metadata"]["ex_adapters_metadata"]
     output:
-        r1_start = EX.ADAPTOR_R1_START,
-        r2_start = EX.ADAPTOR_R2_START
+        r1_start = EX.DEMUX_ADAPTOR_R1,
+        r2_start = EX.DEMUX_ADAPTOR_R2
     params:
         adapter_dict = json.dumps(md.get_ex_lane_adapter_dict(config))
     log:

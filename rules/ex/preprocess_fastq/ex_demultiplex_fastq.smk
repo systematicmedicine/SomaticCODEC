@@ -13,8 +13,8 @@ rule ex_demultiplex_fastq:
         umixd_r2 = expand(EX.UMIXD_FASTQ_R2, ex_lane = md.get_ex_lane_ids(config)),
 
         # Demultiplex adaptors
-        r1_start = expand(EX.ADAPTOR_R1_START, ex_lane = md.get_ex_lane_ids(config)),
-        r2_start = expand(EX.ADAPTOR_R2_START, ex_lane = md.get_ex_lane_ids(config))
+        r1_start = expand(EX.DEMUX_ADAPTOR_R1, ex_lane = md.get_ex_lane_ids(config)),
+        r2_start = expand(EX.DEMUX_ADAPTOR_R2, ex_lane = md.get_ex_lane_ids(config))
 
     output:
         # Demultiplexed FASTQs
