@@ -20,6 +20,7 @@ Types of changes:
 ### Changed
 
 - Test scripts now used centralised paths (#323)
+- Changed file paths for ex pipeline to improve readability (#329)
 
 ### Fixed
 
