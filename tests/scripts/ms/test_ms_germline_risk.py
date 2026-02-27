@@ -107,8 +107,8 @@ def test_indel_padding_added(lightweight_test_run):
                 f"Ends not padded correctly in {post_path}"     
 
 # Test that variant edge cases are correctly included in germ risk BED  
-@pytest.mark.parametrize("germ_risk_vcf, expected_bed", [
-    # No SNV REF only
+@pytest.mark.parametrize("pileup_depth_vcf, expected_bed", [
+    # No SNV, REF only
     ("tests/data/test_ms_germline_risk/snv_ref_only/snv_ref_only.vcf",
      "tests/data/test_ms_germline_risk/snv_ref_only/snv_ref_only_expected.bed"),
      # SNV, ALT only
@@ -143,7 +143,7 @@ def test_indel_padding_added(lightweight_test_run):
      "tests/data/test_ms_germline_risk/del_multi/del_multi_expected.bed")
 ])
 
-def test_variant_edge_cases_bed(lightweight_test_run, tmp_path, germ_risk_vcf, expected_bed):
+def test_variant_edge_cases_bed(lightweight_test_run, tmp_path, pileup_depth_vcf, expected_bed):
 
     # Load config
     config = load_config(lightweight_test_run["test_config_path"])
@@ -155,7 +155,7 @@ def test_variant_edge_cases_bed(lightweight_test_run, tmp_path, germ_risk_vcf, e
     expected_vcf_path = Path(MS.PILEUP_DEPTH.format(ms_sample=ms_sample))
     copied_vcf_path = tmp_path / expected_vcf_path
     copied_vcf_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy(germ_risk_vcf, copied_vcf_path)
+    shutil.copy(pileup_depth_vcf, copied_vcf_path)
 
     # Define target BED
     target_bed = MS.GERMLINE_RISK_MASK.format(ms_sample=ms_sample)
