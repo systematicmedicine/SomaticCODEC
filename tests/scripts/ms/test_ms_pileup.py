@@ -1,7 +1,7 @@
 """
---- test_ms_germline_risk.py
+--- test_ms_pileup.py
 
-Tests the rule ms_germline_risk
+Tests the rule ms_pileup
 
 Authors:
     - Chat-GPT
@@ -16,6 +16,7 @@ import shutil
 from snakemake import snakemake
 from helpers.get_metadata import load_config, get_ms_sample_ids
 from helpers.vcf_helpers import check_vcf_structure
+from definitions.paths.io import ms as MS
 
 # Test that VCF has the correct structure
 def test_vcf_structure_correct(lightweight_test_run):
@@ -24,77 +25,86 @@ def test_vcf_structure_correct(lightweight_test_run):
 
     for ms_sample in ms_samples:
         # Locate VCF file
-        vcf_file = Path(f"tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf")
+        vcf_file = Path(MS.PILEUP_DEPTH.format(ms_sample=ms_sample))
 
         # Check for correct VCF structure
         check_vcf_structure(vcf_file)
 
-# Test that all variants in MS candidate VCF have:
-# 1. alt VAF >= min_alt_vaf
-# 2. depth >= min_depth
-def test_germ_risk_variants_fit_criteria(lightweight_test_run):
+# Test that all positions in pileup depth VCF have depth >= min_depth
+def test_depth_filter(lightweight_test_run):
     config = load_config(lightweight_test_run["test_config_path"])
     ms_samples = get_ms_sample_ids(config)
-    min_alt_vaf = config["sci_params"]["ms_germline_risk"]["min_alt_vaf"]
-    min_depth = config["sci_params"]["ms_call_germline_risk"]["min_depth"]
+    min_depth = config["sci_params"]["ms_pileup"]["min_depth"]
 
     for ms_sample in ms_samples:
         # Locate VCF file
-        vcf_file_path = Path(f"tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf")
+        vcf_file_path = Path(MS.PILEUP_DEPTH.format(ms_sample=ms_sample))
 
         # Open VCF with pysam
         vcf_file = pysam.VariantFile(vcf_file_path)
 
-        # Get alt VAF and depth for each variant
+        # Get depth for each variant
         for record in vcf_file:
             vcf_sample = next(iter(record.samples.values()))
-            ad = vcf_sample.get("AD")
-            dp = vcf_sample.get("DP")
 
-            alt_reads = sum(ad[1:])
-            vaf = alt_reads / dp if dp > 0 else 0
+            ad = vcf_sample.get("AD")
+            total_ad = sum(ad)
 
             # Assert variants fit criteria
-            assert dp < min_depth or vaf >= min_alt_vaf, (
-                f"Variant {record} does not meet masking criteria: "
-                f"Record values: DP={dp}, VAF={vaf}"
-                f"Criteria: min_depth < {min_depth} or min_alt_vaf >= {min_alt_vaf}"
-                )
-
-# Test that allele depth edge cases are correctly included in germ risk VCF     
+            assert total_ad >= min_depth, (
+                f"Variant {record} has total allele depth ({total_ad}) < min_depth threshold ({min_depth})")
+            
+# Test that allele depth edge cases are correctly included in pileup depth VCF     
 @pytest.mark.parametrize("deduped_bam, deduped_bai, expected_vcf, unexpected_vcf", [
-    # Depth < 40, ALT VAF >= 0.10
+    # Depth < 40, REF only
+    ("tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam", 
+    "tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam.bai", 
+    "tests/data/test_ms_germline_risk/AD_1_0/expected_AD_1_0.vcf",
+    "tests/data/test_ms_germline_risk/AD_1_0/unexpected_AD_1_0.vcf"),
+
+    # Depth >= 40, REF only
+    ("tests/data/test_ms_germline_risk/AD_40_0/deduped_map_AD_40_0.bam", 
+    "tests/data/test_ms_germline_risk/AD_40_0/deduped_map_AD_40_0.bam.bai", 
+    "tests/data/test_ms_germline_risk/AD_40_0/expected_AD_40_0.vcf",
+    "tests/data/test_ms_germline_risk/AD_40_0/unexpected_AD_40_0.vcf"),
+
+    # Depth < 40, ALT only
     ("tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam", 
      "tests/data/test_ms_germline_risk/AD_0_1/deduped_map_AD_0_1.bam.bai", 
      "tests/data/test_ms_germline_risk/AD_0_1/expected_AD_0_1.vcf",
      "tests/data/test_ms_germline_risk/AD_0_1/unexpected_AD_0_1.vcf"),
-     # Depth < 40, ALT VAF < 0.10
-     ("tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam", 
-     "tests/data/test_ms_germline_risk/AD_1_0/deduped_map_AD_1_0.bam.bai", 
-     "tests/data/test_ms_germline_risk/AD_1_0/expected_AD_1_0.vcf",
-     "tests/data/test_ms_germline_risk/AD_1_0/unexpected_AD_1_0.vcf"),
-     # Depth >= 40, ALT VAF >= 0.10
-     ("tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam", 
-     "tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam.bai", 
-     "tests/data/test_ms_germline_risk/AD_36_4/expected_AD_36_4.vcf",
-     "tests/data/test_ms_germline_risk/AD_36_4/unexpected_AD_36_4.vcf"),
-     # Depth >= 40, ALT VAF < 0.10
-     ("tests/data/test_ms_germline_risk/AD_37_3/deduped_map_AD_37_3.bam", 
-     "tests/data/test_ms_germline_risk/AD_37_3/deduped_map_AD_37_3.bam.bai", 
-     "tests/data/test_ms_germline_risk/AD_37_3/expected_AD_37_3.vcf",
-     "tests/data/test_ms_germline_risk/AD_37_3/unexpected_AD_37_3.vcf"),
-     # Depth >=40, summed ALT VAF >= 0.10
-     ("tests/data/test_ms_germline_risk/AD_36_2_2/deduped_map_AD_36_2_2.bam", 
-     "tests/data/test_ms_germline_risk/AD_36_2_2/deduped_map_AD_36_2_2.bam.bai", 
-     "tests/data/test_ms_germline_risk/AD_36_2_2/expected_AD_36_2_2.vcf",
-     "tests/data/test_ms_germline_risk/AD_36_2_2/unexpected_AD_36_2_2.vcf"),
-     # Depth >=40, summed ALT VAF < 0.10
-     ("tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam", 
-     "tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam.bai", 
-     "tests/data/test_ms_germline_risk/AD_37_2_1/expected_AD_37_2_1.vcf",
-     "tests/data/test_ms_germline_risk/AD_37_2_1/unexpected_AD_37_2_1.vcf")
+
+    # Depth >= 40, ALT only
+    ("tests/data/test_ms_germline_risk/AD_0_40/deduped_map_AD_0_40.bam", 
+     "tests/data/test_ms_germline_risk/AD_0_40/deduped_map_AD_0_40.bam.bai", 
+     "tests/data/test_ms_germline_risk/AD_0_40/expected_AD_0_40.vcf",
+     "tests/data/test_ms_germline_risk/AD_0_40/unexpected_AD_0_40.vcf"),
+
+    # Depth < 40, REF and ALT
+    ("tests/data/test_ms_germline_risk/AD_36_3/deduped_map_AD_36_3.bam", 
+    "tests/data/test_ms_germline_risk/AD_36_3/deduped_map_AD_36_3.bam.bai", 
+    "tests/data/test_ms_germline_risk/AD_36_3/expected_AD_36_3.vcf",
+    "tests/data/test_ms_germline_risk/AD_36_3/unexpected_AD_36_3.vcf"),
+
+    # Depth >= 40, REF and ALT
+    ("tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam", 
+    "tests/data/test_ms_germline_risk/AD_36_4/deduped_map_AD_36_4.bam.bai", 
+    "tests/data/test_ms_germline_risk/AD_36_4/expected_AD_36_4.vcf",
+    "tests/data/test_ms_germline_risk/AD_36_4/unexpected_AD_36_4.vcf"),
+
+    # Depth < 40, multiple ALTs
+    ("tests/data/test_ms_germline_risk/AD_36_2_1/deduped_map_AD_36_2_1.bam", 
+    "tests/data/test_ms_germline_risk/AD_36_2_1/deduped_map_AD_36_2_1.bam.bai", 
+    "tests/data/test_ms_germline_risk/AD_36_2_1/expected_AD_36_2_1.vcf",
+    "tests/data/test_ms_germline_risk/AD_36_2_1/unexpected_AD_36_2_1.vcf"),
+
+    # Depth >= 40, multiple ALTs
+    ("tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam", 
+    "tests/data/test_ms_germline_risk/AD_37_2_1/deduped_map_AD_37_2_1.bam.bai", 
+    "tests/data/test_ms_germline_risk/AD_37_2_1/expected_AD_37_2_1.vcf",
+    "tests/data/test_ms_germline_risk/AD_37_2_1/unexpected_AD_37_2_1.vcf")
 ])
-def test_variant_edge_cases(lightweight_test_run, tmp_path, deduped_bam, deduped_bai, expected_vcf, unexpected_vcf):
+def test_variant_edge_cases_vcf(lightweight_test_run, tmp_path, deduped_bam, deduped_bai, expected_vcf, unexpected_vcf):
 
     # Returns a dict with CHROM, POS, REF, ALT, AD fields
     def parse_vcf_line(line):
@@ -114,15 +124,15 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, deduped_bam, deduped
     # Load config
     config = load_config(lightweight_test_run["test_config_path"])
 
-    # Set test sample ID as first MS sample
-    test_sample_ID = get_ms_sample_ids(config)[0]
+    # Define test sample ID
+    ms_sample = "SEQ0001"
 
     # Set MS depth threshold higher to allow for testing of depth filter
-    config["sci_params"]["ms_call_germline_risk"]["min_depth"] = 40
+    config["sci_params"]["ms_pileup"]["min_depth"] = 40
 
     # Copy input BAM and BAI to temporary directory
-    expected_bam_path = Path(f"tmp/{test_sample_ID}/{test_sample_ID}_deduped_map.bam")
-    expected_bai_path = Path(f"tmp/{test_sample_ID}/{test_sample_ID}_deduped_map.bam.bai")
+    expected_bam_path = Path(MS.DEDUPED_BAM.format(ms_sample=ms_sample))
+    expected_bai_path = Path(MS.DEDUPED_BAM_INDEX.format(ms_sample=ms_sample))
 
     copied_bam_path = tmp_path / expected_bam_path
     copied_bai_path = tmp_path / expected_bai_path
@@ -134,7 +144,7 @@ def test_variant_edge_cases(lightweight_test_run, tmp_path, deduped_bam, deduped
     shutil.copy(deduped_bai, copied_bai_path)
 
     # Define target VCF
-    target_vcf = f"tmp/{test_sample_ID}/{test_sample_ID}_ms_germ_risk.vcf"
+    target_vcf = MS.PILEUP_DEPTH.format(ms_sample=ms_sample)
 
     # Define output VCF
     output_vcf = Path(tmp_path, target_vcf)
