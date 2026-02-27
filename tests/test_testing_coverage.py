@@ -29,7 +29,6 @@ TESTS_DIR = Path("tests/scripts")
 
 # Rules intentionally not tested (e.g. marker rules)
 EXCLUDED_RULES: Set[str] = {
-    "bwamem_index_files",
     "collate_benchmarks",
     "create_run_timeline_plot",
     "ensure_pipeline_log_exists",
