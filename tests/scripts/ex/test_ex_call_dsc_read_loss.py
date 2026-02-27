@@ -1,7 +1,7 @@
 """
---- test_ex_call_dsc_metrics.py
+--- test_ex_call_dsc_read_loss.py
 
-Tests the script ex_call_dsc_metrics.py
+Tests the script ex_call_dsc_read_loss.py
 
 Authors:
     - Chat-GPT
@@ -12,7 +12,7 @@ from unittest.mock import patch, MagicMock
 import tempfile
 import json
 import os
-from rule_scripts.ex.processing_metrics.ex_call_dsc_metrics import main
+from rule_scripts.ex.processing_metrics.ex_call_dsc_read_loss import main
 import argparse
 
 @pytest.mark.parametrize("pre_out, post_out, expected, expect_error", [
