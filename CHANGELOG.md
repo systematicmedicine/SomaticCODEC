@@ -13,6 +13,10 @@ Types of changes:
 
 ## [Unrealeased]
 
+### Added
+
+- Added test to check that all rules have a test (#325)
+
 ### Changed
 
 - Test scripts now used centralised paths (#323)
