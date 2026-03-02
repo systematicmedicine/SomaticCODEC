@@ -22,7 +22,7 @@ rule ms_trim_fastq:
         intermediate_spacer_removed_r2 = temp(MS.TRIM_FASTQ_INT_R2),
         r1 = temp(MS.TRIMMED_FASTQ_R1),
         r2 = temp(MS.TRIMMED_FASTQ_R2),
-        report = MS.MET_TRIM_FASTQ
+        metrics = MS.MET_TRIM_FASTQ
     params:
         adaptor_1 = config["sci_params"]["ms_trim_fastq"]["adaptor_1"],
         adaptor_2 = config["sci_params"]["ms_trim_fastq"]["adaptor_2"],
@@ -45,6 +45,7 @@ rule ms_trim_fastq:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
 
         # Remove spacer
+        printf "##### Spacer removal #####\n" > {output.metrics}
         cutadapt \
           -j {threads} \
           -u {params.spacer_length} \
@@ -52,9 +53,11 @@ rule ms_trim_fastq:
           -o {output.intermediate_spacer_removed_r1} \
           -p {output.intermediate_spacer_removed_r2} \
           --compression-level {params.compression_level} \
-          {input.r1} {input.r2} 2>> {log}
+          {input.r1} {input.r2} \
+          --report=full >> {output.metrics} 2>> {log}
         
         # Trim adaptors, poly-G artifacts, and low quality bases
+        printf "\n\n##### Adapter/quality trimming #####\n" >> {output.metrics}
         cutadapt \
             -j {threads} \
             -a {params.adaptor_1} \
@@ -70,5 +73,5 @@ rule ms_trim_fastq:
             -p {output.r2} \
             --compression-level {params.compression_level} \
             {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \
-            --report=full > {output.report} 2>> {log}
+            --report=full >> {output.metrics} 2>> {log}
         """

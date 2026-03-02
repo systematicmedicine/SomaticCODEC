@@ -42,9 +42,7 @@ parser.add_argument("--log", required=True)
 args = parser.parse_args()
 
 # Initiate logging
-sys.stdout = open(args.log, "a")
-sys.stderr = open(args.log, "a")
-print("[INFO] Starting ex_demultiplex_fastq.py")
+print("[INFO] Starting ex_demultiplex_fastq.py", file=sys.stderr)
 
 # Define inputs
 raw_r1_files = {Path(file).parent.name: file for file in args.raw_r1}
@@ -97,4 +95,4 @@ for lane in raw_r1_files:
     with open(metrics_file, "w") as report_file, open(args.log, "a") as log_file:
         subprocess.run(cmd, stdout=report_file, stderr=log_file, text=True, check=True)
 
-print("[INFO] Completed ex_demultiplex_fastq.py")
+print("[INFO] Completed ex_demultiplex_fastq.py", file=sys.stderr)
