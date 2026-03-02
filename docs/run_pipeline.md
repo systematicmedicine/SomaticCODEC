@@ -6,7 +6,6 @@ All of the steps below must be run from the repositories root directory. Note th
     * `config.yaml`
     * `ex_lanes.csv`
     * `ex_samples.csv`
-    * `ex_technical_controls.csv`
     * `ex_adapters.csv`
     * `ms_samples.csv`
     * `download_list.csv`

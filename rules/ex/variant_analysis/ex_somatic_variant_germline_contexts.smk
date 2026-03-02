@@ -3,16 +3,17 @@ Obtains the germline contexts for positions where somatic variants were called
 """
 
 import helpers.get_metadata as md
+from definitions.paths.io import ex as EX
+from definitions.paths.io import ms as MS
 
 rule ex_somatic_variant_germline_contexts:
     input:
-        ms_pileup_bcf = lambda wc: (
-            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_ms_pileup.bcf"
-        ),
-        ex_somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf"
+        ms_pileup_bcf = lambda wc: MS.GERMLINE_RISK_INT.format(
+            ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
+            ),
+        ex_somatic_vcf = EX.CALLED_SNVS
     output:
-        contexts_vcf = "results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
+        contexts_vcf = EX.MET_SNV_GERMLINE_CONTEXT
     log:
         "logs/{ex_sample}/ex_somatic_variant_germline_context.log"
     benchmark:

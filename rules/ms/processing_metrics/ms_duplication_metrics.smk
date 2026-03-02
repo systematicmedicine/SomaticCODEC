@@ -2,17 +2,21 @@
 Generates ms duplication metrics
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_duplication_metrics:
     input:
-        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.json"
+        dedup_metrics = MS.MET_DUPLICATION_1
     output:
-        duplication_metrics = "metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json"
+        duplication_metrics = MS.MET_DUPLICATION_2
     params:
         sample = "{ms_sample}"
     log:
         "logs/{ms_sample}/ms_duplication_metrics.log"
     benchmark:
         "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

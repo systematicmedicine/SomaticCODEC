@@ -2,11 +2,14 @@
  Adds read group information to mapped reads for downstream rules
     - All reads are given the same read group
 """
+
+from definitions.paths.io import ms as MS
+
 rule ms_add_read_groups:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_raw_map.bam"
+        bam = MS.RAW_BAM
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_read_group_map.bam")
+        bam = temp(MS.READ_GROUP_BAM)
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:

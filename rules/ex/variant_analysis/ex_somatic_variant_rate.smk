@@ -1,15 +1,20 @@
 """
 Calculate the somatic variant rate
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_somatic_variant_rate:
     input:
-        vcf_all = "tmp/{ex_sample}/{ex_sample}_all_positions.vcf"
+        vcf_all = EX.CALL_SOMATIC_SNV_INT3
     output:
-        results = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.json"
+        results = EX.MET_SOMATIC_VARIANT_RATE
     log:
         "logs/{ex_sample}/ex_somatic_variant_rate.log"
     benchmark:
         "logs/{ex_sample}/ex_somatic_variant_rate.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -2,15 +2,17 @@
 Removes duplicate reads based on alignment and UMIs
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_remove_duplicates:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_annotated_map.bam",
-        bai = "tmp/{ms_sample}/{ms_sample}_annotated_map.bam.bai"
+        bam = MS.MATE_INFO_BAM,
+        bai = MS.MATE_INFO_BAM_INDEX
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam"),
-        bai = temp("tmp/{ms_sample}/{ms_sample}_deduped_map.bam.bai"),
-        dedup_metrics = "metrics/{ms_sample}/{ms_sample}_dedup_metrics.json",
-        intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_deduped_map_unsorted.bam")
+        intermediate_unsorted = temp(MS.REMOVE_DUPLICATES_INT),
+        bam = temp(MS.DEDUPED_BAM),
+        bai = temp(MS.DEDUPED_BAM_INDEX),
+        dedup_metrics = MS.MET_DUPLICATION_1
     params:
         duplicate_decision_method = config["sci_params"]["ms_remove_duplicates"]["duplicate_decision_method"],
         optical_duplicate_distance = config["sci_params"]["ms_remove_duplicates"]["optical_duplicate_distance"],

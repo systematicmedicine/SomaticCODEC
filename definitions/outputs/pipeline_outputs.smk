@@ -8,28 +8,30 @@ Authors: Cameron Fraser
 
 # Load libraries
 import helpers.get_metadata as md
+from definitions.paths.io import ex as EX
+from definitions.paths.io import ms as MS
+from definitions.paths.io import shared as S
 
 # Get lists of sample ids
 ex_lane_ids = md.get_ex_lane_ids(config)
 ex_sample_ids = md.get_ex_sample_ids(config)
-ex_technical_control_ids = md.get_ex_technical_control_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
 # ---------------------------------------------------------------------------------------------
 # Setup files
 # ---------------------------------------------------------------------------------------------
-global_setup = [
-    config["sci_params"]["global"]["reference_genome"] + ".amb",
-    config["sci_params"]["global"]["reference_genome"] + ".ann",
-    config["sci_params"]["global"]["reference_genome"] + ".bwt.2bit.64",
-    config["sci_params"]["global"]["reference_genome"] + ".pac",
-    config["sci_params"]["global"]["reference_genome"] + ".0123",
-    config["sci_params"]["global"]["reference_genome"] + ".fai",
-    os.path.splitext(config["sci_params"]["global"]["reference_genome"])[0] + ".dict",
-    config["sci_params"]["global"]["known_germline_variants"] + ".tbi",
-    "tmp/downloads/excluded_chromosomes.bed",
-    "logs/global_rules/check_included_chromosomes_present.done",
-    "logs/global_rules/log_system_resource_usage.done",
+shared_setup = [
+    config["sci_params"]["shared"]["reference_genome"] + ".amb",
+    config["sci_params"]["shared"]["reference_genome"] + ".ann",
+    config["sci_params"]["shared"]["reference_genome"] + ".bwt.2bit.64",
+    config["sci_params"]["shared"]["reference_genome"] + ".pac",
+    config["sci_params"]["shared"]["reference_genome"] + ".0123",
+    config["sci_params"]["shared"]["reference_genome"] + ".fai",
+    os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict",
+    config["sci_params"]["shared"]["known_germline_variants"] + ".tbi",
+    S.EXCLUDED_CHROMS_BED,
+    "logs/shared_rules/check_included_chromosomes_present.done",
+    "logs/shared_rules/log_system_resource_usage.done",
     "logs/bin_scripts/run_pipeline.log"
 ]
 
@@ -37,109 +39,110 @@ global_setup = [
 # Processing metrics for MS samples
 # ---------------------------------------------------------------------------------------------
 ms_processing_metrics = [
-    expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc_summary.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc_summary.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_trim_metrics.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_metrics_ms.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc_summary.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc_summary.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_dedup_metrics.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_alignment_stats.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json", ms_sample = ms_sample_ids),
-    expand("metrics/{ms_sample}/{ms_sample}_mask_metrics.json", ms_sample = ms_sample_ids)
+    expand(MS.MET_FASTQC_RAW_HTML_R1, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_RAW_HTML_R2, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_RAW_TXT_R1, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_RAW_TXT_R2, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_RAW_SUMMARY_R1, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_RAW_SUMMARY_R2, ms_sample = ms_sample_ids),
+    expand(MS.MET_TRIM_FASTQ, ms_sample = ms_sample_ids),
+    expand(MS.MET_FILTER_FASTQ, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_FILTER_HTML_R1, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_FILTER_HTML_R2, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_FILTER_TXT_R1, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_FILTER_TXT_R2, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_FILTER_SUMMARY_R1, ms_sample = ms_sample_ids),
+    expand(MS.MET_FASTQC_FILTER_SUMMARY_R2, ms_sample = ms_sample_ids),
+    expand(MS.MET_DUPLICATION_1, ms_sample = ms_sample_ids),
+    expand(MS.MET_DUPLICATION_2, ms_sample = ms_sample_ids),
+    expand(MS.MET_ALIGNMENT, ms_sample = ms_sample_ids),
+    expand(MS.MET_INSERT_SIZE_TXT, ms_sample = ms_sample_ids),
+    expand(MS.MET_INSERT_SIZE_PDF, ms_sample = ms_sample_ids),
+    expand(MS.MET_DEPTH_HIST, ms_sample = ms_sample_ids),
+    expand(MS.MET_COVERAGE_BY_DEPTH, ms_sample = ms_sample_ids),
+    expand(MS.MET_MASKING, ms_sample = ms_sample_ids)
 ]
 
 # ---------------------------------------------------------------------------------------------
 # Processing metrics for EX samples
 # ---------------------------------------------------------------------------------------------
 ex_processing_metrics = [
-    expand("metrics/{ex_lane}/{ex_lane}_demux_metrics.txt", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r1_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r2_trim_3prime_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_bases_trimmed.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json", ex_lane = ex_lane_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_total_read_loss.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.html", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics_summary.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics_summary.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_map_metrics.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_duplication_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_call_codec_consensus_metrics.txt", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_dsc_coverage_plot.html", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_depth_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_coverage_overlap_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_softclipping_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_sample}/{ex_sample}_duplex_overlap_metrics.json", ex_sample = ex_sample_ids),
-    expand("metrics/{ex_technical_control}/{ex_technical_control}_trimmed_read_length_metrics_tc.json", ex_technical_control = ex_technical_control_ids)
+    expand(EX.MET_FASTQC_RAW_HTML_R1, ex_lane = ex_lane_ids),
+    expand(EX.MET_FASTQC_RAW_HTML_R2, ex_lane = ex_lane_ids),
+    expand(EX.MET_FASTQC_RAW_TXT_R1, ex_lane = ex_lane_ids),
+    expand(EX.MET_FASTQC_RAW_TXT_R2, ex_lane = ex_lane_ids),
+    expand(EX.MET_FASTQC_RAW_SUMMARY_R1, ex_lane = ex_lane_ids),
+    expand(EX.MET_FASTQC_RAW_SUMMARY_R2, ex_lane = ex_lane_ids),
+    expand(EX.MET_DEMULIPLEX_FASTQ, ex_lane = ex_lane_ids),
+    expand(EX.MET_DEMUX_COUNTS_GINI, ex_lane = ex_lane_ids),
+    expand(EX.MET_TRIM_FASTQ_TRIM5P, ex_sample = ex_sample_ids),
+    expand(EX.MET_TRIM_FASTQ_TRIM3PR1, ex_sample = ex_sample_ids),
+    expand(EX.MET_TRIM_FASTQ_TRIM3PR2, ex_sample = ex_sample_ids),
+    expand(EX.MET_TRIM_READ_LENGTHS, ex_sample = ex_sample_ids),
+    expand(EX.MET_BASES_TRIMMED, ex_sample = ex_sample_ids),
+    expand(EX.MET_FILTER_FASTQ, ex_sample = ex_sample_ids),
+    expand(EX.MET_FASTQC_FILTER_HTML_R1, ex_sample = ex_sample_ids),
+    expand(EX.MET_FASTQC_FILTER_HTML_R2, ex_sample = ex_sample_ids),
+    expand(EX.MET_FASTQC_FILTER_TXT_R1, ex_sample = ex_sample_ids),
+    expand(EX.MET_FASTQC_FILTER_TXT_R2, ex_sample = ex_sample_ids),
+    expand(EX.MET_FASTQC_FILTER_SUMMARY_R1, ex_sample = ex_sample_ids),
+    expand(EX.MET_FASTQC_FILTER_SUMMARY_R2, ex_sample = ex_sample_ids),
+    expand(EX.MET_ALIGNMENT, ex_sample = ex_sample_ids),
+    expand(EX.MET_INSERT_SIZE_TXT, ex_sample = ex_sample_ids),
+    expand(EX.MET_INSERT_SIZE_PDF, ex_sample = ex_sample_ids),
+    expand(EX.MET_GROUP_BY_UMI, ex_sample = ex_sample_ids),
+    expand(EX.MET_DUPLICATION, ex_sample = ex_sample_ids),
+    expand(EX.MET_CALL_DSC, ex_sample = ex_sample_ids),
+    expand(EX.MET_CALL_DSC_2, ex_sample = ex_sample_ids),
+    expand(EX.MET_DSC_REMAP, ex_sample = ex_sample_ids),
+    expand(EX.MET_DUPLEX_OVERLAP, ex_sample = ex_sample_ids),
+    expand(EX.MET_DSC_DEPTH, ex_sample = ex_sample_ids),
+    expand(EX.MET_DSC_COVERAGE_JSON, ex_sample = ex_sample_ids),
+    expand(EX.MET_DSC_COVERAGE_PLOT, ex_sample = ex_sample_ids),
+    expand(EX.MET_COVERAGE_OVERLAP, ex_sample = ex_sample_ids),
+    expand(EX.MET_SOFTCLIPPING, ex_sample = ex_sample_ids),
+    expand(EX.MET_TOTAL_READ_LOSS, ex_sample = ex_sample_ids),
+    expand(EX.MET_VAR_CALL_DISAGREE, ex_sample = ex_sample_ids)
+
 ]
 
 # ---------------------------------------------------------------------------------------------
 # Somatic varaint calling
 # ---------------------------------------------------------------------------------------------
 ex_variant_calling = [
-    expand("results/{ex_sample}/{ex_sample}_variants.vcf", ex_sample = ex_sample_ids)
-
+    expand(EX.CALLED_SNVS, ex_sample = ex_sample_ids)
 ]
 
 # ---------------------------------------------------------------------------------------------
 # Analysis of called variants
 # ---------------------------------------------------------------------------------------------
 ex_variant_analysis = [
-    expand("results/{ex_sample}/{ex_sample}_somatic_variant_rate.json", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_trinuc_proportions.csv", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_trinuc_similarities.csv", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_snv_distance.json", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_snv_position_metrics.json", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_snv_position_plot.pdf", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_germline_matches.vcf", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json", ex_sample = ex_sample_ids),
-    expand("results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf", ex_sample = ex_sample_ids),
-    "results/batch/batch_recurrent_variants.vcf",
-    "results/batch/batch_recurrent_variant_metrics.json"
+    expand(EX.MET_SOMATIC_VARIANT_RATE, ex_sample = ex_sample_ids),
+    expand(EX.MET_CHROM_VARIANT_RATE, ex_sample = ex_sample_ids),
+    expand(EX.MET_TRINUC_PROPORTIONS, ex_sample = ex_sample_ids),
+    expand(EX.MET_TRINUC_SIMILARITIES, ex_sample = ex_sample_ids),
+    expand(EX.MET_TRINUC_PLOTS, ex_sample = ex_sample_ids),
+    expand(EX.MET_SNV_DISTANCE, ex_sample = ex_sample_ids),
+    expand(EX.MET_SNV_POSITION_JSON, ex_sample = ex_sample_ids),
+    expand(EX.MET_SNV_POSITION_PDF, ex_sample = ex_sample_ids),
+    expand(EX.MET_GNOMAD_OVERLAP_VCF, ex_sample = ex_sample_ids),
+    expand(EX.MET_GNOMAD_OVERLAP_JSON, ex_sample = ex_sample_ids),
+    expand(EX.MET_SNV_GERMLINE_CONTEXT, ex_sample = ex_sample_ids),
+    EX.MET_RECURRENT_VARIANTS_VCF,
+    EX.MET_RECURRENT_VARIANTS_JSON
 ]
 
 # ---------------------------------------------------------------------------------------------
-# Global metrics
+# Shared metrics
 # ---------------------------------------------------------------------------------------------
-global_metrics = [
-    "logs/global_rules/git_metadata.json",
-    "metrics/component_metrics_report.csv",
-    "metrics/component_metrics_heatmap.png",
-    "results/system_metrics_report.csv",
-    "results/system_metrics_heatmap.png",
-    "logs/global_rules/combined_benchmarks.csv",
-    "logs/global_rules/system_resource_usage.csv",
-    "logs/global_rules/job_log.csv",
-    "logs/global_rules/create_run_timeline_plot.log"
+shared_metrics = [
+    S.MET_COMPONENT_METRICS_REPORT,
+    S.MET_COMPONENT_METRICS_HEATMAP,
+    S.MET_SYSTEM_METRICS_REPORT,
+    S.MET_SYSTEM_METRICS_HEATMAP,
+    "logs/shared_rules/git_metadata.json",
+    "logs/shared_rules/combined_benchmarks.csv",
+    "logs/shared_rules/system_resource_usage.csv",
+    "logs/shared_rules/job_log.csv",
+    "logs/shared_rules/create_run_timeline_plot.log"
 ]

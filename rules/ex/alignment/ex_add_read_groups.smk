@@ -2,11 +2,14 @@
  Adds read group information to mapped reads for downstream rules
     - All reads are given the same read group
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_add_read_groups:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_correct.bam"
+        bam = EX.FILTERED_BAM
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_read_group.bam")
+        bam = temp(EX.READ_GROUP_BAM)
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:

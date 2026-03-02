@@ -1,0 +1,45 @@
+"""
+--- test_ex_softclipping_metrics.py
+
+Tests the script ex_softclipping_metrics.py
+
+Authors:
+    - Chat-GPT
+    - Joshua Johnstone
+"""
+import json
+import pytest
+import os
+import types
+from rule_scripts.ex.processing_metrics.ex_softclipping_metrics import main
+
+@pytest.mark.parametrize(
+    "bam_path, expected_total_reads, expected_0th_percentile, expected_90th_percentile, expected_100th_percentile",
+    [
+        ("tests/data/test_ex_softclipping_metrics/no_softclip.bam", 5, 0, 0, 0),
+        ("tests/data/test_ex_softclipping_metrics/softclip.bam", 4, 0, 10, 10),
+    ]
+)
+def test_softclipping_percentiles(tmp_path, bam_path, expected_total_reads, expected_0th_percentile, expected_90th_percentile, expected_100th_percentile):
+    output_json = tmp_path / "softclip_metrics.json"
+    log_file = tmp_path / "log.txt"
+
+    args = types.SimpleNamespace(
+        dsc_final=bam_path,
+        metrics=output_json,
+        log=str(tmp_path / "log.log")
+    )
+    main(args=args)
+
+    with open(output_json) as f:
+        result = json.load(f)
+
+    assert result["total_reads_processed"] == expected_total_reads
+    percentiles = result["softclip_bases_per_read_percentiles"]
+    assert percentiles["0th_percentile"] == expected_0th_percentile
+    assert percentiles["90th_percentile"] == expected_90th_percentile
+    assert percentiles["100th_percentile"] == expected_100th_percentile
+
+    if os.path.exists(str(log_file)):
+        os.remove(str(log_file))
+

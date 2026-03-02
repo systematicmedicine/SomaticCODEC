@@ -6,20 +6,21 @@ Generates a fastqc report for demuxed MS FASTQs
 include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
+from definitions.paths.io import ms as MS
 
 rule ms_raw_fastq_metrics:
     input:
-        global_setup = global_setup,
+        shared_setup = shared_setup,
         ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
     output:
-        r1_report = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.html",
-        r1_zip = temp("metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.zip"),
-        r2_zip = temp("metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.zip"),
-        r1_txt = "metrics/{ms_sample}/{ms_sample}_r1_raw_fastqc.txt",
-        r2_txt = "metrics/{ms_sample}/{ms_sample}_r2_raw_fastqc.txt"
+        r1_report = MS.MET_FASTQC_RAW_HTML_R1,
+        r2_report = MS.MET_FASTQC_RAW_HTML_R2,
+        r1_zip = temp(MS.MET_FASTQC_RAW_INT_R1),
+        r2_zip = temp(MS.MET_FASTQC_RAW_INT_R2),
+        r1_txt = MS.MET_FASTQC_RAW_TXT_R1,
+        r2_txt = MS.MET_FASTQC_RAW_TXT_R2
     log:
         "logs/{ms_sample}/ms_raw_fastq_metrics.log"
     benchmark:

@@ -1,14 +1,17 @@
 """
 Group reads by UMI and alignment
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_group_by_umi:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_anno.bam"
+        bam = EX.MATE_INFO_BAM
     output:
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_umi_grouped.bam"),
-        umi_metrics = "metrics/{ex_sample}/{ex_sample}_map_umi_metrics.txt",
-        intermediate_moveumi = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_tmp.bam"),
-        intermediate_moveumi_sorted = temp("tmp/{ex_sample}/{ex_sample}_map_moveumi_sorted_tmp.bam")
+        intermediate_moveumi = temp(EX.GROUP_BY_UMI_INT1),
+        intermediate_moveumi_sorted = temp(EX.GROUP_BY_UMI_INT2),
+        bam = temp(EX.UMI_GROUPED_BAM),
+        umi_metrics = EX.MET_GROUP_BY_UMI,
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"],
         min_umi_length = config["sci_params"]["ex_group_by_umi"]["min_umi_length"]

@@ -19,11 +19,6 @@ Manually check config files for the following:
         * DonorID
         * Age
         * Sex
-
-* `ex_technical_controls.csv`
-    * Cross reference with experimental plan, check:
-        * SeqID
-        * Quadruplex
     
 * `ms_samples.csv`
     * Cross reference with experimental plan, check:

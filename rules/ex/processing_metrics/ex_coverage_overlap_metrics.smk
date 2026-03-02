@@ -3,35 +3,33 @@ Calculates overlap between coverage of various BED and BAM files
 """
 
 import helpers.get_metadata as md
+from definitions.paths.io import ex as EX
+from definitions.paths.io import ms as MS
 
 rule ex_coverage_overlap_metrics:
     input:
-        precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
-        ex_dsc_bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam",
-        ex_dsc_bai = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai",
-        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed",
-        ms_bam = lambda wc: (
-            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_deduped_map.bam"
-        ),
-        lowdepth_bed = lambda wc: (
-            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_lowdepth.bed"
-        ),
-        germ_risk_bed = lambda wc: (
-            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_ms_germ_risk.bed"
-        ),
-        combined_bed = lambda wc: (
-            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_combined_mask.bed"
-        ),
-        ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["shared"]["precomputed_masks"]),
+        ex_dsc_bam = EX.FILTERED_DSC,
+        ex_dsc_bai = EX.FILTERED_DSC_INDEX,
+        include_bed = MS.INCLUDE_BED,
+        ms_bam = lambda wc: MS.DEDUPED_BAM.format(
+            ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
+            ),
+        lowdepth_bed = lambda wc: MS.LOW_DEPTH_MASK.format(
+            ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
+            ),
+        germ_risk_bed = lambda wc: MS.GERMLINE_RISK_MASK.format(
+            ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
+            ),
+        combined_bed = lambda wc: MS.COMBINED_MASK.format(
+            ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
+            ),
+        ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
-        output_json = "metrics/{ex_sample}/{ex_sample}_coverage_overlap_metrics.json"
+        output_json = EX.MET_COVERAGE_OVERLAP
     params: 
         ms_depth_threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"],
-        ex_depth_threshold = 1,
+        ex_depth_threshold = config["sci_params"]["ex_dsc_coverage_metrics"]["ex_depth_threshold"],
         ms_bq_threshold = config["sci_params"]["ms_germline_risk"]["min_base_qual"],
         ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:
