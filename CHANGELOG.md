@@ -23,10 +23,12 @@ Types of changes:
 - Germline risk positions identified in any sample are now masked across all samples (#327)
 - Changed file paths for ex pipeline to improve readability (#330)
 - Expected files test no longer depends on manually collated lists (#332)
+- Consolidated trimming metrics into one file for ex and one for ms (#337)
 
 ### Fixed
 
 - Test script names updated to match new rule names (#324)
+- Cutadapt output no longer pollutes pipeline log (#337)
 
 ## [RC4.0.0]
 
