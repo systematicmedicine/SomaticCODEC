@@ -42,7 +42,7 @@ def test_germline_records_extracted_correctly(tmp_path):
     output_vcf_records = get_vcf_records(output_germ_context_vcf)
     expected_vcf_records = get_vcf_records(expected_germ_context_vcf)
 
-    assert(output_vcf_records == expected_vcf_records, "Output VCF records do not match expected VCF records")
+    assert output_vcf_records == expected_vcf_records, "Output VCF records do not match expected VCF records"
 
 
 
