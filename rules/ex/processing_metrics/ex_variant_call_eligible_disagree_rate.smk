@@ -15,6 +15,7 @@ rule ex_variant_call_eligible_disagree_rate:
     params:
         required_Q = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
         number_of_reads = config["sci_params"]["ex_variant_call_disagree_metrics"]["number_of_reads"],
+        random_seed = config["sci_params"]["shared"]["random_seed"]
     log:
         "logs/{ex_sample}/ex_variant_call_eligible_disagree_rate.log"
     benchmark:
@@ -36,6 +37,7 @@ rule ex_variant_call_eligible_disagree_rate:
             --metrics_json {output.metrics_json} \
             --required_Q {params.required_Q} \
             --number_of_reads {params.number_of_reads} \
+            --random_seed {params.random_seed} \
             --threads {threads} \
             --log {log} 2>> {log}
         """

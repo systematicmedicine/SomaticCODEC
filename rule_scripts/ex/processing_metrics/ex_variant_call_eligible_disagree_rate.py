@@ -162,13 +162,14 @@ def eligible_sites_from_alignment(aln, bed_idx, required_q: int):
     return results
 
 
-def tally_disagreements(bam, bed_idx, required_q: int, number_of_reads: int):
+def tally_disagreements(bam, bed_idx, required_q: int, number_of_reads: int, random_seed: int):
     """
     Stream through BAM, tally eligible sites and disagreements.
     Returns (total_eligible_sites, observed_disagreements, sampled_reads).
     """
     refs = list(bam.header.references)
-    random.shuffle(refs)
+    rng = random.Random(random_seed)
+    rng.shuffle(refs)
 
     total = 0
     disagreements = 0
@@ -210,6 +211,7 @@ def main(args):
     REQUIRED_Q = int(args.required_Q)
     NUMBER_OF_READS = int(args.number_of_reads)
     THREADS = int(args.threads)
+    RANDOM_SEED = int(args.random_seed)
 
     print(f"[INFO] BAM: {bam_path}")
     print(f"[INFO] BED: {bed_path}")
@@ -225,7 +227,7 @@ def main(args):
 
     # Check number of Watson and Crick disagreements
     total_eligible_sites, observed_disagreements, sampled_reads = tally_disagreements(
-        bam, bed_idx, REQUIRED_Q, NUMBER_OF_READS
+        bam, bed_idx, REQUIRED_Q, NUMBER_OF_READS, RANDOM_SEED
     )
 
     bam.close()
@@ -270,6 +272,7 @@ if __name__ == "__main__":
     parser.add_argument("--metrics_json", required=True)
     parser.add_argument("--required_Q", required=True)
     parser.add_argument("--number_of_reads", required=True)
+    parser.add_argument("--random_seed", required=True)
     parser.add_argument("--threads", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()
