@@ -1,14 +1,17 @@
 """
  Adds read mate information to flags/CIGAR strings of mapped reads
 """
+
+from definitions.paths.io import ms as MS
+
 rule ms_add_mate_information:
     input:
-        bam = "tmp/{ms_sample}/{ms_sample}_read_group_map.bam"
+        bam = MS.READ_GROUP_BAM
     output:
-        bam = temp("tmp/{ms_sample}/{ms_sample}_annotated_map.bam"),
-        bai = temp("tmp/{ms_sample}/{ms_sample}_annotated_map.bam.bai"),
-        intermediate_collated = temp("tmp/{ms_sample}/{ms_sample}_read_group_map_collated.bam"),
-        intermediate_unsorted = temp("tmp/{ms_sample}/{ms_sample}_fixmate_map_unsorted.bam")
+        intermediate_collated = temp(MS.ADD_MATE_INFORMATION_INT1),
+        intermediate_unsorted = temp(MS.ADD_MATE_INFORMATION_INT2),
+        bam = temp(MS.MATE_INFO_BAM),
+        bai = temp(MS.MATE_INFO_BAM_INDEX),
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:

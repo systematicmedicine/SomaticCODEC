@@ -11,6 +11,41 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [4.0.0] - 2026-02-26
+
+### Added
+
+- Added script for visualising rulegraphs (#307)
+- Additional test cases for metrics report (#304)
+- Added component metrics for median fragment length during library prep (#316) 
+
+### Changed
+
+- Removed hard coded cofig overrides from conftest.py (#308)
+- Change to packaged outputs directory structure (#306)
+- Refactored test_script directory (#309)
+- Project root and package discovery now handled by conftest instead of individual test scripts (#309)
+- Rules that use a single thread now explicitly declare this (#310)
+- Updated thresholds for DNA fragment size component metrics (#311)
+- Sample metadata for internal testing and external use now decoupled (#312)
+- Removed hard coded paths from test_scripts (#312 and 315)
+- Centralised rule file paths to definitions/paths directory (#317)
+- Renamed scripts directory to rule_scripts (#318)
+- Renamed "global" to "shared" throughout directories, rules, and config (#318)
+- Refactored ex_demultiplex_fastq.py to avoid passing file paths as params (#320)
+- Renamed tests/test_scripts directory to tests/scripts (#321)
+
+### Removed
+- Removed rules and associated files for EX technical controls (#319)
+
+### Fixed
+
+- Pipeline no longer crashes if lane names have underscores (#305)
+- Unused *_end.fasta files no longer created by rule ex_generate_demux_adaptors (#305)
+- Germline risk VCF is now a temp file (#303)
+- Include flag now works for metrics report (#304)
+- Fixed test case in test_ms_germline_risk.py following changes to test config (#314)
+
 ## [3.1.2] - 2026-02-02
 
 ### Changed

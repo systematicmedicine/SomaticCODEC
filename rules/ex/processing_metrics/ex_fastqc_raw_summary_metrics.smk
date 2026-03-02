@@ -1,19 +1,24 @@
 """
 Generates a summary of key metrics for ex raw fastqc reports
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_fastqc_raw_summary_metrics:
     input:
-        fastqc_files = ["metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
-        "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"]
+        fastqc_files = [EX.MET_FASTQC_RAW_TXT_R1,
+        EX.MET_FASTQC_RAW_TXT_R2]
     output:
-        json_files = ["metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics_summary.json",
-        "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics_summary.json"]
+        json_files = [EX.MET_FASTQC_RAW_SUMMARY_R1,
+        EX.MET_FASTQC_RAW_SUMMARY_R2]
     params:
         sample = "{ex_lane}"
     log:
         "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.log"
     benchmark:
         "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -6,20 +6,21 @@ FastQC on raw fastq files (before demultiplexing or any processing)
 include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
+from definitions.paths.io import ex as EX
 
 rule ex_fastqcraw_metrics:
     input:
-        global_setup = global_setup,
+        shared_setup = shared_setup,
         ex_lanes = config["metadata"]["ex_lanes_metadata"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
     output:
-        fastqc_report1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.html",
-        fastqc_report2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.html",
-        zip_r1 = temp("metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.zip"),
-        zip_r2 = temp("metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.zip"),
-        txt_r1 = "metrics/{ex_lane}/{ex_lane}_r1_fastqc_raw_metrics.txt",
-        txt_r2 = "metrics/{ex_lane}/{ex_lane}_r2_fastqc_raw_metrics.txt"
+        fastqc_report1 = EX.MET_FASTQC_RAW_HTML_R1,
+        fastqc_report2 = EX.MET_FASTQC_RAW_HTML_R2,
+        zip_r1 = temp(EX.MET_FASTQC_RAW_INT_R1),
+        zip_r2 = temp(EX.MET_FASTQC_RAW_INT_R2),
+        txt_r1 = EX.MET_FASTQC_RAW_TXT_R1,
+        txt_r2 = EX.MET_FASTQC_RAW_TXT_R2
     log:
         "logs/{ex_lane}/ex_fastqcraw_metrics.log"
     benchmark:

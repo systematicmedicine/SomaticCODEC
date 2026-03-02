@@ -3,21 +3,24 @@ Generates a BED file of regions eligible for variant calling
     - Inverse of combined mask
 """
 import helpers.get_metadata as md
+from definitions.paths.io import ms as MS
 
+# Main rule
 rule generate_include_bed:
     input:
         ms_samples = config["metadata"]["ms_samples_metadata"],
-        mask_bed = lambda wc: (
-            f"tmp/{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}/"
-            f"{md.get_ex_to_ms_sample_map(config)[wc.ex_sample]}_combined_mask.bed"
+        mask_bed = lambda wc: MS.COMBINED_MASK.format(
+            ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
         ),
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
-        include_bed = "tmp/{ex_sample}/{ex_sample}_include.bed"
+        include_bed = MS.INCLUDE_BED
     log:
         "logs/{ex_sample}/generate_include_bed.log"
     benchmark:
         "logs/{ex_sample}/generate_include_bed.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

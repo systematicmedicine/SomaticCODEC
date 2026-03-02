@@ -2,17 +2,19 @@
 Generates a fastqc report for ms processed reads
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_processed_fastq_metrics:
     input:
-        r1 = "tmp/{ms_sample}/{ms_sample}_filter_r1.fastq.gz",
-        r2 = "tmp/{ms_sample}/{ms_sample}_filter_r2.fastq.gz"
+        r1 = MS.FILTERED_FASTQ_R1,
+        r2 = MS.FILTERED_FASTQ_R2
     output:
-        r1_report = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.html",
-        r2_report = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.html",
-        r1_zip = temp("metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.zip"),
-        r2_zip = temp("metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.zip"),
-        r1_txt = "metrics/{ms_sample}/{ms_sample}_filter_r1_fastqc.txt",
-        r2_txt = "metrics/{ms_sample}/{ms_sample}_filter_r2_fastqc.txt"
+        r1_report = MS.MET_FASTQC_FILTER_HTML_R1,
+        r2_report = MS.MET_FASTQC_FILTER_HTML_R2,
+        r1_zip = temp(MS.MET_FASTQC_FILTER_INT_R1),
+        r2_zip = temp(MS.MET_FASTQC_FILTER_INT_R2),
+        r1_txt = MS.MET_FASTQC_FILTER_TXT_R1,
+        r2_txt = MS.MET_FASTQC_FILTER_TXT_R2
     log:
         "logs/{ms_sample}/ms_processed_fastq_metrics.log"
     benchmark:

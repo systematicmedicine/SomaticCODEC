@@ -10,7 +10,6 @@ run_name: experiment_1
 metadata:
 
   ex_samples_metadata: config/ex_samples.csv
-  ex_technical_controls_metadata: config/ex_technical_controls.csv
   ex_lanes_metadata: config/ex_lanes.csv
   ex_adapters_metadata: config/ex_adapters.csv
   ms_samples_metadata: config/ms_samples.csv
@@ -23,7 +22,7 @@ metadata:
 # ------------------------------------------------------------------------------
 sci_params:
   
-  global:
+  shared:
     reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
     reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
     reference_genome_trinuc_counts: tmp/downloads/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv
@@ -57,6 +56,9 @@ sci_params:
   ex_demultiplex_fastq:
     max_error_rate: 0.1
     min_adapter_overlap: 8
+
+  ex_dsc_coverage_metrics:
+    ex_depth_threshold: 1
 
   ex_extract_fastq_umis:
     umi_length: 3
@@ -107,14 +109,6 @@ sci_params:
     r1_cut_end: -9  # Must be negative
     r2_cut_end: -9  # Must be negative
     quality_cutoff: 20
-
-  ex_tc_trim_fastq:
-    max_error_rate: 0.1
-    min_adapter_overlap: 8
-    r1_cut_start: 3
-    r2_cut_start: 3
-    r1_cut_end: -9  # Must be negative
-    r2_cut_end: -9  # Must be negative
     
   ex_variant_call_disagree_metrics:
     number_of_reads: 2000000

@@ -2,21 +2,26 @@
 Combines all masks into a single BED file
 """
 
+from definitions.paths.io import ms as MS
+from definitions.paths.io import shared as S
+
 rule combine_masks:
     input:
-        precomputed_masks = expand("{mask}", mask=config["sci_params"]["global"]["precomputed_masks"]),
-        excluded_chromosomes_bed = "tmp/downloads/excluded_chromosomes.bed",
-        ms_lowdepth_bed = "tmp/{ms_sample}/{ms_sample}_lowdepth.bed",
-        ms_germ_risk_bed = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed",
-        fai = config["sci_params"]["global"]["reference_genome"] + ".fai" 
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["shared"]["precomputed_masks"]),
+        excluded_chromosomes_bed = S.EXCLUDED_CHROMS_BED,
+        ms_lowdepth_bed = MS.LOW_DEPTH_MASK,
+        ms_germ_risk_bed = MS.GERMLINE_RISK_MASK,
+        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai" 
     output:
-        combined_bed = temp("tmp/{ms_sample}/{ms_sample}_combined_mask.bed"),
-        intermediate_cat = temp("tmp/{ms_sample}/{ms_sample}_masks_cat.bed"),
-        intermediate_sorted = temp("tmp/{ms_sample}/{ms_sample}_masks_sorted.bed")
+        combined_bed = temp(MS.COMBINED_MASK),
+        intermediate_cat = temp(MS.COMBINE_MASKS_INT1),
+        intermediate_sorted = temp(MS.COMBINE_MASKS_INT2)
     log:
         "logs/{ms_sample}/combine_masks.log"
     benchmark:
         "logs/{ms_sample}/combine_masks.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

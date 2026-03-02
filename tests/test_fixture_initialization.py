@@ -10,7 +10,7 @@ Author: Cameron Fraser
 
 import pytest
 
-pytestmark = pytest.mark.order(6)
+pytestmark = pytest.mark.order(8)
 
 # Ensure fixture runs successfully before any dependent tests
 def test_lightweight_test_run_initialization(lightweight_test_run):

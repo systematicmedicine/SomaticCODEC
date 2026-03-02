@@ -1,15 +1,20 @@
 """
 Calculates the distance to nearest SNV, for each SNV
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_snv_distance_metrics:
     input:
-        vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
+        vcf = EX.CALLED_SNVS
     output:
-        metrics_json = "results/{ex_sample}/{ex_sample}_snv_distance.json"
+        metrics_json = EX.MET_SNV_DISTANCE
     log:
         "logs/{ex_sample}/ex_snv_distance_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_snv_distance_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

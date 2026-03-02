@@ -79,11 +79,11 @@ def main():
     print(f"[INFO] Creating archive: {archive_path}")
 
     archive_structure = {
-        "results": "Data/results",
-        "metrics": "Data/metrics",
-        "logs": "Data/logs",
+        "results": "Processed data/results",
+        "metrics": "Processed data/metrics",
+        "logs": "Processed data/logs",
         "rules": "Methods/rules",
-        "scripts": "Methods/scripts",
+        "rule_scripts": "Methods/rule_scripts",
         "config": "Methods/config",
         "Snakefile": "Methods/Snakefile",
         "bin": "Methods/bin",
@@ -110,9 +110,9 @@ def main():
                 print(f"[INFO] Adding: {src_path} → {dest}")
                 tar.add(src_path, arcname=dest)
 
-            # Add checksums.txt to archive under Data/checksums/
-            print(f"[INFO] Adding: {checksum_file} → Data/checksums/checksums.txt")
-            tar.add(checksum_file, arcname="Data/checksums/checksums.txt")
+            # Add checksums.txt to archive under Processed data/checksums/
+            print(f"[INFO] Adding: {checksum_file} → Processed data/checksums/checksums.txt")
+            tar.add(checksum_file, arcname="Processed data/checksums/checksums.txt")
 
     except Exception as e:
         print(f"[ERROR] Failed to create archive: {e}")

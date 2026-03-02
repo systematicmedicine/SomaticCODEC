@@ -47,9 +47,7 @@ tmp/{ms_sample}/{ms_sample}_combined_mask.bed
 tmp/{ms_sample}/{ms_sample}_masks_sorted.txt
 tmp/{ms_sample}/{ms_sample}_masks_merged.txt
 tmp/{ex_lane}/{ex_lane}_r1_start.fasta
-tmp/{ex_lane}/{ex_lane}_r1_end.fasta
 tmp/{ex_lane}/{ex_lane}_r2_start.fasta
-tmp/{ex_lane}/{ex_lane}_r2_end.fasta
 tmp/{ex_lane}/{ex_lane}_r1_umi_extracted.fastq.gz
 tmp/{ex_lane}/{ex_lane}_r2_umi_extracted.fastq.gz
 tmp/{ex_sample}/{ex_sample}_r1_demux.fastq.gz
@@ -89,11 +87,3 @@ tmp/{ex_sample}/{ex_sample}_bcf_biallelic.bcf
 tmp/{ex_sample}/{ex_sample}_all_positions.vcf
 tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz
 tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi
-tmp/{ex_technical_control}/{ex_technical_control}_r1_demux.fastq.gz
-tmp/{ex_technical_control}/{ex_technical_control}_r2_demux.fastq.gz
-tmp/{ex_technical_control}/{ex_technical_control}_r1_trim_tc.fastq.gz
-tmp/{ex_technical_control}/{ex_technical_control}_r2_trim_tc.fastq.gz
-tmp/{ex_technical_control}/{ex_technical_control}_r1_trim_adapters_tc.fastq.gz
-tmp/{ex_technical_control}/{ex_technical_control}_r2_trim_adapters_tc.fastq.gz
-tmp/{ex_technical_control}/{ex_technical_control}_r1_trim_adapters2_tc.fastq.gz
-tmp/{ex_technical_control}/{ex_technical_control}_r2_trim_adapters2_tc.fastq.gz

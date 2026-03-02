@@ -22,10 +22,10 @@ import subprocess
 
 # Define reference files (dotted keys into config)
 REFERENCE_FILES = [
-    "sci_params.global.reference_genome",
-    "sci_params.global.reference_tri_contexts",
-    "sci_params.global.known_germline_variants",
-    "sci_params.global.precomputed_masks",  # list-valued
+    "sci_params.shared.reference_genome",
+    "sci_params.shared.reference_tri_contexts",
+    "sci_params.shared.known_germline_variants",
+    "sci_params.shared.precomputed_masks",  # list-valued
 ]
 
 # Define sample FASTQ files from metadata tables
@@ -106,7 +106,6 @@ def check_sample_ids_unique(metadata: dict):
     Ensures that all sample identifiers across the following fields are globally unique:
       - ex_samples_metadata["ex_sample"]
       - ex_lanes_metadata["ex_lane"]
-      - ex_technical_controls_metadata["ex_technical_control"]
       - ex_adapters_metadata["ex_adapter"]
       - ms_samples_metadata["ms_sample"]
 
@@ -116,7 +115,6 @@ def check_sample_ids_unique(metadata: dict):
         all_ids = pd.concat([
             metadata["ex_samples_metadata"]["ex_sample"],
             metadata["ex_lanes_metadata"]["ex_lane"],
-            metadata["ex_technical_controls_metadata"]["ex_technical_control"],
             metadata["ex_adapters_metadata"]["ex_adapter"],
             metadata["ms_samples_metadata"]["ms_sample"],
         ], ignore_index=True).dropna()
@@ -174,19 +172,18 @@ def check_ex_adapter_sequences(metadata: dict, expected_lengths: list[int]):
 
     print("[INFO] ex_adapter sequences are valid (A/T/C/G only, expected lengths)")
 
-# Check each ex_sample and ex_technical_control has a valid ex_lane defined in ex_lanes.csv
+# Check each ex_sample has a valid ex_lane defined in ex_lanes.csv
 def check_ex_lane_mapping(metadata: dict):
 
     ex_sample_lanes = set(metadata["ex_samples_metadata"]["ex_lane"])
-    ex_tc_lanes = set(metadata["ex_technical_controls_metadata"]["ex_lane"])
     valid_lanes = set(metadata["ex_lanes_metadata"]["ex_lane"])
 
-    missing = (ex_sample_lanes | ex_tc_lanes) - valid_lanes
+    missing = ex_sample_lanes - valid_lanes
     if missing:
-        sys.exit(f"[ERROR] ex_lane(s) in ex_samples.csv or ex_technical_controls.csv not found in ex_lanes.csv:\n"
+        sys.exit(f"[ERROR] ex_lane(s) in ex_samples.csv not found in ex_lanes.csv:\n"
                  + "\n".join(sorted(missing)))
 
-    print("[INFO] All ex_samples and ex_technical_controls map to valid ex_lanes")
+    print("[INFO] All ex_samples map to valid ex_lanes")
 
 # Check that all input FASTQ paths are globally unique
 def check_input_fastqs_unique(metadata: dict):
@@ -299,7 +296,7 @@ if __name__ == "__main__":
     # Check ex_adapter sequences contain only A/T/C/G and have expected length
     check_ex_adapter_sequences(metadata_tables, EXPECTED_ADAPTER_LENGTHS)
 
-    # Check each ex_sample and ex_technical_control has a valid ex_lane defined in ex_lanes.csv
+    # Check each ex_sample has a valid ex_lane defined in ex_lanes.csv
     check_ex_lane_mapping(metadata_tables)
 
     # Check that input FASTQs are globally unique

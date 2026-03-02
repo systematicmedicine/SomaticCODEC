@@ -1,19 +1,24 @@
 """
 Generates a summary of key metrics for ex filter fastqc reports
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_fastqc_filter_summary_metrics:
     input:
-        fastqc_files = ["metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics.txt",
-        "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics.txt"]
+        fastqc_files = [EX.MET_FASTQC_FILTER_TXT_R1,
+        EX.MET_FASTQC_FILTER_TXT_R2]
     output:
-        json_files = ["metrics/{ex_sample}/{ex_sample}_r1_fastqc_filter_metrics_summary.json",
-        "metrics/{ex_sample}/{ex_sample}_r2_fastqc_filter_metrics_summary.json"]
+        json_files = [EX.MET_FASTQC_FILTER_SUMMARY_R1,
+        EX.MET_FASTQC_FILTER_SUMMARY_R2]
     params:
         sample = "{ex_sample}"
     log:
         "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.log"
     benchmark:
         "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

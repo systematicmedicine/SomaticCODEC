@@ -9,17 +9,45 @@ Authors:
 
 """
 import pytest
+import sys
 from pathlib import Path
 import shutil
 import subprocess
-from datetime import datetime
 import yaml
 import tempfile
+
+# Find the root directory of the project
+def find_project_root(start: Path) -> Path:
+    start = start.resolve()
+    for p in [start, *start.parents]:
+        # Use multiple sentinels to avoid false-positives
+        if (p / "config").is_dir() and (p / "helpers").is_dir() and (p / "rule_scripts").is_dir():
+            return p
+    raise RuntimeError("Could not find repo root (config/, helpers/, rule_scripts/).")
+
+# Insert PROJECT_ROOT into path
+PROJECT_ROOT = find_project_root(Path(__file__))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+# Explicit public API of PROJECT_ROOT
+__all__ = ["PROJECT_ROOT"]
+
+# Recursively update dict 'base' with values from dict 'override'. Nested dicts are merged; other values are replaced.
+def deep_update(base: dict, override: dict) -> dict:
+    if override is None:
+        return base
+    for k, v in override.items():
+        if isinstance(v, dict) and isinstance(base.get(k), dict):
+            deep_update(base[k], v)
+        else:
+            base[k] = v
+    return base
 
 # Deletes all files from metrics, results, logs, tmp and .snakemake directories
 def clean_workspace():
     for folder in ["metrics", "results", "tmp", "logs", ".snakemake"]:
-        root = Path(folder)
+        root = PROJECT_ROOT / folder
         if not root.exists():
             continue
         # Delete all files except .gitkeep
@@ -39,7 +67,7 @@ def clean_workspace():
                         pass
 
     # Delete .pytest_cache
-    pytest_cache = Path(".pytest_cache")
+    pytest_cache = PROJECT_ROOT / ".pytest_cache"
     if pytest_cache.exists():
         shutil.rmtree(pytest_cache)
 
@@ -51,56 +79,40 @@ def lightweight_test_run():
     clean_workspace()
     
     # Copy test files to tmp/downloads
-    src_dir = Path("tests/data/lightweight_test_run")
-    dst_dir = Path("tmp/downloads")
+    src_dir = PROJECT_ROOT / "tests/data/lightweight_test_run/downloads"
+    dst_dir = PROJECT_ROOT /"tmp/downloads"
     dst_dir.mkdir(exist_ok=True)
 
-    test_data_folder = Path("tests/data/lightweight_test_run")
-    files_to_copy = [f for f in test_data_folder.glob("*") if f.name != ".gitkeep"]
+    files_to_copy = [f for f in src_dir.glob("*") if f.name != ".gitkeep"]
 
     for file_path in files_to_copy:
         shutil.copy2(src_dir / file_path.name, dst_dir / file_path.name)
 
-    # Create modified config.yaml with test parameters and file paths
-    config = Path("config/config.yaml")
-    with config.open("r", encoding="utf-8") as f:
-        config_data = yaml.safe_load(f)
+    # Load base config
+    with Path(PROJECT_ROOT, "config/config.yaml").open("r", encoding="utf-8") as f:
+        config_data = yaml.safe_load(f) or {}
 
-    config_data["run_name"] = "lightweight_test_run"
+    # Merge in config.dev.yaml (if present)
+    dev_config = PROJECT_ROOT / "config/config.dev.yaml"
+    if dev_config.exists():
+        with dev_config.open("r", encoding="utf-8") as f:
+            dev_data = yaml.safe_load(f) or {}
+        config_data = deep_update(config_data, dev_data)
 
-    config_data["sci_params"]["global"]["reference_genome"] = "tmp/downloads/GRCh38_Chr21_plus_stubs.fa"
-    config_data["sci_params"]["global"]["precomputed_masks"] = [
-        "tmp/downloads/GRCh38_alldifficultregions_10lines.bed", 
-        "tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed",
-        "tmp/downloads/GCRh38_repeat_masker_10lines.bed"
-        ]
-    config_data["sci_params"]["global"]["known_germline_variants"] = "tmp/downloads/gnomad-chr21-micro.vcf.bgz"
-
-    config_data["sci_params"]["ms_low_depth_mask"]["min_depth"] = 1
-
-    config_data["infrastructure"]["memory"]["extra_heavy"] = 6
-    config_data["infrastructure"]["memory"]["heavy"] = 6
-    config_data["infrastructure"]["memory"]["moderate"] = 4
-    config_data["infrastructure"]["memory"]["light"] = 2
-    config_data["infrastructure"]["threads"]["heavy"] = 2
-    config_data["infrastructure"]["threads"]["moderate"] = 2
-    config_data["infrastructure"]["threads"]["light"] = 1
-    config_data["infrastructure"]["compression"]["gzip_level"] = 1
-
-
+    # Write merged config to temp file
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w") as f:
         yaml.safe_dump(config_data, f)
 
     # Log file setup
-    log_dir = Path("logs/bin_scripts")
+    log_dir = PROJECT_ROOT / "logs/bin_scripts"
     log_dir.mkdir(exist_ok=True)
     log_file = log_dir / "run_pipeline.log"
     
     # Run snakemake
     snakemake_cmd = [
         "snakemake",
-        "--snakefile", "Snakefile",
+        "--snakefile", str(PROJECT_ROOT / "Snakefile"),
         "--configfile", test_config_file.name,
         "--cores", "all",
         "--notemp",
@@ -110,6 +122,7 @@ def lightweight_test_run():
         with log_file.open("w", encoding="utf-8") as log:
             result = subprocess.run(
                 snakemake_cmd,
+                cwd=str(PROJECT_ROOT),
                 stdout=None,
                 stderr=log, 
                 text=True,
@@ -124,6 +137,8 @@ def lightweight_test_run():
     # Run tests and pass test config path to test functions
     yield {"test_config_path": test_config_file.name}
 
+    # Temp file cleanup
+    Path(test_config_file.name).unlink(missing_ok=True)
+
     # Cleanup test environment
     clean_workspace()
-

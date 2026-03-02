@@ -2,19 +2,23 @@
 Calulcates the number of bases at each depth level
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_depth_histogram_metrics:
     input:
-        intermediate_depth_per_base = "tmp/{ms_sample}/{ms_sample}_depth_per_base.txt",
+        intermediate_depth_per_base = MS.LOW_DEPTH_MASK_INT1,
     output:
-        depth_histogram = "metrics/{ms_sample}/{ms_sample}_depth_histogram_counts.txt",
-        intermediate_depth_values = temp("tmp/{ms_sample}/{ms_sample}_depth_values.txt"),
-        intermediate_depth_values_sorted = temp("tmp/{ms_sample}/{ms_sample}_depth_values_sorted.txt")
+        depth_histogram = MS.MET_DEPTH_HIST,
+        intermediate_depth_values = temp(MS.MET_DEPTH_HIST_INT1),
+        intermediate_depth_values_sorted = temp(MS.MET_DEPTH_HIST_INT2)
+    params:
+        threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
     log:
         "logs/{ms_sample}/ms_low_depth_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
-    params:
-        threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

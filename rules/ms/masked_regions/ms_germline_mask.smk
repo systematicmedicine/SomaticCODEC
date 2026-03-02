@@ -4,28 +4,36 @@ Creates a BED file from germline risk VCF
     - For insertions and SNV's, the BED region is length 1
 """
 
+from definitions.paths.io import ms as MS
+
 rule ms_germline_mask:
     input:
-        vcf = "tmp/{ms_sample}/{ms_sample}_ms_germ_risk.vcf",
-        ref_fai = config["sci_params"]["global"]["reference_genome"] + ".fai"
+        vcf = MS.GERMLINE_RISK_VCF,
+        ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
-        ms_germ_risk_bed = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk.bed"),
-        intermediate_del_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unformatted.bed"),
-        intermediate_ins_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unformatted.bed"),
-        intermediate_all_unformatted = temp("tmp/{ms_sample}/{ms_sample}_germ_all_unformatted.bed"),
-        intermediate_del_unpadded = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions_unpadded.bed"),
-        intermediate_ins_unpadded = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions_unpadded.bed"),
-        ms_germ_del_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_deletions.bed"),
-        ms_germ_ins_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_insertions.bed"),
-        ms_germ_all_bed = temp("tmp/{ms_sample}/{ms_sample}_germ_all.bed"),
-        intermediate_cat_unsorted = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk_cat_unsorted.bed"),
-        intermediate_cat_unmerged = temp("tmp/{ms_sample}/{ms_sample}_ms_germ_risk_cat_unmerged.bed")
+        # Intermediate files
+        intermediate_del_unformatted = temp(MS.GERMLINE_MASK_INT1),
+        intermediate_ins_unformatted = temp(MS.GERMLINE_MASK_INT2),
+        intermediate_all_unformatted = temp(MS.GERMLINE_MASK_INT3),
+        intermediate_del_unpadded = temp(MS.GERMLINE_MASK_INT4),
+        intermediate_ins_unpadded = temp(MS.GERMLINE_MASK_INT5),
+        ms_germ_del_bed = temp(MS.GERMLINE_MASK_INT6),
+        ms_germ_ins_bed = temp(MS.GERMLINE_MASK_INT7),
+        ms_germ_all_bed = temp(MS.GERMLINE_MASK_INT8),
+        intermediate_cat_unsorted = temp(MS.GERMLINE_MASK_INT9),
+        intermediate_cat_unmerged = temp(MS.GERMLINE_MASK_INT10),
+        
+        # Rule output
+        ms_germ_risk_bed = temp(MS.GERMLINE_RISK_MASK)
+
     params:
         indel_padding_bases = config["sci_params"]["ms_germline_mask"]["indel_padding_bases"]
     log:
         "logs/{ms_sample}/ms_germline_variants_mask.log"
     benchmark:
         "logs/{ms_sample}/ms_germline_variants_mask.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:

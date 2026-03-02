@@ -2,13 +2,16 @@
 Filter reads from DSC
     - Remove reads with low MAPQ
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_filter_dsc:
     input:
-        bam = "tmp/{ex_sample}/{ex_sample}_map_dsc_anno.bam"
+        bam = EX.ANNOTATED_DSC
     output:
-        intermediate_bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered_unsorted.bam"),
-        bam = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam"),
-        bai = temp("tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai")
+        intermediate_bam = temp(EX.FILTER_DSC_INT1),
+        bam = temp(EX.FILTERED_DSC),
+        bai = temp(EX.FILTERED_DSC_INDEX)
     params:
         min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
@@ -16,6 +19,8 @@ rule ex_filter_dsc:
         "logs/{ex_sample}/ex_filter_dsc.log"
     benchmark:
         "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

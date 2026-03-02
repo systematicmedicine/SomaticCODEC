@@ -1,20 +1,25 @@
 """
 Determines how many called somatic variants are present in dataset of common germline variants
 """
+
+from definitions.paths.io import ex as EX
+
 rule ex_gnomAD_overlap:
     input:
-        somatic_vcf = "results/{ex_sample}/{ex_sample}_variants.vcf",
-        germline_vcf = config["sci_params"]["global"]["known_germline_variants"],
-        germline_tbi = config["sci_params"]["global"]["known_germline_variants"] + ".tbi"
+        somatic_vcf = EX.CALLED_SNVS,
+        germline_vcf = config["sci_params"]["shared"]["known_germline_variants"],
+        germline_tbi = config["sci_params"]["shared"]["known_germline_variants"] + ".tbi"
     output:
-        intermediate_somatic_bgz = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz"),
-        intermediate_somatic_tbi = temp("tmp/{ex_sample}/{ex_sample}_indexed_somatic_vcf.bgz.tbi"),
-        germline_matches = "results/{ex_sample}/{ex_sample}_germline_matches.vcf",
-        metrics_file = "results/{ex_sample}/{ex_sample}_gnomAD_overlap_metrics.json"
+        intermediate_somatic_bgz = temp(EX.MET_GNOMAD_OVERLAP_INT_BGZ),
+        intermediate_somatic_tbi = temp(EX.MET_GNOMAD_OVERLAP_INT_TBI),
+        germline_matches = EX.MET_GNOMAD_OVERLAP_VCF,
+        metrics_file = EX.MET_GNOMAD_OVERLAP_JSON
     log:
         "logs/{ex_sample}/ex_gnomAD_overlap.log"
     benchmark:
         "logs/{ex_sample}/ex_gnomAD_overlap.benchmark.txt"
+    threads:
+        1
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
