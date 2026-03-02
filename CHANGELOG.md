@@ -61,6 +61,7 @@ Types of changes:
 - Germline risk VCF is now a temp file (#303)
 - Include flag now works for metrics report (#304)
 - Fixed test case in test_ms_germline_risk.py following changes to test config (#314)
+- ex_bases_trimmed.smk and ex_trimmed_read_length_metrics.smk now take r1 and r2 as input, instead of r1 twice (#317)
 
 ## [3.1.2] - 2026-02-02
 
