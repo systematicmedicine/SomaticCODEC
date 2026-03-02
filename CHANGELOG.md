@@ -28,7 +28,7 @@ Types of changes:
 
 - Test script names updated to match new rule names (#324)
 
-## [RC4.0.0]
+## [4.0.0] - 2026-02-26
 
 ### Added
 
