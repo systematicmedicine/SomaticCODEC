@@ -16,6 +16,11 @@ Types of changes:
 ## Added
 
 - Added tests for various rules without tests (#338)
+- Added random_seed to config.yaml (#339)
+
+### Changed
+
+- Set seed for pseudodorandom selection of reads in ex_variant_call_eligible_disagree_rate.py (#339)
 
 ## [5.0.0] - 2026-03-02
 

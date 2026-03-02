@@ -37,7 +37,7 @@ BED = TEST_DATA / "include.bed"
 BAM = TEST_DATA / "test_map_dsc_anno_filtered.bam"
 BAI = TEST_DATA / "test_map_dsc_anno_filtered.bam.bai"
 REQUIRED_Q = 70
-
+RANDOM_SEED = 123
 
 # Import the script as a module without executing __main__
 SCRIPT_PATH = Path("rule_scripts/ex/processing_metrics") / "ex_variant_call_eligible_disagree_rate.py"
@@ -162,5 +162,5 @@ def test_only_bed_positions_are_eligible(bam, bed_idx):
 # 3) At least one disagreement exists in the BAM within the BED
 # --------------------------------------------------------------------------------------
 def test_at_least_one_disagreement_found(bam, bed_idx):
-    _, disagreements, _ = mod.tally_disagreements(bam, bed_idx, REQUIRED_Q, 10000)
+    _, disagreements, _ = mod.tally_disagreements(bam, bed_idx, REQUIRED_Q, 10000, RANDOM_SEED)
     assert disagreements == 1, f"Expected 1 disagreement, found {disagreements}"
