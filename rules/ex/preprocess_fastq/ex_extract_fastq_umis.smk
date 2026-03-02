@@ -52,5 +52,5 @@ rule ex_extract_fastq_umis:
           -o {output.fastq1} \
           -p {output.fastq2} \
           --compression-level {params.compression_level} \
-          {input.fastq1} {input.fastq2} 2>> {log}
+          {input.fastq1} {input.fastq2} >> {log} 2>&1
         """

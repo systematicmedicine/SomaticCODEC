@@ -56,5 +56,5 @@ rule ex_demultiplex_fastq:
             --ex_samples {params.ex_samples} \
             --compression_level {params.compression_level} \
             --threads {threads} \
-            --log {log} 2>> {log}
+            --log {log} >> {log} 2>&1
         """

@@ -95,12 +95,13 @@ MET_FASTQC_RAW_SUMMARY_R1 = "metrics/{ex_lane}/{ex_lane}_fastqc_raw_metrics_summ
 MET_FASTQC_RAW_SUMMARY_R2 = "metrics/{ex_lane}/{ex_lane}_fastqc_raw_metrics_summary_r2.json"
 
 MET_DEMULIPLEX_FASTQ = "metrics/{ex_lane}/{ex_lane}_demux_metrics.txt"
+
 MET_DEMUX_COUNTS_GINI = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
 
-MET_TRIM_FASTQ_TRIM5P = "metrics/{ex_sample}/{ex_sample}_trim_5prime_metrics.json"
-MET_TRIM_FASTQ_TRIM3PR1 = "metrics/{ex_sample}/{ex_sample}_trim_3prime_metrics_r1.json"
-MET_TRIM_FASTQ_TRIM3PR2 = "metrics/{ex_sample}/{ex_sample}_trim_3prime_metrics_r2.json"
+MET_TRIM_FASTQ = "metrics/{ex_sample}/{ex_sample}_trim_metrics.txt"
+
 MET_TRIM_READ_LENGTHS = "metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json"
+
 MET_BASES_TRIMMED = "metrics/{ex_sample}/{ex_sample}_bases_trimmed.json"
 
 MET_FILTER_FASTQ = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
