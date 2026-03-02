@@ -11,8 +11,13 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [4.0.0] - 2026-02-26
-## [Unrealeased]
+## [Unreleased]
+
+## Added
+
+- Added tests for various rules without tests (#338)
+
+## [5.0.0] - 2026-03-02
 
 ### Added
 
