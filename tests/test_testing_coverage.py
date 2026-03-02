@@ -36,10 +36,18 @@ EXCLUDED_RULES: Set[str] = {
     "ex_fastqc_filter_summary_metrics", # One test multiple rules
     "ex_fastqc_raw_summary_metrics", # One test multiple rules
     "ms_fastqc_summary_metrics", # One test multiple rules
-    "ex_fastqcfilter_metrics",
-    "ex_fastqcraw_metrics",
-    "ms_raw_fastq_metrics",
-    "ms_processed_fastq_metrics"
+    "ex_fastqcfilter_metrics", # Wrapper for external tool
+    "ex_fastqcraw_metrics", # Wrapper for external tool
+    "ms_raw_fastq_metrics", # Wrapper for external tool
+    "ms_processed_fastq_metrics", # Wrapper for external tool
+    "bwamem_index_files", # Wrapper for external tool
+    "ex_alignment_metrics", # Wrapper for external tool
+    "ex_insert_metrics", # Wrapper for external tool
+    "ms_alignment_metrics", # Wrapper for external tool
+    "ms_insert_metrics", # Wrapper for external tool
+    "picard_sequence_dict", # Wrapper for external tool
+    "samtools_index_files", # Wrapper for external tool
+    "tabix_index_files" # Wrapper for external tool
 }
 
 # Tests that do not correspond to a single rule name (e.g. multi-rule tests)
@@ -47,7 +55,7 @@ EXCLUDED_RULES: Set[str] = {
 EXCLUDED_TEST_NAMES: Set[str] = {
     "docker",
     "dryrun",
-    "expected_files_nonempty",
+    "expected_files",
     "metadata_schema",
     "path_constants",
     "regex",
