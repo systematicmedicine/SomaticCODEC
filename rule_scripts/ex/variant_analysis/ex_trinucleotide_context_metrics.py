@@ -356,6 +356,7 @@ def main(args):
     similarity_df_normalised, similarity_dict_normalised = calculate_cosine_similarities(sample_proportions_normalised, profiles, ref_df, CONTEXTS, "norm")
 
     similarity_df = similarity_df_raw.merge(similarity_df_normalised, on="Profile", how="inner")
+    similarity_df.sort_values("cosine_sim_norm", ascending=False, inplace=True)
     similarity_df.to_csv(output_similarities_csv, index=False)
 
     # Generate comparison plots
