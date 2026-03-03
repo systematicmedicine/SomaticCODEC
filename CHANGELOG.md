@@ -21,11 +21,12 @@ Types of changes:
 
 ### Changed
 
-- Set seed for pseudodorandom selection of reads in ex_variant_call_eligible_disagree_rate.py (#339)
+- Set seed for pseudorandom selection of reads in ex_variant_call_eligible_disagree_rate.py (#339)
 - Redirected fastqc progress messages from stdout to rule log files (#340)
 - Metrics report now uses centralised paths (#341)
 - Trinucleotide context cosine similarities CSV is now sorted by normalised values (#)
 - Mask metrics are now calculated for both individual and combined germ risk BEDs (#)
+- pytest_cache and pycache are now removed from all directories before and after running tests (#)
 
 ## [5.0.0] - 2026-03-02
 
