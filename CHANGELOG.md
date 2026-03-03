@@ -17,17 +17,17 @@ Types of changes:
 
 - Added tests for various rules without tests (#338)
 - Added random_seed to config.yaml (#339)
-- Added germline risk variant and germline risk rate metrics (#)
+- Added germline risk variant and germline risk rate metrics (#342)
 
 ### Changed
 
 - Set seed for pseudorandom selection of reads in ex_variant_call_eligible_disagree_rate.py (#339)
 - Redirected fastqc progress messages from stdout to rule log files (#340)
 - Metrics report now uses centralised paths (#341)
-- Trinucleotide context cosine similarities CSV is now sorted by normalised values (#)
-- Mask metrics are now calculated for both individual and combined germ risk BEDs (#)
-- pytest_cache and pycache are now removed from all directories before and after running tests (#)
-- Combined ex_bases_trimmed and ex_trimmed_read_length_metrics into ex_trim_summary_metrics (#)
+- Trinucleotide context cosine similarities CSV is now sorted by normalised values (#342)
+- Mask metrics are now calculated for both individual and combined germ risk BEDs (#342)
+- pytest_cache and pycache are now removed from all directories before and after running tests (#342)
+- Combined ex_bases_trimmed and ex_trimmed_read_length_metrics into ex_trim_summary_metrics (#342)
 
 ## [5.0.0] - 2026-03-02
 
