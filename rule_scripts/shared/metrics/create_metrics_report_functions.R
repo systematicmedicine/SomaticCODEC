@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 #
-# --- metrics_report_functions.R ---
+# --- create_metrics_report_functions.R ---
 #
-# Functions used in metrics_report.R
+# Functions used in create_metrics_report.R
 #
 # Authors: 
 #   - Cameron Fraser
@@ -62,28 +62,60 @@ coerce_types <- function(df, schema) {
 # Find all files that match a pattern
 # ---------------------------------------------------------------------------
 
-find_metric_files <- function(pattern) {
-  
-  # Ensure the pattern only matches files ending in the given suffix
-  full_pattern <- paste0(pattern, "$")
-  
-  # Search metrics directory recursively
-  metrics_files <- list.files(
-    path = "metrics",
-    pattern = full_pattern,
-    recursive = TRUE,
-    full.names = TRUE
+find_metric_files <- function(pattern, ex_lanes, ex_samples, ms_samples) {
+
+  # Prepare JSON payload for Python
+  payload <- jsonlite::toJSON(
+    list(
+      pattern = pattern,
+      ex_lanes = ex_lanes,
+      ex_samples = ex_samples,
+      ms_samples = ms_samples
+    ),
+    auto_unbox = TRUE
   )
-  
-  # Search results directory recursively
-  results_files <- list.files(
-    path = "results",
-    pattern = full_pattern,
-    recursive = TRUE,
-    full.names = TRUE
+
+  # Inline Python resolver (reads JSON from stdin, prints paths)
+  py_code <- "
+import sys, json
+from helpers.resolve_path_constant import expand_pattern_to_paths
+
+data = json.load(sys.stdin)
+
+paths = expand_pattern_to_paths(
+    data['pattern'],
+    data['ex_lanes'],
+    data['ex_samples'],
+    data['ms_samples']
+)
+
+for p in paths:
+    print(p)
+"
+
+  # Run Python and pass JSON via stdin.
+  # Capture stderr too so failures don't silently look like 'no files found'.
+  out <- system2(
+    command = "python",
+    args = c("-c", shQuote(py_code)),
+    input = payload,
+    stdout = TRUE,
+    stderr = TRUE
   )
-  
-  return(c(metrics_files, results_files))
+
+  message(sprintf("[INFO] find_metric_files output: %s", paste(out, collapse = ", ")))
+
+  status <- attr(out, "status")
+  if (!is.null(status) && status != 0) {
+    stop("Python resolver failed:\n", paste(out, collapse = "\n"))
+  }
+
+  # Preserve original return type/behaviour
+  if (length(out) == 1 && identical(out, "")) {
+    return(character(0))
+  }
+
+  return(out)
 }
 
 # ---------------------------------------------------------------------------
@@ -191,7 +223,7 @@ grade_metric_value <- function(value, ideal_lower, ideal_upper, nn_lower, nn_upp
 # Assess a single metric
 # ---------------------------------------------------------------------------
 
-assess_metric <- function(metric) {
+assess_metric <- function(metric, ex_lanes, ex_samples, ms_samples) {
   # Create empty results list
   results_list <- list()
   
@@ -206,8 +238,8 @@ assess_metric <- function(metric) {
   value_pattern <- metric[["value_pattern"]]
  
   # Find all relevant metrics files
-  matching_files <- find_metric_files(file_pattern)
-  message(sprintf("[INFO] Found %d files for pattern: %s", length(matching_files), file_pattern))
+  matching_files <- find_metric_files(file_pattern, ex_lanes, ex_samples, ms_samples)
+  message(sprintf("[INFO] Found %d files for pattern: %s \n", length(matching_files), file_pattern))
   
   for (file_path in matching_files) {
     # Decide which getter to use based on file extension
@@ -273,13 +305,21 @@ plot_metric_heatmap <- function(df, title, suptitle) {
         exclude = NULL
       ),
       Metric_pos = as.numeric(Metric),
-      Sample = as.factor(Sample)  
+      Sample = as.factor(Sample)
     )
 
   ggplot(df, aes(x = Sample, y = Metric, fill = Grade)) +
     geom_tile(color = "white", linewidth = 0.2) +
-    geom_hline(yintercept = seq(1.5, length(levels(df$Metric)) - 0.5, by = 1), color = "grey95", linewidth = 0.3) +
-    geom_vline(xintercept = seq(1.5, length(levels(df$Sample)) - 0.5, by = 1), color = "grey95", linewidth = 0.3) +
+    geom_hline(
+      yintercept = seq_len(length(levels(df$Metric)) - 1) + 0.5,
+      color = "grey95",
+      linewidth = 0.3
+    ) +
+    geom_vline(
+      xintercept = seq_len(length(levels(df$Sample)) - 1) + 0.5,
+      color = "grey95",
+      linewidth = 0.3
+    ) +
     scale_fill_manual(
       values = c(
         "pass_ideal" = "#2ecc71",

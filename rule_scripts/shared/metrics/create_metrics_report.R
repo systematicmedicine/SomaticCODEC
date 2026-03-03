@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 #
-# --- metrics_report.R ---
+# --- create_metrics_report.R ---
 #
 # Collate component level and system level metrics into respective reports
 #   - To be used exclusively with Snakemake parent rule create_metrics_report
@@ -19,7 +19,7 @@
 library(dplyr)
 library(openxlsx)
 library(argparse)
-source("rule_scripts/shared/metrics/metrics_report_functions.R")
+source("rule_scripts/shared/metrics/create_metrics_report_functions.R")
 
 # Snakemake-injected paths
 parser <- ArgumentParser()
@@ -29,17 +29,23 @@ parser$add_argument("--component_csv", required = TRUE)
 parser$add_argument("--component_png", required = TRUE)
 parser$add_argument("--system_csv", required = TRUE)
 parser$add_argument("--system_png", required = TRUE)
+parser$add_argument("--ex_lanes", required = TRUE, nargs="+")
+parser$add_argument("--ex_samples", required = TRUE, nargs="+")
+parser$add_argument("--ms_samples", required = TRUE, nargs="+")
 parser$add_argument("--run_name", required = TRUE)
 parser$add_argument("--log", required = TRUE)
 args <- parser$parse_args()
 
 COMPONENT_METRICS_PATH <- args$component_metrics_metadata
 SYSTEM_METRICS_PATH <- args$system_metrics_metadata
-EXP_NAME <- args$run_name
 COMPONENT_CSV <- args$component_csv
 COMPONENT_PNG <- args$component_png
 SYSTEM_CSV <- args$system_csv
 SYSTEM_PNG <- args$system_png
+EX_LANES <- args$ex_lanes
+EX_SAMPLES <- args$ex_samples
+MS_SAMPLES <- args$ms_samples
+EXP_NAME <- args$run_name
 LOG_PATH <- args$log
 
 
@@ -79,6 +85,8 @@ for (i in seq_along(report_types)) {
   csv_path <- csv_paths[i]
   png_path <- png_paths[i]
 
+  message(sprintf("[INFO] Starting on %s metrics report\n", type))
+
   # Load metrics metadata
   meta <- read.xlsx(metrics_path, sheet = "Metrics") %>%
     coerce_types(METRICS_FILE_SCHEMA)
@@ -87,7 +95,13 @@ for (i in seq_along(report_types)) {
   meta <- filter(meta, include_automated_report == TRUE)
 
   # Assess metrics
-  report_list <- lapply(split(meta, seq_len(nrow(meta))), assess_metric)
+  report_list <- lapply(
+    X = split(meta, seq_len(nrow(meta))),
+    FUN = assess_metric,
+    ex_lanes = EX_LANES,
+    ex_samples = EX_SAMPLES,
+    ms_samples = MS_SAMPLES
+  )
   report_df <- bind_rows(report_list)
 
   # Write CSV report
