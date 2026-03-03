@@ -31,13 +31,16 @@ def test_reads_decrease(lightweight_test_run):
 
 # Test that all reads with MAPQ < min_mapq are removed
 def test_mapq_under_min_mapq_removed(lightweight_test_run):
-    # Locate all post-filtering BAM files
-    post_files = glob.glob("tmp/*/*_map_dsc_anno_filtered.bam")
-    post_counts = {Path(f).name: count_bam_reads_under_min_mapq(f) for f in post_files}
-    total_post_reads = sum(post_counts.values())
+
+    # Load min_mapq from config
     config = load_config(lightweight_test_run["test_config_path"])
     min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"]
 
+    # Locate all post-filtering BAM files
+    post_files = glob.glob("tmp/*/*_map_dsc_anno_filtered.bam")
+    post_counts = {Path(f).name: count_bam_reads_under_min_mapq(f, min_mapq) for f in post_files}
+    total_post_reads = sum(post_counts.values())
+    
     # # Assert no reads with MAPQ < min_mapq after filtering
     assert total_post_reads == 0, (
         f"{total_post_reads} reads with MAPQ < min_mapq ({min_mapq}) present after filtering"
