@@ -117,6 +117,9 @@ MET_COVERAGE_BY_DEPTH = "metrics/{ms_sample}/{ms_sample}_coverage_by_depth.json"
 
 # Masked regions
 
+MET_GERM_RISK_VARIANTS = "metrics/{ms_sample}/{ms_sample}_germ_risk_variant_metrics.txt"
+MET_GERMLINE_RISK_RATE = "metrics/{ms_sample}/{ms_sample}_germline_risk_rate.json"
+
 MET_MASKING_INT1 = "tmp/{ms_sample}/{ms_sample}_germ_risk_all_samples.txt"
 MET_MASKING_INT2 = "tmp/{ms_sample}/{ms_sample}_masks_sorted.txt"
 MET_MASKING_INT3 = "tmp/{ms_sample}/{ms_sample}_masks_merged.txt"

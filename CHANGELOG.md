@@ -17,6 +17,7 @@ Types of changes:
 
 - Added tests for various rules without tests (#338)
 - Added random_seed to config.yaml (#339)
+- Added germline risk variant and germline risk rate metrics (#)
 
 ### Changed
 
@@ -24,6 +25,7 @@ Types of changes:
 - Redirected fastqc progress messages from stdout to rule log files (#340)
 - Metrics report now uses centralised paths (#341)
 - Trinucleotide context cosine similarities CSV is now sorted by normalised values (#)
+- Mask metrics are now calculated for both individual and combined germ risk BEDs (#)
 
 ## [5.0.0] - 2026-03-02
 
