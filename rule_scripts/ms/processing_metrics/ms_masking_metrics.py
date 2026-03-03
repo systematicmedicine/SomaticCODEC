@@ -50,7 +50,8 @@ def main(args):
     # Add other masks
     mask_files.update({
         "lowdepth": args.ms_lowdepth_bed,
-        "ms_germ_risk": args.ms_germ_risk_bed,
+        "ms_germ_risk_individual": args.ms_germ_risk_bed,
+        "ms_germ_risk_all_samples": args.ms_germ_risk_all_samples,
         "combined_mask": args.combined_bed,
     })
 
@@ -88,6 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("--precomputed_masks", required=True, nargs = "+")
     parser.add_argument("--ms_lowdepth_bed", required=True)
     parser.add_argument("--ms_germ_risk_bed", required=True)
+    parser.add_argument("--ms_germ_risk_all_samples", required=True)
     parser.add_argument("--combined_bed", required=True)
     parser.add_argument("--ref_index", required=True)
     parser.add_argument("--mask_metrics", required=True)
