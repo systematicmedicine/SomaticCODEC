@@ -60,6 +60,8 @@ ms_processing_metrics = [
     expand(MS.MET_INSERT_SIZE_PDF, ms_sample = ms_sample_ids),
     expand(MS.MET_DEPTH_HIST, ms_sample = ms_sample_ids),
     expand(MS.MET_COVERAGE_BY_DEPTH, ms_sample = ms_sample_ids),
+    expand(MS.MET_GERM_RISK_VARIANTS, ms_sample = ms_sample_ids),
+    expand(MS.MET_GERMLINE_RISK_RATE, ms_sample = ms_sample_ids),
     expand(MS.MET_MASKING, ms_sample = ms_sample_ids)
 ]
 
@@ -76,8 +78,7 @@ ex_processing_metrics = [
     expand(EX.MET_DEMULIPLEX_FASTQ, ex_lane = ex_lane_ids),
     expand(EX.MET_DEMUX_COUNTS_GINI, ex_lane = ex_lane_ids),
     expand(EX.MET_TRIM_FASTQ, ex_sample = ex_sample_ids),
-    expand(EX.MET_TRIM_READ_LENGTHS, ex_sample = ex_sample_ids),
-    expand(EX.MET_BASES_TRIMMED, ex_sample = ex_sample_ids),
+    expand(EX.MET_TRIM_SUMMARY, ex_sample = ex_sample_ids),
     expand(EX.MET_FILTER_FASTQ, ex_sample = ex_sample_ids),
     expand(EX.MET_FASTQC_FILTER_HTML_R1, ex_sample = ex_sample_ids),
     expand(EX.MET_FASTQC_FILTER_HTML_R2, ex_sample = ex_sample_ids),

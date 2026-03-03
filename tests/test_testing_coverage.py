@@ -47,7 +47,8 @@ EXCLUDED_RULES: Set[str] = {
     "ms_insert_metrics", # Wrapper for external tool
     "picard_sequence_dict", # Wrapper for external tool
     "samtools_index_files", # Wrapper for external tool
-    "tabix_index_files" # Wrapper for external tool
+    "tabix_index_files", # Wrapper for external tool
+    "ms_germ_risk_variant_metrics" # Wrapper for external tool
 }
 
 # Tests that do not correspond to a single rule name (e.g. multi-rule tests)
