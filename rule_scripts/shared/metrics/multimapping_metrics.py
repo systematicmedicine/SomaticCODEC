@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
---- multimapping_read_metrics.py ---
+--- multimapping_metrics.py ---
 
 Generates a summary file with the percentage of reads that mapped to multiple positions
 
@@ -20,7 +20,7 @@ def main(args):
     # Initiate logging
     sys.stdout = open(args.log, "a")
     sys.stderr = open(args.log, "a")
-    print("[INFO] Starting multimapping_read_metrics.py")
+    print("[INFO] Starting multimapping_metrics.py")
 
     # Define inputs
     bam_path = args.bam
@@ -28,7 +28,7 @@ def main(args):
     # Define outputs
     output_json_path = args.json
 
-    # Count number of reads that align equally well to more than one position (from NH tag)
+    # Count number of reads that align to more than one position (from NH tag)
     bam = pysam.AlignmentFile(bam_path, "rb")
 
     total_reads = 0
@@ -54,11 +54,11 @@ def main(args):
             "value": total_reads
         },
         "multimapping_reads": {
-            "description": "Number of reads that aligned equally well to more than one position",
+            "description": "Number of reads that aligned to more than one position",
             "value": multimapping_reads
         },
         "multimapping_pct": {
-            "description": "Percentage of total reads that aligned equally well to more than one position",
+            "description": "Percentage of total reads that aligned to more than one position",
             "value": multimapping_pct
         }
     }
@@ -66,7 +66,7 @@ def main(args):
     with open(output_json_path, 'w') as f:
             json.dump(result, f, indent=4)
 
-    print("[INFO] Completed multimapping_read_metrics.py")
+    print("[INFO] Completed multimapping_metrics.py")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

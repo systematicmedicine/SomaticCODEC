@@ -48,7 +48,10 @@ EXCLUDED_RULES: Set[str] = {
     "picard_sequence_dict", # Wrapper for external tool
     "samtools_index_files", # Wrapper for external tool
     "tabix_index_files", # Wrapper for external tool
-    "ms_germ_risk_variant_metrics" # Wrapper for external tool
+    "ms_germ_risk_variant_metrics", # Wrapper for external tool
+    "ms_multimapping_metrics", # One test multiple rules
+    "ex_multimapping_metrics_raw", # One test multiple rules
+    "ex_multimapping_metrics_dsc" # One test multiple rules
 }
 
 # Tests that do not correspond to a single rule name (e.g. multi-rule tests)
@@ -61,7 +64,8 @@ EXCLUDED_TEST_NAMES: Set[str] = {
     "path_constants",
     "regex",
     "script_syntax",
-    "fastqc_summary_metrics" # One test multiple rules
+    "fastqc_summary_metrics", # One test multiple rules
+    "multimapping_metrics"
 }
 
 RULE_DECL_RE = re.compile(r"(?m)^\s*rule\s+([A-Za-z_][A-Za-z0-9_]*)\s*:")

@@ -56,6 +56,7 @@ ms_processing_metrics = [
     expand(MS.MET_DUPLICATION_1, ms_sample = ms_sample_ids),
     expand(MS.MET_DUPLICATION_2, ms_sample = ms_sample_ids),
     expand(MS.MET_ALIGNMENT, ms_sample = ms_sample_ids),
+    expand(MS.MET_MULTIMAPPING, ms_sample = ms_sample_ids),
     expand(MS.MET_INSERT_SIZE_TXT, ms_sample = ms_sample_ids),
     expand(MS.MET_INSERT_SIZE_PDF, ms_sample = ms_sample_ids),
     expand(MS.MET_DEPTH_HIST, ms_sample = ms_sample_ids),
@@ -87,6 +88,7 @@ ex_processing_metrics = [
     expand(EX.MET_FASTQC_FILTER_SUMMARY_R1, ex_sample = ex_sample_ids),
     expand(EX.MET_FASTQC_FILTER_SUMMARY_R2, ex_sample = ex_sample_ids),
     expand(EX.MET_ALIGNMENT, ex_sample = ex_sample_ids),
+    expand(EX.MET_MULTIMAPPING_RAW, ex_sample = ex_sample_ids),
     expand(EX.MET_INSERT_SIZE_TXT, ex_sample = ex_sample_ids),
     expand(EX.MET_INSERT_SIZE_PDF, ex_sample = ex_sample_ids),
     expand(EX.MET_GROUP_BY_UMI, ex_sample = ex_sample_ids),
@@ -94,6 +96,7 @@ ex_processing_metrics = [
     expand(EX.MET_CALL_DSC, ex_sample = ex_sample_ids),
     expand(EX.MET_CALL_DSC_READ_LOSS, ex_sample = ex_sample_ids),
     expand(EX.MET_DSC_REMAP, ex_sample = ex_sample_ids),
+    expand(EX.MET_MULTIMAPPING_DSC, ex_sample = ex_sample_ids),
     expand(EX.MET_DUPLEX_OVERLAP, ex_sample = ex_sample_ids),
     expand(EX.MET_DSC_DEPTH, ex_sample = ex_sample_ids),
     expand(EX.MET_DSC_COVERAGE_JSON, ex_sample = ex_sample_ids),
@@ -102,7 +105,6 @@ ex_processing_metrics = [
     expand(EX.MET_SOFTCLIPPING, ex_sample = ex_sample_ids),
     expand(EX.MET_TOTAL_READ_LOSS, ex_sample = ex_sample_ids),
     expand(EX.MET_VAR_CALL_DISAGREE, ex_sample = ex_sample_ids)
-
 ]
 
 # ---------------------------------------------------------------------------------------------

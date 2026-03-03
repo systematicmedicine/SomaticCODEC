@@ -116,6 +116,9 @@ MET_FASTQC_FILTER_SUMMARY_R2 = "metrics/{ex_sample}/{ex_sample}_fastqc_filter_me
 # Alignment
 
 MET_ALIGNMENT = "metrics/{ex_sample}/{ex_sample}_alignment_metrics.txt"
+
+MET_MULTIMAPPING_RAW = "metrics/{ex_sample}/{ex_sample}_multimapping_raw_metrics.json"
+
 MET_INSERT_SIZE_TXT = "metrics/{ex_sample}/{ex_sample}_insert_metrics.txt"
 MET_INSERT_SIZE_PDF = "metrics/{ex_sample}/{ex_sample}_insert_metrics.pdf"
 
@@ -130,6 +133,8 @@ MET_CALL_DSC = "metrics/{ex_sample}/{ex_sample}_call_dsc_metrics.txt"
 MET_CALL_DSC_READ_LOSS = "metrics/{ex_sample}/{ex_sample}_call_dsc_read_loss.json"
 
 MET_DSC_REMAP = "metrics/{ex_sample}/{ex_sample}_dsc_remap_metrics.json"
+
+MET_MULTIMAPPING_DSC = "metrics/{ex_sample}/{ex_sample}_multimapping_dsc_metrics.json"
 
 MET_DUPLEX_OVERLAP = "metrics/{ex_sample}/{ex_sample}_duplex_overlap_metrics.json"
 

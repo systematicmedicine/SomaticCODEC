@@ -1,7 +1,7 @@
 """
---- test_multimapping_read_metrics.py
+--- test_multimapping_metrics.py
 
-Tests the script multimapping_read_metrics.py
+Tests the script multimapping_metrics.py
 
 Authors:
     - Chat-GPT
@@ -10,14 +10,14 @@ Authors:
 
 import json
 import types
-from rule_scripts.shared.metrics.multimapping_read_metrics import main
+from rule_scripts.shared.metrics.multimapping_metrics import main
 
 def test_multimapping_reads_calculation(tmp_path):
 
     # Define inputs and outputs
-    input_bam_path = "tests/data/test_multimapping_read_metrics/input.bam"
-    output_json_path = tmp_path / "multimapping_read_metrics.json"
-    log_file = tmp_path / "multimapping_read_metrics.log"
+    input_bam_path = "tests/data/test_multimapping_metrics/input.bam"
+    output_json_path = tmp_path / "multimapping_metrics.json"
+    log_file = tmp_path / "multimapping_metrics.log"
 
     # Define expected values
     expected_values = {
