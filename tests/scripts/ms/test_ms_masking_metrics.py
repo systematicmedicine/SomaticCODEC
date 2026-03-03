@@ -19,6 +19,7 @@ from rule_scripts.ms.processing_metrics.ms_masking_metrics import main
                              "tests/data/test_ms_masking_metrics/giab.bed"],
             "ms_lowdepth_bed": "tests/data/test_ms_masking_metrics/lowdepth.bed",
             "ms_germ_risk_bed": "tests/data/test_ms_masking_metrics/ms_germ_risk.bed",
+            "ms_germ_risk_all_samples_bed": "tests/data/test_ms_masking_metrics/ms_germ_risk_all_samples.bed",
             "combined_bed": "tests/data/test_ms_masking_metrics/combined.bed",
             "ref_index": "tests/data/test_ms_masking_metrics/reference.fai",
         },
@@ -26,7 +27,8 @@ from rule_scripts.ms.processing_metrics.ms_masking_metrics import main
             "gnomad": 2.5,
             "giab": 5.0,
             "lowdepth": 0.25,
-            "ms_germ_risk": 0.02,
+            "ms_germ_risk_individual": 0.02,
+            "ms_germ_risk_all_samples": 0.07,
             "combined_mask": 100
         }
     )
@@ -41,6 +43,7 @@ def test_masking_metrics(tmp_path, input_files, expected_percentages):
         precomputed_masks = input_files["precomputed_masks"],
         ms_lowdepth_bed = input_files["ms_lowdepth_bed"],
         ms_germ_risk_bed = input_files["ms_germ_risk_bed"],
+        ms_germ_risk_all_samples = input_files["ms_germ_risk_all_samples_bed"],
         combined_bed = input_files["combined_bed"],
         ref_index = input_files["ref_index"],
         mask_metrics = str(output_json),
