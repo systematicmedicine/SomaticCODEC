@@ -29,17 +29,23 @@ parser$add_argument("--component_csv", required = TRUE)
 parser$add_argument("--component_png", required = TRUE)
 parser$add_argument("--system_csv", required = TRUE)
 parser$add_argument("--system_png", required = TRUE)
+parser$add_argument("--ex_lanes", required = TRUE, nargs="+")
+parser$add_argument("--ex_samples", required = TRUE, nargs="+")
+parser$add_argument("--ms_samples", required = TRUE, nargs="+")
 parser$add_argument("--run_name", required = TRUE)
 parser$add_argument("--log", required = TRUE)
 args <- parser$parse_args()
 
 COMPONENT_METRICS_PATH <- args$component_metrics_metadata
 SYSTEM_METRICS_PATH <- args$system_metrics_metadata
-EXP_NAME <- args$run_name
 COMPONENT_CSV <- args$component_csv
 COMPONENT_PNG <- args$component_png
 SYSTEM_CSV <- args$system_csv
 SYSTEM_PNG <- args$system_png
+EX_LANES <- args$ex_lanes
+EX_SAMPLES <- args$ex_samples
+MS_SAMPLES <- args$ms_samples
+EXP_NAME <- args$run_name
 LOG_PATH <- args$log
 
 
@@ -87,11 +93,27 @@ for (i in seq_along(report_types)) {
   meta <- filter(meta, include_automated_report == TRUE)
 
   # Assess metrics
-  report_list <- lapply(split(meta, seq_len(nrow(meta))), assess_metric)
+  report_list <- lapply(
+    X = split(meta, seq_len(nrow(meta))),
+    FUN = assess_metric,
+    ex_lanes = EX_LANES,
+    ex_samples = EX_SAMPLES,
+    ms_samples = MS_SAMPLES
+  )
   report_df <- bind_rows(report_list)
+  message(sprintf("[INFO] report_df nrow %s", nrow(report_df)))
+  message(sprintf("[INFO] report_df cols %s", paste(colnames(report_df), collapse = ", ")))
+  message(sprintf("[INFO] report_df row 1: %s", paste(as.character(report_df[1, ]), collapse = ", ")))
+
+  message(sprintf("[DEBUG] getwd(): %s", getwd()))
+  message(sprintf("[DEBUG] csv_path: %s", csv_path))
+  message(sprintf("[DEBUG] dirname exists? %s", dir.exists(dirname(csv_path))))
 
   # Write CSV report
   write.csv(report_df, csv_path, row.names = FALSE, quote = FALSE)
+
+  message(sprintf("[DEBUG] file.exists after write? %s", file.exists(csv_path)))
+  message(sprintf("[DEBUG] list.files in dir: %s", paste(list.files(dirname(csv_path)), collapse = ", ")))
 
   # Create and save heatmap
   heatmap <- plot_metric_heatmap(report_df, paste0(type, "-level metrics report"), EXP_NAME)
