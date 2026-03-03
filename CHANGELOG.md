@@ -18,7 +18,7 @@ Types of changes:
 - Added tests for various rules without tests (#338)
 - Added random_seed to config.yaml (#339)
 - Added germline risk variant and germline risk rate metrics (#342)
-- Added multimapping read metrics (#)
+- Added metrics files and component metrics for multimapping reads (#)
 
 ### Changed
 
