@@ -43,7 +43,7 @@ rule ms_raw_fastq_metrics:
         --memory $MEMORY_PER_FILE \
         -t {threads} \
         -o metrics/{wildcards.ms_sample} \
-        {input.r1} {input.r2} 2>> {log}
+        {input.r1} {input.r2} &>> {log}
 
         # Rename output files
         mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}

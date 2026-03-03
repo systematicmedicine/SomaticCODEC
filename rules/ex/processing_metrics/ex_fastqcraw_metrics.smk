@@ -39,7 +39,7 @@ rule ex_fastqcraw_metrics:
         --memory $MEMORY_PER_FILE \
         -t {threads} \
          -o metrics/ \
-        {input.fastq1} {input.fastq2} 2>> {log}
+        {input.fastq1} {input.fastq2} &>> {log}
 
         # Rename outputs
         mv metrics/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1} 2>> {log}
