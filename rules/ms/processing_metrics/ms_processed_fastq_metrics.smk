@@ -33,7 +33,7 @@ rule ms_processed_fastq_metrics:
         --memory $MEMORY_PER_FILE \
         -t {threads} \
         -o metrics/{wildcards.ms_sample} \
-        {input.r1} {input.r2} 2>> {log}
+        {input.r1} {input.r2} &>> {log}
 
         # Extract txt file from zip output
         unzip -p {output.r1_zip} */fastqc_data.txt > {output.r1_txt} 2>> {log}
