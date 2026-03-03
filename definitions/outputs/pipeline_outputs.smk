@@ -60,6 +60,8 @@ ms_processing_metrics = [
     expand(MS.MET_INSERT_SIZE_PDF, ms_sample = ms_sample_ids),
     expand(MS.MET_DEPTH_HIST, ms_sample = ms_sample_ids),
     expand(MS.MET_COVERAGE_BY_DEPTH, ms_sample = ms_sample_ids),
+    expand(MS.MET_GERM_RISK_VARIANTS, ms_sample = ms_sample_ids),
+    expand(MS.MET_GERMLINE_RISK_RATE, ms_sample = ms_sample_ids),
     expand(MS.MET_MASKING, ms_sample = ms_sample_ids)
 ]
 
