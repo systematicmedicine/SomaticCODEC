@@ -29,6 +29,7 @@ Types of changes:
 - Mask metrics are now calculated for both individual and combined germ risk BEDs (#342)
 - pytest_cache and pycache are now removed from all directories before and after running tests (#342)
 - Combined ex_bases_trimmed and ex_trimmed_read_length_metrics into ex_trim_summary_metrics (#342)
+- Removed hardcoded config paths from helper functions (#344)
 
 ## [5.0.0] - 2026-03-02
 
@@ -59,7 +60,7 @@ Types of changes:
 
 ### Changed
 
-- Removed hard coded cofig overrides from conftest.py (#308)
+- Removed hard coded config overrides from conftest.py (#308)
 - Change to packaged outputs directory structure (#306)
 - Refactored test_script directory (#309)
 - Project root and package discovery now handled by conftest instead of individual test scripts (#309)
