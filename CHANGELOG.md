@@ -22,6 +22,7 @@ Types of changes:
 
 - Set seed for pseudodorandom selection of reads in ex_variant_call_eligible_disagree_rate.py (#339)
 - Redirected fastqc progress messages from stdout to rule log files (#340)
+- Metrics report now uses centralised paths (#341)
 
 ## [5.0.0] - 2026-03-02
 
