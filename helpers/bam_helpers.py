@@ -28,11 +28,9 @@ def count_bam_data_points(path):
         raise RuntimeError(f"samtools failed on {path} with error:\n{e.stderr}")
     
 # Counts the number of bases with quality designated to single-stranded bases in a BAM file
-def count_bam_ss_qual_bases(path):
+def count_bam_ss_qual_bases(path, ss_qual):
     path = str(path)
     count = 0
-    config = load_config("config/config.yaml")
-    ss_qual = config["sci_params"]["ex_call_dsc"]["single_strand_qual"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
                 quals = read.query_qualities
@@ -41,11 +39,9 @@ def count_bam_ss_qual_bases(path):
     return count
 
 # Count the number of reads with MPAQ under the threshold set in config
-def count_bam_reads_under_min_mapq(path):
+def count_bam_reads_under_min_mapq(path, min_mapq):
     path = str(path)
     count = 0
-    config = load_config("config/config.yaml")
-    min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"]
     with pysam.AlignmentFile(path, "rb", check_sq=False) as bam:
         for read in bam.fetch(until_eof=True):
             if not read.is_unmapped and read.mapping_quality < min_mapq:
