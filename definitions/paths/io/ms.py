@@ -106,6 +106,8 @@ MET_DUPLICATION_2 = "metrics/{ms_sample}/{ms_sample}_duplication_metrics_ms.json
 
 MET_ALIGNMENT = "metrics/{ms_sample}/{ms_sample}_alignment_stats.txt"
 
+MET_MULTIMAPPING = "metrics/{ms_sample}/{ms_sample}_multimapping_metrics.json"
+
 MET_INSERT_SIZE_TXT = "metrics/{ms_sample}/{ms_sample}_insert_size_metrics.txt"
 MET_INSERT_SIZE_PDF = "metrics/{ms_sample}/{ms_sample}_insert_size_histogram.pdf"
 
