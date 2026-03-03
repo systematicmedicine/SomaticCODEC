@@ -141,4 +141,4 @@ def lightweight_test_run():
     Path(test_config_file.name).unlink(missing_ok=True)
 
     # Cleanup test environment
-    #clean_workspace()
+    clean_workspace()

@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 #
-# --- metrics_report_functions.R ---
+# --- create_metrics_report_functions.R ---
 #
-# Functions used in metrics_report.R
+# Functions used in create_metrics_report.R
 #
 # Authors: 
 #   - Cameron Fraser
@@ -239,7 +239,7 @@ assess_metric <- function(metric, ex_lanes, ex_samples, ms_samples) {
  
   # Find all relevant metrics files
   matching_files <- find_metric_files(file_pattern, ex_lanes, ex_samples, ms_samples)
-  message(sprintf("[INFO] Found %d files for pattern: %s", length(matching_files), file_pattern))
+  message(sprintf("[INFO] Found %d files for pattern: %s \n", length(matching_files), file_pattern))
   
   for (file_path in matching_files) {
     # Decide which getter to use based on file extension

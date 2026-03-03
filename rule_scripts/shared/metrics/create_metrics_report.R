@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 #
-# --- metrics_report.R ---
+# --- create_metrics_report.R ---
 #
 # Collate component level and system level metrics into respective reports
 #   - To be used exclusively with Snakemake parent rule create_metrics_report
@@ -19,7 +19,7 @@
 library(dplyr)
 library(openxlsx)
 library(argparse)
-source("rule_scripts/shared/metrics/metrics_report_functions.R")
+source("rule_scripts/shared/metrics/create_metrics_report_functions.R")
 
 # Snakemake-injected paths
 parser <- ArgumentParser()
@@ -85,6 +85,8 @@ for (i in seq_along(report_types)) {
   csv_path <- csv_paths[i]
   png_path <- png_paths[i]
 
+  message(sprintf("[INFO] Starting on %s metrics report\n", type))
+
   # Load metrics metadata
   meta <- read.xlsx(metrics_path, sheet = "Metrics") %>%
     coerce_types(METRICS_FILE_SCHEMA)
@@ -101,19 +103,9 @@ for (i in seq_along(report_types)) {
     ms_samples = MS_SAMPLES
   )
   report_df <- bind_rows(report_list)
-  message(sprintf("[INFO] report_df nrow %s", nrow(report_df)))
-  message(sprintf("[INFO] report_df cols %s", paste(colnames(report_df), collapse = ", ")))
-  message(sprintf("[INFO] report_df row 1: %s", paste(as.character(report_df[1, ]), collapse = ", ")))
-
-  message(sprintf("[DEBUG] getwd(): %s", getwd()))
-  message(sprintf("[DEBUG] csv_path: %s", csv_path))
-  message(sprintf("[DEBUG] dirname exists? %s", dir.exists(dirname(csv_path))))
 
   # Write CSV report
   write.csv(report_df, csv_path, row.names = FALSE, quote = FALSE)
-
-  message(sprintf("[DEBUG] file.exists after write? %s", file.exists(csv_path)))
-  message(sprintf("[DEBUG] list.files in dir: %s", paste(list.files(dirname(csv_path)), collapse = ", ")))
 
   # Create and save heatmap
   heatmap <- plot_metric_heatmap(report_df, paste0(type, "-level metrics report"), EXP_NAME)
