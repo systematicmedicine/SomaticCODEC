@@ -48,7 +48,7 @@ rule create_metrics_report:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Create metrics report
-        metrics_report.R \
+        create_metrics_report.R \
             --component_metrics_metadata {input.component_metrics_metadata} \
             --system_metrics_metadata {input.system_metrics_metadata} \
             --component_csv {output.component_csv} \

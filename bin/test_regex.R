@@ -20,7 +20,7 @@ file_path <- args[[1]]
 pattern <- args[[2]]
 
 # Source the pipeline function
-source("rule_scripts/shared/metrics/metrics_report_functions.R")
+source("rule_scripts/shared/metrics/create_metrics_report_functions.R")
 
 # Run and print result
 result <- get_metric_txt(file_path, pattern)
