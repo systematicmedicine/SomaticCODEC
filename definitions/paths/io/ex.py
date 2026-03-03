@@ -100,9 +100,7 @@ MET_DEMUX_COUNTS_GINI = "metrics/{ex_lane}/{ex_lane}_demux_counts_and_gini.json"
 
 MET_TRIM_FASTQ = "metrics/{ex_sample}/{ex_sample}_trim_metrics.txt"
 
-MET_TRIM_READ_LENGTHS = "metrics/{ex_sample}/{ex_sample}_trimmed_read_length_metrics.json"
-
-MET_BASES_TRIMMED = "metrics/{ex_sample}/{ex_sample}_bases_trimmed.json"
+MET_TRIM_SUMMARY = "metrics/{ex_sample}/{ex_sample}_trim_summary_metrics.json"
 
 MET_FILTER_FASTQ = "metrics/{ex_sample}/{ex_sample}_filter_metrics_ex.txt"
 
