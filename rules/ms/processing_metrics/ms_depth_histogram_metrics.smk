@@ -9,10 +9,10 @@ rule ms_depth_histogram_metrics:
         bam = MS.DEDUPED_BAM,
         bai = MS.DEDUPED_BAM_INDEX
     output:
-        depth_histogram = MS.MET_DEPTH_HIST,
-        intermediate_depth_per_base = temp(MS.MET_DEPTH_HIST_INT1),
-        intermediate_depth_values = temp(MS.MET_DEPTH_HIST_INT2),
-        intermediate_depth_values_sorted = temp(MS.MET_DEPTH_HIST_INT3)
+        depth_histogram = MS.MET_DEPTH,
+        intermediate_depth_per_base = temp(MS.MET_DEPTH_INT1),
+        intermediate_depth_values = temp(MS.MET_DEPTH_INT2),
+        intermediate_depth_values_sorted = temp(MS.MET_DEPTH_INT3)
     params:
         min_base_qual = config["sci_params"]["ms_pileup"]["min_base_qual"],
         min_map_qual = config["sci_params"]["ms_pileup"]["min_map_qual"],

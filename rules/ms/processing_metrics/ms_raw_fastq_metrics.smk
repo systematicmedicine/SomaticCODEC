@@ -35,21 +35,24 @@ rule ms_raw_fastq_metrics:
         MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
 
         # Get basename for input files
-        r1_base=$(basename {input.r1} .fastq.gz)
-        r2_base=$(basename {input.r2} .fastq.gz)
+        r1_base=$(basename {input.r1} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+        r2_base=$(basename {input.r2} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+
+        # Get output directory
+        output_dir=$(dirname {output.r1_report})
         
         # Run fastqc
         fastqc \
         --memory $MEMORY_PER_FILE \
         -t {threads} \
-        -o metrics/{wildcards.ms_sample} \
+        -o ${{output_dir}} \
         {input.r1} {input.r2} &>> {log}
 
-        # Rename output files
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report} 2>> {log}
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.zip {output.r1_zip} 2>> {log}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.zip {output.r2_zip} 2>> {log}
+        # Rename and move output files
+        mv ${{output_dir}}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.html {output.r2_report} 2>> {log}
+        mv ${{output_dir}}/${{r1_base}}_fastqc.zip {output.r1_zip} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.zip {output.r2_zip} 2>> {log}
 
         # Extract txt file from zip output
         unzip -p {output.r1_zip} */fastqc_data.txt > {output.r1_txt} 2>> {log}

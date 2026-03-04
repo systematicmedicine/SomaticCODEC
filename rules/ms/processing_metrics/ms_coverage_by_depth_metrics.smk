@@ -6,9 +6,9 @@ from definitions.paths.io import ms as MS
 
 rule ms_coverage_by_depth_metrics:
     input:
-        depth_histogram = MS.MET_DEPTH_HIST
+        depth_histogram = MS.MET_DEPTH
     output:
-        coverage_by_depth = MS.MET_COVERAGE_BY_DEPTH
+        coverage_by_depth = MS.MET_COVERAGE
     params:
         sample = "{ms_sample}",
         min_depth = config["sci_params"]["ms_pileup"]["min_depth"]
