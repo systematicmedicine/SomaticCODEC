@@ -19,6 +19,7 @@ Types of changes:
 - Added random_seed to config.yaml (#339)
 - Added germline risk variant and germline risk rate metrics (#342)
 - Added metrics files and component metrics for multimapping reads (#343)
+- Added component metric for germline risk rate (#347)
 
 ### Changed
 
@@ -40,8 +41,8 @@ Types of changes:
 
 ### Changed
 
-- Test scripts now used centralised paths (#323)
 - Germline risk positions identified in any sample are now masked across all samples (#327)
+- Test scripts now used centralised paths (#323)
 - Changed file paths for ex pipeline to improve readability (#330)
 - Expected files test no longer depends on manually collated lists (#332)
 - Consolidated trimming metrics into one file for ex and one for ms (#337)
