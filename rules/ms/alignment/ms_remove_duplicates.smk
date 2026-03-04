@@ -12,7 +12,7 @@ rule ms_remove_duplicates:
         intermediate_unsorted = temp(MS.REMOVE_DUPLICATES_INT),
         bam = temp(MS.DEDUPED_BAM),
         bai = temp(MS.DEDUPED_BAM_INDEX),
-        dedup_metrics = MS.MET_DUPLICATION_1
+        dedup_metrics = MS.MET_DEDUP_REPORT
     params:
         duplicate_decision_method = config["sci_params"]["ms_remove_duplicates"]["duplicate_decision_method"],
         optical_duplicate_distance = config["sci_params"]["ms_remove_duplicates"]["optical_duplicate_distance"],

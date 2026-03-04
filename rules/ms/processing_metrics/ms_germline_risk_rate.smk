@@ -9,7 +9,7 @@ rule ms_germline_risk_rate:
         depth_pileup = MS.PILEUP_DEPTH,
         depth_alt_pileup = MS.GERMLINE_RISK_INT1,
     output:
-        json = MS.MET_GERMLINE_RISK_RATE
+        json = MS.MET_GERM_RISK_RATE
     log:
         "logs/{ms_sample}/ms_germline_risk_rate.log"
     benchmark:
