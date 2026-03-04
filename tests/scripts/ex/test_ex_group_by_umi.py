@@ -8,17 +8,29 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-import glob
 import pysam
 from collections import Counter
 from helpers.bam_helpers import count_bam_data_points
+from helpers.get_metadata import load_config, get_ex_sample_ids
+import definitions.paths.io.ex as EX
 
 def test_group_by_umi(lightweight_test_run):
+
+    # Load ex_sample IDs
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
+
     # Locate all pre-UMI grouping BAM files
-    pre_files = glob.glob("tmp/*/*_map_anno.bam")
-    
+    pre_files = []
+    for ex_sample in ex_samples:
+        resolved_path = EX.MATE_INFO_BAM.format(ex_sample=ex_sample)
+        pre_files.append(resolved_path)
+
     # Locate all post-UMI grouping BAM files
-    post_files = glob.glob("tmp/*/*_map_umi_grouped.bam")
+    post_files = []
+    for ex_sample in ex_samples:
+        resolved_path = EX.UMI_GROUPED_BAM.format(ex_sample=ex_sample)
+        post_files.append(resolved_path)
 
     # Get number of reads in pre- and post-UMI grouping files
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}

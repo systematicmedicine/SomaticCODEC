@@ -30,7 +30,7 @@ rule ms_raw_fastq_metrics:
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
-        """
+        r"""
         # Set memory limit
         MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
 
