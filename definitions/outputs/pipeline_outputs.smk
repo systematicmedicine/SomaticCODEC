@@ -53,16 +53,16 @@ ms_processing_metrics = [
     expand(MS.MET_FASTQC_FILTER_TXT_R2, ms_sample = ms_sample_ids),
     expand(MS.MET_FASTQC_FILTER_SUMMARY_R1, ms_sample = ms_sample_ids),
     expand(MS.MET_FASTQC_FILTER_SUMMARY_R2, ms_sample = ms_sample_ids),
-    expand(MS.MET_DUPLICATION_1, ms_sample = ms_sample_ids),
-    expand(MS.MET_DUPLICATION_2, ms_sample = ms_sample_ids),
+    expand(MS.MET_DEDUP_REPORT, ms_sample = ms_sample_ids),
+    expand(MS.MET_DUPLICATION, ms_sample = ms_sample_ids),
     expand(MS.MET_ALIGNMENT, ms_sample = ms_sample_ids),
     expand(MS.MET_MULTIMAPPING, ms_sample = ms_sample_ids),
     expand(MS.MET_INSERT_SIZE_TXT, ms_sample = ms_sample_ids),
     expand(MS.MET_INSERT_SIZE_PDF, ms_sample = ms_sample_ids),
-    expand(MS.MET_DEPTH_HIST, ms_sample = ms_sample_ids),
-    expand(MS.MET_COVERAGE_BY_DEPTH, ms_sample = ms_sample_ids),
+    expand(MS.MET_DEPTH, ms_sample = ms_sample_ids),
+    expand(MS.MET_COVERAGE, ms_sample = ms_sample_ids),
     expand(MS.MET_GERM_RISK_VARIANTS, ms_sample = ms_sample_ids),
-    expand(MS.MET_GERMLINE_RISK_RATE, ms_sample = ms_sample_ids),
+    expand(MS.MET_GERM_RISK_RATE, ms_sample = ms_sample_ids),
     expand(MS.MET_MASKING, ms_sample = ms_sample_ids)
 ]
 

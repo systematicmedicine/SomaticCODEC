@@ -8,22 +8,27 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-import glob
 from helpers.bam_helpers import count_bam_data_points
+from definitions.paths.io import ms as MS
+from helpers.get_metadata import load_config, get_ms_sample_ids
 
 # Test that adding mate information does not change read count
 def test_read_counts_preserved(lightweight_test_run):
-    # Locate all pre-mate information BAM files
-    pre_files = glob.glob("tmp/*/*_read_group_map.bam")
-    pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
-    total_pre_reads = sum(pre_counts.values())
 
-    # Locate all post-mate information group BAM files
-    post_files = glob.glob("tmp/*/*_annotated_map.bam")
-    post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
-    total_post_reads = sum(post_counts.values())
+    config = load_config(lightweight_test_run["test_config_path"])
+    ms_samples = get_ms_sample_ids(config)
 
-    # Assert that total reads pre adding mate information == total reads post adding mate information
-    assert total_post_reads == total_pre_reads, (
-        f"Post-mate information reads ({total_post_reads}) not equal to pre-mate information reads ({total_pre_reads})"
+    for ms_sample in ms_samples:
+        
+        # Get read count pre-mate information
+        input_bam = Path(MS.READ_GROUP_BAM.format(ms_sample=ms_sample))
+        input_reads = count_bam_data_points(input_bam)
+
+        # Get read count post-mate information      
+        output_bam = Path(MS.MATE_INFO_BAM.format(ms_sample=ms_sample))
+        output_reads = count_bam_data_points(output_bam)
+
+        # Assert that total reads pre adding mate information == total reads post adding mate information
+        assert output_reads == input_reads, (
+            f"Post-mate information reads ({output_reads}) > pre-mate information reads ({input_reads})"
     )
