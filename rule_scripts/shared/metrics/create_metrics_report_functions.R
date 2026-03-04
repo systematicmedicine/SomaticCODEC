@@ -257,10 +257,10 @@ assess_metric <- function(metric, ex_lanes, ex_samples, ms_samples) {
 
     # Extract sample ID from filename (e.g., S001_metric.txt → S001)
     sample_id <- ifelse(
-      grepl("^(metrics|results)/[^/]+/", file_path),
-      sub("^(metrics|results)/([^/]+)/.*$", "\\2", file_path),
+      grepl("^(metrics|results)/", file_path),
+      basename(dirname(file_path)),
       NA
-    )
+      )
 
     # Create formatted targets string
     targets <- format_targets(nn_lower, nn_upper, ideal_lower, ideal_upper)

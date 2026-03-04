@@ -6,67 +6,73 @@ Tests the rule ex_trim_fastq
 Authors:
     - Chat-GPT
     - Cameron Fraser
+    - Joshua Johnstone
 """
 
-import glob
 from pathlib import Path
 import os
 from helpers.fastq_helpers import count_fastq_data_points, sum_len_fastq
 from helpers.get_metadata import load_config, get_ex_sample_ids
+import definitions.paths.io.ex as EX
 
 def test_read_counts_preserved(lightweight_test_run):
+    # Load ex_sample IDs
     config = load_config(lightweight_test_run["test_config_path"])
-    ex_samples_set = set(get_ex_sample_ids(config))
-    
-    input_files = sorted(
-        f for f in glob.glob("tmp/*/*_r1_demux.fastq.gz")
-        if os.path.basename(os.path.dirname(f)) in ex_samples_set
-        )
-    
-    output_files = sorted(
-        f for f in glob.glob("tmp/*/*_r1_trim.fastq.gz")
-        if os.path.basename(os.path.dirname(f)) in ex_samples_set
-        )
+    ex_samples = get_ex_sample_ids(config)
 
-    # Build a mapping from sample stem to path
-    input_map = {Path(f).stem.replace("_r1_demux", ""): f for f in input_files}
-    output_map = {Path(f).stem.replace("_r1_trim", ""): f for f in output_files}
+    # Locate all pre-trimming FASTQ files
+    pre_files = []
+    for ex_sample in ex_samples:
+        resolved_path_r1 = EX.DEMUXD_FASTQ_R1.format(ex_sample=ex_sample)
+        resolved_path_r2 = EX.DEMUXD_FASTQ_R2.format(ex_sample=ex_sample)
+        pre_files.append(resolved_path_r1)
+        pre_files.append(resolved_path_r2)
 
-    assert input_map.keys() == output_map.keys(), "Mismatch between input and output files"
+    # Locate all post-trimming FASTQ files
+    post_files = []
+    for ex_sample in ex_samples:
+        resolved_path_r1 = EX.TRIMMED_FASTQ_R1.format(ex_sample=ex_sample)
+        resolved_path_r2 = EX.TRIMMED_FASTQ_R2.format(ex_sample=ex_sample)
+        post_files.append(resolved_path_r1)
+        post_files.append(resolved_path_r2)
 
-    for key in input_map:
-        in_path = input_map[key]
-        out_path = output_map[key]
+    # Count reads pre- and post-trimming
+    pre_counts = {Path(f).name: count_fastq_data_points(f) for f in pre_files}
+    total_pre_reads = sum(pre_counts.values())
 
-        in_reads = count_fastq_data_points(in_path)
-        out_reads = count_fastq_data_points(out_path)
+    post_counts = {Path(f).name: count_fastq_data_points(f) for f in post_files}
+    total_post_reads = sum(post_counts.values())
 
-        assert in_reads == out_reads, f"Read count mismatch for {key}: {in_reads} in vs {out_reads} out"
+    # Assert that total reads pre- and post-trimming match
+    assert total_pre_reads == total_post_reads, f"Read count mismatch after trimming: {total_pre_reads} in vs {total_post_reads} out"
 
 def test_sequences_are_shorter(lightweight_test_run):
+    # Load ex_sample IDs
     config = load_config(lightweight_test_run["test_config_path"])
-    ex_samples_set = set(get_ex_sample_ids(config))
-    
-    input_files = sorted(
-        f for f in glob.glob("tmp/*/*_r1_demux.fastq.gz")
-        if os.path.basename(os.path.dirname(f)) in ex_samples_set
-        )
-    
-    output_files = sorted(
-        f for f in glob.glob("tmp/*/*_r1_trim.fastq.gz")
-        if os.path.basename(os.path.dirname(f)) in ex_samples_set
-        )
+    ex_samples = get_ex_sample_ids(config)
 
-    input_map = {Path(f).stem.replace("_r1_demux", ""): f for f in input_files}
-    output_map = {Path(f).stem.replace("_r1_trim", ""): f for f in output_files}
+    # Locate all pre-trimming FASTQ files
+    pre_files = []
+    for ex_sample in ex_samples:
+        resolved_path_r1 = EX.DEMUXD_FASTQ_R1.format(ex_sample=ex_sample)
+        resolved_path_r2 = EX.DEMUXD_FASTQ_R2.format(ex_sample=ex_sample)
+        pre_files.append(resolved_path_r1)
+        pre_files.append(resolved_path_r2)
 
-    assert input_map.keys() == output_map.keys(), "Mismatch between input and output files"
+    # Locate all post-trimming FASTQ files
+    post_files = []
+    for ex_sample in ex_samples:
+        resolved_path_r1 = EX.TRIMMED_FASTQ_R1.format(ex_sample=ex_sample)
+        resolved_path_r2 = EX.TRIMMED_FASTQ_R2.format(ex_sample=ex_sample)
+        post_files.append(resolved_path_r1)
+        post_files.append(resolved_path_r2)
 
-    for key in input_map:
-        in_path = input_map[key]
-        out_path = output_map[key]
+    # Get read lengths pre- and post-trimming
+    pre_lengths = {Path(f).name: sum_len_fastq(f) for f in pre_files}
+    total_pre_lengths = sum(pre_lengths.values())
 
-        in_len = sum_len_fastq(in_path)
-        out_len = sum_len_fastq(out_path)
+    post_lengths = {Path(f).name: sum_len_fastq(f) for f in post_files}
+    total_post_lengths = sum(post_lengths.values())
 
-        assert out_len < in_len, f"Trimmed seq not shorter for {key}: {in_len} in vs {out_len} out"
+    # Assert that lengths are shorter post-trimming
+    assert total_post_lengths < total_pre_lengths, f"Trimmed seq not shorter: {total_pre_lengths} in vs {total_post_lengths} out"
