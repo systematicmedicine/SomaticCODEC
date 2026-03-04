@@ -50,8 +50,8 @@ EXCLUDED_RULES: Set[str] = {
     "tabix_index_files", # Wrapper for external tool
     "ms_germ_risk_variant_metrics", # Wrapper for external tool
     "ms_multimapping_metrics", # One test multiple rules
-    "ex_multimapping_metrics_raw", # One test multiple rules
-    "ex_multimapping_metrics_dsc" # One test multiple rules
+    "ex_multimapping_raw_metrics", # One test multiple rules
+    "ex_multimapping_dsc_metrics" # One test multiple rules
 }
 
 # Tests that do not correspond to a single rule name (e.g. multi-rule tests)

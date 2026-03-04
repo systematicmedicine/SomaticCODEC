@@ -4,15 +4,15 @@ Calculates the number of multimapping reads following realignment of DSC reads
 
 from definitions.paths.io import ex as EX
 
-rule ex_multimapping_metrics_dsc:
+rule ex_multimapping_dsc_metrics:
     input:
         bam = EX.REALIGNED_DSC
     output:
         json = EX.MET_MULTIMAPPING_DSC
     log:
-        "logs/{ex_sample}/ex_multimapping_metrics_dsc.log"
+        "logs/{ex_sample}/ex_multimapping_dsc_metrics.log"
     benchmark:
-        "logs/{ex_sample}/ex_multimapping_metrics_dsc.benchmark.txt"
+        "logs/{ex_sample}/ex_multimapping_dsc_metrics.benchmark.txt"
     threads:
         1
     resources:
