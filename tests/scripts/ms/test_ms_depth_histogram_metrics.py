@@ -46,7 +46,7 @@ def test_depth_hist_values_correct(tmp_path, lightweight_test_run):
     shutil.copytree("definitions", tmp_path / "definitions")
     
     # Define target file
-    target_depth_hist = MS.MET_DEPTH_HIST.format(ms_sample=ms_sample)
+    target_depth_hist = MS.MET_DEPTH.format(ms_sample=ms_sample)
 
     # Define output
     output_depth_hist = tmp_path / target_depth_hist

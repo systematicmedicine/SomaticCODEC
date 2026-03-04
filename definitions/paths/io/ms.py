@@ -20,8 +20,8 @@ Authors:
 
 # Preprocess FASTQ
 
-TRIM_FASTQ_INT_R1 = "tmp/ms/{ms_sample}/{ms_sample}_int1_trimmed_r1.fastq.gz"
-TRIM_FASTQ_INT_R2 = "tmp/ms/{ms_sample}/{ms_sample}_int1_trimmed_r2.fastq.gz"
+TRIM_FASTQ_INT_R1 = "tmp/ms/{ms_sample}/{ms_sample}_int_trimmed_r1.fastq.gz"
+TRIM_FASTQ_INT_R2 = "tmp/ms/{ms_sample}/{ms_sample}_int_trimmed_r2.fastq.gz"
 TRIMMED_FASTQ_R1 = "tmp/ms/{ms_sample}/{ms_sample}_trimmed_r1.fastq.gz"
 TRIMMED_FASTQ_R2 = "tmp/ms/{ms_sample}/{ms_sample}_trimmed_r2.fastq.gz"
 
