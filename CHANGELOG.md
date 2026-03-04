@@ -30,6 +30,7 @@ Types of changes:
 - pytest_cache and pycache are now removed from all directories before and after running tests (#342)
 - Combined ex_bases_trimmed and ex_trimmed_read_length_metrics into ex_trim_summary_metrics (#342)
 - Removed hardcoded config paths from helper functions (#344)
+- Removed hardcoded file paths from tests (#346)
 
 ## [5.0.0] - 2026-03-02
 

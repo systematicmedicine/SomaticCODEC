@@ -8,33 +8,32 @@ Tests the rule ms_filter_fastq
 Authors:
     - Chat-GPT
     - Cameron Fraser
+    - Joshua Johnstone
 """
 
 # Import libraries
-import glob
 from pathlib import Path
 from helpers.fastq_helpers import count_fastq_data_points
+from definitions.paths.io import ms as MS
+from helpers.get_metadata import load_config, get_ms_sample_ids
 
 # Test that filtering decreases the number of reads
 def test_filtering_decreases_reads(lightweight_test_run):
 
-    input_files = glob.glob("tmp/*/*_trim_r1.fastq.gz")
-    output_files = glob.glob("tmp/*/*_filter_r1.fastq.gz")
+    config = load_config(lightweight_test_run["test_config_path"])
+    ms_samples = get_ms_sample_ids(config)
 
-    # Build maps from sample name to file path
-    input_map = {Path(f).stem.replace("_trim_r1", ""): f for f in input_files}
-    output_map = {Path(f).stem.replace("_filter_r1", ""): f for f in output_files}
+    for ms_sample in ms_samples:
+        
+        # Get read count pre-filtering
+        input_fastq1 = Path(MS.TRIMMED_FASTQ_R1.format(ms_sample=ms_sample))
+        input_fastq2 = Path(MS.TRIMMED_FASTQ_R2.format(ms_sample=ms_sample))
+        input_reads = count_fastq_data_points(input_fastq1) + count_fastq_data_points(input_fastq2)
 
-    assert input_map.keys() == output_map.keys(), "Mismatch between input and output files"
+        # Get read count post-filtering   
+        output_fastq1 = Path(MS.FILTERED_FASTQ_R1.format(ms_sample=ms_sample))
+        output_fastq2 = Path(MS.FILTERED_FASTQ_R2.format(ms_sample=ms_sample))
+        output_reads = count_fastq_data_points(output_fastq1) + count_fastq_data_points(output_fastq2)
 
-    for sample_id in input_map:
-        in_path = Path(input_map[sample_id])
-        out_path = Path(output_map[sample_id])
-
-        assert in_path.exists(), f"Missing input file: {in_path}"
-        assert out_path.exists(), f"Missing output file: {out_path}"
-
-        in_reads = count_fastq_data_points(in_path)
-        out_reads = count_fastq_data_points(out_path)
-
-        assert out_reads < in_reads, f"Read count not reduced for {sample_id}: {in_reads} -> {out_reads}"
+        # Assert that read count is reduced by filtering
+        assert output_reads < input_reads, f"Read count not reduced for {ms_sample}: {input_reads} -> {output_reads}"

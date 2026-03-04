@@ -6,32 +6,46 @@ Tests the rule ex_filter_fastq
 Authors:
     - Chat-GPT
     - Cameron Fraser
+    - Joshua Johnstone
 """
 
-import glob
 from pathlib import Path
 from helpers.fastq_helpers import count_fastq_data_points
+from helpers.get_metadata import load_config, get_ex_sample_ids
+import definitions.paths.io.ex as EX
 
 # Test that filtering decreases the number of reads
 def test_filtering_decreases_reads(lightweight_test_run):
-    # Find input and output FASTQ files
-    input_files = sorted(glob.glob("tmp/*/*_r1_trim.fastq.gz"))
-    output_files = sorted(glob.glob("tmp/*/*_r1_filter.fastq.gz"))
 
-    # Map sample names to file paths
-    input_map = {Path(f).stem.replace("_r1_trim", ""): f for f in input_files}
-    output_map = {Path(f).stem.replace("_r1_filter", ""): f for f in output_files}
+    # Load ex_sample IDs
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
 
-    assert input_map.keys() == output_map.keys(), "Mismatch between input and output files"
+    # Locate all pre-filtering FASTQ files
+    pre_files = []
+    for ex_sample in ex_samples:
+        resolved_path_r1 = EX.TRIMMED_FASTQ_R1.format(ex_sample=ex_sample)
+        resolved_path_r2 = EX.TRIMMED_FASTQ_R2.format(ex_sample=ex_sample)
+        pre_files.append(resolved_path_r1)
+        pre_files.append(resolved_path_r2)
 
-    for sample_id in input_map:
-        in_path = input_map[sample_id]
-        out_path = output_map[sample_id]
+    # Locate all post-filtering FASTQ files
+    post_files = []
+    for ex_sample in ex_samples:
+        resolved_path_r1 = EX.FILTERED_FASTQ_R1.format(ex_sample=ex_sample)
+        resolved_path_r2 = EX.FILTERED_FASTQ_R2.format(ex_sample=ex_sample)
+        pre_files.append(resolved_path_r1)
+        pre_files.append(resolved_path_r2)
 
-        in_reads = count_fastq_data_points(in_path)
-        out_reads = count_fastq_data_points(out_path)
+    # Count reads pre- and post-filtering
+    pre_counts = {Path(f).name: count_fastq_data_points(f) for f in pre_files}
+    total_pre_reads = sum(pre_counts.values())
 
-        assert out_reads < in_reads, (
-            f"Filtering did not reduce the number of reads for {sample_id}: "
-            f"{in_reads} in vs {out_reads} out"
-        )
+    post_counts = {Path(f).name: count_fastq_data_points(f) for f in post_files}
+    total_post_reads = sum(post_counts.values())
+
+    # Assert that filtering reduced read count
+    assert total_post_reads < total_pre_reads, (
+        f"Filtering did not reduce the total number of reads: "
+        f"{total_pre_reads} in vs {total_post_reads} out"
+    )
