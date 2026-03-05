@@ -9,7 +9,7 @@ rule check_included_chromosomes_present:
         fai = config["sci_params"]["shared"]["reference_genome"] + ".fai",
         precomputed_masks = config["sci_params"]["shared"]["precomputed_masks"]
     output:
-        done_file = L.INC_CHROM_PRESENT_DONE
+        done_file = L.CHECK_INCLUDED_CHROMOSOMES_PRESENT_DONE
     params:
         included_chromosomes = config["sci_params"]["shared"]["included_chromosomes"]
     log:

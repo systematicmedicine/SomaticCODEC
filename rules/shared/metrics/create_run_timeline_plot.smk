@@ -9,7 +9,7 @@ rule create_run_timeline_plot:
         job_log = L.JOB_LOG,
         resources_log = L.SYSTEM_RESOURCE_USAGE
     output:
-        plot = L.RUN_TIMELINE_PLOT
+        plot = L.RUN_TIMELINE
     params:
         run_name = config["run_name"],
         max_iops = config["infrastructure"]["disk"]["iops"],
