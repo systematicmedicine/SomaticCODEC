@@ -4,6 +4,7 @@ Add metadata to the DSC
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_annotate_dsc: 
     input:
@@ -22,7 +23,7 @@ rule ex_annotate_dsc:
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_annotate_dsc.log"
+        L.EX_ANNOTATE_DSC
     benchmark:
         "logs/{ex_sample}/ex_annotate_dsc.benchmark.txt"
     resources:

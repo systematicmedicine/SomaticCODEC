@@ -3,6 +3,7 @@ Collects alignment metrics from the experimental bam mapped to the reference gen
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_alignment_metrics:
     input:
@@ -10,7 +11,7 @@ rule ex_alignment_metrics:
     output:
         txt = EX.MET_ALIGNMENT
     log:
-        "logs/{ex_sample}/ex_map_metrics.log"
+        L.EX_ALIGNMENT_METRICS
     benchmark:
         "logs/{ex_sample}/ex_map_metrics.benchmark.txt"
     threads:

@@ -3,6 +3,7 @@ Calculate duplex overlap metrics
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_duplex_overlap_metrics:
     input:
@@ -10,7 +11,7 @@ rule ex_duplex_overlap_metrics:
     output:
         metrics = EX.MET_DUPLEX_OVERLAP
     log:
-        "logs/{ex_sample}/ex_duplex_overlap_metrics.log"
+        L.EX_DUPLEX_OVERLAP_METRICS
     benchmark:
         "logs/{ex_sample}/ex_duplex_overlap_metrics.benchmark.txt"
     threads:

@@ -3,6 +3,7 @@ Compares variant rate between chromosomes
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_chromosomal_variant_rate_metrics:
     input:
@@ -13,7 +14,7 @@ rule ex_chromosomal_variant_rate_metrics:
     params:
         included_chromosomes = config["sci_params"]["shared"]["included_chromosomes"]
     log:
-        "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
+        L.EX_CHROMOSOMAL_VARIANT_RATE_METRICS
     benchmark:
         "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
     threads:

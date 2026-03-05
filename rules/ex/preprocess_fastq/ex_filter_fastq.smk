@@ -6,6 +6,7 @@ Filter reads
 
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_filter_fastq:
     input: 
@@ -19,7 +20,7 @@ rule ex_filter_fastq:
         average_quality_threshold = config["sci_params"]["ex_filter_fastq"]["average_quality_threshold"],
         min_read_length = config["sci_params"]["ex_filter_fastq"]["min_read_length"]
     log:
-        "logs/{ex_sample}/ex_filter_fastq.log"
+        L.EX_FILTER_FASTQ
     benchmark:
         "logs/{ex_sample}/ex_filter_fastq.benchmark.txt"
     threads:

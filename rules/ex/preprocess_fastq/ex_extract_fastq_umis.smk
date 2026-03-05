@@ -29,7 +29,7 @@ rule ex_extract_fastq_umis:
         umi_length = config["sci_params"]["ex_extract_fastq_umis"]["umi_length"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_lane}/ex_extract_fastq_umis.log"
+        L.EX_EXTRACT_FASTQ_UMIS
     benchmark:
         "logs/{ex_lane}/ex_extract_fastq_umis.benchmark.txt"
     threads:

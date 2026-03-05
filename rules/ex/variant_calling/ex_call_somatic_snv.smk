@@ -10,6 +10,7 @@ is insufficient)
 
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ex_call_somatic_snv:
     input:
@@ -33,7 +34,7 @@ rule ex_call_somatic_snv:
         min_mapping_quality = config["sci_params"]["ex_call_somatic_snv"]["min_mapping_quality"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_call_somatic_snv.log"
+        L.EX_CALL_SOMATIC_SNV
     benchmark:
         "logs/{ex_sample}/ex_call_somatic_snv.benchmark.txt"
     threads:
