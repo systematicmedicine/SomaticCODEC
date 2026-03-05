@@ -2,15 +2,13 @@
 Generates a fastqc report for demuxed MS FASTQs
 """
 
-# Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
-
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_raw_fastq_metrics:
     input:
-        shared_setup = shared_setup,
+        setup_done = L.SETUP_DONE,
         ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]

@@ -2,15 +2,13 @@
 FastQC on raw fastq files (before demultiplexing or any processing)
 """
 
-# Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
-
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_fastqcraw_metrics:
     input:
-        shared_setup = shared_setup,
+        setup_done = L.SETUP_DONE,
         ex_lanes = config["metadata"]["ex_lanes_metadata"],
         fastq1 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][0],
         fastq2 = lambda wc: md.get_ex_lane_fastqs(config)[wc.ex_lane][1],
