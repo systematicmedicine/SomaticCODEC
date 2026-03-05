@@ -2,7 +2,7 @@
 Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
 """
 
-import definitions.paths.log as L
+from definitions.paths import log as L
 
 rule check_included_chromosomes_present:
     input:
@@ -13,7 +13,7 @@ rule check_included_chromosomes_present:
     params:
         included_chromosomes = config["sci_params"]["shared"]["included_chromosomes"]
     log:
-        "logs/shared_rules/check_included_chromosomes_present.log"
+        L.CHECK_INCLUDED_CHROMOSOMES_PRESENT
     benchmark:
         "logs/shared_rules/check_included_chromosomes_present.benchmark.txt"
     threads:

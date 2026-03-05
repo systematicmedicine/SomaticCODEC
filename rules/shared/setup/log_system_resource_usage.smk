@@ -2,17 +2,17 @@
 Logs disk space, memory, and cpu load at a defined interval
 """
 
-import definitions.paths.log as L
+from definitions.paths import log as L
 
 rule log_system_resource_usage:
     output:
-        log = "logs/shared_rules/system_resource_usage.csv",
+        log = L.SYSTEM_RESOURCE_USAGE,
         done_file = L.SYS_RESOURCE_LOG_DONE
     params:
         sleep_interval = config["infrastructure"]["log_system_resource_usage"]["sleep_interval"],
         total_cores = int(os.popen("nproc").read().strip()) - config["infrastructure"]["threads"]["global_buffer"]
     log:
-        "logs/shared_rules/log_system_resource_usage.log"
+        L.LOG_SYSTEM_RESOURCE_USAGE
     benchmark:
         "logs/shared_rules/log_system_resource_usage.benchmark.txt"
     threads:

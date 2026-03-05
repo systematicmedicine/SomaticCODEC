@@ -2,13 +2,15 @@
 Creates reference .dict file
 """
 
+from definitions.paths import log as L
+
 rule picard_sequence_dict:
     input:
         ref = config["sci_params"]["shared"]["reference_genome"]
     output:
         dictf = os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict"
     log:
-        "logs/shared_rules/picard_sequence_dict.log"
+        L.PICARD_SEQUENCE_DICT
     benchmark:
         "logs/shared_rules/picard_sequence_dict.benchmark.txt"
     threads:
