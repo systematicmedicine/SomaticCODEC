@@ -18,24 +18,6 @@ ex_sample_ids = md.get_ex_sample_ids(config)
 ms_sample_ids = md.get_ms_sample_ids(config)
 
 # ---------------------------------------------------------------------------------------------
-# Setup files
-# ---------------------------------------------------------------------------------------------
-shared_setup = [
-    config["sci_params"]["shared"]["reference_genome"] + ".amb",
-    config["sci_params"]["shared"]["reference_genome"] + ".ann",
-    config["sci_params"]["shared"]["reference_genome"] + ".bwt.2bit.64",
-    config["sci_params"]["shared"]["reference_genome"] + ".pac",
-    config["sci_params"]["shared"]["reference_genome"] + ".0123",
-    config["sci_params"]["shared"]["reference_genome"] + ".fai",
-    os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict",
-    config["sci_params"]["shared"]["known_germline_variants"] + ".tbi",
-    S.EXCLUDED_CHROMS_BED,
-    "logs/shared_rules/check_included_chromosomes_present.done",
-    "logs/shared_rules/log_system_resource_usage.done",
-    "logs/bin_scripts/run_pipeline.log"
-]
-
-# ---------------------------------------------------------------------------------------------
 # Processing metrics for MS samples
 # ---------------------------------------------------------------------------------------------
 ms_processing_metrics = [
@@ -145,5 +127,6 @@ shared_metrics = [
     "logs/shared_rules/combined_benchmarks.csv",
     "logs/shared_rules/system_resource_usage.csv",
     "logs/shared_rules/job_log.csv",
-    "logs/shared_rules/create_run_timeline_plot.log"
+    "logs/shared_rules/create_run_timeline_plot.log",
+    "logs/bin_scripts/run_pipeline.log"
 ]

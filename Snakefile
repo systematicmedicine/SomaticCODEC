@@ -41,7 +41,6 @@ include: "definitions/outputs/pipeline_outputs.smk"
 # Define rule all
 rule all:
     input:
-        shared_setup + 
         ms_processing_metrics + 
         ex_processing_metrics +
         ex_variant_calling +

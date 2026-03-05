@@ -2,6 +2,8 @@
 Ensures that run_pipeline.log has been created
 """
 
+from definitions.paths import log as L
+
 rule ensure_pipeline_log_exists:
     output:
         log = "logs/bin_scripts/run_pipeline.log"

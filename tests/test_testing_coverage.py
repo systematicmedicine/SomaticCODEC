@@ -33,6 +33,7 @@ EXCLUDED_RULES: Set[str] = {
     "create_run_timeline_plot",
     "ensure_pipeline_log_exists",
     "write_git_metadata",
+    "complete_setup",
     "ex_fastqc_filter_summary_metrics", # One test multiple rules
     "ex_fastqc_raw_summary_metrics", # One test multiple rules
     "ms_fastqc_summary_metrics", # One test multiple rules
