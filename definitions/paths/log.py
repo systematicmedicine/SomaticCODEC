@@ -16,15 +16,16 @@ Authors:
 # Setup
 
 RUN_PIPELINE = "logs/bin_scripts/run_pipeline.log"
-SYSTEM_RESOURCE_USAGE = "logs/shared_rules/system_resource_usage.csv"
-
 ENSURE_PIPELINE_LOG_EXISTS = "logs/shared_rules/ensure_pipeline_log_exists.log"
-LOG_SYSTEM_RESOURCE_USAGE = "logs/shared_rules/log_system_resource_usage.log"
-CHECK_INCLUDED_CHROMOSOMES_PRESENT = "logs/shared_rules/check_included_chromosomes_present.log"
-COMPLETE_SETUP = "logs/shared_rules/complete_setup.log"
 
-SYS_RESOURCE_LOG_DONE = "logs/shared_rules/log_system_resource_usage.done"
-INC_CHROM_PRESENT_DONE = "logs/shared_rules/check_included_chromosomes_present.done"
+LOG_SYSTEM_RESOURCE_USAGE = "logs/shared_rules/log_system_resource_usage.log"
+SYSTEM_RESOURCE_USAGE = "logs/shared_rules/system_resource_usage.csv"
+LOG_SYSTEM_RESOURCE_USAGE_DONE = "logs/shared_rules/log_system_resource_usage.done"
+
+CHECK_INCLUDED_CHROMOSOMES_PRESENT = "logs/shared_rules/check_included_chromosomes_present.log"
+CHECK_INCLUDED_CHROMOSOMES_PRESENT_DONE = "logs/shared_rules/check_included_chromosomes_present.done"
+
+COMPLETE_SETUP = "logs/shared_rules/complete_setup.log"
 SETUP_DONE = "logs/shared_rules/setup.done"
 
 # Processing
@@ -46,7 +47,7 @@ JOB_LOG = "logs/shared_rules/job_log.csv"
 CREATE_METRICS_REPORT = "logs/shared_rules/create_metrics_report.log"
 
 CREATE_RUN_TIMELINE_PLOT = "logs/shared_rules/create_run_timeline_plot.log"
-RUN_TIMELINE_PLOT = "logs/shared_rules/run_timeline.pdf"
+RUN_TIMELINE = "logs/shared_rules/run_timeline.pdf"
 
 WRITE_GIT_METADATA = "logs/shared_rules/write_git_metadata.log"
 GIT_METADATA = "logs/shared_rules/git_metadata.json"

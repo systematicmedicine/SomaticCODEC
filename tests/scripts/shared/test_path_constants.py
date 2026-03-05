@@ -1,27 +1,29 @@
 """
 --- test_path_constants.py ---
 
-Guardrails for centralised path constants in definitions.paths.io.*
+Guardrails for centralised path constants in definitions.paths.*
 
 Checks:
 1) No duplicate constant values.
 2) R1/R2 naming consistency for all constants.
-3) Non-metrics constants (name does NOT contain "MET"):
+2) Metrics constants (name contains "MET"):
+   - must end with an acceptable extension
+4) Log constants must contain the same name as the constant name
+5) Non-metrics constants (name does NOT contain "MET"):
    - extension expectations based on name tokens (BAM/SAM/FASTQ/VCF/BED)
    - must end with an acceptable extension
-4) Metrics constants (name contains "MET"):
-   - must end with an acceptable extension
-5) Log constants must contain the same name as the constant name
 
-Author: Cameron Fraser
+Authors: 
+    - Cameron Fraser
+    - Joshua Johnstone
 """
 
 from __future__ import annotations
-
 import importlib
 import pkgutil
 from collections import defaultdict
 import pytest
+from pathlib import Path
 
 pytestmark = [
     pytest.mark.quicktests,
@@ -59,7 +61,7 @@ def _iter_io_constants():
     Yield (fq_name, const_name, value) for uppercase string constants
     in definitions.paths.* modules.
     """
-    package = importlib.import_module("definitions.paths.io")
+    package = importlib.import_module("definitions.paths")
     for module_info in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
         mod = importlib.import_module(module_info.name)
         for name, value in vars(mod).items():
@@ -86,8 +88,8 @@ def test_path_constants_guardrails():
 
     # 2-5) Per-constant checks
     for fq, name, value in constants:
-        is_met = "MET" in name
-        is_log = ".log" in value
+        is_met = name.startswith("MET")
+        is_log = fq.startswith("definitions.paths.log.")
 
         # 2) R1 / R2 rules (apply to all constants)
         if "R1" in name:
@@ -97,9 +99,29 @@ def test_path_constants_guardrails():
         if "R2" in name:
             if "r2" not in value.lower() or "r1" in value.lower():
                 offenders.append(f"{fq}: name implies R2 but value is '{value}'")
+       
+        if is_met:
+            # 3) MET rules
+            if not _endswith_any(value, MET_ALLOWED_SUFFIXES):
+                offenders.append(
+                    f"{fq}: MET path must end with one of {MET_ALLOWED_SUFFIXES} -> '{value}'"
+                )
 
-        if not is_met and not is_log:
-            # 3) Non-metrics rules
+        elif is_log:
+            # 4) Log rules
+            if "DONE" in name:
+                if not Path(value).stem + "_done" == name.lower():
+                    offenders.append(
+                        f"{fq}: Log filename '{Path(value).stem + '_done'}' must match log constant name '{name}'"
+                    )
+
+            elif not Path(value).stem == name.lower():
+                offenders.append(
+                    f"{fq}: Log filename '{Path(value).stem}' must match log constant name '{name}'"
+                )
+
+        else:
+            # 5) Non-metrics rules
 
             if "BAM" in name and ".bam" not in value:
                 offenders.append(f"{fq}: name contains BAM but '.bam' not in value -> '{value}'")
@@ -119,19 +141,6 @@ def test_path_constants_guardrails():
             if not _endswith_any(value, NON_MET_ALLOWED_SUFFIXES):
                 offenders.append(
                     f"{fq}: non-MET path must end with one of {NON_MET_ALLOWED_SUFFIXES} -> '{value}'"
-                )
-        
-        if is_met:
-            # 4) MET rules
-            if not _endswith_any(value, MET_ALLOWED_SUFFIXES):
-                offenders.append(
-                    f"{fq}: MET path must end with one of {MET_ALLOWED_SUFFIXES} -> '{value}'"
-                )
-        else:
-            # 5) Log rules
-            if not name.lower() in value or not value.upper() in name:
-                offenders.append(
-                    f"{fq}: Log path '{value}' must match log constant name '{name}'"
                 )
 
     assert not offenders, "Path constant guardrail failures:\n" + "\n".join(offenders)

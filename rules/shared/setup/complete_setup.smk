@@ -7,8 +7,8 @@ from definitions.paths import log as L
 rule complete_setup:
     input:
         run_pipeline_log = L.RUN_PIPELINE,
-        sys_resource_log_done = L.SYS_RESOURCE_LOG_DONE,
-        inc_chrom_present_done = L.INC_CHROM_PRESENT_DONE
+        sys_resource_log_done = L.LOG_SYSTEM_RESOURCE_USAGE_DONE,
+        inc_chrom_present_done = L.CHECK_INCLUDED_CHROMOSOMES_PRESENT_DONE
     output:
         L.SETUP_DONE
     log:

@@ -7,7 +7,7 @@ from definitions.paths import log as L
 rule log_system_resource_usage:
     output:
         log = L.SYSTEM_RESOURCE_USAGE,
-        done_file = L.SYS_RESOURCE_LOG_DONE
+        done_file = L.LOG_SYSTEM_RESOURCE_USAGE_DONE
     params:
         sleep_interval = config["infrastructure"]["log_system_resource_usage"]["sleep_interval"],
         total_cores = int(os.popen("nproc").read().strip()) - config["infrastructure"]["threads"]["global_buffer"]
