@@ -7,7 +7,8 @@ from definitions.paths.io import ms as MS
 
 rule ms_add_read_groups:
     input:
-        bam = MS.RAW_BAM
+        bam = MS.RAW_BAM,
+        dictf = os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict"
     output:
         bam = temp(MS.READ_GROUP_BAM)
     params:

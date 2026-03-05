@@ -2,12 +2,14 @@
 Checks that chromosomes included for variant calling are present in reference and precomputed BEDs
 """
 
+import definitions.paths.log as L
+
 rule check_included_chromosomes_present:
     input:
         fai = config["sci_params"]["shared"]["reference_genome"] + ".fai",
         precomputed_masks = config["sci_params"]["shared"]["precomputed_masks"]
     output:
-        done_file = "logs/shared_rules/check_included_chromosomes_present.done"
+        done_file = L.INC_CHROM_PRESENT_DONE
     params:
         included_chromosomes = config["sci_params"]["shared"]["included_chromosomes"]
     log:

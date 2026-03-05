@@ -5,15 +5,14 @@ Trims FASTQ files
     - Poly-G artifacts (>10 Gs at 3' end)
     - Bases of quality < qual_trim_threshold from read ends
 """
-# Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_trim_fastq:
     input:
-        shared_setup = shared_setup,
+        setup_done = L.SETUP_DONE,
         ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
