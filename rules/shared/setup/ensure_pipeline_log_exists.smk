@@ -6,9 +6,9 @@ from definitions.paths import log as L
 
 rule ensure_pipeline_log_exists:
     output:
-        log = "logs/bin_scripts/run_pipeline.log"
+        log = L.RUN_PIPELINE
     log:
-        "logs/shared_rules/ensure_pipeline_log_exists.log"
+        L.ENSURE_PIPELINE_LOG_EXISTS
     benchmark:
         "logs/shared_rules/ensure_pipeline_log_exists.benchmark.txt"
     threads:

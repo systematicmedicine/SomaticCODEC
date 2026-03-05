@@ -2,11 +2,13 @@
 Writes git metadata to file for version tracking
 """
 
+from definitions.paths import log as L
+
 rule write_git_metadata:
     output:
-        json = "logs/shared_rules/git_metadata.json"
+        json = L.GIT_METADATA
     log:
-        "logs/shared_rules/write_git_metadata.log"
+        L.WRITE_GIT_METADATA
     benchmark:
         "logs/shared_rules/write_git_metadata.benchmark.txt"
     threads:

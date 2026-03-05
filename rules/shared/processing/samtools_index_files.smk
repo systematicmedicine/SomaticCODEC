@@ -2,13 +2,15 @@
 Creates reference .fai file
 """
 
+from definitions.paths import log as L
+
 rule samtools_index_files:
     input:
         reference = config["sci_params"]["shared"]["reference_genome"]
     output:
         fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     log:
-        "logs/shared_rules/samtools_index_files.log"
+        L.SAMTOOLS_INDEX_FILES
     benchmark:
         "logs/shared_rules/samtools_index_files.benchmark.txt"
     threads:
