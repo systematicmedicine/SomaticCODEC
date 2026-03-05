@@ -7,6 +7,7 @@ from definitions.paths.io import ex as EX
 rule ex_insert_metrics:
     input:
         bam = EX.FILTERED_BAM,
+        dictf = os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict"
     output:
         txt = EX.MET_INSERT_SIZE_TXT,
         hist = EX.MET_INSERT_SIZE_PDF
