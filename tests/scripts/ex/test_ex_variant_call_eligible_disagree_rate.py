@@ -1,166 +1,184 @@
 """
 --- test_ex_variant_call_eligible_disagree_rate.py ---
 
-Tests
-  1) Reverse-strand quality alignment check
-    * Quality tags for Watson and Crick strands are not reversed automatically, while Watson, Crick and duplex sequences are. 
-    * This tests that the reverse script implemented during ex_variant_call_eligible_disagree_rate.py correctly reverses the required tags. 
-  2) BED masking integrity: only positions inside include.bed are ever assessed
-    * Tests that only positions inside the bed mask are assessed for Watson and Crick disagreement
-  3) Exactly one disagreement exists in the test BAM at eligible positions
-    * The test file contains only one Watson and Crick disagreement where the following are true:
-      * The disagreeing Watson and Crick base quality scores add up to >= 70
-      * The disagreeing Watson and Crick bases are within the bed mask
-      * The disagreeing Watson and Crick bases are both either A, C, G or T
-  4) Guardrail: ex_call_somatic.smk checksum must not change (assumption lock)
-      * ex_variant_call_eligible_disagree_rate metrics make assumptions about how variant calling is done
-      * This test flags if ex_call_somatic.smk has been changed
-      * After any changes to ex_call_somatic.smk, this script must be checked to make sure the assumptions match the updated rule
+Tests the script ex_variant_call_eligible_disagree_rate.py
 
 Authors:
   - ChatGPT
   - James Phie
+  - Joshua Johnstone
 """
-# --------------------------------------------------------------------------------------
-# Setup
-# --------------------------------------------------------------------------------------
 
-import sys
-import importlib.util
-from pathlib import Path
 import pysam
 import pytest
+import rule_scripts.ex.processing_metrics.ex_variant_call_eligible_disagree_rate as vcedr
+from helpers.get_metadata import load_config, get_ex_sample_ids
+import definitions.paths.io.ex as EX
+import definitions.paths.io.ms as MS
 
-# Run pytest from repo root so these relative paths resolve.
-TEST_DATA = Path("tests/data/test_ex_variant_call_eligible_disagree_rate")
-BED = TEST_DATA / "include.bed"
-BAM = TEST_DATA / "test_map_dsc_anno_filtered.bam"
-BAI = TEST_DATA / "test_map_dsc_anno_filtered.bam.bai"
-REQUIRED_Q = 70
-RANDOM_SEED = 123
-
-# Import the script as a module without executing __main__
-SCRIPT_PATH = Path("rule_scripts/ex/processing_metrics") / "ex_variant_call_eligible_disagree_rate.py"
-spec = importlib.util.spec_from_file_location(
-    "ex_variant_call_eligible_disagree_rate", str(SCRIPT_PATH)
-)
-mod = importlib.util.module_from_spec(spec)
-sys.modules[spec.name] = mod
-spec.loader.exec_module(mod)
-
-# --------------------------
-# Fixtures
-# --------------------------
-@pytest.fixture(scope="session")
-def bed_idx():
-    assert BED.exists(), f"Missing {BED}"
-    return mod.load_bed_as_index(str(BED))
-
-
-@pytest.fixture(scope="session")
-def bam():
-    assert BAM.exists(), f"Missing {BAM}"
-    assert BAI.exists(), f"Missing {BAI}"
-    return pysam.AlignmentFile(str(BAM), "rb", index_filename=str(BAI))
-
-
-# --------------------------
-# Helpers (local to tests)
-# --------------------------
-def _count_leading(s: str, ch: str) -> int:
-    n = 0
-    for c in s:
-        if c == ch:
-            n += 1
+# Helper functions
+def count_leading(string: str, match: str) -> int:
+    count = 0
+    for char in string:
+        if char == match:
+            count += 1
         else:
             break
-    return n
+    return count
 
-def _count_trailing(s: str, ch: str) -> int:
-    n = 0
-    for c in reversed(s):
-        if c == ch:
-            n += 1
+def count_trailing(string: str, match: str) -> int:
+    count = 0
+    for char in reversed(string):
+        if char == match:
+            count += 1
         else:
             break
-    return n
-
+    return count
 
 # --------------------------------------------------------------------------------------
 # 1) Reverse-strand quality alignment check
 # --------------------------------------------------------------------------------------
-def test_flag16_reverse_aligns_ns_with_bang_qualities(bam):
+def test_flag16_reverse_aligns_ns_with_bang_qualities(lightweight_test_run):
     """
     After reversing qualities on FLAG 16 reads, leading/trailing 'n' runs in ac/bc
     should align to leading/trailing '!' runs in aq/bq respectively (same lengths).
     """
-    found_reverse = False
 
-    for aln in bam.fetch("chr1", 633279, 633472):
-        if aln.is_unmapped or aln.is_secondary or aln.is_supplementary:
-            continue
-        if not aln.is_reverse:
-            continue
+    # Load ex_sample IDs from config
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
 
-        # Pull tags
-        ac = aln.get_tag("ac")
-        bc = aln.get_tag("bc")
-        aq = aln.get_tag("aq")
-        bq = aln.get_tag("bq")
+    for ex_sample in ex_samples:
 
-        # Reverse qualities for reverse-strand, mirroring production code
-        aq_r = mod.revstr(aq)
-        bq_r = mod.revstr(bq)
+        found_reverse = False
 
-        # Watson check: n <-> !
-        lead_n_ac = _count_leading(ac, "n")
-        trail_n_ac = _count_trailing(ac, "n")
-        lead_bang_aq = _count_leading(aq_r, "!")
-        trail_bang_aq = _count_trailing(aq_r, "!")
+        # Load BAM and BAI
+        bam_path = EX.FILTERED_DSC.format(ex_sample=ex_sample)
+        bai_path = EX.FILTERED_DSC_INDEX.format(ex_sample=ex_sample)
+        bam = pysam.AlignmentFile(str(bam_path), "rb", index_filename=str(bai_path))
 
-        assert lead_n_ac == lead_bang_aq
-        assert trail_n_ac == trail_bang_aq
+        for aln in bam.fetch():
+            if aln.is_unmapped or aln.is_secondary or aln.is_supplementary:
+                continue
+            if not aln.is_reverse:
+                continue
 
-        # Crick check: n <-> !
-        lead_n_bc = _count_leading(bc, "n")
-        trail_n_bc = _count_trailing(bc, "n")
-        lead_bang_bq = _count_leading(bq_r, "!")
-        trail_bang_bq = _count_trailing(bq_r, "!")
+            # Pull tags
+            ac = aln.get_tag("ac")
+            bc = aln.get_tag("bc")
+            aq = aln.get_tag("aq")
+            bq = aln.get_tag("bq")
 
-        assert lead_n_bc == lead_bang_bq
-        assert trail_n_bc == trail_bang_bq
+            # Reverse qualities for reverse-strand, mirroring production code
+            aq_r = vcedr.revstr(aq)
+            bq_r = vcedr.revstr(bq)
 
-        found_reverse = True
-        break
+            # Watson check: n <-> !
+            lead_n_ac = count_leading(ac, "n")
+            trail_n_ac = count_trailing(ac, "n")
+            lead_bang_aq = count_leading(aq_r, "!")
+            trail_bang_aq = count_trailing(aq_r, "!")
 
-    if not found_reverse:
-        pytest.skip("No reverse-strand primary read found in chr1 test window")
+            assert lead_n_ac == lead_bang_aq
+            assert trail_n_ac == trail_bang_aq
+
+            # Crick check: n <-> !
+            lead_n_bc = count_leading(bc, "n")
+            trail_n_bc = count_trailing(bc, "n")
+            lead_bang_bq = count_leading(bq_r, "!")
+            trail_bang_bq = count_trailing(bq_r, "!")
+
+            assert lead_n_bc == lead_bang_bq
+            assert trail_n_bc == trail_bang_bq
+
+            found_reverse = True
+            break
+
+        if not found_reverse:
+            pytest.skip("No reverse-strand primary read found in BAM")
 
 # --------------------------------------------------------------------------------------
-# 2) BED masking integrity: only positions inside include.bed are ever assessed
+# 2) BED masking integrity: only positions inside include BED are assessed
 # --------------------------------------------------------------------------------------
-def test_only_bed_positions_are_eligible(bam, bed_idx):
-    positions = []
-    for aln in bam.fetch():
-        positions.extend(mod.eligible_sites_from_alignment(aln, bed_idx, REQUIRED_Q))
+def test_only_bed_positions_are_eligible(lightweight_test_run):
 
-    assert positions, "No eligible positions found"
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
+    REQUIRED_Q = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
 
-    # Build a quick lookup for allowed positions from the BED
-    allowed = {
-        chrom: set(range(start, end))
-        for chrom, (starts, ends) in bed_idx.items()
-        for start, end in zip(starts, ends)
-    }
+    for ex_sample in ex_samples:
 
-    # Collect any leaks (pos not in allowed BED set)
-    leaks = [(ch, p) for ch, p, _, _ in positions if ch not in allowed or p not in allowed[ch]]
+        # Load BAM and BAI
+        bam_path = EX.FILTERED_DSC.format(ex_sample=ex_sample)
+        bai_path = EX.FILTERED_DSC_INDEX.format(ex_sample=ex_sample)
+        bam = pysam.AlignmentFile(bam_path, "rb", index_filename=bai_path)
+        include_bed_path = MS.INCLUDE_BED.format(ex_sample=ex_sample)
 
-    assert not leaks, f"Found assessed positions outside include.bed: {leaks}"
+        # Create index for include BED
+        bed_idx = vcedr.load_bed_as_index(include_bed_path)
+
+        # Get eligible positions
+        positions = []
+        for aln in bam.fetch():
+            positions.extend(vcedr.eligible_sites_from_alignment(aln, bed_idx, REQUIRED_Q))
+
+        assert positions, "No eligible positions found"
+
+        # Verify every returned position is inside the BED intervals
+        for ch, p, _, _ in positions:
+            assert ch in bed_idx, f"{ch} not present in BED index"
+            assert any(start <= p < end
+                    for start, end in zip(*bed_idx[ch])), f"Position {ch}:{p} outside include.bed"
 
 # --------------------------------------------------------------------------------------
 # 3) At least one disagreement exists in the BAM within the BED
 # --------------------------------------------------------------------------------------
-def test_at_least_one_disagreement_found(bam, bed_idx):
-    _, disagreements, _ = mod.tally_disagreements(bam, bed_idx, REQUIRED_Q, 10000, RANDOM_SEED)
-    assert disagreements == 1, f"Expected 1 disagreement, found {disagreements}"
+def test_at_least_one_disagreement_found(lightweight_test_run):
+
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
+    REQUIRED_Q = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
+    RANDOM_SEED = config["sci_params"]["shared"]["random_seed"]
+
+    for ex_sample in ex_samples:
+
+        # Load BAM and BAI
+        bam_path = EX.FILTERED_DSC.format(ex_sample=ex_sample)
+        bai_path = EX.FILTERED_DSC_INDEX.format(ex_sample=ex_sample)
+        bam = pysam.AlignmentFile(bam_path, "rb", index_filename=bai_path)
+        include_bed_path = MS.INCLUDE_BED.format(ex_sample=ex_sample)
+
+        # Create index for include BED
+        bed_idx = vcedr.load_bed_as_index(include_bed_path)
+
+        # Tally disagreements within BED region
+        _, disagreements, _ = vcedr.tally_disagreements(bam, bed_idx, REQUIRED_Q, 10000, RANDOM_SEED)
+        assert disagreements >= 1, f"Expected >= 1 disagreement, found {disagreements}"
+
+# --------------------------------------------------------------------------------------
+# 4) Exactly one disagreement exists in the BAM within the BED
+#   * The test file contains only one Watson and Crick disagreement where the following are true:
+#   * The disagreeing Watson and Crick base quality scores add up to >= 70
+#   * The disagreeing Watson and Crick bases are within the bed mask
+#   * The disagreeing Watson and Crick bases are both either A, C, G or T
+# --------------------------------------------------------------------------------------
+def test_exactly_one_disagreement_found():
+
+    # Define test input paths
+    bam_path = "tests/data/test_ex_variant_call_eligible_disagree_rate/test_map_dsc_anno_filtered.bam"
+    bai_path = "tests/data/test_ex_variant_call_eligible_disagree_rate/test_map_dsc_anno_filtered.bam.bai"
+    include_bed_path = "tests/data/test_ex_variant_call_eligible_disagree_rate/include.bed"
+
+    # Define hardcoded test params
+    REQUIRED_Q = 70
+    RANDOM_SEED = 123
+
+    # Load BAM
+    bam = pysam.AlignmentFile(bam_path, "rb", index_filename=bai_path)
+
+    # Create index for include BED
+    bed_idx = vcedr.load_bed_as_index(include_bed_path)
+
+    # Tally disagreements within BED region
+    _, disagreements, _ = vcedr.tally_disagreements(bam, bed_idx, REQUIRED_Q, 10000, RANDOM_SEED)
+    assert disagreements == 1, f"Expected exactly 1 disagreement, found {disagreements}"

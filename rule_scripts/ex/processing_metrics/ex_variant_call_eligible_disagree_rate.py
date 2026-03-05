@@ -4,33 +4,28 @@
 
 Compute empirical Watson/Crick disagreement rate at positions that are eligible for variant calling.
 
-Inputs (from Snakemake rule):
-  - BAM:   tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam
-  - BAI:   tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai
-  - BED:   tmp/{ex_sample}/{ex_sample}_include.bed    (include mask)
+To be used with rule ex_variant_call_eligible_disagree_rate
 
-Outputs:
-  - JSON:  metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json
-
-What we do:
-  - Shuffle references and take the first NUMBER_OF_READS primary alignments from the test BAM
+Steps:
+  - Shuffle references and take the first NUMBER_OF_READS primary alignments from the DSC BAM
   - Reverse aq:Z and bq:Z (Watson and Crick quality scores) on FLAG16 (reverse reads) so qualities align to ac:Z / bc:Z (Watson and Crick sequences)
   - Per base assessed for disagrement, require:
-      - ac:Z:,bc:Z be either A,C,G,T
-      - qa+qb ≥ REQUIRED_Q
+      - ac:Z:,bc:Z be one of A/C/G/T
+      - qa+qb >= REQUIRED_Q
       - Position lies inside include BED
   - Tally:
       - Total_eligible_sites
-      - Observed_disagreements   (ac:Z: != bc:Z:)
+      - Observed_disagreements (ac:Z: != bc:Z:)
       - Observed_disagreement_rate = Observed_disagreements / Total_eligible_sites
 
 Notes:
   - aq and bq must be reversed if flag 0x10 (flag 16) is set
-      - The main sequence, ac and bc were already reversed earlier in the pipeline, but aq and bq were not
+      - The sequence strings (ac and bc) are already reversed by fgbio CallCodecConsensusReads, but the quality strings (aq and bq) are not
   - Uses per-read interval sweeping for fast BED membership checks.
 
 Authors:
  - James Phie
+ - Joshua Johnstone
  - ChatGPT
 """
 
