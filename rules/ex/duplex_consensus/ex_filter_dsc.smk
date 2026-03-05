@@ -4,6 +4,7 @@ Filter reads from DSC
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_filter_dsc:
     input:
@@ -16,7 +17,7 @@ rule ex_filter_dsc:
         min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_filter_dsc.log"
+        L.EX_FILTER_DSC
     benchmark:
         "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
     threads:

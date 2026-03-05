@@ -4,6 +4,7 @@ Generates depth metrics for the final EX DSC BAM
 
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ex_depth_metrics:
     input:
@@ -16,7 +17,7 @@ rule ex_depth_metrics:
     params:
         ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:
-        "logs/{ex_sample}/ex_depth_metrics.log"
+        L.EX_DEPTH_METRICS
     benchmark:
         "logs/{ex_sample}/ex_depth_metrics.benchmark.txt"
     threads:

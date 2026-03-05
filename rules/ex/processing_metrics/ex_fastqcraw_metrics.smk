@@ -20,7 +20,7 @@ rule ex_fastqcraw_metrics:
         txt_r1 = EX.MET_FASTQC_RAW_TXT_R1,
         txt_r2 = EX.MET_FASTQC_RAW_TXT_R2
     log:
-        "logs/{ex_lane}/ex_fastqcraw_metrics.log"
+        L.EX_FASTQCRAW_METRICS
     benchmark:
         "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
     threads: 

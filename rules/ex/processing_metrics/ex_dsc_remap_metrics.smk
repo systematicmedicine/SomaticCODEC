@@ -5,6 +5,7 @@ Calculate DSC remapping metrics
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_dsc_remap_metrics:
     input:
@@ -15,7 +16,7 @@ rule ex_dsc_remap_metrics:
         min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"],
         sample = "{ex_sample}"
     log:
-        "logs/{ex_sample}/ex_dsc_remap_metrics.log"
+        L.EX_DSC_REMAP_METRICS
     benchmark:
         "logs/{ex_sample}/ex_dsc_remap_metrics.benchmark.txt"
     threads:

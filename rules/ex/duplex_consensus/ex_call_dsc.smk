@@ -7,6 +7,7 @@ Create duplex consensus (DSC)
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_call_dsc:
     input:
@@ -23,7 +24,7 @@ rule ex_call_dsc:
         max_duplex_disagreement_rate = config["sci_params"]["ex_call_dsc"]["max_duplex_disagreement_rate"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_call_dsc.log"
+        L.EX_CALL_DSC
     benchmark:
         "logs/{ex_sample}/ex_call_dsc.benchmark.txt"
     threads:

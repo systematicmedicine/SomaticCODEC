@@ -110,14 +110,14 @@ def test_path_constants_guardrails():
         elif is_log:
             # 4) Log rules
             if "DONE" in name:
-                if not Path(value).stem + "_done" == name.lower():
+                if not (Path(value).stem).lower() + "_done" == name.lower():
                     offenders.append(
-                        f"{fq}: Log filename '{Path(value).stem + '_done'}' must match log constant name '{name}'"
+                        f"{fq}: Log filename '{(Path(value).stem).lower() + '_done'}' must match log constant name '{name}'"
                     )
 
-            elif not Path(value).stem == name.lower():
+            elif not (Path(value).stem).lower() == name.lower():
                 offenders.append(
-                    f"{fq}: Log filename '{Path(value).stem}' must match log constant name '{name}'"
+                    f"{fq}: Log filename '{(Path(value).stem).lower()}' must match log constant name '{name}'"
                 )
 
         else:

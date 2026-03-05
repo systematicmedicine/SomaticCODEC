@@ -3,6 +3,7 @@ FastQC on demultiplexed, trimmed, filtered FASTQs
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_fastqcfilter_metrics:
     input:
@@ -16,7 +17,7 @@ rule ex_fastqcfilter_metrics:
         txt_r1 = EX.MET_FASTQC_FILTER_TXT_R1,
         txt_r2 = EX.MET_FASTQC_FILTER_TXT_R2
     log:
-        "logs/{ex_sample}/ex_fastqctrim_metrics.log"
+        L.EX_FASTQCFILTER_METRICS
     benchmark:
         "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
     threads: 

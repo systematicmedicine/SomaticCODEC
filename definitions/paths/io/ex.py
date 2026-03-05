@@ -149,7 +149,7 @@ MET_TOTAL_READ_LOSS = "metrics/ex/{ex_sample}/{ex_sample}_total_read_loss.json"
 
 MET_VAR_CALL_DISAGREE = "metrics/ex/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json"
 
-# Variant calling
+# Variant analysis
 
 MET_SOMATIC_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.json"
 MET_CHROM_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"

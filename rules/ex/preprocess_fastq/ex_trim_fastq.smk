@@ -9,6 +9,7 @@ Trim reads so that only inserts are remaining
 
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_trim_fastq:
     input:
@@ -48,7 +49,7 @@ rule ex_trim_fastq:
         r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_trim_fastq.log"
+        L.EX_TRIM_FASTQ
     benchmark:
         "logs/{ex_sample}/ex_trim_fastq.benchmark.txt"
     threads:

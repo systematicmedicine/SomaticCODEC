@@ -3,6 +3,7 @@ Generates a summary of key metrics for ex filter fastqc reports
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
 
 rule ex_fastqc_filter_summary_metrics:
     input:
@@ -14,7 +15,7 @@ rule ex_fastqc_filter_summary_metrics:
     params:
         sample = "{ex_sample}"
     log:
-        "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.log"
+        L.EX_FASTQC_FILTER_SUMMARY_METRICS
     benchmark:
         "logs/{ex_sample}/ex_fastqc_filter_summary_metrics.benchmark.txt"
     threads:

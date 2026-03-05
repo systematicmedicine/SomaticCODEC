@@ -4,6 +4,7 @@ Calculates DSC coverage metrics
 
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ex_dsc_coverage_metrics:
     input:
@@ -18,7 +19,7 @@ rule ex_dsc_coverage_metrics:
         ex_depth_threshold = config["sci_params"]["ex_dsc_coverage_metrics"]["ex_depth_threshold"],
         ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:
-        "logs/{ex_sample}/ex_dsc_coverage_metrics.log"
+        L.EX_DSC_COVERAGE_METRICS
     benchmark:
         "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
     threads:
