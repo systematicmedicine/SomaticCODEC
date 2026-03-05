@@ -32,7 +32,7 @@ Types of changes:
 - Combined ex_bases_trimmed and ex_trimmed_read_length_metrics into ex_trim_summary_metrics (#342)
 - Removed hardcoded config paths from helper functions (#344)
 - Removed hardcoded file paths from tests (#346)
-- Decoupled shared setup and processing rules (#)
+- Decoupled shared setup and processing rules (#349)
 
 ## [5.0.0] - 2026-03-02
 
