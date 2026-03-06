@@ -5,6 +5,8 @@ Combines all masks into a single BED file
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
 from definitions.paths.io import shared as S
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule combine_masks:
     input:
@@ -27,9 +29,9 @@ rule combine_masks:
         intermediate_cat = temp(MS.COMBINE_MASKS_INT1),
         intermediate_sorted = temp(MS.COMBINE_MASKS_INT2)
     log:
-        "logs/{ms_sample}/combine_masks.log"
+        L.COMBINE_MASKS
     benchmark:
-        "logs/{ms_sample}/combine_masks.benchmark.txt"
+        B.COMBINE_MASKS
     threads:
         1
     resources:

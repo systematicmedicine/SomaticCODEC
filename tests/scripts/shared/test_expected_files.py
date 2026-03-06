@@ -37,7 +37,7 @@ def load_config(lightweight_test_run):
 
 # Create a list of all files created by the pipeline
 def file_manifest() -> list[str]:
-    roots = ["tmp", "metrics", "results"]
+    roots = ["tmp", "metrics", "results", "logs"]
     out = set()
 
     for root in roots:
@@ -126,6 +126,8 @@ def expected_from_paths_package(config) -> list[str]:
         "definitions.paths.io.ex",
         "definitions.paths.io.ms",
         "definitions.paths.io.shared",
+        "definitions.paths.log",
+        "definitions.paths.benchmark"
     )
 
     fmt = string.Formatter()
@@ -134,6 +136,10 @@ def expected_from_paths_package(config) -> list[str]:
     for mod in modules:
         for name, tpl in vars(importlib.import_module(mod)).items():
             if name.startswith("_") or not isinstance(tpl, str):
+                continue
+
+            # Skip rule which does not run if pipeline log exists
+            if "ensure_pipeline_log_exists" in tpl:
                 continue
 
             fields = {f for _, f, _, _ in fmt.parse(tpl) if f}
@@ -197,6 +203,11 @@ def test_nonzero_size():
     zero_size = []
 
     for path in file_manifest():
+        # Skip log/benchmark files
+        if Path(path).parts[0] == "logs":
+            continue
+
+        # Add zero-size files to list
         if Path(path).stat().st_size == 0:
             zero_size.append(path)
 

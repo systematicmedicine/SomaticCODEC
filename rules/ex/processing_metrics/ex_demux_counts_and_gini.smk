@@ -4,6 +4,8 @@ Generates a summary file with demuxed adaptor counts and Gini coefficient for in
 
 import json
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_demux_counts_and_gini:
     input:
@@ -13,9 +15,9 @@ rule ex_demux_counts_and_gini:
     params:
         ex_sample_ids = md.get_ex_sample_ids(config)
     log:
-        "logs/{ex_lane}/ex_demux_counts_and_gini.log"
+        L.EX_DEMUX_COUNTS_AND_GINI
     benchmark:
-        "logs/{ex_lane}/ex_demux_counts_and_gini.benchmark.txt"
+        B.EX_DEMUX_COUNTS_AND_GINI
     threads:
         1
     resources:

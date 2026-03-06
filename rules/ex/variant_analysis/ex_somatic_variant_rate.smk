@@ -3,6 +3,8 @@ Calculate the somatic variant rate
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_somatic_variant_rate:
     input:
@@ -10,9 +12,9 @@ rule ex_somatic_variant_rate:
     output:
         results = EX.MET_SOMATIC_VARIANT_RATE
     log:
-        "logs/{ex_sample}/ex_somatic_variant_rate.log"
+        L.EX_SOMATIC_VARIANT_RATE
     benchmark:
-        "logs/{ex_sample}/ex_somatic_variant_rate.benchmark.txt"
+        B.EX_SOMATIC_VARIANT_RATE
     threads:
         1
     resources:

@@ -4,6 +4,8 @@
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_add_read_groups:
     input:
@@ -14,9 +16,9 @@ rule ex_add_read_groups:
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_add_read_groups.log"
+        L.EX_ADD_READ_GROUPS
     benchmark:
-        "logs/{ex_sample}/ex_add_read_groups.benchmark.txt"
+        B.EX_ADD_READ_GROUPS
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

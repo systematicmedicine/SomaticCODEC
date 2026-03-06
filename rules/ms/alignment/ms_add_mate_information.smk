@@ -3,6 +3,8 @@
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_add_mate_information:
     input:
@@ -15,9 +17,9 @@ rule ms_add_mate_information:
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ms_sample}/ms_add_mate_information.log"
+        L.MS_ADD_MATE_INFORMATION
     benchmark:
-        "logs/{ms_sample}/ms_add_mate_information.benchmark.txt"
+        B.MS_ADD_MATE_INFORMATION
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

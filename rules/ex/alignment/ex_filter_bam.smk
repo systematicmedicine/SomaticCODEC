@@ -11,6 +11,8 @@ Filter mapped reads
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_filter_bam:
     input:
@@ -20,9 +22,9 @@ rule ex_filter_bam:
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_filter_map.log"
+        L.EX_FILTER_BAM
     benchmark:
-        "logs/{ex_sample}/ex_filter_map.benchmark.txt"
+        B.EX_FILTER_BAM
     threads: 
         config["infrastructure"]["threads"]["heavy"]
     resources:

@@ -3,7 +3,9 @@
 
 Defines pipeline outputs, to be imported into top-level Snakefile
 
-Authors: Cameron Fraser
+Authors: 
+    - Cameron Fraser
+    - Joshua Johnstone
 """
 
 # Load libraries
@@ -11,6 +13,7 @@ import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
 from definitions.paths.io import shared as S
+from definitions.paths import log as L
 
 # Get lists of sample ids
 ex_lane_ids = md.get_ex_lane_ids(config)
@@ -123,10 +126,10 @@ shared_metrics = [
     S.MET_COMPONENT_METRICS_HEATMAP,
     S.MET_SYSTEM_METRICS_REPORT,
     S.MET_SYSTEM_METRICS_HEATMAP,
-    "logs/shared_rules/git_metadata.json",
-    "logs/shared_rules/combined_benchmarks.csv",
-    "logs/shared_rules/system_resource_usage.csv",
-    "logs/shared_rules/job_log.csv",
-    "logs/shared_rules/create_run_timeline_plot.log",
-    "logs/bin_scripts/run_pipeline.log"
+    L.GIT_METADATA,
+    L.COMBINED_BENCHMARKS,
+    L.SYSTEM_RESOURCE_USAGE,
+    L.JOB_LOG,
+    L.RUN_TIMELINE,
+    L.RUN_PIPELINE
 ]

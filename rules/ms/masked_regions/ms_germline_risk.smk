@@ -6,6 +6,8 @@ Creates a BED file from germline risk VCF
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_germline_risk:
     input:
@@ -32,9 +34,9 @@ rule ms_germline_risk:
         indel_padding_bases = config["sci_params"]["ms_germline_risk"]["indel_padding_bases"],
         min_alt_vaf = config["sci_params"]["ms_germline_risk"]["min_alt_vaf"]
     log:
-        "logs/{ms_sample}/ms_germline_risk.log"
+        L.MS_GERMLINE_RISK
     benchmark:
-        "logs/{ms_sample}/ms_germline_risk.benchmark.txt"
+        B.MS_GERMLINE_RISK
     threads:
         config["infrastructure"]["threads"]["light"]
     resources:

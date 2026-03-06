@@ -5,6 +5,8 @@ Calculates overlap between coverage of various BED and BAM files
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_coverage_overlap_metrics:
     input:
@@ -33,9 +35,9 @@ rule ex_coverage_overlap_metrics:
         ms_bq_threshold = config["sci_params"]["ms_pileup"]["min_base_qual"],
         ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:
-        "logs/{ex_sample}/ex_coverage_overlap_metrics.log"
+        L.EX_COVERAGE_OVERLAP_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_coverage_overlap_metrics.benchmark.txt"
+        B.EX_COVERAGE_OVERLAP_METRICS
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:

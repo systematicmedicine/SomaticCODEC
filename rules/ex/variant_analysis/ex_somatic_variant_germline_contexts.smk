@@ -5,6 +5,8 @@ Obtains the germline contexts for positions where somatic variants were called
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_somatic_variant_germline_contexts:
     input:
@@ -15,9 +17,9 @@ rule ex_somatic_variant_germline_contexts:
     output:
         contexts_vcf = EX.MET_SNV_GERMLINE_CONTEXT
     log:
-        "logs/{ex_sample}/ex_somatic_variant_germline_context.log"
+        L.EX_SOMATIC_VARIANT_GERMLINE_CONTEXTS
     benchmark:
-        "logs/{ex_sample}/ex_somatic_variant_germline_context.benchmark.txt"
+        B.EX_SOMATIC_VARIANT_GERMLINE_CONTEXTS
     threads: 
         config["infrastructure"]["threads"]["heavy"]
     resources:

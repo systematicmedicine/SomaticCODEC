@@ -2,6 +2,9 @@
 Creates index files from reference genome
 """
 
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
+
 rule bwamem_index_files:
     input:
         reference = config["sci_params"]["shared"]["reference_genome"]
@@ -12,9 +15,9 @@ rule bwamem_index_files:
         pac = config["sci_params"]["shared"]["reference_genome"] + ".pac",
         sa = config["sci_params"]["shared"]["reference_genome"] + ".0123"
     log:
-        "logs/shared_rules/bwamem_index_files.log"
+        L.BWAMEM_INDEX_FILES
     benchmark:
-        "logs/shared_rules/bwamem_index_files.benchmark.txt"
+        B.BWAMEM_INDEX_FILES
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:
