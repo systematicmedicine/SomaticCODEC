@@ -33,6 +33,7 @@ Types of changes:
 - Removed hardcoded config paths from helper functions (#344)
 - Removed hardcoded file paths from tests (#346)
 - Decoupled shared setup and processing rules (#349)
+- Centralised log and benchmark file paths (#350) 
 
 ## [5.0.0] - 2026-03-02
 
