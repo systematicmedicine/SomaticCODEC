@@ -4,6 +4,7 @@ Creates a mask for genomic positions with low read depth in matched sample
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_low_depth:
     input:
@@ -13,7 +14,7 @@ rule ms_low_depth:
         intermediate_bed = temp(MS.LOW_DEPTH_MASK_INT1),
         lowdepth_bed = temp(MS.LOW_DEPTH_MASK)
     log:
-        "logs/{ms_sample}/ms_low_depth.log"
+        L.MS_LOW_DEPTH
     benchmark:
         "logs/{ms_sample}/ms_low_depth.benchmark.txt"
     threads:

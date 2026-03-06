@@ -31,7 +31,7 @@ rule ms_trim_fastq:
         min_overlap = config["sci_params"]["ms_trim_fastq"]["min_overlap"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ms_sample}/ms_trim_fastq.log"
+        L.MS_TRIM_FASTQ
     benchmark:
         "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
     threads: 

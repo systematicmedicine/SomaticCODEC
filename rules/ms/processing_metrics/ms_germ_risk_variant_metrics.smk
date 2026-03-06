@@ -3,6 +3,7 @@ Generates metrics for germline risk variants
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
  
 rule ms_germ_risk_variant_metrics:
     input: 
@@ -10,7 +11,7 @@ rule ms_germ_risk_variant_metrics:
     output:
         stat = MS.MET_GERM_RISK_VARIANTS
     log:
-        "logs/{ms_sample}/ms_germ_risk_variant_metrics.log"
+        L.MS_GERM_RISK_VARIANT_METRICS
     benchmark:
         "logs/{ms_sample}/ms_germ_risk_variant_metrics.benchmark.txt"
     resources:

@@ -3,6 +3,7 @@ Calulcates the number of bases at each depth level
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_depth_histogram_metrics:
     input:
@@ -17,7 +18,7 @@ rule ms_depth_histogram_metrics:
         min_base_qual = config["sci_params"]["ms_pileup"]["min_base_qual"],
         min_map_qual = config["sci_params"]["ms_pileup"]["min_map_qual"],
     log:
-        "logs/{ms_sample}/ms_depth_histogram_metrics.log"
+        L.MS_DEPTH_HISTOGRAM_METRICS
     benchmark:
         "logs/{ms_sample}/ms_depth_histogram_metrics.benchmark.txt"
     threads:

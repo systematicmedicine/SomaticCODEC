@@ -3,6 +3,7 @@ Generates ms duplication metrics
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_duplication_metrics:
     input:
@@ -12,7 +13,7 @@ rule ms_duplication_metrics:
     params:
         sample = "{ms_sample}"
     log:
-        "logs/{ms_sample}/ms_duplication_metrics.log"
+        L.MS_DUPLICATION_METRICS
     benchmark:
         "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
     threads:

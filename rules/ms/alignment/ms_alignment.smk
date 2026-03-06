@@ -3,6 +3,7 @@ Aligns reads to reference genome
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_alignment:
     input:
@@ -36,7 +37,7 @@ rule ms_alignment:
         z_dropoff = config["sci_params"]["ms_map"]["z_dropoff"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ms_sample}/ms_raw_alignment.log"
+        L.MS_ALIGNMENT
     benchmark:
         "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
     threads: 

@@ -3,6 +3,7 @@ Generates MS alignment metrics
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_alignment_metrics:
     input:
@@ -10,7 +11,7 @@ rule ms_alignment_metrics:
     output:
         stats = MS.MET_ALIGNMENT
     log:
-        "logs/{ms_sample}/ms_alignment_metrics.log"
+        L.MS_ALIGNMENT_METRICS
     benchmark:
         "logs/{ms_sample}/ms_alignment_metrics.benchmark.txt"
     threads:

@@ -163,9 +163,31 @@ EX_RECURRENT_VARIANT_METRICS = "logs/shared_rules/ex_recurrent_variant_metrics.l
 
 # Preprocess FASTQ
 
+MS_TRIM_FASTQ = "logs/{ms_sample}/ms_trim_fastq.log"
+
+MS_FILTER_FASTQ = "logs/{ms_sample}/ms_filter_fastq.log"
+
 # Alignment
 
+MS_ALIGNMENT = "logs/{ms_sample}/ms_alignment.log"
+
+MS_ADD_READ_GROUPS = "logs/{ms_sample}/ms_add_read_groups.log"
+
+MS_ADD_MATE_INFORMATION = "logs/{ms_sample}/ms_add_mate_information.log"
+
+MS_REMOVE_DUPLICATES = "logs/{ms_sample}/ms_remove_duplicates.log"
+
 # Masked regions
+
+MS_PILEUP = "logs/{ms_sample}/ms_pileup.log"
+
+MS_GERMLINE_RISK = "logs/{ms_sample}/ms_germline_risk.log"
+
+MS_LOW_DEPTH = "logs/{ms_sample}/ms_low_depth.log"
+
+COMBINE_MASKS = "logs/{ms_sample}/combine_masks.log"
+
+GENERATE_INCLUDE_BED = "logs/{ex_sample}/generate_include_bed.log"
 
 # ---------------------------------------------------------------------------------------------------------------
 # Metrics
@@ -173,6 +195,26 @@ EX_RECURRENT_VARIANT_METRICS = "logs/shared_rules/ex_recurrent_variant_metrics.l
 
 # Preprocess FASTQ
 
+MS_RAW_FASTQ_METRICS = "logs/{ms_sample}/ms_raw_fastq_metrics.log"
+MS_PROCESSED_FASTQ_METRICS = "logs/{ms_sample}/ms_processed_fastq_metrics.log"
+MS_FASTQC_SUMMARY_METRICS = "logs/{ms_sample}/ms_fastqc_summary_metrics.log"
+
 # Alignment
 
+MS_ALIGNMENT_METRICS = "logs/{ms_sample}/ms_alignment_metrics.log"
+
+MS_MULTIMAPPING_METRICS = "logs/{ms_sample}/ms_multimapping_metrics.log"
+
+MS_INSERT_METRICS = "logs/{ms_sample}/ms_insert_metrics.log"
+
+MS_DUPLICATION_METRICS = "logs/{ms_sample}/ms_duplication_metrics.log"
+
+MS_DEPTH_HISTOGRAM_METRICS = "logs/{ms_sample}/ms_depth_histogram_metrics.log"
+MS_COVERAGE_BY_DEPTH_METRICS = "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
+
 # Masked regions
+
+MS_GERM_RISK_VARIANT_METRICS = "logs/{ms_sample}/ms_germ_risk_variant_metrics.log"
+MS_GERMLINE_RISK_RATE = "logs/{ms_sample}/ms_germline_risk_rate.log"
+
+MS_MASKING_METRICS = "logs/{ms_sample}/ms_masking_metrics.log"
