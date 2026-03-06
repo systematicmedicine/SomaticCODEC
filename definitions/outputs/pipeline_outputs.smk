@@ -3,7 +3,9 @@
 
 Defines pipeline outputs, to be imported into top-level Snakefile
 
-Authors: Cameron Fraser
+Authors: 
+    - Cameron Fraser
+    - Joshua Johnstone
 """
 
 # Load libraries

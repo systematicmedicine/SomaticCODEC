@@ -4,6 +4,7 @@ Generates MS alignment metrics
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_alignment_metrics:
     input:
@@ -13,7 +14,7 @@ rule ms_alignment_metrics:
     log:
         L.MS_ALIGNMENT_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_alignment_metrics.benchmark.txt"
+        B.MS_ALIGNMENT_METRICS
     threads:
         1
     resources:

@@ -4,6 +4,7 @@ Calculates the distance to nearest SNV, for each SNV
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_snv_distance_metrics:
     input:
@@ -13,7 +14,7 @@ rule ex_snv_distance_metrics:
     log:
         L.EX_SNV_DISTANCE_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_snv_distance_metrics.benchmark.txt"
+        B.EX_SNV_DISTANCE_METRICS
     threads:
         1
     resources:

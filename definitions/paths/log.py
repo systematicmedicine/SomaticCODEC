@@ -3,9 +3,7 @@
 
 Defines path constants for logs
 
-Authors: 
-    - Cameron Fraser
-    - Joshua Johnstone
+Author: Joshua Johnstone
 
 """
 

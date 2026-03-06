@@ -4,6 +4,7 @@ Creates a CSV of job start and finish times
 
 from definitions.paths.io import shared as S
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule create_job_log:
     input:
@@ -17,7 +18,7 @@ rule create_job_log:
     log:
         L.CREATE_JOB_LOG
     benchmark:
-        "logs/shared_rules/create_job_log.benchmark.txt"
+        B.CREATE_JOB_LOG
     threads:
         1
     resources:

@@ -4,6 +4,7 @@ Calculate percentage of reads lost when calling DSC
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_call_dsc_read_loss:
     input:
@@ -16,7 +17,7 @@ rule ex_call_dsc_read_loss:
     log:
         L.EX_CALL_DSC_READ_LOSS
     benchmark:
-        "logs/{ex_sample}/ex_call_dsc_metrics.benchmark.txt"
+        B.EX_CALL_DSC_READ_LOSS
     threads:
         1
     resources:

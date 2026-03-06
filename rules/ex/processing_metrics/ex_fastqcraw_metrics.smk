@@ -5,6 +5,7 @@ FastQC on raw fastq files (before demultiplexing or any processing)
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_fastqcraw_metrics:
     input:
@@ -22,7 +23,7 @@ rule ex_fastqcraw_metrics:
     log:
         L.EX_FASTQCRAW_METRICS
     benchmark:
-        "logs/{ex_lane}/ex_fastqcraw_metrics.benchmark.txt"
+        B.EX_FASTQCRAW_METRICS
     threads: 
         config["infrastructure"]["threads"]["light"]
     resources:

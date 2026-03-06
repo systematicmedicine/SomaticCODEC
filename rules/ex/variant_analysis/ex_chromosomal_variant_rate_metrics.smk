@@ -4,6 +4,7 @@ Compares variant rate between chromosomes
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_chromosomal_variant_rate_metrics:
     input:
@@ -16,7 +17,7 @@ rule ex_chromosomal_variant_rate_metrics:
     log:
         L.EX_CHROMOSOMAL_VARIANT_RATE_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
+        B.EX_CHROMOSOMAL_VARIANT_RATE_METRICS
     threads:
         1
     resources:

@@ -5,6 +5,7 @@ Filter reads from DSC
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_filter_dsc:
     input:
@@ -19,7 +20,7 @@ rule ex_filter_dsc:
     log:
         L.EX_FILTER_DSC
     benchmark:
-        "logs/{ex_sample}/ex_filter_dsc.benchmark.txt"
+        B.EX_FILTER_DSC
     threads:
         1
     resources:

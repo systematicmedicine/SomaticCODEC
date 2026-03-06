@@ -5,6 +5,7 @@ Calculate trinucleotide contexts for called somatic mutations
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_trinucleotide_context_metrics:
     input:
@@ -22,7 +23,7 @@ rule ex_trinucleotide_context_metrics:
     log:
         L.EX_TRINUCLEOTIDE_CONTEXT_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_trinucleotide_context_metrics.benchmark.txt"
+        B.EX_TRINUCLEOTIDE_CONTEXT_METRICS
     threads:
         1
     resources:

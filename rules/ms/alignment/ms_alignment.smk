@@ -4,6 +4,7 @@ Aligns reads to reference genome
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_alignment:
     input:
@@ -39,7 +40,7 @@ rule ms_alignment:
     log:
         L.MS_ALIGNMENT
     benchmark:
-        "logs/{ms_sample}/ms_raw_alignment.benchmark.txt"
+        B.MS_ALIGNMENT
     threads: 
         config["infrastructure"]["threads"]["moderate"]
     resources:

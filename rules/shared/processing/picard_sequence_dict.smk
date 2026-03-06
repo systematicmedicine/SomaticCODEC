@@ -3,6 +3,7 @@ Creates reference .dict file
 """
 
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule picard_sequence_dict:
     input:
@@ -12,7 +13,7 @@ rule picard_sequence_dict:
     log:
         L.PICARD_SEQUENCE_DICT
     benchmark:
-        "logs/shared_rules/picard_sequence_dict.benchmark.txt"
+        B.PICARD_SEQUENCE_DICT
     threads:
         1
     resources:

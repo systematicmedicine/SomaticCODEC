@@ -4,6 +4,7 @@ Generates a summary of key metrics for ms fastqc reports
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_fastqc_summary_metrics:
     input:
@@ -21,7 +22,7 @@ rule ms_fastqc_summary_metrics:
     log:
         L.MS_FASTQC_SUMMARY_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_fastqc_summary_metrics.benchmark.txt"
+        B.MS_FASTQC_SUMMARY_METRICS
     threads:
         1
     resources:

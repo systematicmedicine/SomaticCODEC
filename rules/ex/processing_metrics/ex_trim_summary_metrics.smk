@@ -4,6 +4,7 @@ Calculates the number of bases lost during ex_trim_fastq, the length percentiles
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_trim_summary_metrics:
     input:
@@ -16,7 +17,7 @@ rule ex_trim_summary_metrics:
     log:
         L.EX_TRIM_SUMMARY_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_trim_summary_metrics.benchmark.txt"
+        B.EX_TRIM_SUMMARY_METRICS
     threads:
         1
     resources:

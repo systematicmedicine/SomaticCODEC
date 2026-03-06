@@ -8,8 +8,8 @@ Checks:
 2) R1/R2 naming consistency for all constants.
 2) Metrics constants (name contains "MET"):
    - must end with an acceptable extension
-4) Log constants must contain the same name as the constant name
-5) Non-metrics constants (name does NOT contain "MET"):
+4/5) Log/benchmark constants must contain the same name as the constant name
+6) Non-metrics/log/benchmark constants:
    - extension expectations based on name tokens (BAM/SAM/FASTQ/VCF/BED)
    - must end with an acceptable extension
 
@@ -90,6 +90,7 @@ def test_path_constants_guardrails():
     for fq, name, value in constants:
         is_met = name.startswith("MET")
         is_log = fq.startswith("definitions.paths.log.")
+        is_benchmark = fq.startswith("definitions.paths.benchmark.")
 
         # 2) R1 / R2 rules (apply to all constants)
         if "R1" in name:
@@ -117,12 +118,18 @@ def test_path_constants_guardrails():
 
             elif not (Path(value).stem).lower() == name.lower():
                 offenders.append(
-                    f"{fq}: Log filename '{(Path(value).stem).lower()}' must match log constant name '{name}'"
+                    f"{fq}: Log filename '{(Path(value).stem).lower()}' must match constant name '{name}'"
                 )
 
-        else:
-            # 5) Non-metrics rules
+        elif is_benchmark:
+            # 5) Benchmark rules
+            if not (Path(value).stem.rsplit('.', 1)[0]).lower() == name.lower():
+                    offenders.append(
+                        f"{fq}: Benchmark filename '{(Path(value).stem.rsplit('.', 1)[0]).lower()}' must match constant name '{name}'"
+                    )   
 
+        else:
+            # 6) Non-metrics/log/benchmark rules
             if "BAM" in name and ".bam" not in value:
                 offenders.append(f"{fq}: name contains BAM but '.bam' not in value -> '{value}'")
 

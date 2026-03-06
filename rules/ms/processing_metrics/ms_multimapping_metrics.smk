@@ -4,6 +4,7 @@ Calculates the number of multimapping reads following alignment
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_multimapping_metrics:
     input:
@@ -13,7 +14,7 @@ rule ms_multimapping_metrics:
     log:
         L.MS_MULTIMAPPING_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_multimapping_metrics.benchmark.txt"
+        B.MS_MULTIMAPPING_METRICS
     threads:
         1
     resources:

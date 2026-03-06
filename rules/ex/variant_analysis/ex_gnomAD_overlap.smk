@@ -4,6 +4,7 @@ Determines how many called somatic variants are present in dataset of common ger
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_gnomAD_overlap:
     input:
@@ -18,7 +19,7 @@ rule ex_gnomAD_overlap:
     log:
         L.EX_GNOMAD_OVERLAP
     benchmark:
-        "logs/{ex_sample}/ex_gnomAD_overlap.benchmark.txt"
+        B.EX_GNOMAD_OVERLAP
     threads:
         1
     resources:

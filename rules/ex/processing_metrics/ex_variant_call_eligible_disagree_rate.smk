@@ -5,6 +5,7 @@ Calculates the Watson vs Crick base disagreement rate at positions that would be
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_variant_call_eligible_disagree_rate:
     input:
@@ -20,7 +21,7 @@ rule ex_variant_call_eligible_disagree_rate:
     log:
         L.EX_VARIANT_CALL_ELIGIBLE_DISAGREE_RATE
     benchmark:
-        "logs/{ex_sample}/ex_variant_call_eligible_disagree_rate.benchmark.txt"
+        B.EX_VARIANT_CALL_ELIGIBLE_DISAGREE_RATE
     threads:
         1
     resources:

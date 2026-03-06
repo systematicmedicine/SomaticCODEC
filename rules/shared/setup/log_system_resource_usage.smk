@@ -3,6 +3,7 @@ Logs disk space, memory, and cpu load at a defined interval
 """
 
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule log_system_resource_usage:
     output:
@@ -14,7 +15,7 @@ rule log_system_resource_usage:
     log:
         L.LOG_SYSTEM_RESOURCE_USAGE
     benchmark:
-        "logs/shared_rules/log_system_resource_usage.benchmark.txt"
+        B.LOG_SYSTEM_RESOURCE_USAGE
     threads:
         1
     resources:

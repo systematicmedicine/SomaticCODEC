@@ -6,6 +6,7 @@ import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
 from definitions.paths.io import shared as S
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule combine_masks:
     input:
@@ -30,7 +31,7 @@ rule combine_masks:
     log:
         L.COMBINE_MASKS
     benchmark:
-        "logs/{ms_sample}/combine_masks.benchmark.txt"
+        B.COMBINE_MASKS
     threads:
         1
     resources:

@@ -3,6 +3,7 @@ Ensures that setup has been completed
 """
 
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule complete_setup:
     input:
@@ -14,7 +15,7 @@ rule complete_setup:
     log:
         L.COMPLETE_SETUP
     benchmark:
-        "logs/shared_rules/complete_setup.benchmark.txt"
+        B.COMPLETE_SETUP
     threads:
         1
     resources:
@@ -25,5 +26,5 @@ rule complete_setup:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
 
         # Create setup complete done file
-        touch {output}
+        touch {output} 2>> {log}
         """

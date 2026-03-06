@@ -8,6 +8,7 @@ Create duplex consensus (DSC)
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_call_dsc:
     input:
@@ -26,7 +27,7 @@ rule ex_call_dsc:
     log:
         L.EX_CALL_DSC
     benchmark:
-        "logs/{ex_sample}/ex_call_dsc.benchmark.txt"
+        B.EX_CALL_DSC
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

@@ -3,6 +3,7 @@ Creates a plot of jobs and resource usage during the run
 """
 
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule create_run_timeline_plot:
     input:
@@ -17,7 +18,7 @@ rule create_run_timeline_plot:
     log:
         L.CREATE_RUN_TIMELINE_PLOT
     benchmark:
-        "logs/shared_rules/create_run_timeline_plot.benchmark.txt"
+        B.CREATE_RUN_TIMELINE_PLOT
     threads:
         1
     resources:

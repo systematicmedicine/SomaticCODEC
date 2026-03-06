@@ -6,6 +6,7 @@ Uses matched sample BAM to identify positions that may contain germline variants
 from definitions.paths.io import ms as MS
 from definitions.paths.io import shared as S
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_pileup:
     input:
@@ -27,7 +28,7 @@ rule ms_pileup:
     log:
         L.MS_PILEUP
     benchmark:
-        "logs/{ms_sample}/ms_pileup.benchmark.txt"
+        B.MS_PILEUP
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
