@@ -3,6 +3,7 @@ Removes duplicate reads based on alignment and UMIs
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_remove_duplicates:
     input:
@@ -18,7 +19,7 @@ rule ms_remove_duplicates:
         optical_duplicate_distance = config["sci_params"]["ms_remove_duplicates"]["optical_duplicate_distance"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ms_sample}/ms_remove_duplicates.log"
+        L.MS_REMOVE_DUPLICATES
     benchmark:
         "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
     threads:

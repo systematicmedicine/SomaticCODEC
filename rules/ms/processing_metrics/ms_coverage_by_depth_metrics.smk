@@ -3,6 +3,7 @@ Generates a summary of genome coverage by depth
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_coverage_by_depth_metrics:
     input:
@@ -13,7 +14,7 @@ rule ms_coverage_by_depth_metrics:
         sample = "{ms_sample}",
         min_depth = config["sci_params"]["ms_pileup"]["min_depth"]
     log:
-        "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
+        L.MS_COVERAGE_BY_DEPTH_METRICS
     benchmark:
         "logs/{ms_sample}/ms_coverage_by_depth_metrics.benchmark.txt"
     threads:

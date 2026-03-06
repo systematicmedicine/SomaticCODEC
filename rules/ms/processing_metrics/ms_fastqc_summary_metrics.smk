@@ -3,6 +3,7 @@ Generates a summary of key metrics for ms fastqc reports
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_fastqc_summary_metrics:
     input:
@@ -18,7 +19,7 @@ rule ms_fastqc_summary_metrics:
     params:
         sample = "{ms_sample}"
     log:
-        "logs/{ms_sample}/ms_fastqc_summary_metrics.log"
+        L.MS_FASTQC_SUMMARY_METRICS
     benchmark:
         "logs/{ms_sample}/ms_fastqc_summary_metrics.benchmark.txt"
     threads:

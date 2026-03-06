@@ -3,6 +3,7 @@ Generates a metrics file with the germline risk rate
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
 
 rule ms_germline_risk_rate:
     input:
@@ -11,7 +12,7 @@ rule ms_germline_risk_rate:
     output:
         json = MS.MET_GERM_RISK_RATE
     log:
-        "logs/{ms_sample}/ms_germline_risk_rate.log"
+        L.MS_GERMLINE_RISK_RATE
     benchmark:
         "logs/{ms_sample}/ms_germline_risk_rate.benchmark.txt"
     resources:
