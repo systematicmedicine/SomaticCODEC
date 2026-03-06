@@ -4,6 +4,7 @@ Generates ms duplication metrics
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_duplication_metrics:
     input:
@@ -15,7 +16,7 @@ rule ms_duplication_metrics:
     log:
         L.MS_DUPLICATION_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_duplication_metrics.benchmark.txt"
+        B.MS_DUPLICATION_METRICS
     threads:
         1
     resources:

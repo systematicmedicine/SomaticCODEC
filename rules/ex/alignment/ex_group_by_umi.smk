@@ -4,6 +4,7 @@ Group reads by UMI and alignment
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_group_by_umi:
     input:
@@ -19,7 +20,7 @@ rule ex_group_by_umi:
     log:
         L.EX_GROUP_BY_UMI
     benchmark:
-        "logs/{ex_sample}/ex_group_by_umi.benchmark.txt"
+        B.EX_GROUP_BY_UMI
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

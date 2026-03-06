@@ -4,6 +4,7 @@ Generates a summary of genome coverage by depth
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_coverage_by_depth_metrics:
     input:
@@ -16,7 +17,7 @@ rule ms_coverage_by_depth_metrics:
     log:
         L.MS_COVERAGE_BY_DEPTH_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_coverage_by_depth_metrics.benchmark.txt"
+        B.MS_COVERAGE_BY_DEPTH_METRICS
     threads:
         1
     resources:

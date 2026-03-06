@@ -8,6 +8,7 @@ Moves the read pair UMI to readname
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 # Rule
 rule ex_extract_fastq_umis:
@@ -31,7 +32,7 @@ rule ex_extract_fastq_umis:
     log:
         L.EX_EXTRACT_FASTQ_UMIS
     benchmark:
-        "logs/{ex_lane}/ex_extract_fastq_umis.benchmark.txt"
+        B.EX_EXTRACT_FASTQ_UMIS
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

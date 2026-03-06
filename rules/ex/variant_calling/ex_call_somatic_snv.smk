@@ -11,6 +11,7 @@ is insufficient)
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_call_somatic_snv:
     input:
@@ -36,7 +37,7 @@ rule ex_call_somatic_snv:
     log:
         L.EX_CALL_SOMATIC_SNV
     benchmark:
-        "logs/{ex_sample}/ex_call_somatic_snv.benchmark.txt"
+        B.EX_CALL_SOMATIC_SNV
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

@@ -7,6 +7,7 @@ Creates a BED file from germline risk VCF
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_germline_risk:
     input:
@@ -35,7 +36,7 @@ rule ms_germline_risk:
     log:
         L.MS_GERMLINE_RISK
     benchmark:
-        "logs/{ms_sample}/ms_germline_risk.benchmark.txt"
+        B.MS_GERMLINE_RISK
     threads:
         config["infrastructure"]["threads"]["light"]
     resources:

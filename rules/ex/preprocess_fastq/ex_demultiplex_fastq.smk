@@ -6,6 +6,7 @@ Demultiplex each lane FASTQ into sample FASTQs
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_demultiplex_fastq:
     input:
@@ -33,7 +34,7 @@ rule ex_demultiplex_fastq:
     log:
         L.EX_DEMULTIPLEX_FASTQ
     benchmark:
-        "logs/shared_rules/ex_demultiplex_fastq.benchmark.txt"
+        B.EX_DEMULTIPLEX_FASTQ
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

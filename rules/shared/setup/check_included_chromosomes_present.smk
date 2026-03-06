@@ -3,6 +3,7 @@ Checks that chromosomes included for variant calling are present in reference an
 """
 
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule check_included_chromosomes_present:
     input:
@@ -15,7 +16,7 @@ rule check_included_chromosomes_present:
     log:
         L.CHECK_INCLUDED_CHROMOSOMES_PRESENT
     benchmark:
-        "logs/shared_rules/check_included_chromosomes_present.benchmark.txt"
+        B.CHECK_INCLUDED_CHROMOSOMES_PRESENT
     threads:
         1
     resources:

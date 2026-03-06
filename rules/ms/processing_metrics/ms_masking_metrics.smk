@@ -5,6 +5,7 @@ Generates metrics for each mask BED file
 from definitions.paths.io import ms as MS
 import helpers.get_metadata as md
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_masking_metrics:
     input:
@@ -24,7 +25,7 @@ rule ms_masking_metrics:
     log:
         L.MS_MASKING_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_masking_metrics.benchmark.txt"
+        B.MS_MASKING_METRICS
     threads:
         1
     resources:

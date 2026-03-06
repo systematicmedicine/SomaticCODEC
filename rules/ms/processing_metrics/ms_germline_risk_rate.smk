@@ -4,6 +4,7 @@ Generates a metrics file with the germline risk rate
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_germline_risk_rate:
     input:
@@ -14,7 +15,7 @@ rule ms_germline_risk_rate:
     log:
         L.MS_GERMLINE_RISK_RATE
     benchmark:
-        "logs/{ms_sample}/ms_germline_risk_rate.benchmark.txt"
+        B.MS_GERMLINE_RISK_RATE
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     threads:

@@ -3,6 +3,7 @@ Writes git metadata to file for version tracking
 """
 
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule write_git_metadata:
     output:
@@ -10,7 +11,7 @@ rule write_git_metadata:
     log:
         L.WRITE_GIT_METADATA
     benchmark:
-        "logs/shared_rules/write_git_metadata.benchmark.txt"
+        B.WRITE_GIT_METADATA
     threads:
         1
     resources:

@@ -5,6 +5,7 @@ Generates adapter FASTA files for demultiplexing
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 import json
 
 rule ex_generate_demux_adaptors:
@@ -20,7 +21,7 @@ rule ex_generate_demux_adaptors:
     log:
         L.EX_GENERATE_DEMUX_ADAPTORS
     benchmark:
-        "logs/shared_rules/ex_generate_demux_adaptors/{ex_lane}.benchmark.txt"
+        B.EX_GENERATE_DEMUX_ADAPTORS
     threads:
         1
     resources:

@@ -4,6 +4,7 @@ Removes duplicate reads based on alignment and UMIs
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_remove_duplicates:
     input:
@@ -21,7 +22,7 @@ rule ms_remove_duplicates:
     log:
         L.MS_REMOVE_DUPLICATES
     benchmark:
-        "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
+        B.MS_REMOVE_DUPLICATES
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

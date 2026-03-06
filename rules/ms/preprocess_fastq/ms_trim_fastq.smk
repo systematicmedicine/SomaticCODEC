@@ -9,6 +9,7 @@ Trims FASTQ files
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_trim_fastq:
     input:
@@ -33,7 +34,7 @@ rule ms_trim_fastq:
     log:
         L.MS_TRIM_FASTQ
     benchmark:
-        "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
+        B.MS_TRIM_FASTQ
     threads: 
         config["infrastructure"]["threads"]["heavy"]
     resources:

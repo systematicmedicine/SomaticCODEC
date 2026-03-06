@@ -6,6 +6,7 @@ Filters FASTQ files
 
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_filter_fastq:
     input:
@@ -21,7 +22,7 @@ rule ms_filter_fastq:
     log:
         L.MS_FILTER_FASTQ
     benchmark:
-        "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
+        B.MS_FILTER_FASTQ
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

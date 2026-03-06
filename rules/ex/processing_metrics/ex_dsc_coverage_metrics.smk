@@ -5,6 +5,7 @@ Calculates DSC coverage metrics
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_dsc_coverage_metrics:
     input:
@@ -21,7 +22,7 @@ rule ex_dsc_coverage_metrics:
     log:
         L.EX_DSC_COVERAGE_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_dsc_coverage_metrics.benchmark.txt"
+        B.EX_DSC_COVERAGE_METRICS
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:

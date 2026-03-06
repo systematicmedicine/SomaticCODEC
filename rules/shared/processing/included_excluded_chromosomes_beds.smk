@@ -5,6 +5,7 @@ e.g. chrUn, chr*_random, chrM, chrEBV
 
 from definitions.paths.io import shared as S
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule included_excluded_chromosomes_beds:
     input:
@@ -17,7 +18,7 @@ rule included_excluded_chromosomes_beds:
     log:
         L.INCLUDED_EXCLUDED_CHROMOSOMES_BEDS
     benchmark:
-        "logs/shared_rules/included_excluded_chromosomes_beds.benchmark.txt"
+        B.INCLUDED_EXCLUDED_CHROMOSOMES_BEDS
     threads:
         1
     resources:

@@ -4,6 +4,7 @@ Collects alignment metrics from the experimental bam mapped to the reference gen
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_alignment_metrics:
     input:
@@ -13,7 +14,7 @@ rule ex_alignment_metrics:
     log:
         L.EX_ALIGNMENT_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_map_metrics.benchmark.txt"
+        B.EX_ALIGNMENT_METRICS
     threads:
         1
     resources:
