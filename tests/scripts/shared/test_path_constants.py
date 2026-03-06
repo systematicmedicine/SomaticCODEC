@@ -6,7 +6,7 @@ Guardrails for centralised path constants in definitions.paths.*
 Checks:
 1) No duplicate constant values.
 2) R1/R2 naming consistency for all constants.
-2) Metrics constants (name contains "MET"):
+3) Metrics constants (name contains "MET"):
    - must end with an acceptable extension
 4/5) Log/benchmark constants must contain the same name as the constant name
 6) Non-metrics/log/benchmark constants:
