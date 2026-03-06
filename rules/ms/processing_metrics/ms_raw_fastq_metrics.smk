@@ -5,6 +5,7 @@ Generates a fastqc report for demuxed MS FASTQs
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
 from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_raw_fastq_metrics:
     input:
@@ -20,9 +21,9 @@ rule ms_raw_fastq_metrics:
         r1_txt = MS.MET_FASTQC_RAW_TXT_R1,
         r2_txt = MS.MET_FASTQC_RAW_TXT_R2
     log:
-        "logs/{ms_sample}/ms_raw_fastq_metrics.log"
+        L.MS_RAW_FASTQ_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
+        B.MS_RAW_FASTQ_METRICS
     threads: 
         config["infrastructure"]["threads"]["light"]
     resources:

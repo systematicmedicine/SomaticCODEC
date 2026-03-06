@@ -2,19 +2,20 @@
 Ensures that setup has been completed
 """
 
-import definitions.paths.log as L
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule complete_setup:
     input:
-        run_pipeline_log = "logs/bin_scripts/run_pipeline.log",
-        sys_resource_log_done = L.SYS_RESOURCE_LOG_DONE,
-        inc_chrom_present_done = L.INC_CHROM_PRESENT_DONE
+        run_pipeline_log = L.RUN_PIPELINE,
+        sys_resource_log_done = L.LOG_SYSTEM_RESOURCE_USAGE_DONE,
+        inc_chrom_present_done = L.CHECK_INCLUDED_CHROMOSOMES_PRESENT_DONE
     output:
         L.SETUP_DONE
     log:
-        "logs/shared_rules/complete_setup.log"
+        L.COMPLETE_SETUP
     benchmark:
-        "logs/shared_rules/complete_setup.benchmark.txt"
+        B.COMPLETE_SETUP
     threads:
         1
     resources:
@@ -25,5 +26,5 @@ rule complete_setup:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
 
         # Create setup complete done file
-        touch {output}
+        touch {output} 2>> {log}
         """

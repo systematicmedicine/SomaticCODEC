@@ -4,6 +4,8 @@
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_add_read_groups:
     input:
@@ -14,9 +16,9 @@ rule ms_add_read_groups:
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ms_sample}/ms_add_read_groups.log"
+        L.MS_ADD_READ_GROUPS
     benchmark:
-        "logs/{ms_sample}/ms_add_read_groups.benchmark.txt"
+        B.MS_ADD_READ_GROUPS
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

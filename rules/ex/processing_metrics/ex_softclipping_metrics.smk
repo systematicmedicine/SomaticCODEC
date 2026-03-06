@@ -3,6 +3,8 @@ Quantifies soft clipping in final DSC
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_softclipping_metrics:
     input:
@@ -10,9 +12,9 @@ rule ex_softclipping_metrics:
     output:
         metrics = EX.MET_SOFTCLIPPING
     log:
-        "logs/{ex_sample}/ex_softclipping_metrics.log"
+        L.EX_SOFTCLIPPING_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_softclipping_metrics.benchmark.txt"
+        B.EX_SOFTCLIPPING_METRICS
     threads:
         1
     resources:

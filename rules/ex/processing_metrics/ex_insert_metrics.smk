@@ -3,6 +3,8 @@ Shows distribution of insert sizes (distance between 5' end of R1 and 3' end of 
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_insert_metrics:
     input:
@@ -12,9 +14,9 @@ rule ex_insert_metrics:
         txt = EX.MET_INSERT_SIZE_TXT,
         hist = EX.MET_INSERT_SIZE_PDF
     log:
-        "logs/{ex_sample}/ex_insert_metrics.log"
+        L.EX_INSERT_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_insert_metrics.benchmark.txt"
+        B.EX_INSERT_METRICS
     threads:
         1
     resources:

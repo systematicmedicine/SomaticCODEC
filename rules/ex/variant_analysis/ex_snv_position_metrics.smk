@@ -3,6 +3,8 @@ Positional distribution of called SNVs
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_snv_position_metrics:
     input:
@@ -15,9 +17,9 @@ rule ex_snv_position_metrics:
         included_chroms = config["sci_params"]["shared"]["included_chromosomes"],
         run_name = config["run_name"]
     log:
-        "logs/{ex_sample}/ex_snv_position_metrics.log"
+        L.EX_SNV_POSITION_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_snv_position_metrics.benchmark.txt"
+        B.EX_SNV_POSITION_METRICS
     threads:
         1
     resources:

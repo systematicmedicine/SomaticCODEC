@@ -4,6 +4,8 @@ Generates a BED file of regions eligible for variant calling
 """
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 # Main rule
 rule generate_include_bed:
@@ -16,9 +18,9 @@ rule generate_include_bed:
     output:
         include_bed = MS.INCLUDE_BED
     log:
-        "logs/{ex_sample}/generate_include_bed.log"
+        L.GENERATE_INCLUDE_BED
     benchmark:
-        "logs/{ex_sample}/generate_include_bed.benchmark.txt"
+        B.GENERATE_INCLUDE_BED
     threads:
         1
     resources:

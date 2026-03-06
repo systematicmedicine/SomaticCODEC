@@ -3,6 +3,8 @@ Generates ms insert size metrics
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_insert_metrics:
     input:
@@ -12,9 +14,9 @@ rule ms_insert_metrics:
         insert_metrics = MS.MET_INSERT_SIZE_TXT,
         insert_hist = MS.MET_INSERT_SIZE_PDF
     log:
-        "logs/{ms_sample}/ms_insert_metrics.log"
+        L.MS_INSERT_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_insert_metrics.benchmark.txt"
+        B.MS_INSERT_METRICS
     threads:
         1
     resources:

@@ -5,6 +5,8 @@ Filters FASTQ files
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_filter_fastq:
     input:
@@ -18,9 +20,9 @@ rule ms_filter_fastq:
         min_read_length = config["sci_params"]["ms_filter_fastq"]["min_read_length"],
         average_quality_threshold = config["sci_params"]["ms_filter_fastq"]["average_quality_threshold"]
     log:
-        "logs/{ms_sample}/ms_filter_fastq.log"
+        L.MS_FILTER_FASTQ
     benchmark:
-        "logs/{ms_sample}/ms_filter_fastq.benchmark.txt"
+        B.MS_FILTER_FASTQ
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

@@ -7,6 +7,8 @@ include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outp
 
 from definitions.paths.io import shared as S
 from helpers import get_metadata as md
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 # Rule
 rule create_metrics_report:
@@ -35,9 +37,9 @@ rule create_metrics_report:
         ms_samples = md.get_ms_sample_ids(config),
         run_name = config["run_name"]
     log:
-        "logs/shared_rules/create_metrics_report.log"
+        L.CREATE_METRICS_REPORT
     benchmark:
-        "logs/shared_rules/create_metrics_report.benchmark.txt"
+        B.CREATE_METRICS_REPORT
     threads:
         1
     resources:

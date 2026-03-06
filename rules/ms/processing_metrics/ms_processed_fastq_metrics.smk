@@ -3,6 +3,8 @@ Generates a fastqc report for ms processed reads
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_processed_fastq_metrics:
     input:
@@ -16,9 +18,9 @@ rule ms_processed_fastq_metrics:
         r1_txt = MS.MET_FASTQC_FILTER_TXT_R1,
         r2_txt = MS.MET_FASTQC_FILTER_TXT_R2
     log:
-        "logs/{ms_sample}/ms_processed_fastq_metrics.log"
+        L.MS_PROCESSED_FASTQ_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_processed_fastq_metrics.benchmark.txt"
+        B.MS_PROCESSED_FASTQ_METRICS
     threads:
         config["infrastructure"]["threads"]["light"]
     resources:
