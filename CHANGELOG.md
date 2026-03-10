@@ -40,7 +40,8 @@ Types of changes:
 - Removed hardcoded file paths from tests (#346)
 - Decoupled shared setup and processing rules (#349)
 - Centralised log and benchmark file paths (#350)
-- Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50
+- Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50 ()
+- Changed nn thresholds for external_concordance_blood, removed ideal thresholds ()
 
 ### Fixed
 
