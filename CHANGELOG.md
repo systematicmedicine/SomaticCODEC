@@ -15,6 +15,7 @@ Types of changes:
 
 ## Added
 
+- Added test to check that all rules have a test (#325)
 - Added tests for various rules without tests (#338)
 - Added random_seed to config.yaml (#339)
 - Added germline risk variant and germline risk rate metrics (#342)
@@ -23,6 +24,11 @@ Types of changes:
 
 ### Changed
 
+- Germline risk positions identified in any sample are now masked across all samples (#327)
+- Test scripts now used centralised paths (#323)
+- Changed file paths for ex pipeline to improve readability (#330)
+- Expected files test no longer depends on manually collated lists (#332)
+- Consolidated trimming metrics into one file for ex and one for ms (#337)
 - Set seed for pseudorandom selection of reads in ex_variant_call_eligible_disagree_rate.py (#339)
 - Redirected fastqc progress messages from stdout to rule log files (#340)
 - Metrics report now uses centralised paths (#341)
@@ -33,21 +39,9 @@ Types of changes:
 - Removed hardcoded config paths from helper functions (#344)
 - Removed hardcoded file paths from tests (#346)
 - Decoupled shared setup and processing rules (#349)
-- Centralised log and benchmark file paths (#350) 
-
-## [5.0.0] - 2026-03-02
-
-### Added
-
-- Added test to check that all rules have a test (#325)
-
-### Changed
-
-- Germline risk positions identified in any sample are now masked across all samples (#327)
-- Test scripts now used centralised paths (#323)
-- Changed file paths for ex pipeline to improve readability (#330)
-- Expected files test no longer depends on manually collated lists (#332)
-- Consolidated trimming metrics into one file for ex and one for ms (#337)
+- Centralised log and benchmark file paths (#350)
+- Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50 ()
+- Changed nn thresholds for external_concordance_blood, removed ideal thresholds ()
 
 ### Fixed
 
