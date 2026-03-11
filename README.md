@@ -24,6 +24,7 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
   SomaticCODEC utilises two distinct sample types per individual. Details on the preparation of these samples can be found in `Library preparation` below.
 
   - **Experimental (ex) samples**: Prepared with CODEC and used for somatic variant calling.
+
   - **Matched (ms) samples**: Prepared with a mostly standard PCR-free protocol, and used to create a germline variant mask for somatic variant calling.
 
 - **Library Preparation**
@@ -32,15 +33,17 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
 - **Running the Pipeline**
 
-  Overview goes here.
+  The below documents detail our `Recommended` approach for running the pipeline, as well as tips for using a `Custom` approach.
 
-  - [Setting up config.yaml]()
+  - [Setting up compute environment](docs/setup/compute_setup.md)
 
-  - [Setting up sample metadata]()
+  - [Setting up config.yaml](docs/setup/config_yaml_setup.md)
 
-  - [Setting up compute environment]()
+  - [Setting up sample metadata](docs/setup/sample_metadata_setup.md)
 
-  - [Example data]()
+  - [Running the pipeline](docs/run_pipeline.md)
+
+  - [Example setup/data](docs/example_setup.md)
 
 - **Interpreting Outputs**
 

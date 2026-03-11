@@ -184,5 +184,5 @@ infrastructure:
       sleep_interval: 60
     
   aws:
-    s3_bucket: "s3://<bucket>/<dir>/"
+    s3_out_dir: "s3://<bucket>/<dir>/"
     sns_arn: "arn:aws:sns:<region>:<account_ID>:<topic_name>"
