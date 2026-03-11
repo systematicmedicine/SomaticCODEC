@@ -19,8 +19,8 @@ rule combine_masks:
         # Positions with depth < min_depth threshold
         ms_lowdepth_bed = MS.LOW_DEPTH_MASK,
 
-        # Germline variant risk sites for all MS samples in batch
-        ms_germ_risk_beds = expand(MS.GERMLINE_RISK_MASK, ms_sample = md.get_ms_sample_ids(config)),
+        # Germline variant risk sites
+        ms_germ_risk_bed = MS.GERMLINE_RISK_MASK,
 
         # Reference FAI
         fai = config["sci_params"]["shared"]["reference_genome"] + ".fai" 
@@ -45,7 +45,7 @@ rule combine_masks:
         cat {input.precomputed_masks} \
         {input.excluded_chromosomes_bed} \
         {input.ms_lowdepth_bed} \
-        {input.ms_germ_risk_beds} > {output.intermediate_cat} 2>> {log}
+        {input.ms_germ_risk_bed} > {output.intermediate_cat} 2>> {log}
 
         # Sort combined BED in the same order as the reference file       
         bedtools sort -faidx {input.fai} -i {output.intermediate_cat} > {output.intermediate_sorted} 2>> {log}
