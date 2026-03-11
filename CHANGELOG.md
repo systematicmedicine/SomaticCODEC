@@ -24,7 +24,8 @@ Types of changes:
 
 ### Changed
 
-- Germline risk positions identified in any sample are now masked across all samples (#327)
+- Refactored rules for germline risk masking (#327 and 352)
+- Low depth mask is now set as the complement of positions eligible for germline risk calling (#327)
 - Test scripts now used centralised paths (#323)
 - Changed file paths for ex pipeline to improve readability (#330)
 - Expected files test no longer depends on manually collated lists (#332)
@@ -33,15 +34,15 @@ Types of changes:
 - Redirected fastqc progress messages from stdout to rule log files (#340)
 - Metrics report now uses centralised paths (#341)
 - Trinucleotide context cosine similarities CSV is now sorted by normalised values (#342)
-- Mask metrics are now calculated for both individual and combined germ risk BEDs (#342)
+- Mask metrics are now calculated for germ risk BEDs (#342 and 352)
 - pytest_cache and pycache are now removed from all directories before and after running tests (#342)
 - Combined ex_bases_trimmed and ex_trimmed_read_length_metrics into ex_trim_summary_metrics (#342)
 - Removed hardcoded config paths from helper functions (#344)
 - Removed hardcoded file paths from tests (#346)
 - Decoupled shared setup and processing rules (#349)
 - Centralised log and benchmark file paths (#350)
-- Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50 ()
-- Changed nn thresholds for external_concordance_blood, removed ideal thresholds ()
+- Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50 (#351)
+- Changed nn thresholds for external_concordance_blood, removed ideal thresholds (#351)
 
 ### Fixed
 
