@@ -11,19 +11,65 @@ There are four sample metadata CSVs:
 
 ex_adapters.csv contains the following columns:
 
-- ex_adapter: A unique name assigned to each adapter quadruplex (e.g. QD001)
-- r1_start: P5 adapter sequence (e.g. CTTGAACGGACTGTCCAC)
-- r1_end: Reverse complement of P7 adapter sequence (e.g. GTAGTCTAACGCTCGGTG)
-- r2_start: Reverse complement of P7 bridge sequence (e.g. CACCGAGCGTTAGACTAC)
-- r2_end: 
+- ex_adapter: A unique name assigned to each adapter quadruplex
+- r1_start: The P5 adapter sequence
+- r1_end: The P7 bridge sequence
+- r2_start: The P7 adapter sequence
+- r2_end: The P5 bridge sequence
 
-- For each adapter quadruplex, add the r1_start, r1_end, r2_start, and r2_end sequences 
+Example using quadruplex 1 from Bae *et al.* 2023:
+
+```
+ex_adapter,r1_start,r1_end,r2_start,r2_end
+QD001,CTTGAACGGACTGTCCAC,GTAGTCTAACGCTCGGTG,CACCGAGCGTTAGACTAC,GTGGACAGTCCGTTCAAG
+```
 
 ### ex_lanes.csv
 
+ex_lanes.csv contains the following columns:
 
+- ex_lane: A unique ID assigned to each sequencing lane
+- fastq1: The path to the R1 FASTQ for each lane (relative to the SomaticCODEC directory)
+- fastq2: The path to the R2 FASTQ for each lane (relative to the SomaticCODEC directory)
+
+Example:
+
+```
+ex_lane,fastq1,fastq2
+LN001,tmp/downloads/L001_R1.fastq.gz,tmp/downloads/L001_R2.fastq.gz
+```
 
 ### ex_samples.csv
 
+ex_samples.csv contains the following columns:
+
+- ex_sample: A unique ID assigned to each sample following demultiplexing of the ex_lane
+- ex_lane: The ex_lane ID for the sequencing lane that contains the ex_sample
+- ex_adapter: The ex_adapter ID that will be used to identify the ex_sample during demultiplexing
+- ms_sample: The ID of the matched sample that corrsponds to the ex_sample
+- donor_id: An ID shared between the ex_sample and the ms_sample to ensure a correct match
+- comments: Any comments about the sample (this field is not used by the pipeline)
+
+Example:
+
+```
+ex_sample,ex_lane,ex_adapter,ms_sample,donor_id,comments
+S001,LN001,QD001,S002,D001,"Buffy coat sample, 43yo male"
+```
+
 ### ms_samples.csv
 
+ms_samples.csv contains the following columns:
+
+- ms_sample: A unique ID assigned to each matched sample
+- fastq1: The path to the R1 FASTQ for each sample (relative to the SomaticCODEC directory)
+- fastq2: The path to the R2 FASTQ for each sample (relative to the SomaticCODEC directory)
+- donor_id: An ID shared between the ex_sample and the ms_sample to ensure a correct match
+- comments: Any comments about the sample (this field is not used by the pipeline)
+
+Example:
+
+```
+ms_sample,fastq1,fastq2,donor_id,comments
+S002,tmp/downloads/Buffy_D001_Age43_R1.fastq.gz,tmp/downloads/Buffy_D001_Age43_R2.fastq.gz,D001,"Buffy coat sample, 43yo male"
+```
