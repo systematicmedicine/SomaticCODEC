@@ -19,28 +19,40 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
 ### User guide
 
-- **Overview**
-  - Assay overview
+- **Assay Overview**
+  
+  SomaticCODEC utilises two distinct sample types per individual. Details on the preparation of these samples can be found in `Library preparation` below.
+
+  - **Experimental (ex) samples**: Prepared with CODEC and used for somatic variant calling.
+  - **Matched (ms) samples**: Prepared with a mostly standard PCR-free protocol, and used to create a germline variant mask for somatic variant calling.
+
 - **Library Preparation**
-  - SOP0017 CODECseq library preparation
-  - SOP0029 CODECseq matched sample library preparation
-- **Compute Platform Setup**
-  - [EC2 setup guide](docs/ec2_setup.md)
+  
+  Phie *et al.* 2026 (doi: ) describes the preparation of experimental and matched samples for use with SomaticCODEC.
+
 - **Running the Pipeline**
-  - Configuring parameters
-  - Creating sample sheets
-  - [Run pipeline](docs/run_pipeline.md)
+
+  Overview goes here.
+
+  - [Setting up config.yaml]()
+
+  - [Setting up sample metadata]()
+
+  - [Setting up compute environment]()
+
+  - [Example data]()
+
 - **Interpreting Outputs**
-  - Primary outputs
-  - Metrics report
-  - Metrics files and plots
-- **Assay Validation**
-  - System level validation
-  - Component level validation
-  - Software testing
-- **Developer guide (internal)**
-  - [Versioning](docs/versioning.md)
-  - [Intermediate file generation](docs/intermediate_files.md)
+
+  - System Metrics
+
+  - Component Metrics
+
+  - Other
+
+- **Developer Guide**
+
+  - Please report bugs using GitHub Issues (we do not monitor external pull requests).
 
 ### Maintainers
 
