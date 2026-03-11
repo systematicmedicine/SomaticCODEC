@@ -4,7 +4,7 @@ The config.yaml file contains many modifiable pipeline parameters.
 
 ## Recommended
 
-If following the recommended setup, modify only the below parameters within config.yaml:
+If following the [recommended compute setup](docs/setup/compute_setup.md), modify only the below parameters within config.yaml:
 
 - run_name: Used by bin scripts and to label various metrics plots.
 - infrastructure.aws.s3_out_dir: The S3 directory where the packaged outputs should be uploaded.
