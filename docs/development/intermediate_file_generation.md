@@ -40,7 +40,7 @@ docker start -ai codec-container
 
 ```
 aws s3 cp tmp/ \
-s3://{destination_bucket}/{directory}/ \
+s3://<destination_bucket>/<directory>/ \
 --recursive \
 --exclude "*" \
 --include "*_filtered_r1.fastq.gz" \
