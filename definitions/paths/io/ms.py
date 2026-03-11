@@ -124,5 +124,4 @@ MET_GERM_RISK_RATE = "metrics/ms/{ms_sample}/{ms_sample}_germ_risk_rate.json"
 
 MET_MASKING_INT1 = "tmp/ms/{ms_sample}/{ms_sample}_int1_mask_metrics.txt"
 MET_MASKING_INT2 = "tmp/ms/{ms_sample}/{ms_sample}_int2_mask_metrics.txt"
-MET_MASKING_INT3 = "tmp/ms/{ms_sample}/{ms_sample}_int3_mask_metrics.txt"
 MET_MASKING = "metrics/ms/{ms_sample}/{ms_sample}_mask_metrics.json"

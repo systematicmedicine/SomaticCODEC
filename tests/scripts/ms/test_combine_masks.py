@@ -26,8 +26,7 @@ def assert_correctly_merged(lightweight_test_run, ms_sample):
     # Load individual BED files
     pre_files = [
         MS.LOW_DEPTH_MASK.format(ms_sample=ms_sample),
-        *[MS.GERMLINE_RISK_MASK.format(ms_sample=ms_sample)
-          for ms_sample in md.get_ms_sample_ids(config)],
+        MS.GERMLINE_RISK_MASK.format(ms_sample=ms_sample),
         *config["sci_params"]["shared"]["precomputed_masks"],
         S.EXCLUDED_CHROMS_BED
         ]
