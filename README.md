@@ -31,17 +31,17 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
   
   Phie *et al.* 2026 (doi: ) describes the preparation of experimental and matched samples for use with SomaticCODEC.
 
-- **Running the Pipeline**
+- **Running Pipeline**
 
   The below documents detail our `Recommended` approach for running the pipeline, as well as tips for using a `Custom` approach.
-
-  - [Setting up compute environment](docs/setup/compute_setup.md)
 
   - [Setting up config.yaml](docs/setup/config_yaml_setup.md)
 
   - [Setting up sample metadata](docs/setup/sample_metadata_setup.md)
 
-  - [Running the pipeline](docs/run_pipeline.md)
+  - [Setting up compute environment](docs/setup/compute_setup.md)
+
+  - [Running pipeline](docs/run_pipeline.md)
 
   - [Example setup/data](docs/example_setup.md)
 
