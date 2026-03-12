@@ -2,14 +2,14 @@
 
 By default, the pipeline deletes intermediate files that are marked with temp(). If these files are required, they can be generated using the steps below.
 
-1. Create config files for the desired number of EX/MS sample pairs
+1. Create config files as per the [config.yaml setup](../setup/config_yaml_setup.md) and [metadata file setup](../setup/metadata_file_setup) guides.
 
-2. Set up EC2 instance as per the [compute setup guide](docs/compute_setup.md), with the following change:
-    * Allocate 5000GiB per EX/MS sample pair
+2. Set up EC2 instance as per the [compute setup guide](../setup/compute_setup.md), with the following change:
+    * Allocate 2500GiB per EX or MS sample (instead of 500 GiB)
 
-3. Create tmux session and run docker as per the [Run pipeline](docs/run_pipeline.md) document
+3. Create tmux session and run docker as per the [Run pipeline](../run_pipeline.md) document
 
-4. Open bin/run_pipeline.sh with nano and add the --notemp flag to the Snakemake command
+4. Open *bin/run_pipeline.sh* with nano and add the `--notemp` flag to the Snakemake command
 
 ```
 snakemake \
@@ -22,7 +22,7 @@ snakemake \
     --stats logs/bin_scripts/run_pipeline_stats.json
 ```
 
-5. Run pipeline as per the [Run pipeline](docs/run_pipeline.md) document
+5. Run pipeline as per the [Run pipeline document](docs/run_pipeline.md)
 
 6. Following successful completion of the pipeline, the instance will shut down
 

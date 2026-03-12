@@ -6,16 +6,16 @@
 #### A CODEC-based assay and open-source pipeline for quantifying somatic mutation burden in normal human tissue
 
 SomaticCODEC is a rigorously validated bioinformatics assay optimized for detecting rare somatic mutations in normal human tissues — supporting applications in ageing, mosaicism and preventative cancer research.
-It leverages the CODEC sequencing protocol (with modifications from [Bae et al., 2023](https://doi.org/10.1038/s41588-023-01376-0)) and a new, modular, and test-driven bioinformatics pipeline.
+The assay leverages the CODEC sequencing protocol (with modifications from [Bae *et al*. 2023](https://doi.org/10.1038/s41588-023-01376-0)) and a new, modular, test-driven bioinformatics pipeline.
 
 ### Key features
 
 - **Tailored for somatic mutation detection in normal tissue**
-- **Matched-sample design**: distinguishes somatic from germline variants using independent samples from the same individual
-- **Open-source toolchain**: reproducible, portable, and cloud-ready (Docker + Snakemake)
+- **Matched-sample design**: Distinguishes somatic from germline variants using independent samples from the same individual
+- **Open-source toolchain**: Reproducible, portable, and cloud-ready (Docker + Snakemake)
 - **Extensive assay validation**: >80 component-level and >10 system-level metrics
-- **Automated QC reports**: detailed metrics, plots, and validation benchmarks
-- **Robust software engineering**: unit tests, integration tests, config validators, CI support
+- **Automated QC reports**: Detailed metrics, plots, and validation benchmarks
+- **Robust software engineering**: Unit tests, integration tests, config validators, CI support
 
 ### User guide
 
@@ -60,19 +60,27 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
   4. [Run pipeline](docs/run_pipeline.md)
 
-  Example methods and data (link to public S3 bucket)
+  [Example methods and data]() (*link to public S3 bucket*)
 
 - **Interpreting Outputs**
 
-  - System Metrics
+  The pipeline produces two metrics reports containing key metric values:
 
-  - Component Metrics
+  - ***metrics/component_metrics_report.csv***
 
-  - Other
+    Component-level metrics measure the performance of individual assay components. The description for each metric can be found in *config/component_level_metrics.xlsx*.
+
+  - ***results/system_metrics_report.csv***
+
+    System-level metrics measure the performance of the entire assay. The description for each metric can be found in *config/system_level_metrics.xlsx*.
+
+  The thresholds for each component- and system-level metric have been set based on internal and external data. These thresholds should be used as a guide only.
+
+  Many additional metrics files can be found in *metrics/* and *results/*, and the full records for called somatic variants can be found in *results/{ex_sample}/{ex_sample}_called_snvs.vcf*.
 
 - **Developer Guide**
 
-  - Please report bugs using GitHub Issues (external pull requests are not monitored).
+  - Please report bugs via GitHub Issues (external pull requests are not monitored).
 
 ### Maintainers
 
