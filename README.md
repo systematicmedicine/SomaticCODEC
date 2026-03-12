@@ -23,8 +23,26 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
   
   SomaticCODEC utilises two distinct sample types per individual. Details on the preparation of these samples can be found in `Library preparation` below.
 
-  - **Experimental (ex) samples**: Prepared with CODEC and used for somatic variant calling.
-  - **Matched (ms) samples**: Prepared with a mostly standard PCR-free protocol, and used to create a germline variant mask for somatic variant calling.
+  - **Experimental (ex) samples**: Prepared with CODEC, and used for somatic variant calling.
+  - **Matched (ms) samples**: Prepared with a mostly standard PCR-free protocol, and used to create a germline risk mask for somatic variant calling.
+
+  The pipeline workflow is managed by Snakemake. Briefly, the following steps are performed:
+
+  - **Matched (ms) samples**:
+    - Trimming and filtering
+    - Alignment and annotation
+    - Deduplication
+    - Germline risk calling
+    - Mask creation (germline risk and low depth masks)
+    - Mask combination
+
+  - **Experimental (ex) samples**:
+    - Demultiplexing
+    - Trimming and filtering
+    - Initial alignment, filtering, and annotation
+    - Duplex consensus calling
+    - Realignment, filtering, and annotation
+    - Somatic variant calling
 
 - **Library Preparation**
   
