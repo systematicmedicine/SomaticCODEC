@@ -24,7 +24,6 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
   SomaticCODEC utilises two distinct sample types per individual. Details on the preparation of these samples can be found in `Library preparation` below.
 
   - **Experimental (ex) samples**: Prepared with CODEC and used for somatic variant calling.
-
   - **Matched (ms) samples**: Prepared with a mostly standard PCR-free protocol, and used to create a germline variant mask for somatic variant calling.
 
 - **Library Preparation**
@@ -33,17 +32,17 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
 - **Running Pipeline**
 
-  The below documents detail our `Recommended` approach for running the pipeline, as well as tips for using a `Custom` approach.
+  The below documents detail our `Recommended` approach for running the pipeline, as well as considerations if using a `Custom` approach.
 
-  - [Setting up config.yaml](docs/setup/config_yaml_setup.md)
+  1. [Set up config.yaml](docs/setup/config_yaml_setup.md)
 
-  - [Setting up sample metadata](docs/setup/sample_metadata_setup.md)
+  2. [Set up metadata files](docs/setup/metadata_file_setup.md)
 
-  - [Setting up compute environment](docs/setup/compute_setup.md)
+  3. [Set up compute environment](docs/setup/compute_setup.md)
 
-  - [Running pipeline](docs/run_pipeline.md)
+  4. [Run pipeline](docs/run_pipeline.md)
 
-  - [Example setup/data](docs/example_setup.md)
+  Example methods and data (link to public S3 bucket)
 
 - **Interpreting Outputs**
 
@@ -55,7 +54,7 @@ It leverages the CODEC sequencing protocol (with modifications from [Bae et al.,
 
 - **Developer Guide**
 
-  - Please report bugs using GitHub Issues (we do not monitor external pull requests).
+  - Please report bugs using GitHub Issues (external pull requests are not monitored).
 
 ### Maintainers
 

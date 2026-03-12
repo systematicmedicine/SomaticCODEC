@@ -1,11 +1,12 @@
-# sample_metadata_setup.md
+# metadata_file_setup.md
 
-There are four sample metadata CSVs:
+Download and fill in the following [metadata CSVs](https://github.com/systematicmedicine/SomaticCODEC/tree/master/config):
 
 - **ex_adapters.csv**: Defines the sequences for each CODEC adapter quadruplex.
 - **ex_lanes.csv**: Defines the FASTQ files for each ex_lane ID.
 - **ex_samples.csv**: Defines the ex_lane ID, ex_sample ID, ex_adapter ID, and ms_sample ID for each ex_sample.
 - **ms_samples.csv**: Defines the FASTQ files for each ms_sample ID.
+- **download_list.csv**: Defines which files to download from S3 (only required if using bin/download_S3.py for file staging)
 
 ### ex_adapters.csv
 
@@ -73,3 +74,20 @@ Example:
 ms_sample,fastq1,fastq2,donor_id,comments
 S002,tmp/downloads/Buffy_D001_Age43_R1.fastq.gz,tmp/downloads/Buffy_D001_Age43_R2.fastq.gz,D001,"Buffy coat sample, 43yo male"
 ```
+
+### download_list.csv
+
+download_list.csv contains the following columns:
+
+- file_name: The name of the file to be downloaded
+- source_dir: The absolute path to the file on S3
+- destination_dir: The path to the destination directory (relative to the SomaticCODEC directory, typically tmp/downloads)
+- expected_md5sum: The md5sum of the file (checked after download)
+
+Example:
+
+```
+file_name,source_dir,destination_dir,expected_md5sum
+UCSC-GCRh38-p14-filtered.fa,s3://<bucket>/reference-genomes/UCSC-GCRh38-p14-filtered/,tmp/downloads,5e43e66f74da7ecf87f7060a310a26bf
+```
+

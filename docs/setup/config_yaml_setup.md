@@ -1,6 +1,6 @@
 # config_yaml_setup.md
 
-The config.yaml file contains many modifiable pipeline parameters. 
+Download and prepare the [config.yaml file](https://github.com/systematicmedicine/SomaticCODEC/blob/master/config/config.yaml).
 
 ## Recommended
 
@@ -8,7 +8,10 @@ If following the [recommended compute setup](docs/setup/compute_setup.md), modif
 
 - run_name: Used by bin scripts and to label various metrics plots.
 - infrastructure.aws.s3_out_dir: The S3 directory where the packaged outputs should be uploaded.
-- infrastructure.aws.sns_arn: The Amazon Resource Name for an SNS topic that sends an email when the pipeline finishes.
+
+The below parameter is only required if using the bin/run_all.sh script:
+
+- infrastructure.aws.sns_arn: The Amazon Resource Name for an SNS topic that sends an email when the pipeline finishes ([SNS setup instructions](https://docs.aws.amazon.com/sns/latest/dg/sns-getting-started.html)).
 
 ## Custom
 
