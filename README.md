@@ -86,7 +86,7 @@ The assay leverages the CODEC sequencing protocol (with modifications from [Bae 
 
 This repository is developed and maintained by [Systematic Medicine Pty Ltd](https://systematicmedicine.com), an Australian-based biotechnology company and wholly owned subsiduary of [Leading Technology Group](https://leadingtechnology.com).
 
-![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![CI: passing](https://img.shields.io/github/actions/workflow/status/systematicmedicine/SomaticCODEC/test.yml)
 ![Version](https://img.shields.io/github/v/tag/systematicmedicine/SomaticCODEC?label=version)
 ![Repo Size](https://img.shields.io/github/repo-size/systematicmedicine/SomaticCODEC)
