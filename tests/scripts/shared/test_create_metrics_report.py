@@ -13,6 +13,9 @@ import pytest
 import pandas as pd
 from pathlib import Path
 import helpers.get_metadata as md
+import subprocess
+import definitions.paths.io.shared as S
+import definitions.paths.log as L
 
 # -------------------------------------------------------------------------------------
 # Fixtures
@@ -104,3 +107,58 @@ def test_component_uniformity(lightweight_test_run, config, id_type, getter):
     assert len(set(counts)) == 1, (
         f"[component] {id_type}s have unequal counts: {counts.to_dict()}"
     )
+
+@pytest.mark.parametrize("ex_lanes", [
+    ["LN001"],
+    ["LN001", "LN002"]
+])
+def test_lane_id_not_split(lightweight_test_run, config, tmp_path, ex_lanes):
+
+    # Define test params
+    component_metrics_metadata = config["metadata"]["component_metrics_metadata"]
+    system_metrics_metadata = config["metadata"]["system_metrics_metadata"]
+    ex_samples = md.get_ex_sample_ids(config)
+    ms_samples = md.get_ms_sample_ids(config)
+    run_name = "test_run"
+
+    # Define test output paths
+    component_csv = tmp_path / "component_metrics.csv"
+    component_png = tmp_path / "component_metrics.png"
+    system_csv = tmp_path / "system_metrics.csv"
+    system_png = tmp_path / "system_metrics.png"
+    log = tmp_path / "create_metrics_report.log"
+
+    # Run R script with test params
+    subprocess.run(
+        [
+            "Rscript",
+            "rule_scripts/shared/metrics/create_metrics_report.R",
+            "--component_metrics_metadata", str(component_metrics_metadata),
+            "--system_metrics_metadata", str(system_metrics_metadata),
+            "--component_csv", str(component_csv),
+            "--component_png", str(component_png),
+            "--system_csv", str(system_csv),
+            "--system_png", str(system_png),
+            "--ex_lanes", *ex_lanes,
+            "--ex_samples", *ex_samples,
+            "--ms_samples", *ms_samples,
+            "--run_name", str(run_name),
+            "--log", str(log)
+        ],
+        check = True
+    )
+
+    # Load component metrics report as df
+    component_metrics_report_df = pd.read_csv(component_csv)
+
+    # Get unique values in Sample column
+    sample_values = component_metrics_report_df["Sample"].unique()
+
+    # Get expected sample names
+    expected_sample_names = set(ex_lanes) | set(ex_samples) | set(ms_samples)
+
+    # Check that all sample values are in ex_lanes, ex_samples, or ms_samples
+    # If ex_lane is split across multiple rows (i.e. "L", "N", etc) test will fail
+    for value in sample_values:
+        assert value in expected_sample_names, f"Unexpected sample value: {value}"
+    
