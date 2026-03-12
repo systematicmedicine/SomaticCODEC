@@ -11,16 +11,7 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [Unreleased]
-
-### Added
-- Added LICENSE file (#355)
-
-### Changed
-- Moved disk IOPs and throughput under create_run_timeline_plot key in config.yaml (#354)
-- Updated docs in preparation for public release (#354)
-
-## [RC5.0.0] - 2026-03-11
+## [RC5.0.0] - 2026-03-13
 
 ### Added
 
@@ -30,6 +21,7 @@ Types of changes:
 - Added germline risk variant and germline risk rate metrics (#342)
 - Added metrics files and component metrics for multimapping reads (#343)
 - Added component metric for germline risk rate (#347)
+- Added LICENSE file (#355)
 
 ### Changed
 
@@ -52,6 +44,8 @@ Types of changes:
 - Centralised log and benchmark file paths (#350)
 - Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50 (#351)
 - Changed nn thresholds for external_concordance_blood, removed ideal thresholds (#351)
+- Moved disk IOPs and throughput under create_run_timeline_plot key in config.yaml (#354)
+- Updated docs in preparation for public release (#354)
 
 ### Fixed
 
