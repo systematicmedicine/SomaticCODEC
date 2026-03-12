@@ -38,7 +38,7 @@
 7. Clone the SomaticCODEC repository
 
     ```
-    git clone git@github.com:systematicmedicine/SomaticCODEC.git
+    git clone https://github.com/systematicmedicine/SomaticCODEC.git
     ```
 
 8. Build Docker image
