@@ -48,25 +48,4 @@
     sudo docker build -t codec-image .
     ```
 
-9. Start tmux session
-
-    ```
-    tmux new -s codec-session
-    ```
-
-10. Run docker container
-
-    ```
-    TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && \
-    INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id) && \
-    REGION=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d'"' -f4) && \
-    sudo docker run -it \
-    --name codec-container \
-    -v "$PWD":/work \
-    -w /work \
-    -e INSTANCE_ID="$INSTANCE_ID" \
-    -e AWS_REGION="$REGION" \
-    codec-image
-    ```
-
 ## Custom

@@ -3,7 +3,7 @@
 # --- run_all.sh ---
 #
 # Master orchestration script to run the full bioinformatics pipeline:
-#   1. Check sample metadat configuration
+#   1. Check sample metadata configuration
 #   2. Check download list configuration
 #   3. Download files from S3
 #   4. Check pipeline configuration (Snakemake dryrun)
@@ -72,7 +72,7 @@ function handle_exit {
         --message "$MSG" \
         --region $AWS_REGION
 
-    # Wait 2 miutes before shutting down
+    # Wait 2 minutes before shutting down
     echo "[INFO] Instance shutdown in 2 minutes" | tee -a "$LOG_FILE"
     sleep 120
 
