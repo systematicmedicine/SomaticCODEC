@@ -172,17 +172,17 @@ infrastructure:
     moderate: 12
     heavy: 24
     global_buffer: 4
-      
-  disk:
-    iops: 8000
-    throughput: 2000 #MiB/s
     
   compression:
     gzip_level: 1
+
+  create_run_timeline_plot: # Values used to calculate disk usage (no effect on disk behaviour)
+    disk_iops: 8000
+    disk_throughput: 2000 # MiB/s
     
   log_system_resource_usage:
       sleep_interval: 60
     
   aws:
-    s3_bucket: "s3://sm-unrestricted-team-a/tmp/codec-opensource-runs/"
-    sns_arn: "arn:aws:sns:ap-southeast-2:554765025175:ec2-pipeline-complete"
+    s3_out_dir: "s3://<bucket>/<dir>/"
+    sns_arn: "arn:aws:sns:<region>:<account_ID>:<topic_name>"

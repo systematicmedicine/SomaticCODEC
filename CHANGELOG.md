@@ -43,6 +43,8 @@ Types of changes:
 - Centralised log and benchmark file paths (#350)
 - Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50 (#351)
 - Changed nn thresholds for external_concordance_blood, removed ideal thresholds (#351)
+- Moved disk IOPs and throughput under create_run_timeline_plot key in config.yaml (#354)
+- Updated docs in preparation for public release (#354)
 
 ### Fixed
 

@@ -13,8 +13,8 @@ rule create_run_timeline_plot:
         plot = L.RUN_TIMELINE
     params:
         run_name = config["run_name"],
-        max_iops = config["infrastructure"]["disk"]["iops"],
-        max_throughput = config["infrastructure"]["disk"]["throughput"]
+        max_iops = config["infrastructure"]["create_run_timeline_plot"]["disk_iops"],
+        max_throughput = config["infrastructure"]["create_run_timeline_plot"]["disk_throughput"]
     log:
         L.CREATE_RUN_TIMELINE_PLOT
     benchmark:

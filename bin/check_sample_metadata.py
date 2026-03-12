@@ -1,10 +1,11 @@
 """
---- check_configs.py ---
+--- check_sample_metadata.py ---
 
-Checks that the pipeline configs are formatted correctly
+Checks that the sample metadata sheets are configured correctly
 
 Authors:
   - Cameron Fraser
+  - Joshua Johnstone
   - Chat-GPT
 
 """
@@ -18,22 +19,6 @@ from pathlib import Path
 import pandas as pd
 import yaml
 import sys
-import subprocess
-
-# Define reference files (dotted keys into config)
-REFERENCE_FILES = [
-    "sci_params.shared.reference_genome",
-    "sci_params.shared.reference_tri_contexts",
-    "sci_params.shared.reference_genome_trinuc_counts",
-    "sci_params.shared.known_germline_variants",
-    "sci_params.shared.precomputed_masks",  # list-valued
-]
-
-# Define sample FASTQ files from metadata tables
-SAMPLE_FILES = {
-    "ex_lanes_metadata": ["fastq1", "fastq2"],
-    "ms_samples_metadata": ["fastq1", "fastq2"],
-}
 
 # Define expected adapter lengths
 EXPECTED_ADAPTER_LENGTHS = [18, 19]
@@ -61,45 +46,6 @@ def get_config_value(config: dict, dotted_key: str):
     for key in dotted_key.split("."):
         val = val[key]
     return val
-
-# Check download list contains required files
-def check_download_list(config: dict, metadata: dict):
-    """Check that all required files are listed in download_list.csv."""
-    expected = set()
-
-    # FASTQs from metadata
-    for table, cols in SAMPLE_FILES.items():
-        for col in cols:
-            expected |= set(metadata[table][col])
-
-    # Reference files from config
-    for key in REFERENCE_FILES:
-        val = get_config_value(config, key)
-        expected |= set(val) if isinstance(val, list) else {val}
-
-    # Files listed for download
-    dl_df = metadata["download_list"]
-    listed = set(dl_df["destination_dir"].str.rstrip("/") + "/" + dl_df["file_name"])
-
-    missing = expected - listed
-    if missing:
-        sys.exit(f"[ERROR] Missing files in download_list.csv:\n" + "\n".join(sorted(missing)))
-
-    print("[INFO] All required files are present in download_list.csv")
-
-# Check that checksums are valid md5sums
-def check_download_list_md5sums(metadata: dict):
-    
-    dl_df = metadata["download_list"]
-    if "expected_md5sum" not in dl_df.columns:
-        sys.exit("[ERROR] expected_md5sum column missing from download_list.csv")
-
-    invalid = dl_df["expected_md5sum"].isna() | ~dl_df["expected_md5sum"].astype(str).str.match(r"^[0-9a-f]{32}$")
-    if invalid.any():
-        bad = dl_df.loc[invalid, ["destination_dir", "file_name", "expected_md5sum"]]
-        sys.exit("[ERROR] Invalid or missing MD5 checksums:\n" + bad.to_string(index=False))
-
-    print("[INFO] All expected_md5sum entries are present and valid")
 
 # Check that all sample-like IDs are globally unique
 def check_sample_ids_unique(metadata: dict):
@@ -212,31 +158,6 @@ def check_input_fastqs_unique(metadata: dict):
 
     print("[INFO] All input FASTQ file paths are unique")
 
-# Check that all S3 URIs in download_list.csv exist
-def check_s3_files_exist(metadata: dict):
-    dl = metadata["download_list"]
-
-    for _, row in dl.iterrows():
-        s3_uri = row["source_dir"].rstrip("/") + "/" + row["file_name"]
-
-        if not s3_uri.startswith("s3://"):
-            sys.exit(f"[ERROR] Invalid S3 URI (must start with s3://): {s3_uri}")
-
-        try:
-            bucket, key = s3_uri[5:].split("/", 1)  # strip "s3://", split once
-        except ValueError:
-            sys.exit(f"[ERROR] Malformed S3 URI: {s3_uri}")
-
-        try:
-            subprocess.run(
-                ["aws", "s3api", "head-object", "--bucket", bucket, "--key", key],
-                check=True, capture_output=True
-            )
-        except subprocess.CalledProcessError:
-            sys.exit(f"[ERROR] Missing S3 object: {s3_uri}")
-
-    print("[INFO] All S3 objects in download_list.csv exist")
-
 # Check that run_name has been set
 def check_run_name_set(config: dict):
     if config["run_name"] == "experiment_1":
@@ -278,12 +199,6 @@ if __name__ == "__main__":
 
     # Load metadata tables
     metadata_tables = load_metadata_tables(config)
-    
-    # Check download list contains required files 
-    check_download_list(config, metadata_tables)
-
-    # Check that checksums are valid md5sums
-    check_download_list_md5sums(metadata_tables)
 
     # Check that all sample IDs are globally unique
     check_sample_ids_unique(metadata_tables)
@@ -302,9 +217,6 @@ if __name__ == "__main__":
 
     # Check that input FASTQs are globally unique
     check_input_fastqs_unique(metadata_tables)
-
-    # Check that all S3 URIs in download_list.csv exist
-    check_s3_files_exist(metadata_tables)
 
     # Check that run_name has been set
     check_run_name_set(config)
