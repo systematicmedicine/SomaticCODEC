@@ -7,7 +7,7 @@ Download and prepare the [config.yaml file](https://github.com/systematicmedicin
 If following the [recommended compute setup](docs/setup/compute_setup.md), modify only the below parameters within config.yaml:
 
 - run_name: Used by bin scripts and to label various metrics plots.
-- infrastructure.aws.s3_out_dir: The S3 directory where the packaged outputs should be uploaded.
+- infrastructure.aws.s3_out_dir: The S3 directory where the packaged outputs will be uploaded if using the bin/upload_S3.sh script.
 
 The below parameter is only required if using the bin/run_all.sh script:
 
