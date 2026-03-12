@@ -11,7 +11,7 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
-## [RC5.0.0] - 2026-03-13
+## [5.0.0] - 2026-03-13
 
 ### Added
 
