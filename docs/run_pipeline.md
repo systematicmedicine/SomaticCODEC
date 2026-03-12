@@ -4,7 +4,7 @@
 
 *Note: Steps 4-10 can be run autonomously with the bin/run_all.sh script. Once the pipeline finishes, the EC2 instance will be shut down and an email will be sent describing the outcome of the run (this requires an SNS topic to be set up and the ARN provided in config.yaml)*
 
-1. Upload prepared config files to the SomaticCODEC/config directory on the EC2 instance:
+1. Upload prepared config files to the *SomaticCODEC/config* directory on the EC2 instance:
     - `config.yaml`
     - `ex_lanes.csv`
     - `ex_samples.csv`
@@ -85,9 +85,9 @@ If Amazon S3 and/or Amazon EC2 are not being used:
 
 - Skip the download and upload steps, but ensure all required files are otherwise staged at the paths defined in:
 
-    - config/config.yaml: sci_params.shared
-    - config/ex_lanes.csv: fastq1 and fastq1
-    - ms_samples: fastq1 and fastq2
+    - *config/config.yaml*: `sci_params.shared`
+    - *config/ex_lanes.csv*: `fastq1` and `fastq1`
+    - *config/ms_samples.csv*: `fastq1` and `fastq2`
 
 - Run the Docker container without the AWS variables, or otherwise ensure all dependencies are available:
 

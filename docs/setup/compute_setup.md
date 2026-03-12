@@ -15,7 +15,7 @@
     - Allow SSH traffic: My IP
     - Configure storage: 
         - Volume type: gp3
-        - Size (GiB): 500 per EX or MS sample
+        - Size: 500 GiB per EX or MS sample
         - IOPS: 8000
         - Throughput (MiB/s): 2000
     - IAM instance profile: A profile with read access to the bucket where the sequencing data is stored, and write access to the bucket where the outputs will be uploaded
@@ -55,7 +55,7 @@ If using a different compute method or instance, ensure that:
 - The chosen OS is compatible with the tools used by the pipeline
 
 - The system resources available are sufficent, and the below parameters have been adjusted in config/config.yaml:
-    - infrastructure.memory
-    - infrastructure.threads
-    - infrastructure.create_run_timeline_plot.disk_iops
-    - infrastructure.create_run_timeline_plot.disk_throughput
+    - `infrastructure.memory`
+    - `infrastructure.threads`
+    - `infrastructure.create_run_timeline_plot.disk_iops`
+    - `infrastructure.create_run_timeline_plot.disk_throughput`
