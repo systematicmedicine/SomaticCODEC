@@ -21,6 +21,7 @@ Types of changes:
 - Added germline risk variant and germline risk rate metrics (#342)
 - Added metrics files and component metrics for multimapping reads (#343)
 - Added component metric for germline risk rate (#347)
+- Added LICENSE file (#355)
 
 ### Changed
 
