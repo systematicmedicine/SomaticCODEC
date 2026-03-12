@@ -67,12 +67,11 @@ find_metric_files <- function(pattern, ex_lanes, ex_samples, ms_samples) {
   # Prepare JSON payload for Python
   payload <- jsonlite::toJSON(
     list(
-      pattern = pattern,
+      pattern = jsonlite::unbox(pattern),
       ex_lanes = ex_lanes,
       ex_samples = ex_samples,
       ms_samples = ms_samples
-    ),
-    auto_unbox = TRUE
+    )
   )
 
   # Inline Python resolver (reads JSON from stdin, prints paths)

@@ -57,6 +57,7 @@ Types of changes:
 
 - Test script names updated to match new rule names (#324)
 - Cutadapt output no longer pollutes pipeline log (#337)
+- Fixed bug in create_metrics_report.R where ex_lane IDs were split across rows (#358)
 
 ## [4.0.0] - 2026-02-26
 
