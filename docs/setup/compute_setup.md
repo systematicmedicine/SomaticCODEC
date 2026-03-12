@@ -4,7 +4,7 @@
 
 1. Log into [AWS](https://aws.amazon.com/)
 
-2.  Navigate to EC2
+2. Navigate to EC2
 
 3. Select *Launch instances*
 
@@ -49,3 +49,13 @@
     ```
 
 ## Custom
+
+If using a different compute method or instance, ensure that:
+
+- The chosen OS is compatible with the tools used by the pipeline
+
+- The system resources available are sufficent, and the below parameters have been adjusted in config/config.yaml:
+    - infrastructure.memory
+    - infrastructure.threads
+    - infrastructure.create_run_timeline_plot.disk_iops
+    - infrastructure.create_run_timeline_plot.disk_throughput
