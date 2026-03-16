@@ -12,7 +12,7 @@ Each type of change has different validation requirements before it can be relea
 ## [Unreleased]
 
 ### Patch
-- Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#TBD)
+- Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)
 
 ## [5.0.0] - 2026-03-13
 
