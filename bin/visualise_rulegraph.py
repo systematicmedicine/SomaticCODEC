@@ -32,18 +32,18 @@ Not intended for:
 
 from __future__ import annotations
 
-import csv
 import re
 import subprocess
 import sys
 import tempfile
-from pathlib import Path
 from datetime import date
+from pathlib import Path
+
 import yaml
 
 
 def merge_existing(base, dev):
-    """Deep-merge dev into base, but ONLY for keys already present in base."""
+    """Deep-merge dev into base, but only for keys already present in base."""
     if isinstance(base, dict) and isinstance(dev, dict):
         out = dict(base)
         for k, v in dev.items():
@@ -54,25 +54,26 @@ def merge_existing(base, dev):
     return dev
 
 
-def touch_downloads(download_list_csv: Path, downloads_root: Path) -> None:
-    with download_list_csv.open(newline="", encoding="utf-8-sig") as f:
-        reader = csv.reader(f)
-        _ = next(reader, None)  # header
-        for row in reader:
-            if not row:
-                continue
-            fname = row[0].strip().strip('"').strip("'")
-            if not fname:
-                continue
-            rel = fname[len("tmp/downloads/") :] if fname.startswith("tmp/downloads/") else fname
-            p = downloads_root / rel
-            p.parent.mkdir(parents=True, exist_ok=True)
-            p.touch(exist_ok=True)
+def touch_lightweight_test_downloads(project_root: Path, downloads_root: Path) -> None:
+    """Create empty placeholder download files based on lightweight_test_run."""
+    src_dir = project_root / "tests" / "data" / "lightweight_test_run" / "downloads"
+
+    if not src_dir.exists():
+        raise FileNotFoundError(
+            f"Lightweight test downloads directory not found: {src_dir}"
+        )
+
+    files_to_create = [f for f in src_dir.glob("*") if f.name != ".gitkeep"]
+
+    for src in files_to_create:
+        dst = downloads_root / src.name
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.touch(exist_ok=True)
 
 
 def extract_dot(text: str) -> str | None:
     """
-    Extract the DOT digraph from mixed stdout.
+    Extract the DOT digraph from mixed stdout/stderr.
     Looks for the first 'digraph ... { ... }' block.
     """
     m = re.search(r"(digraph\s+[^{]*\{.*\}\s*)", text, flags=re.DOTALL)
@@ -80,14 +81,15 @@ def extract_dot(text: str) -> str | None:
 
 
 def main() -> int:
-    snakefile = Path("Snakefile")
-    config_base = Path("config/config.yaml")
-    config_dev = Path("config/config.dev.yaml")
-    downloads_link = Path("tmp/downloads")
+    project_root = Path.cwd()
+    snakefile = project_root / "Snakefile"
+    config_base = project_root / "config" / "config.yaml"
+    config_dev = project_root / "config" / "config.dev.yaml"
+    downloads_link = project_root / "tmp" / "downloads"
 
     target_rule = "called_variants"
     today = date.today().strftime("%Y%m%d")
-    pdf_out = Path("docs") / "rulegraphs" / f"{today}_called_variants_rulegraph.pdf"
+    pdf_out = project_root / "docs" / "rulegraphs" / f"{today}_called_variants_rulegraph.pdf"
     pdf_out.parent.mkdir(parents=True, exist_ok=True)
 
     for p in (snakefile, config_base, config_dev):
@@ -99,17 +101,11 @@ def main() -> int:
     dev = yaml.safe_load(config_dev.read_text(encoding="utf-8")) or {}
     merged = merge_existing(base, dev)
 
-    download_list_csv = Path((base.get("metadata", {}) or {}).get("download_list", "config/download_list.csv"))
-    if not download_list_csv.exists():
-        print(f"ERROR: missing download list CSV: {download_list_csv}", file=sys.stderr)
-        return 2
-
     with tempfile.TemporaryDirectory() as tmpdir_str:
         tmpdir = Path(tmpdir_str)
         stub_downloads = tmpdir / "downloads"
         stub_downloads.mkdir(parents=True, exist_ok=True)
 
-        # symlink tmp/downloads -> temp/downloads
         downloads_link.parent.mkdir(parents=True, exist_ok=True)
         if downloads_link.exists() and not downloads_link.is_symlink():
             print(f"ERROR: {downloads_link} exists and is not a symlink. Refusing.", file=sys.stderr)
@@ -119,12 +115,14 @@ def main() -> int:
         downloads_link.symlink_to(stub_downloads)
 
         try:
-            touch_downloads(download_list_csv, stub_downloads)
+            touch_lightweight_test_downloads(project_root, stub_downloads)
 
             merged_cfg = tmpdir / "config.merged.yaml"
-            merged_cfg.write_text(yaml.safe_dump(merged, sort_keys=False), encoding="utf-8")
+            merged_cfg.write_text(
+                yaml.safe_dump(merged, sort_keys=False),
+                encoding="utf-8",
+            )
 
-            # Run snakemake and capture mixed stdout/stderr
             proc = subprocess.run(
                 [
                     "snakemake",
@@ -135,19 +133,18 @@ def main() -> int:
                     "--configfile",
                     str(merged_cfg),
                 ],
+                cwd=str(project_root),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
             )
 
-            # If snakemake failed, show stderr
             if proc.returncode != 0:
                 print(proc.stderr, file=sys.stderr)
                 return proc.returncode
 
             dot_text = extract_dot(proc.stdout)
             if not dot_text:
-                # Some setups print graph to stderr instead; try that too
                 dot_text = extract_dot(proc.stderr)
 
             if not dot_text:
@@ -161,11 +158,12 @@ def main() -> int:
             dot_path = tmpdir / "rulegraph.dot"
             dot_path.write_text(dot_text, encoding="utf-8")
 
-            subprocess.run(
-                ["dot", "-Tpdf", str(dot_path)],
-                check=True,
-                stdout=pdf_out.open("wb"),
-            )
+            with pdf_out.open("wb") as f:
+                subprocess.run(
+                    ["dot", "-Tpdf", str(dot_path)],
+                    check=True,
+                    stdout=f,
+                )
 
             print(f"Wrote: {pdf_out}")
             return 0

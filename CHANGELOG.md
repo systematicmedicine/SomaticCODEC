@@ -13,6 +13,7 @@ Each type of change has different validation requirements before it can be relea
 
 ### Patch
 - Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)
+- Fixed bug that prevented rulegraph script from running (#364)
 
 ## [5.0.0] - 2026-03-13
 
