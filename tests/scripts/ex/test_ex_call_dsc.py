@@ -9,20 +9,35 @@ Authors:
     - Cameron Fraser
 """
 from pathlib import Path
-import glob
 from collections import Counter
 import pysam
 from helpers.bam_helpers import count_bam_data_points
+from helpers.get_metadata import load_config, get_ex_sample_ids
+import definitions.paths.io.ex as EX
 
 # Test that the read count decreases due to collapsing reads
 def test_reads_decrease(lightweight_test_run):
-     # Locate all pre-call BAM files
-    pre_files = glob.glob("tmp/*/*_map_anno.bam")
+
+    # Load ex_sample IDs
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
+
+    # Locate all pre-call BAM files
+    pre_files = []
+    for ex_sample in ex_samples:
+        resolved_path = EX.UMI_GROUPED_BAM.format(ex_sample=ex_sample)
+        pre_files.append(resolved_path)
+
+    # Locate all post-call BAM files
+    post_files = []
+    for ex_sample in ex_samples:
+        resolved_path = EX.RAW_DSC.format(ex_sample=ex_sample)
+        post_files.append(resolved_path)
+
+    # Counts reads pre- and post-call
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
     total_pre_reads = sum(pre_counts.values())
 
-    # Locate all post-call BAM files
-    post_files = glob.glob("tmp/*/*_unmap_dsc.bam")
     post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
@@ -32,8 +47,16 @@ def test_reads_decrease(lightweight_test_run):
     )
 
 def test_no_duplicated_read_names(lightweight_test_run):    
-    # Locate all post-UMI grouping BAM files
-    post_files = glob.glob("tmp/*/*_unmap_dsc.bam")
+    
+    # Load ex_sample IDs
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
+
+    # Locate all post-call BAM files
+    post_files = []
+    for ex_sample in ex_samples:
+        resolved_path = EX.RAW_DSC.format(ex_sample=ex_sample)
+        post_files.append(resolved_path)
 
     # Collect relevant data about post-CODEC consensus calling BAMs
     for bam_path in post_files:

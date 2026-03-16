@@ -8,22 +8,37 @@ Authors:
     - Joshua Johnstone
 """
 from pathlib import Path
-import glob
 from helpers.bam_helpers import count_bam_data_points
+from helpers.get_metadata import load_config, get_ex_sample_ids
+import definitions.paths.io.ex as EX
 
 # Test that annotation does not change read count
 def test_read_counts_preserved(lightweight_test_run):
-     # Locate all pre-annotation BAM files
-    pre_files = glob.glob("tmp/*/*_map_dsc.bam")
+
+    # Load ex_sample IDs
+    config = load_config(lightweight_test_run["test_config_path"])
+    ex_samples = get_ex_sample_ids(config)
+
+    # Locate all pre-annotation BAM files
+    pre_files = []
+    for ex_sample in ex_samples:
+        resolved_path = EX.REALIGNED_DSC.format(ex_sample=ex_sample)
+        pre_files.append(resolved_path)
+
+    # Locate all post-annotation BAM files
+    post_files = []
+    for ex_sample in ex_samples:
+        resolved_path = EX.ANNOTATED_DSC.format(ex_sample=ex_sample)
+        post_files.append(resolved_path)
+
+    # Count reads pre- and post-annotation
     pre_counts = {Path(f).name: count_bam_data_points(f) for f in pre_files}
     total_pre_reads = sum(pre_counts.values())
 
-    # Locate all post-annotation BAM files
-    post_files = glob.glob("tmp/*/*_map_dsc_anno.bam")
     post_counts = {Path(f).name: count_bam_data_points(f) for f in post_files}
     total_post_reads = sum(post_counts.values())
 
-    # Assertion 1: Total reads pre annotation == total reads post annotation
+    # Assert total reads pre annotation == total reads post annotation
     assert total_post_reads == total_pre_reads, (
         f"Post-annotation reads ({total_post_reads}) not equal to pre-annotation reads ({total_pre_reads})"
     )

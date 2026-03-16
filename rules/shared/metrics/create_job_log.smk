@@ -3,6 +3,8 @@ Creates a CSV of job start and finish times
 """
 
 from definitions.paths.io import shared as S
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule create_job_log:
     input:
@@ -10,13 +12,13 @@ rule create_job_log:
         component_metrics_png = S.MET_COMPONENT_METRICS_HEATMAP,
         system_metrics_csv = S.MET_SYSTEM_METRICS_REPORT,
         system_metrics_png = S.MET_SYSTEM_METRICS_HEATMAP,
-        run_pipeline_log = ancient("logs/bin_scripts/run_pipeline.log")
+        run_pipeline_log = ancient(L.RUN_PIPELINE)
     output:
-        job_log_csv = "logs/shared_rules/job_log.csv"
+        job_log_csv = L.JOB_LOG
     log:
-        "logs/shared_rules/create_job_log.log"
+        L.CREATE_JOB_LOG
     benchmark:
-        "logs/shared_rules/create_job_log.benchmark.txt"
+        B.CREATE_JOB_LOG
     threads:
         1
     resources:

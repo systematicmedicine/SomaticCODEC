@@ -5,15 +5,15 @@ Trims FASTQ files
     - Poly-G artifacts (>10 Gs at 3' end)
     - Bases of quality < qual_trim_threshold from read ends
 """
-# Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
 
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_trim_fastq:
     input:
-        shared_setup = shared_setup,
+        setup_done = L.SETUP_DONE,
         ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
@@ -22,7 +22,7 @@ rule ms_trim_fastq:
         intermediate_spacer_removed_r2 = temp(MS.TRIM_FASTQ_INT_R2),
         r1 = temp(MS.TRIMMED_FASTQ_R1),
         r2 = temp(MS.TRIMMED_FASTQ_R2),
-        report = MS.MET_TRIM_FASTQ
+        metrics = MS.MET_TRIM_FASTQ
     params:
         adaptor_1 = config["sci_params"]["ms_trim_fastq"]["adaptor_1"],
         adaptor_2 = config["sci_params"]["ms_trim_fastq"]["adaptor_2"],
@@ -32,9 +32,9 @@ rule ms_trim_fastq:
         min_overlap = config["sci_params"]["ms_trim_fastq"]["min_overlap"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ms_sample}/ms_trim_fastq.log"
+        L.MS_TRIM_FASTQ
     benchmark:
-        "logs/{ms_sample}/ms_trim_fastq.benchmark.txt"
+        B.MS_TRIM_FASTQ
     threads: 
         config["infrastructure"]["threads"]["heavy"]
     resources:
@@ -45,6 +45,7 @@ rule ms_trim_fastq:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
 
         # Remove spacer
+        printf "##### Spacer removal #####\n" > {output.metrics}
         cutadapt \
           -j {threads} \
           -u {params.spacer_length} \
@@ -52,9 +53,11 @@ rule ms_trim_fastq:
           -o {output.intermediate_spacer_removed_r1} \
           -p {output.intermediate_spacer_removed_r2} \
           --compression-level {params.compression_level} \
-          {input.r1} {input.r2} 2>> {log}
+          {input.r1} {input.r2} \
+          --report=full >> {output.metrics} 2>> {log}
         
         # Trim adaptors, poly-G artifacts, and low quality bases
+        printf "\n\n##### Adapter/quality trimming #####\n" >> {output.metrics}
         cutadapt \
             -j {threads} \
             -a {params.adaptor_1} \
@@ -70,5 +73,5 @@ rule ms_trim_fastq:
             -p {output.r2} \
             --compression-level {params.compression_level} \
             {output.intermediate_spacer_removed_r1} {output.intermediate_spacer_removed_r2} \
-            --report=full > {output.report} 2>> {log}
+            --report=full >> {output.metrics} 2>> {log}
         """

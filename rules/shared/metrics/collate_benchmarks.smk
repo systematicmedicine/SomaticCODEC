@@ -2,14 +2,16 @@
 Collates all benchmarks into a single CSV
 """
 
+from definitions.paths import log as L
+
 rule collate_benchmarks:
     input:
-        git_metadata = "logs/shared_rules/git_metadata.json",
-        timeline_plot = "logs/shared_rules/run_timeline.pdf"
+        git_metadata = L.GIT_METADATA,
+        timeline_plot = L.RUN_TIMELINE
     output:
-        combined_benchmarks = "logs/shared_rules/combined_benchmarks.csv"
+        combined_benchmarks = L.COMBINED_BENCHMARKS
     log:
-        "logs/shared_rules/collate_benchmarks.log"
+        L.COLLATE_BENCHMARKS
     threads:
         1
     resources:

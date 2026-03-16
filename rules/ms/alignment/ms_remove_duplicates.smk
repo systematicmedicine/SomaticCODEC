@@ -3,6 +3,8 @@ Removes duplicate reads based on alignment and UMIs
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_remove_duplicates:
     input:
@@ -12,15 +14,15 @@ rule ms_remove_duplicates:
         intermediate_unsorted = temp(MS.REMOVE_DUPLICATES_INT),
         bam = temp(MS.DEDUPED_BAM),
         bai = temp(MS.DEDUPED_BAM_INDEX),
-        dedup_metrics = MS.MET_DUPLICATION_1
+        dedup_metrics = MS.MET_DEDUP_REPORT
     params:
         duplicate_decision_method = config["sci_params"]["ms_remove_duplicates"]["duplicate_decision_method"],
         optical_duplicate_distance = config["sci_params"]["ms_remove_duplicates"]["optical_duplicate_distance"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ms_sample}/ms_remove_duplicates.log"
+        L.MS_REMOVE_DUPLICATES
     benchmark:
-        "logs/{ms_sample}/ms_remove_duplicates.benchmark.txt"
+        B.MS_REMOVE_DUPLICATES
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

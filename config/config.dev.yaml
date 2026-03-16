@@ -37,7 +37,7 @@ sci_params:
       - tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed
       - tmp/downloads/GCRh38_repeat_masker_10lines.bed
 
-  ms_low_depth_mask:
+  ms_pileup:
     min_depth: 1
 
 # ------------------------------------------------------------------------------

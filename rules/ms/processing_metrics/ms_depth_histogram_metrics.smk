@@ -3,20 +3,25 @@ Calulcates the number of bases at each depth level
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_depth_histogram_metrics:
     input:
-        intermediate_depth_per_base = MS.LOW_DEPTH_MASK_INT1,
+        bam = MS.DEDUPED_BAM,
+        bai = MS.DEDUPED_BAM_INDEX
     output:
-        depth_histogram = MS.MET_DEPTH_HIST,
-        intermediate_depth_values = temp(MS.MET_DEPTH_HIST_INT1),
-        intermediate_depth_values_sorted = temp(MS.MET_DEPTH_HIST_INT2)
+        depth_histogram = MS.MET_DEPTH,
+        intermediate_depth_per_base = temp(MS.MET_DEPTH_INT1),
+        intermediate_depth_values = temp(MS.MET_DEPTH_INT2),
+        intermediate_depth_values_sorted = temp(MS.MET_DEPTH_INT3)
     params:
-        threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"]
+        min_base_qual = config["sci_params"]["ms_pileup"]["min_base_qual"],
+        min_map_qual = config["sci_params"]["ms_pileup"]["min_map_qual"],
     log:
-        "logs/{ms_sample}/ms_low_depth_mask.log"
+        L.MS_DEPTH_HISTOGRAM_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_low_depth_mask.benchmark.txt"
+        B.MS_DEPTH_HISTOGRAM_METRICS
     threads:
         1
     resources:
@@ -26,8 +31,17 @@ rule ms_depth_histogram_metrics:
         # Set memory limit
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
 
+        # Calculate depth per base
+        samtools depth \
+        -aa \
+        --min-BQ {params.min_base_qual} \
+        --min-MQ {params.min_map_qual} \
+        -s \
+        -J \
+        {input.bam} > {output.intermediate_depth_per_base} 2>> {log}
+
         # Extract depth column
-        awk '{{print $3}}' {input.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
+        awk '{{print $3}}' {output.intermediate_depth_per_base} > {output.intermediate_depth_values} 2>> {log}
 
         # Sort numerically
         sort -n {output.intermediate_depth_values} > {output.intermediate_depth_values_sorted} 2>> {log}

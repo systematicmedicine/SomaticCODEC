@@ -3,6 +3,8 @@ Duplication rate calculated based on unique UMI families output from ex_groupbyu
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_duplication_metrics:
     input:
@@ -12,9 +14,9 @@ rule ex_duplication_metrics:
     output:
         json = EX.MET_DUPLICATION
     log:
-        "logs/{ex_sample}/ex_duplication_metrics.log"
+        L.EX_DUPLICATION_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_duplication_metrics.benchmark.txt"
+        B.EX_DUPLICATION_METRICS
     threads:
         1
     resources:

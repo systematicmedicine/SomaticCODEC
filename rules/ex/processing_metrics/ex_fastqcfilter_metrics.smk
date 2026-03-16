@@ -3,6 +3,8 @@ FastQC on demultiplexed, trimmed, filtered FASTQs
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_fastqcfilter_metrics:
     input:
@@ -16,30 +18,37 @@ rule ex_fastqcfilter_metrics:
         txt_r1 = EX.MET_FASTQC_FILTER_TXT_R1,
         txt_r2 = EX.MET_FASTQC_FILTER_TXT_R2
     log:
-        "logs/{ex_sample}/ex_fastqctrim_metrics.log"
+        L.EX_FASTQCFILTER_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_fastqctrim_metrics.benchmark.txt"
+        B.EX_FASTQCFILTER_METRICS
     threads: 
         config["infrastructure"]["threads"]["light"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
-        """
+        r"""
         # Set memory limit
         MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
 
+        # Get basename for input files
+        r1_base=$(basename {input.fastq1} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+        r2_base=$(basename {input.fastq2} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+
+        # Get output directory
+        output_dir=$(dirname {output.fastqc_report1})
+        
         # Run fastqc
         fastqc \
         --memory $MEMORY_PER_FILE \
         -t {threads} \
-        -o metrics/{wildcards.ex_sample} \
-        {input.fastq1} {input.fastq2} 2>> {log}
+        -o ${{output_dir}} \
+        {input.fastq1} {input.fastq2} &>> {log}
 
-        # Rename outputs
-        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.html {output.fastqc_report1} 2>> {log}
-        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.html {output.fastqc_report2} 2>> {log}
-        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq1} .fastq.gz)_fastqc.zip {output.zip_r1} 2>> {log}
-        mv metrics/{wildcards.ex_sample}/$(basename {input.fastq2} .fastq.gz)_fastqc.zip {output.zip_r2} 2>> {log}
+        # Rename and move output files
+        mv ${{output_dir}}/${{r1_base}}_fastqc.html {output.fastqc_report1} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.html {output.fastqc_report2} 2>> {log}
+        mv ${{output_dir}}/${{r1_base}}_fastqc.zip {output.zip_r1} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.zip {output.zip_r2} 2>> {log}
 
         # Extract txt file from zip output
         unzip -p {output.zip_r1} */fastqc_data.txt > {output.txt_r1} 2>> {log}

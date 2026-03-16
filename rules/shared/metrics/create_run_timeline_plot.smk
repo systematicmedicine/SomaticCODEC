@@ -2,21 +2,23 @@
 Creates a plot of jobs and resource usage during the run
 """
 
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
+
 rule create_run_timeline_plot:
     input:
-        job_log = "logs/shared_rules/job_log.csv",
-        resources_log = "logs/shared_rules/system_resource_usage.csv",
-        git_metadata = "logs/shared_rules/git_metadata.json"
+        job_log = L.JOB_LOG,
+        resources_log = L.SYSTEM_RESOURCE_USAGE
     output:
-        plot = "logs/shared_rules/run_timeline.pdf"
+        plot = L.RUN_TIMELINE
     params:
         run_name = config["run_name"],
-        max_iops = config["infrastructure"]["disk"]["iops"],
-        max_throughput = config["infrastructure"]["disk"]["throughput"]
+        max_iops = config["infrastructure"]["create_run_timeline_plot"]["disk_iops"],
+        max_throughput = config["infrastructure"]["create_run_timeline_plot"]["disk_throughput"]
     log:
-        "logs/shared_rules/create_run_timeline_plot.log"
+        L.CREATE_RUN_TIMELINE_PLOT
     benchmark:
-        "logs/shared_rules/create_run_timeline_plot.benchmark.txt"
+        B.CREATE_RUN_TIMELINE_PLOT
     threads:
         1
     resources:

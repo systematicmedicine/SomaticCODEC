@@ -3,6 +3,8 @@ Generates a summary of key metrics for ex raw fastqc reports
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_fastqc_raw_summary_metrics:
     input:
@@ -14,9 +16,9 @@ rule ex_fastqc_raw_summary_metrics:
     params:
         sample = "{ex_lane}"
     log:
-        "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.log"
+        L.EX_FASTQC_RAW_SUMMARY_METRICS
     benchmark:
-        "logs/{ex_lane}/ex_fastqc_raw_summary_metrics.benchmark.txt"
+        B.EX_FASTQC_RAW_SUMMARY_METRICS
     threads:
         1
     resources:

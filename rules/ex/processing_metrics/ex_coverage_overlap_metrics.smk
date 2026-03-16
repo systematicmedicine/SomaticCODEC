@@ -5,6 +5,8 @@ Calculates overlap between coverage of various BED and BAM files
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_coverage_overlap_metrics:
     input:
@@ -28,14 +30,14 @@ rule ex_coverage_overlap_metrics:
     output:
         output_json = EX.MET_COVERAGE_OVERLAP
     params: 
-        ms_depth_threshold = config["sci_params"]["ms_low_depth_mask"]["min_depth"],
+        ms_depth_threshold = config["sci_params"]["ms_pileup"]["min_depth"],
         ex_depth_threshold = config["sci_params"]["ex_dsc_coverage_metrics"]["ex_depth_threshold"],
-        ms_bq_threshold = config["sci_params"]["ms_germline_risk"]["min_base_qual"],
+        ms_bq_threshold = config["sci_params"]["ms_pileup"]["min_base_qual"],
         ex_bq_threshold = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
     log:
-        "logs/{ex_sample}/ex_coverage_overlap_metrics.log"
+        L.EX_COVERAGE_OVERLAP_METRICS
     benchmark:
-        "logs/{ex_sample}/ex_coverage_overlap_metrics.benchmark.txt"
+        B.EX_COVERAGE_OVERLAP_METRICS
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:
@@ -45,7 +47,7 @@ rule ex_coverage_overlap_metrics:
         # Set memory limit
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
-        # Calculate DSC coverage metrics
+        # Calculate coverage overlap metrics
         ex_coverage_overlap_metrics.py \
             --threads {threads} \
             --precomputed_masks {input.precomputed_masks} \

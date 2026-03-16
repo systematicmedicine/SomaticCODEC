@@ -19,11 +19,13 @@ from pathlib import Path
 from helpers.bed_helpers import read_bed
 from helpers.fai_helpers import read_fai
 from helpers.get_metadata import load_config, get_ex_to_ms_sample_map
+from definitions.paths.io import ms as MS
+from definitions.paths.io import ex as EX
 
 # Load input and output BEDs for a sample
 def get_mask_and_include_beds(ex_sample, ms_sample):
-    mask_path = Path(f"tmp/{ms_sample}/{ms_sample}_combined_mask.bed")
-    include_path = Path(f"tmp/{ex_sample}/{ex_sample}_include.bed")
+    mask_path = Path(MS.COMBINED_MASK.format(ms_sample=ms_sample))
+    include_path = Path(MS.INCLUDE_BED.format(ex_sample=ex_sample))
 
     assert mask_path.exists(), f"Missing input mask BED: {mask_path}"
     assert include_path.exists(), f"Missing output include BED: {include_path}"

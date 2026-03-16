@@ -3,6 +3,8 @@ Map reads to reference genome
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_alignment:
     input:
@@ -32,9 +34,9 @@ rule ex_alignment:
         z_dropoff = config["sci_params"]["ex_map"]["z_dropoff"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_map.log"
+        L.EX_ALIGNMENT
     benchmark:
-        "logs/{ex_sample}/ex_map.benchmark.txt"
+        B.EX_ALIGNMENT
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
