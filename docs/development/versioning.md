@@ -1,41 +1,39 @@
 # Versioning.md
 
-Explanation of how semantic versioning is implemented in this codebase.
+## Types of changes
 
-## Incrementing version numbers
-
-Version numbers use the MAJOR.MINOR.PATCH format. 
-
-The relevant version number is incremented when making the following changes:
-
-- **MAJOR**: Changes that could affect variant calling
+- **MAJOR**: <B>Changes that could affect variant calling </b>
     - Example: Changing the tool used to call variants
     - Example: Changing the default paramemter for read quality filtering
     - Example: Changing the Dockerfile
 
-- **MINOR**: Changes that could affect computational performance/stability, but not variant calling
+- **MINOR**: <B>Changes that could affect computational performance/stability</b>
     - Example: Updating resource allocation to a rule
     - Example: Adding a new scientific metric that calculates genomic coverage
-    - Example: Adding an innocent little metrics script that shouldn't effect performance...
+    - Example: Adding an innocent little metrics script that shouldn't affect performance...
 
-- **PATCH**: Changes that can't affect variant calling or computational performance/stability
+- **PATCH**: <B>Changes that can't affect variant calling or computational performance/stability</b>
     - Example: Changing metrics report configuration (component_metrics.xlsx, system_metrics.xlsx)
     - Example: Adding new unit tests
     - Example: Updating documentation
 
-## Required testing before merging into `master`
+## Validation required to update `master` branch
 
-The following tests must be carried out before merging changes into `master`:
+The validation required before updating the `master` branch depends on the scope of the changes. If multiple changes, use the highest level of change.
 
 - **MAJOR**: 
-    - All tests required for **MINOR** and **PATCH**
+    - All validation required for **MINOR** and **PATCH**
     - All system and component level metrics are assessed. Net improvement in assay performance.
 
 - **MINOR**: 
-    - All tests required for **PATCH**
-    - Pipeline runs successfully on a batch of 12 full-size files
+    - All validation required for **PATCH**
+    - Pipeline runs successfully on a batch of atleast 12 samples of typical file size
     - Changes to runtime and disk usage are acceptable
 
 - **PATCH**:
-    - All unit/integration tests pass
+    - All unit and integration tests pass
     - Every rule that affects variant calling or scientific metrics must have atleast 1 unit test
+
+## Semantic versioning
+
+Version numbers use the MAJOR.MINOR.PATCH format (e.g. `v3.0.1`).
