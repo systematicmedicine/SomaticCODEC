@@ -8,14 +8,19 @@ Version numbers use the MAJOR.MINOR.PATCH format.
 
 The relevant version number is incremented when making the following changes:
 
-- **MAJOR**: Changes that affect variant calling
-    - Example: Adding a new read-level filter
+- **MAJOR**: Changes that could affect variant calling
+    - Example: Changing the tool used to call variants
+    - Example: Changing the default paramemter for read quality filtering
+    - Example: Changing the Dockerfile
 
-- **MINOR**: Changes that do not affect variant calling
-    - Example: Adding a new metrics file or updating resource allocation to a rule
+- **MINOR**: Changes that could affect computational performance/stability, but not variant calling
+    - Example: Updating resource allocation to a rule
+    - Example: Adding or changing a scientific metrics rule
 
-- **PATCH**: Changes that do not affect variant calling, metrics outputs, or performance
-    - Example: Updating unit tests or documentation
+- **PATCH**: Changes that do not affect variant calling or computational performance/stability
+    - Example: Adding or changing a component or system level metric
+    - Example: Adding new unit tests
+    - Example: Updating documentation
 
 ## Required testing before merging into `master`
 
@@ -23,12 +28,13 @@ The following tests must be carried out before merging changes into `master`:
 
 - **MAJOR**: 
     - All tests required for **MINOR** and **PATCH**
-    - All system level metrics pass
+    - All system and component level metrics are assessed. Net improvement in assay performance.
 
 - **MINOR**: 
     - All tests required for **PATCH**
-    - Pipeline runs successfully on 2+ full-size files
-    - Runtime does not increase excessively
+    - Pipeline runs successfully on a batch of 12 full-size files
+    - Changes to runtime and disk usage are acceptable
 
 - **PATCH**:
     - All unit/integration tests pass
+    - Every rule that affects variant calling or scientific metrics must have atleast 1 unit test
