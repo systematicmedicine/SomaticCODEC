@@ -145,6 +145,8 @@ EX_GNOMAD_OVERLAP = "logs/{ex_sample}/ex_gnomAD_overlap.benchmark.txt"
 
 EX_SOMATIC_VARIANT_GERMLINE_CONTEXTS = "logs/{ex_sample}/ex_somatic_variant_germline_contexts.benchmark.txt"
 
+EX_SNV_READ_POSITION_METRICS = "logs/{ex_sample}/ex_snv_read_position_metrics.benchmark.txt"
+
 EX_RECURRENT_VARIANT_METRICS = "logs/shared_rules/ex_recurrent_variant_metrics.benchmark.txt"
 
 # ---------------------------------------------------------------------------------------------------------------
