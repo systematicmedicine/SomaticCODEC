@@ -15,10 +15,11 @@ The relevant version number is incremented when making the following changes:
 
 - **MINOR**: Changes that could affect computational performance/stability, but not variant calling
     - Example: Updating resource allocation to a rule
-    - Example: Adding or changing a scientific metrics rule
+    - Example: Adding a new scientific metric that calculates genomic coverage
+    - Example: Adding an innocent little metrics script that shouldn't effect performance...
 
-- **PATCH**: Changes that do not affect variant calling or computational performance/stability
-    - Example: Adding or changing a component or system level metric
+- **PATCH**: Changes that can't affect variant calling or computational performance/stability
+    - Example: Changing metrics report configuration (component_metrics.xlsx, system_metrics.xlsx)
     - Example: Adding new unit tests
     - Example: Updating documentation
 
