@@ -4,7 +4,6 @@
 visualise_rulegraph.py
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 
 Render a Snakemake rulegraph for inspection and documentation.
@@ -17,7 +16,7 @@ Key properties:
 - Not part of the core pipeline contract
 - Does not run or modify the pipeline
 - Uses temporary stub files and a temporary symlink for graph generation only
-- Produces a human-readable rulegraph (PDF) for documentation and review
+- Produces a human-readable rulegraph (SVG) for documentation and review
 
 Intended use:
 - Understanding pipeline structure and dependencies
@@ -89,8 +88,8 @@ def main() -> int:
 
     target_rule = "called_variants"
     today = date.today().strftime("%Y%m%d")
-    pdf_out = project_root / "docs" / "rulegraphs" / f"{today}_called_variants_rulegraph.pdf"
-    pdf_out.parent.mkdir(parents=True, exist_ok=True)
+    svg_out = project_root / "docs" / "development" / "variant_calling_rulegraph.svg"
+    svg_out.parent.mkdir(parents=True, exist_ok=True)
 
     for p in (snakefile, config_base, config_dev):
         if not p.exists():
@@ -158,14 +157,14 @@ def main() -> int:
             dot_path = tmpdir / "rulegraph.dot"
             dot_path.write_text(dot_text, encoding="utf-8")
 
-            with pdf_out.open("wb") as f:
+            with svg_out.open("wb") as f:
                 subprocess.run(
-                    ["dot", "-Tpdf", str(dot_path)],
+                    ["dot", "-Tsvg", str(dot_path)],
                     check=True,
                     stdout=f,
                 )
 
-            print(f"Wrote: {pdf_out}")
+            print(f"Wrote: {svg_out}")
             return 0
 
         finally:
