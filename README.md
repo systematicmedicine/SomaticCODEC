@@ -80,7 +80,8 @@ The assay leverages the CODEC sequencing protocol (with modifications from [Bae 
 
 - **Developer Guide**
 
-  - Please report bugs via GitHub Issues (external pull requests are not monitored).
+  - Please report bugs via GitHub Issues
+  - For DAG, see *docs/rulegraphs* or run *bin/visualise_rulegraph.py*
 
 ### Maintainers
 
