@@ -50,7 +50,7 @@ def main(args):
     # Add other masks
     mask_files.update({
         "lowdepth": args.ms_lowdepth_bed,
-        "ms_germ_risk": args.ms_germ_risk_bed,
+        "germ_risk": args.ms_germ_risk_bed,
         "combined_mask": args.combined_bed,
     })
 

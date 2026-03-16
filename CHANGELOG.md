@@ -11,6 +11,48 @@ Types of changes:
 - `Removed` for now removed features.
 - `Fixed` for any bug fixes.
 
+## [5.0.0] - 2026-03-13
+
+### Added
+
+- Added test to check that all rules have a test (#325)
+- Added tests for various rules without tests (#338)
+- Added random_seed to config.yaml (#339)
+- Added germline risk variant and germline risk rate metrics (#342)
+- Added metrics files and component metrics for multimapping reads (#343)
+- Added component metric for germline risk rate (#347)
+- Added LICENSE file (#355)
+
+### Changed
+
+- Refactored rules for germline risk masking (#327 and 352)
+- Low depth mask is now set as the complement of positions eligible for germline risk calling (#327)
+- Test scripts now used centralised paths (#323)
+- Changed file paths for ex pipeline to improve readability (#330)
+- Expected files test no longer depends on manually collated lists (#332)
+- Consolidated trimming metrics into one file for ex and one for ms (#337)
+- Set seed for pseudorandom selection of reads in ex_variant_call_eligible_disagree_rate.py (#339)
+- Redirected fastqc progress messages from stdout to rule log files (#340)
+- Metrics report now uses centralised paths (#341)
+- Trinucleotide context cosine similarities CSV is now sorted by normalised values (#342)
+- Mask metrics are now calculated for germ risk BEDs (#342 and 352)
+- pytest_cache and pycache are now removed from all directories before and after running tests (#342)
+- Combined ex_bases_trimmed and ex_trimmed_read_length_metrics into ex_trim_summary_metrics (#342)
+- Removed hardcoded config paths from helper functions (#344)
+- Removed hardcoded file paths from tests (#346)
+- Decoupled shared setup and processing rules (#349)
+- Centralised log and benchmark file paths (#350)
+- Changed nn lower threshold for ex_unique_reads_initial_alignment from 58.3 to 50 (#351)
+- Changed nn thresholds for external_concordance_blood, removed ideal thresholds (#351)
+- Moved disk IOPs and throughput under create_run_timeline_plot key in config.yaml (#354)
+- Updated docs in preparation for public release (#354)
+
+### Fixed
+
+- Test script names updated to match new rule names (#324)
+- Cutadapt output no longer pollutes pipeline log (#337)
+- Fixed bug in create_metrics_report.R where ex_lane IDs were split across rows (#358)
+
 ## [4.0.0] - 2026-02-26
 
 ### Added
@@ -21,7 +63,7 @@ Types of changes:
 
 ### Changed
 
-- Removed hard coded cofig overrides from conftest.py (#308)
+- Removed hard coded config overrides from conftest.py (#308)
 - Change to packaged outputs directory structure (#306)
 - Refactored test_script directory (#309)
 - Project root and package discovery now handled by conftest instead of individual test scripts (#309)
@@ -45,6 +87,7 @@ Types of changes:
 - Germline risk VCF is now a temp file (#303)
 - Include flag now works for metrics report (#304)
 - Fixed test case in test_ms_germline_risk.py following changes to test config (#314)
+- ex_bases_trimmed.smk and ex_trimmed_read_length_metrics.smk now take r1 and r2 as input, instead of r1 twice (#317)
 
 ## [3.1.2] - 2026-02-02
 

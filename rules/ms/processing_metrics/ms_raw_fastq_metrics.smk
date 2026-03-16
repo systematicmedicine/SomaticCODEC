@@ -2,15 +2,14 @@
 Generates a fastqc report for demuxed MS FASTQs
 """
 
-# Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
-
 import helpers.get_metadata as md
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_raw_fastq_metrics:
     input:
-        shared_setup = shared_setup,
+        setup_done = L.SETUP_DONE,
         ms_samples = config["metadata"]["ms_samples_metadata"],
         r1 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][0],
         r2 = lambda wc: md.get_ms_sample_fastqs(config)[wc.ms_sample][1]
@@ -22,34 +21,37 @@ rule ms_raw_fastq_metrics:
         r1_txt = MS.MET_FASTQC_RAW_TXT_R1,
         r2_txt = MS.MET_FASTQC_RAW_TXT_R2
     log:
-        "logs/{ms_sample}/ms_raw_fastq_metrics.log"
+        L.MS_RAW_FASTQ_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_raw_fastq_metrics.benchmark.txt"
+        B.MS_RAW_FASTQ_METRICS
     threads: 
         config["infrastructure"]["threads"]["light"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
-        """
+        r"""
         # Set memory limit
         MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
 
         # Get basename for input files
-        r1_base=$(basename {input.r1} .fastq.gz)
-        r2_base=$(basename {input.r2} .fastq.gz)
+        r1_base=$(basename {input.r1} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+        r2_base=$(basename {input.r2} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+
+        # Get output directory
+        output_dir=$(dirname {output.r1_report})
         
         # Run fastqc
         fastqc \
         --memory $MEMORY_PER_FILE \
         -t {threads} \
-        -o metrics/{wildcards.ms_sample} \
-        {input.r1} {input.r2} 2>> {log}
+        -o ${{output_dir}} \
+        {input.r1} {input.r2} &>> {log}
 
-        # Rename output files
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.html {output.r2_report} 2>> {log}
-        mv metrics/{wildcards.ms_sample}/${{r1_base}}_fastqc.zip {output.r1_zip} 2>> {log}
-        mv metrics/{wildcards.ms_sample}/${{r2_base}}_fastqc.zip {output.r2_zip} 2>> {log}
+        # Rename and move output files
+        mv ${{output_dir}}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.html {output.r2_report} 2>> {log}
+        mv ${{output_dir}}/${{r1_base}}_fastqc.zip {output.r1_zip} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.zip {output.r2_zip} 2>> {log}
 
         # Extract txt file from zip output
         unzip -p {output.r1_zip} */fastqc_data.txt > {output.r1_txt} 2>> {log}

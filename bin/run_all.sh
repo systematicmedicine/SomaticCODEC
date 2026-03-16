@@ -3,13 +3,13 @@
 # --- run_all.sh ---
 #
 # Master orchestration script to run the full bioinformatics pipeline:
-#   1. Download inputs from S3
-#   2. Check pipeline configuration (Snakemake dryrun)
-#   3. Run pipeline (Snakemake)
-#   4. Package outputs
-#   5. Upload results to S3
-#   6. Notify via SNS
-#   7. Shutdown instance
+#   1. Check sample metadata configuration
+#   2. Check download list configuration
+#   3. Download files from S3
+#   4. Check pipeline configuration (Snakemake dryrun)
+#   5. Run pipeline
+#   6. Package outputs for upload to S3
+#   7. Upload packaged outputs to S3
 #   
 # Logs:
 #   - High-level: logs/bin_scripts/run_all.log
@@ -21,6 +21,7 @@
 #
 # Authors:
 #   - Cameron Fraser
+#   - Joshua Johnstone
 #   - ChatGPT
 #
 
@@ -71,7 +72,7 @@ function handle_exit {
         --message "$MSG" \
         --region $AWS_REGION
 
-    # Wait 2 miutes before shutting down
+    # Wait 2 minutes before shutting down
     echo "[INFO] Instance shutdown in 2 minutes" | tee -a "$LOG_FILE"
     sleep 120
 
@@ -93,44 +94,49 @@ function handle_exit {
 # Run scripts
 # -----------------------------------------------------------------------------
 
-# Step 1: check_configs.py
-echo "[INFO] Step 1: check_configs.py" | tee -a "$LOG_FILE"
-if ! python3 -u bin/check_configs.py > logs/bin_scripts/check_configs.log 2>&1; then
-    echo "[ERROR] check_configs.py failed. See logs/bin_scripts/check_configs.log" | tee -a "$LOG_FILE"
+# Step 1: check_sample_metadata.py
+echo "[INFO] Step 1: check_sample_metadata.py" | tee -a "$LOG_FILE"
+if ! python3 -u bin/check_sample_metadata.py > logs/bin_scripts/check_sample_metadata.log 2>&1; then
+    echo "[ERROR] check_sample_metadata.py failed. See logs/bin_scripts/check_sample_metadata.log" | tee -a "$LOG_FILE"
     exit 1
 fi
 
-# Step 2: download_S3.py
-echo "[INFO] Step 2: download_S3.py" | tee -a "$LOG_FILE"
+# Step 2: check_download_list_S3.py
+echo "[INFO] Step 2: check_download_list_S3.py" | tee -a "$LOG_FILE"
+if ! python3 -u bin/check_download_list_S3.py > logs/bin_scripts/check_download_list_S3.log 2>&1; then
+    echo "[ERROR] check_download_list_S3.py failed. See logs/bin_scripts/check_download_list_S3.log" | tee -a "$LOG_FILE"
+    exit 1
+fi
+
+# Step 3: download_S3.py
+echo "[INFO] Step 3: download_S3.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/download_S3.py > logs/bin_scripts/download_S3.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 2: download_S3.py"
 fi
 
-# Step 3: dryrun.sh
-echo "[INFO] Step 2: dryrun.sh" | tee -a "$LOG_FILE"
+# Step 4: dryrun.sh
+echo "[INFO] Step 4: dryrun.sh" | tee -a "$LOG_FILE"
 if ! bash bin/dryrun.sh > logs/bin_scripts/dryrun.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 2: dryrun.sh"
 fi
 
-# Step 4: run_pipeline.sh
-echo "[INFO] Step 4: run_pipeline.sh" | tee -a "$LOG_FILE"
+# Step 5: run_pipeline.sh
+echo "[INFO] Step 5: run_pipeline.sh" | tee -a "$LOG_FILE"
 if ! bash bin/run_pipeline.sh > logs/bin_scripts/run_pipeline.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 4: run_pipeline.sh"
 fi
 
-# Step 5: package_outputs.py
-echo "[INFO] Step 5: package_outputs.py" | tee -a "$LOG_FILE"
+# Step 6: package_outputs.py
+echo "[INFO] Step 6: package_outputs.py" | tee -a "$LOG_FILE"
 if ! python3 bin/package_outputs.py > logs/bin_scripts/package_outputs.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 5: package_outputs.py"
 fi
 
-# Step 6: upload_S3.sh
-echo "[INFO] Step 6: upload_S3.sh" | tee -a "$LOG_FILE"
+# Step 7: upload_S3.sh
+echo "[INFO] Step 7: upload_S3.sh" | tee -a "$LOG_FILE"
 if ! bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 6: upload_S3.sh"
 fi
 
 # ✅ Success case
 handle_exit "SUCCEEDED" "Pipeline run completed successfully"
-
-

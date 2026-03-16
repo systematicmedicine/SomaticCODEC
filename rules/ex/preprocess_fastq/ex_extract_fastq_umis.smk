@@ -5,11 +5,10 @@ Moves the read pair UMI to readname
     - Append read 2 3bp UMI sequence after read 1 UMI in read 1 and read 2
 """ 
 
-# Rule depends on output lists defined in pipeline_outputs.smk
-include: os.path.join(workflow.basedir, "definitions", "outputs", "pipeline_outputs.smk")
-
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 # Rule
 rule ex_extract_fastq_umis:
@@ -22,7 +21,7 @@ rule ex_extract_fastq_umis:
         ex_lanes = config["metadata"]["ex_lanes_metadata"],
 
         # All setup complete before rule can run
-        shared_setup = shared_setup
+        setup_done = L.SETUP_DONE
 
     output:
         fastq1 = temp(EX.UMIXD_FASTQ_R1),
@@ -31,9 +30,9 @@ rule ex_extract_fastq_umis:
         umi_length = config["sci_params"]["ex_extract_fastq_umis"]["umi_length"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_lane}/ex_extract_fastq_umis.log"
+        L.EX_EXTRACT_FASTQ_UMIS
     benchmark:
-        "logs/{ex_lane}/ex_extract_fastq_umis.benchmark.txt"
+        B.EX_EXTRACT_FASTQ_UMIS
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
@@ -52,5 +51,5 @@ rule ex_extract_fastq_umis:
           -o {output.fastq1} \
           -p {output.fastq2} \
           --compression-level {params.compression_level} \
-          {input.fastq1} {input.fastq2} 2>> {log}
+          {input.fastq1} {input.fastq2} >> {log} 2>&1
         """

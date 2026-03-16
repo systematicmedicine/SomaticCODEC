@@ -26,7 +26,7 @@ from rule_scripts.ms.processing_metrics.ms_masking_metrics import main
             "gnomad": 2.5,
             "giab": 5.0,
             "lowdepth": 0.25,
-            "ms_germ_risk": 0.02,
+            "germ_risk": 0.02,
             "combined_mask": 100
         }
     )

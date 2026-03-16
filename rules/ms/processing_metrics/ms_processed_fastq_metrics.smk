@@ -3,6 +3,8 @@ Generates a fastqc report for ms processed reads
 """
 
 from definitions.paths.io import ms as MS
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ms_processed_fastq_metrics:
     input:
@@ -16,24 +18,37 @@ rule ms_processed_fastq_metrics:
         r1_txt = MS.MET_FASTQC_FILTER_TXT_R1,
         r2_txt = MS.MET_FASTQC_FILTER_TXT_R2
     log:
-        "logs/{ms_sample}/ms_processed_fastq_metrics.log"
+        L.MS_PROCESSED_FASTQ_METRICS
     benchmark:
-        "logs/{ms_sample}/ms_processed_fastq_metrics.benchmark.txt"
+        B.MS_PROCESSED_FASTQ_METRICS
     threads:
         config["infrastructure"]["threads"]["light"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:
-        """    
+        r"""    
         # Set memory limit
         MEMORY_PER_FILE=$(( {resources.memory} * 1024 / 2 ))
 
-        # Run fastqc        
+        # Get basename for input files
+        r1_base=$(basename {input.r1} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+        r2_base=$(basename {input.r2} | sed -E 's/(\.fastq\.gz|\.fq\.gz|\.fastq|\.fq)$//')
+
+        # Get output directory
+        output_dir=$(dirname {output.r1_report})
+        
+        # Run fastqc
         fastqc \
         --memory $MEMORY_PER_FILE \
         -t {threads} \
-        -o metrics/{wildcards.ms_sample} \
-        {input.r1} {input.r2} 2>> {log}
+        -o ${{output_dir}} \
+        {input.r1} {input.r2} &>> {log}
+
+        # Rename and move output files
+        mv ${{output_dir}}/${{r1_base}}_fastqc.html {output.r1_report} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.html {output.r2_report} 2>> {log}
+        mv ${{output_dir}}/${{r1_base}}_fastqc.zip {output.r1_zip} 2>> {log}
+        mv ${{output_dir}}/${{r2_base}}_fastqc.zip {output.r2_zip} 2>> {log}
 
         # Extract txt file from zip output
         unzip -p {output.r1_zip} */fastqc_data.txt > {output.r1_txt} 2>> {log}

@@ -9,6 +9,8 @@ Trim reads so that only inserts are remaining
 
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_trim_fastq:
     input:
@@ -26,9 +28,7 @@ rule ex_trim_fastq:
         r2 = temp(EX.TRIMMED_FASTQ_R2),
 
         # Metrics files
-        trim5primejson = EX.MET_TRIM_FASTQ_TRIM5P,
-        r1_trim3primejson = EX.MET_TRIM_FASTQ_TRIM3PR1,
-        r2_trim3primejson = EX.MET_TRIM_FASTQ_TRIM3PR2, 
+        metrics = EX.MET_TRIM_FASTQ,
 
         # Intermediate files
         int1_r1 = temp(EX.TRIM_FASTQ_INT1_R1),
@@ -50,9 +50,9 @@ rule ex_trim_fastq:
         r2_end = lambda wc: md.get_ex_sample_adapter_dict(config)[wc.ex_sample]["r2_end"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_trim_fastq.log"
+        L.EX_TRIM_FASTQ
     benchmark:
-        "logs/{ex_sample}/ex_trim_fastq.benchmark.txt"
+        B.EX_TRIM_FASTQ
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
@@ -63,6 +63,7 @@ rule ex_trim_fastq:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Trim 5' adapter sequences
+        printf "##### Trim 5' adapter sequences #####\n" > {output.metrics}
         cutadapt \
           -j {threads} \
           --error-rate {params.max_error_rate} \
@@ -72,9 +73,10 @@ rule ex_trim_fastq:
           -p {output.int1_r2} \
           --compression-level {params.compression_level} \
           {input.r1} {input.r2} \
-          --json={output.trim5primejson} 2>> {log}
+          --report=full >> {output.metrics} 2>> {log}
 
         # Trim 3' adapter sequences from R1
+        printf "\n\n##### Trim 3' adapter sequences from R1 #####\n" >> {output.metrics}
         cutadapt \
           -j {threads} \
           --error-rate {params.max_error_rate} \
@@ -83,9 +85,10 @@ rule ex_trim_fastq:
           -o {output.int2_r1} \
           --compression-level {params.compression_level} \
           {output.int1_r1} \
-          --json={output.r1_trim3primejson} 2>> {log}
+          --report=full >> {output.metrics} 2>> {log}
 
         # Trim 3' adapter sequences from R2
+        printf "\n\n##### Trim 3' adapter sequences from R2 #####\n" >> {output.metrics}
         cutadapt \
           -j {threads} \
           --error-rate {params.max_error_rate} \
@@ -94,9 +97,10 @@ rule ex_trim_fastq:
           -o {output.int2_r2} \
           --compression-level {params.compression_level} \
           {output.int1_r2} \
-          --json={output.r2_trim3primejson} 2>> {log}
+          --report=full >> {output.metrics} 2>> {log}
 
         # Trim additional bases and low quality bases
+        printf "\n\n##### Trim additional bases and low quality bases #####\n" >> {output.metrics}
         cutadapt \
           -j {threads} \
           -u {params.r1_cut_start} \
@@ -107,5 +111,6 @@ rule ex_trim_fastq:
           -o {output.r1} \
           -p {output.r2} \
           --compression-level {params.compression_level} \
-          {output.int2_r1} {output.int2_r2} 2>> {log}
+          {output.int2_r1} {output.int2_r2} \
+          --report=full >> {output.metrics} 2>> {log}
         """ 

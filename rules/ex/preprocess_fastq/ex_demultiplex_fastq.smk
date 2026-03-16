@@ -5,6 +5,8 @@ Demultiplex each lane FASTQ into sample FASTQs
 
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_demultiplex_fastq:
     input:
@@ -13,8 +15,8 @@ rule ex_demultiplex_fastq:
         umixd_r2 = expand(EX.UMIXD_FASTQ_R2, ex_lane = md.get_ex_lane_ids(config)),
 
         # Demultiplex adaptors
-        r1_start = expand(EX.ADAPTOR_R1_START, ex_lane = md.get_ex_lane_ids(config)),
-        r2_start = expand(EX.ADAPTOR_R2_START, ex_lane = md.get_ex_lane_ids(config))
+        r1_start = expand(EX.DEMUX_ADAPTOR_R1, ex_lane = md.get_ex_lane_ids(config)),
+        r2_start = expand(EX.DEMUX_ADAPTOR_R2, ex_lane = md.get_ex_lane_ids(config))
 
     output:
         # Demultiplexed FASTQs
@@ -30,9 +32,9 @@ rule ex_demultiplex_fastq:
         ex_samples = md.get_ex_sample_ids(config),
         compression_level = config["infrastructure"]["compression"]["gzip_level"]  
     log:
-        "logs/shared_rules/ex_demultiplex_fastq.log"
+        L.EX_DEMULTIPLEX_FASTQ
     benchmark:
-        "logs/shared_rules/ex_demultiplex_fastq.benchmark.txt"
+        B.EX_DEMULTIPLEX_FASTQ
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
@@ -56,5 +58,5 @@ rule ex_demultiplex_fastq:
             --ex_samples {params.ex_samples} \
             --compression_level {params.compression_level} \
             --threads {threads} \
-            --log {log} 2>> {log}
+            --log {log} >> {log} 2>&1
         """

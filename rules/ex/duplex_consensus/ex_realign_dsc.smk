@@ -5,6 +5,8 @@ Realign the DSC to the reference genome
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_realign_dsc:
     input:
@@ -41,9 +43,9 @@ rule ex_realign_dsc:
         z_dropoff = config["sci_params"]["ex_remap_dsc"]["z_dropoff"],
         compression_level = config["infrastructure"]["compression"]["gzip_level"]
     log:
-        "logs/{ex_sample}/ex_remap_dsc.log"
+        L.EX_REALIGN_DSC
     benchmark:
-        "logs/{ex_sample}/ex_remap_dsc.benchmark.txt"
+        B.EX_REALIGN_DSC
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:

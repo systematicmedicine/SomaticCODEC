@@ -4,33 +4,28 @@
 
 Compute empirical Watson/Crick disagreement rate at positions that are eligible for variant calling.
 
-Inputs (from Snakemake rule):
-  - BAM:   tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam
-  - BAI:   tmp/{ex_sample}/{ex_sample}_map_dsc_anno_filtered.bam.bai
-  - BED:   tmp/{ex_sample}/{ex_sample}_include.bed    (include mask)
+To be used with rule ex_variant_call_eligible_disagree_rate
 
-Outputs:
-  - JSON:  metrics/{ex_sample}/{ex_sample}_variant_call_disagree_metrics.json
-
-What we do:
-  - Shuffle references and take the first NUMBER_OF_READS primary alignments from the test BAM
+Steps:
+  - Shuffle references and take the first NUMBER_OF_READS primary alignments from the DSC BAM
   - Reverse aq:Z and bq:Z (Watson and Crick quality scores) on FLAG16 (reverse reads) so qualities align to ac:Z / bc:Z (Watson and Crick sequences)
   - Per base assessed for disagrement, require:
-      - ac:Z:,bc:Z be either A,C,G,T
-      - qa+qb ≥ REQUIRED_Q
+      - ac:Z:,bc:Z be one of A/C/G/T
+      - qa+qb >= REQUIRED_Q
       - Position lies inside include BED
   - Tally:
       - Total_eligible_sites
-      - Observed_disagreements   (ac:Z: != bc:Z:)
+      - Observed_disagreements (ac:Z: != bc:Z:)
       - Observed_disagreement_rate = Observed_disagreements / Total_eligible_sites
 
 Notes:
   - aq and bq must be reversed if flag 0x10 (flag 16) is set
-      - The main sequence, ac and bc were already reversed earlier in the pipeline, but aq and bq were not
+      - The sequence strings (ac and bc) are already reversed by fgbio CallCodecConsensusReads, but the quality strings (aq and bq) are not
   - Uses per-read interval sweeping for fast BED membership checks.
 
 Authors:
  - James Phie
+ - Joshua Johnstone
  - ChatGPT
 """
 
@@ -162,13 +157,14 @@ def eligible_sites_from_alignment(aln, bed_idx, required_q: int):
     return results
 
 
-def tally_disagreements(bam, bed_idx, required_q: int, number_of_reads: int):
+def tally_disagreements(bam, bed_idx, required_q: int, number_of_reads: int, random_seed: int):
     """
     Stream through BAM, tally eligible sites and disagreements.
     Returns (total_eligible_sites, observed_disagreements, sampled_reads).
     """
     refs = list(bam.header.references)
-    random.shuffle(refs)
+    rng = random.Random(random_seed)
+    rng.shuffle(refs)
 
     total = 0
     disagreements = 0
@@ -210,6 +206,7 @@ def main(args):
     REQUIRED_Q = int(args.required_Q)
     NUMBER_OF_READS = int(args.number_of_reads)
     THREADS = int(args.threads)
+    RANDOM_SEED = int(args.random_seed)
 
     print(f"[INFO] BAM: {bam_path}")
     print(f"[INFO] BED: {bed_path}")
@@ -225,7 +222,7 @@ def main(args):
 
     # Check number of Watson and Crick disagreements
     total_eligible_sites, observed_disagreements, sampled_reads = tally_disagreements(
-        bam, bed_idx, REQUIRED_Q, NUMBER_OF_READS
+        bam, bed_idx, REQUIRED_Q, NUMBER_OF_READS, RANDOM_SEED
     )
 
     bam.close()
@@ -270,6 +267,7 @@ if __name__ == "__main__":
     parser.add_argument("--metrics_json", required=True)
     parser.add_argument("--required_Q", required=True)
     parser.add_argument("--number_of_reads", required=True)
+    parser.add_argument("--random_seed", required=True)
     parser.add_argument("--threads", required=True)
     parser.add_argument("--log", required=True)
     args = parser.parse_args()

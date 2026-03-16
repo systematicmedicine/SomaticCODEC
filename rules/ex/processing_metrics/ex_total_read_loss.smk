@@ -3,6 +3,8 @@ Calculates the total read loss between raw FASTQ, and DSC immediately before var
 """
 
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_total_read_loss:
     input:
@@ -14,9 +16,9 @@ rule ex_total_read_loss:
     params:
         sample = "{ex_sample}"
     log:
-        "logs/{ex_sample}/ex_total_read_loss.log"
+        L.EX_TOTAL_READ_LOSS
     benchmark:
-        "logs/{ex_sample}/ex_total_read_loss.benchmark.txt"
+        B.EX_TOTAL_READ_LOSS
     threads:
         1
     resources:

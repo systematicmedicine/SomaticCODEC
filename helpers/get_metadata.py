@@ -179,6 +179,6 @@ def load_metadata(config):
 """
 Load the Snakemake config.yaml file
 """ 
-def load_config(path="config/config.yaml"):
+def load_config(path):
     with open(path, "r") as f:
         return yaml.safe_load(f)

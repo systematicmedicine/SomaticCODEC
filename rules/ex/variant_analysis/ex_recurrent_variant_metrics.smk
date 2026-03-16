@@ -4,6 +4,8 @@ Identify somatic variants present in multiple samples in a batch
 
 import helpers.get_metadata as md
 from definitions.paths.io import ex as EX
+from definitions.paths import log as L
+from definitions.paths import benchmark as B
 
 rule ex_recurrent_variant_metrics:
     input:
@@ -13,9 +15,9 @@ rule ex_recurrent_variant_metrics:
         vcf_path = EX.MET_RECURRENT_VARIANTS_VCF,
         metrics_path = EX.MET_RECURRENT_VARIANTS_JSON
     log:
-        "logs/shared_rules/batch_ex_recurrent_variant_metrics.log"
+        L.EX_RECURRENT_VARIANT_METRICS
     benchmark:
-        "logs/shared_rules/batch_ex_recurrent_variant_metrics.benchmark.txt"
+        B.EX_RECURRENT_VARIANT_METRICS
     threads:
         1
     resources:

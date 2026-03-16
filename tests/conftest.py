@@ -66,10 +66,10 @@ def clean_workspace():
                     except FileNotFoundError:
                         pass
 
-    # Delete .pytest_cache
-    pytest_cache = PROJECT_ROOT / ".pytest_cache"
-    if pytest_cache.exists():
-        shutil.rmtree(pytest_cache)
+    # Delete .pytest_cache and __pycache__ in all directories
+    for pattern in (".pytest_cache", "__pycache__"):
+        for cache_dir in PROJECT_ROOT.rglob(pattern):
+            shutil.rmtree(cache_dir)
 
 # Runs a small dataset through the snakemake pipeline to generate files for testing
 @pytest.fixture(scope = "session")
