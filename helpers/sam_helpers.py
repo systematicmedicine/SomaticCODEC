@@ -4,7 +4,6 @@
 Functions for obtaining data from SAM files.
 
 Authors: 
-    - Chat-GPT
     - Joshua Johnstone
 """
 

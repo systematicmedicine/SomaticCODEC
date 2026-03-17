@@ -7,7 +7,6 @@ Writes git metadata to a JSON file so that the version of the pipeline that was 
 To be used exclusively with the Snakemake rule write_git_metadata
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 

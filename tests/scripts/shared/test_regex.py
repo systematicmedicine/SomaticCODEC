@@ -9,7 +9,6 @@ To add additional test cases, update:
 tests\\expected\\test_regex\\regex_expected_values.csv
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 

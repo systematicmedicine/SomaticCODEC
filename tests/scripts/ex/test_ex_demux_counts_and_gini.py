@@ -4,7 +4,6 @@
 Tests the script ex_demux_counts_and_gini.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import json

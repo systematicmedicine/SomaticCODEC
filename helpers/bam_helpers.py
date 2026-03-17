@@ -4,7 +4,6 @@
 Functions for obtaining data from BAM files.
 
 Authors: 
-    - Chat-GPT
     - Joshua Johnstone
 """
 import subprocess

@@ -5,7 +5,6 @@ Tests the script ms_coverage_by_depth_metrics.py
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 """
 import pytest
 import json

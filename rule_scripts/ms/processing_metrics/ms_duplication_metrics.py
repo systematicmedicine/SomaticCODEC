@@ -6,7 +6,6 @@ Calculates duplication rate based on samtools markdup metrics.
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 """
 import sys
 import json

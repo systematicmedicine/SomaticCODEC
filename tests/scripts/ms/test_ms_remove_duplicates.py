@@ -4,7 +4,6 @@
 Tests the rule ms_remove_duplicates
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 from pathlib import Path

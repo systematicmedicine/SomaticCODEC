@@ -4,7 +4,6 @@
 Tests the script create_job_log.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

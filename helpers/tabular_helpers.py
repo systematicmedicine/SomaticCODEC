@@ -4,7 +4,6 @@
 Functions for obtaining data from tabular (.csv, .tsv, .txt) files.
 
 Authors: 
-    - Chat-GPT
     - Joshua Johnstone
 """
 

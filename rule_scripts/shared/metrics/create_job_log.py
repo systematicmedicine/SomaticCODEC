@@ -7,7 +7,6 @@ Generates a csv with job metadata from the Snakemake log
 To be used with the rule create_job_log
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

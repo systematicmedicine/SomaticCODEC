@@ -6,7 +6,6 @@
 #
 # Authors: 
 #   - Joshua Johnstone
-#   - Chat-GPT
 #
 set -e
 

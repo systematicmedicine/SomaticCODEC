@@ -8,7 +8,6 @@ Exclude germline variants present in the gnomAD database.
 
 Authors: 
    - Cameron Fraser
-   - Chat-GPT
 """
 
 # ---------------------------------------------------------------------------------------

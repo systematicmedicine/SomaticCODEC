@@ -5,7 +5,6 @@ Runs a snakemake dry run
 
 Authors:
     - Cameron Fraser
-    - Chat-GPT
     - Joshua Johnstone
 """
 

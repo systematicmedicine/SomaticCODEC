@@ -4,7 +4,6 @@
 Tests the script ms_masking_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import json

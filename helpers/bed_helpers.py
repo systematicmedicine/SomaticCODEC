@@ -4,7 +4,6 @@
 Functions for obtaining data from BED files.
 
 Authors: 
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

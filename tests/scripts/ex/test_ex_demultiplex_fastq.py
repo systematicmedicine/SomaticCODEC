@@ -4,7 +4,6 @@
 Tests the rule ex_demultiplex_fastq
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 

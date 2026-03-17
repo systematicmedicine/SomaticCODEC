@@ -7,7 +7,6 @@ Determines how many called somatic variants are present in dataset of common ger
 Designed to be used exclusively with the rule "ex_gnomAD_overlap"
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
     - Joshua Johnstone
 """

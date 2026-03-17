@@ -5,7 +5,6 @@ Tests the rule ms_depth_histogram_metrics.py
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 """
 
 import shutil

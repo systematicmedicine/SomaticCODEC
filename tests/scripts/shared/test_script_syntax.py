@@ -6,7 +6,6 @@ Tests scripts for syntax errors
     - Test fails if any scripts have other file extenstions
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 
 """

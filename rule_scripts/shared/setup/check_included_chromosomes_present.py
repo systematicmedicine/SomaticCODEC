@@ -7,7 +7,6 @@ Checks that chromosomes included for variant calling are present in reference an
 Designed to be used exclusively with the rule "check_included_chromosomes_present"
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 from pathlib import Path

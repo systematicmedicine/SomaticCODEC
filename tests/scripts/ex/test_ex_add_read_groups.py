@@ -4,7 +4,6 @@
 Tests the rule ex_add_read_groups
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 from pathlib import Path

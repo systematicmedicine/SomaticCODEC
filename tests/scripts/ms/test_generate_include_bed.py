@@ -10,7 +10,6 @@ This test has been tested by changing the shell script of the rule in the follow
         cp {input.mask_bed} {output.include_bed} 2>> {log}
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 

@@ -6,7 +6,6 @@ Checks that the sample metadata sheets are configured correctly
 Authors:
   - Cameron Fraser
   - Joshua Johnstone
-  - Chat-GPT
 
 """
 

@@ -7,7 +7,6 @@ Calculates the number of reads lost between the start and end of the ex pipeline
 Rule to be used exclusively with parent rule, ex_total_read_loss
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
     - Joshua Johnstone
 """

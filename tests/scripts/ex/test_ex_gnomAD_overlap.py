@@ -4,7 +4,6 @@
 Tests the script ex_gnomAD_overlap.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import pytest

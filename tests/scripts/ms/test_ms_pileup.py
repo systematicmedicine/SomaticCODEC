@@ -4,7 +4,6 @@
 Tests the rule ms_pileup
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

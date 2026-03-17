@@ -4,7 +4,6 @@
 Functions for obtaining data from VCF files.
 
 Authors: 
-    - Chat-GPT
     - Joshua Johnstone
 """
 from pathlib import Path

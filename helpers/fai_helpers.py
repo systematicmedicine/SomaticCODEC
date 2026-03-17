@@ -4,7 +4,6 @@
 Functions for obtaining data from FAI files.
 
 Authors: 
-    - Chat-GPT
     - Joshua Johnstone
 """
 import pandas as pd

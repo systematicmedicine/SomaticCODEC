@@ -4,7 +4,6 @@
 Tests the script ex_call_dsc_read_loss.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import pytest

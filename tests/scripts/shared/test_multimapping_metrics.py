@@ -4,7 +4,6 @@
 Tests the script multimapping_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

@@ -4,7 +4,6 @@
 Tests the rule ms_alignment
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

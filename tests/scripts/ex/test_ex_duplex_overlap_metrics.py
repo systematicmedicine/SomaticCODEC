@@ -4,7 +4,6 @@
 Tests the script ex_duplex_overlap_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import json

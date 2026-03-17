@@ -6,7 +6,6 @@ Calculates the read position for each called SNV (as a percentage of read length
 
 Authors:
   - Joshua Johnstone
-  - Chat-GPT
 """
 
 import pysam

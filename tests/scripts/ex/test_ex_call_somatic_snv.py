@@ -4,7 +4,6 @@
 Tests the rule ex_call_somatic_snv
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

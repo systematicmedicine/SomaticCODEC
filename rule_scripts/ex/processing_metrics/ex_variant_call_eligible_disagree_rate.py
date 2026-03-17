@@ -26,7 +26,6 @@ Notes:
 Authors:
  - James Phie
  - Joshua Johnstone
- - ChatGPT
 """
 
 # ---------------------------------------------------------------------

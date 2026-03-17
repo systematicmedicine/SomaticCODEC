@@ -7,7 +7,6 @@ Tests the ex_snv_position.R script against 3 VCF cases:
   - multi_chrom: multiple chromosomes
 
 Authors:
-  - Chat-GPT 
   - Cameron Fraser
 """
 # --------------------------------------------------------------------------------------

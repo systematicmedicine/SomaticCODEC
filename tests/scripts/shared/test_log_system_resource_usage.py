@@ -4,7 +4,6 @@
 Tests the script log_system_resource_usage.sh
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import subprocess
