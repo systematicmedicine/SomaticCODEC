@@ -19,6 +19,7 @@ Each type of change has different validation requirements before it can be relea
 - Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)
 - Fixed bug that prevented rulegraph script from running (#364)
 - Changed rulegraph format (#365)
+- Moved random_seed from sci_params to infrastructure in config.yaml (#368)
 
 ## [5.0.0] - 2026-03-13
 
