@@ -88,7 +88,7 @@ def main() -> int:
 
     target_rule = "called_variants"
     today = date.today().strftime("%Y%m%d")
-    svg_out = project_root / "docs" / "development" / "variant_calling_rulegraph.svg"
+    svg_out = project_root / "docs" / "figures" / "variant_calling_rulegraph.svg"
     svg_out.parent.mkdir(parents=True, exist_ok=True)
 
     for p in (snakefile, config_base, config_dev):

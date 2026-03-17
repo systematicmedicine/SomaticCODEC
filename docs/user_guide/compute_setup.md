@@ -1,6 +1,6 @@
-# compute_setup.md
+# Setting up the compute environment
 
-## Recommended (Amazon EC2)
+## Default platform (Amazon EC2)
 
 1. Log into [AWS](https://aws.amazon.com/)
 
@@ -48,14 +48,21 @@
     sudo docker build -t codec-image .
     ```
 
-## Custom
+## Custom platform
 
-If using a different compute method or instance, ensure that:
+If using a different compute platform from Amazon EC2:
 
-- The chosen OS is compatible with the tools used by the pipeline
+- Linux OS compatible with Docker
 
-- The system resources available are sufficent, and the below parameters have been adjusted in config/config.yaml:
-    - `infrastructure.memory`
-    - `infrastructure.threads`
-    - `infrastructure.create_run_timeline_plot.disk_iops`
-    - `infrastructure.create_run_timeline_plot.disk_throughput`
+- Perform steps 6-8 from the Amazon EC2 instructions above
+
+- For a batch of 12 samples (12 EX and 12 MS), it is reccommended the compute platform has at least:
+    - 1.5x memory defined in `infrastructure.memory.extra_heavy`
+    - 1.5x threads defined in `infrastructure.memory.heavy`
+    - 12 TB free disk space
+
+- The defalt resource parameters defined in `config.yaml` are optimised for EC2 m7i.48xlarge instances running batches of 12 samples. Consider adjusting these parameters to suit your compute platform and number of samples.
+
+
+
+

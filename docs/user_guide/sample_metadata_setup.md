@@ -1,4 +1,4 @@
-# metadata_file_setup.md
+# Preparing sample metadata sheets
 
 Download and fill in the following [metadata CSVs](https://github.com/systematicmedicine/SomaticCODEC/tree/master/config):
 
