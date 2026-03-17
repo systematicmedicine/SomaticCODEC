@@ -169,7 +169,7 @@ MET_GNOMAD_OVERLAP_INT_TBI = "tmp/ex/{ex_sample}/{ex_sample}_int_gnomad_overlap.
 
 MET_SNV_GERMLINE_CONTEXT = "results/{ex_sample}/{ex_sample}_somatic_variant_germline_contexts.vcf"
 
-MET_SNV_READ_POSITION_JSON = "results/{ex_sample}/{ex_sample}_snv_read_position_uniformity.json"
+MET_SNV_READ_POSITION_JSON = "results/{ex_sample}/{ex_sample}_snv_read_position_metrics.json"
 MET_SNV_READ_POSITION_PDF = "results/{ex_sample}/{ex_sample}_snv_read_position_plot.pdf"
 
 MET_RECURRENT_VARIANTS_VCF = "results/batch/batch_recurrent_variants.vcf"
