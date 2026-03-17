@@ -1,4 +1,4 @@
-# Versioning.md
+# Versioning & releases
 
 ## Types of changes
 
@@ -17,7 +17,7 @@
     - Example: Adding new unit tests
     - Example: Updating documentation
 
-## Validation required to update `master` branch
+## Validation required to release a new version
 
 The validation required before updating the `master` branch depends on the scope of the changes. If multiple changes, use the highest level of change.
 

@@ -61,7 +61,7 @@ If using a different compute platform from Amazon EC2:
     - 1.5x threads defined in `infrastructure.memory.heavy`
     - 12 TB free disk space
 
-- The defalt resource parameters defined in `config.yaml` are optimised for EC2 `m7i.48xlarge` instances running batches of 12 samples. Consider adjusting these parameters if your compute platform or number of samples differs.
+- The defalt resource parameters defined in `config.yaml` are optimised for EC2 `m7i.48xlarge` instances running batches of 12 samples generated using the reccomended library prep and sequencing parameters . Consider adjusting these parameters if your context differs.
 
 
 

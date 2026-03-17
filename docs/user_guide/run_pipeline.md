@@ -3,11 +3,11 @@
 ## Preparation
 
 The following instructions assume you have:
-- Set up the compute platform
+- `ex_lane` and `ms_sample` FASTQ files have been generated
 - Prepared sample metadata sheets
 - Prepared `config.yaml`
 - Reference files are ready for staging
-- `ex_lane` and `ms_sample` FASTQ files are ready for staging
+- Set up the compute platform
 
 See the relevant documentation for more information on how to do the above steps.
 
@@ -113,12 +113,18 @@ See the relevant documentation for more information on how to do the above steps
 
     If using this script, upload destination must be defined in `config.yaml` -> `infrastructure.aws.s3_out_dir`
 
-## End-end pipeline automation (Amazon EC2)
+## Alternative process (end-end pipeline automation)
+
+The following process assumes:
+- You are using the default compute platform (Amazon EC2)
+- You have configured AWS SNS
+- SNS ARN has been defined in `config.yaml` -> `infrastructure.aws.sns_arn`
 
 Perform steps 1-3 as per instructions above, then run the following command:
 
-    ```
-    bash bin/run_all.sh
-    ```
-If using this script, SNS ARN must be defined in `config.yaml` -> `infrastructure.aws.sns_arn`
+```
+bash bin/run_all.sh
+```
+
+When the pipeline stops (sucesfully or unsucessfully), the instance will be automatically shut down and an email sent via SNS.
 

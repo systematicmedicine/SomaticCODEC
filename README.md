@@ -22,12 +22,12 @@ SomaticCODEC comprises a laboratory protocol for library preparation (Phie *et a
 ### User guide
 
 - [Assay overview](docs/user_guide/assay_overview.md)
-- [Generating sequencing data](docs/user_guide/generating_sequencing_data.md)
-- Preparing to run the pipeline
-  - [Setting up compute platform](docs/user_guide/compute_setup.md)
+- Before running the pipeline
+  - [Generating sequencing data](docs/user_guide/generating_sequencing_data.md)
   - [Preparing sample metadata](docs/user_guide/sample_metadata_setup.md)
   - [Preparing the configuration file](docs/user_guide/config_yaml_setup.md)
   - [Obtain reference files](docs/user_guide/obtain_reference_files.md)
+  - [Setting up compute platform](docs/user_guide/compute_setup.md)
 - [Running the pipeline](docs/user_guide/run_pipeline.md)
 - [Interpreting outputs](docs/user_guide/interpreting_outputs.md)
 - [Troubleshooting](docs/user_guide/troubleshooting.md)
@@ -45,6 +45,7 @@ This repository is developed and maintained by [Systematic Medicine Pty Ltd](htt
 
 - [Rulegraph](docs/figures/variant_calling_rulegraph.svg)
 - [Repository structure](docs/development/respository_structure.md)
+- [Versioning & releases](docs/development/versioning.md)
 
 <br>
 
