@@ -21,6 +21,7 @@ Each type of change has different validation requirements before it can be relea
 - Changed rulegraph format (#365)
 - Moved random_seed from sci_params to infrastructure in config.yaml (#368)
 - Updated user facing documentation (#369)
+- Removed author references to ChatGPT (#370)
 
 ## [5.0.0] - 2026-03-13
 
