@@ -1,4 +1,4 @@
-# Setting up the compute environment
+# Setting up compute platform
 
 ## Default platform (Amazon EC2)
 
@@ -61,7 +61,7 @@ If using a different compute platform from Amazon EC2:
     - 1.5x threads defined in `infrastructure.memory.heavy`
     - 12 TB free disk space
 
-- The defalt resource parameters defined in `config.yaml` are optimised for EC2 m7i.48xlarge instances running batches of 12 samples. Consider adjusting these parameters to suit your compute platform and number of samples.
+- The defalt resource parameters defined in `config.yaml` are optimised for EC2 `m7i.48xlarge` instances running batches of 12 samples. Consider adjusting these parameters if your compute platform or number of samples differs.
 
 
 

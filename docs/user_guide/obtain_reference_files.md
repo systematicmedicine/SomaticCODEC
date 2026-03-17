@@ -1,6 +1,6 @@
 # Obtain reference files
 
-The pipeline requires the following reference filse, define in `config.yaml`.
+The pipeline requires the following reference filee, define in `config.yaml` -> `sci_params.shared`.
 
 ```
 sci_params:
@@ -16,4 +16,4 @@ sci_params:
       - "tmp/downloads/GCRh38_repeat_masker.bed"
 ```
 
-You can generate these files yourself, or download them from Systematic Medicines public S3 bucket.
+You can generate these files yourself, or download them from Systematic Medicines public S3 bucket. `arn:aws:s3:::sm-unrestricted-public`

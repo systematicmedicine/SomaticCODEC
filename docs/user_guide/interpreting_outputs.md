@@ -24,14 +24,14 @@ A graphical version of the report can be found at `results/system_metrics_report
 
 ### Metrics thresholds
 
-Thresholds for each component- and system-level metric were established using a combination of internal data (~20 batches) and first-principles reasoning.
+Thresholds for each component and system level metric were established using a combination of internal data (~20 batches) and first-principles reasoning.
 
 These thresholds are intended as a guide for troubleshooting assay performance. Results may differ if different wet-lab, sequencing, or bioinformatic parameters are used.
 
 ### Additional metrics
 Additional metrics files are generated that are not included in the automated report. These can be found in the `metrics/` and `results/` directories.
 
-Some notable metrics:
+Some notable files:
 
 - `results/{ex_sample}/{ex_sample}_trinuc_plots_normalised.pdf`
 - `results/{ex_sample}/{ex_sample}_snv_position_plot.pdf`

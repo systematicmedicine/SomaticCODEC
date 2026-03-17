@@ -1,12 +1,12 @@
 # Preparing sample metadata sheets
 
-Download and fill in the following [metadata CSVs](https://github.com/systematicmedicine/SomaticCODEC/tree/master/config):
+Download the following CSV files from `config/` and populate them for your experiment using the instructions below.
 
 - ***config/ex_adapters.csv***: Defines the sequences for each CODEC adapter quadruplex.
-- ***config/ex_lanes.csv***: Defines the FASTQ files for each ex_lane ID.
-- ***config/ex_samples.csv***: Defines the ex_lane ID, ex_sample ID, ex_adapter ID, and ms_sample ID for each ex_sample.
-- ***config/ms_samples.csv***: Defines the FASTQ files for each ms_sample ID.
-- ***config/download_list.csv***: Defines which files to download from S3 (only required if using *bin/download_S3.py* for file staging)
+- ***config/ex_lanes.csv***: Defines the sample ID and FASTQ files for each `ex_lane`.
+- ***config/ex_samples.csv***: Defines the sample ID for each `ex_sample`, the `ex_lane` it derives from and the `ms_sample` it pairs with.
+- ***config/ms_samples.csv***: Defines the sample ID and FASTQ files for each `ms_sample`.
+- ***config/download_list.csv***: Optional. Defines files to download using *bin/download_S3.py*.
 
 ### config/ex_adapters.csv
 
@@ -30,8 +30,8 @@ QD001,CTTGAACGGACTGTCCAC,GTAGTCTAACGCTCGGTG,CACCGAGCGTTAGACTAC,GTGGACAGTCCGTTCAA
 *config/ex_lanes.csv* contains the following fields:
 
 - `ex_lane`: A unique ID assigned to each sequencing lane
-- `fastq1`: The path to the R1 FASTQ for each lane (relative to the SomaticCODEC directory)
-- `fastq2`: The path to the R2 FASTQ for each lane (relative to the SomaticCODEC directory)
+- `fastq1`: The path to the R1 FASTQ for each lane
+- `fastq2`: The path to the R2 FASTQ for each lane
 
 Example:
 
@@ -44,18 +44,18 @@ LN001,tmp/downloads/L001_R1.fastq.gz,tmp/downloads/L001_R2.fastq.gz
 
 *config/ex_samples.csv* contains the following fields:
 
-- `ex_sample`: A unique ID assigned to each sample following demultiplexing of the ex_lane
+- `ex_sample`: A unique ID assigned to each ex_sample following demultiplexing of the ex_lane
 - `ex_lane`: The ex_lane ID for the sequencing lane that contains the ex_sample
 - `ex_adapter`: The ex_adapter ID that will be used to identify the ex_sample during demultiplexing
 - `ms_sample`: The ID of the matched sample that corrsponds to the ex_sample
 - `donor_id`: An ID shared between the ex_sample and the ms_sample to ensure a correct match
-- `comments`: Any comments about the sample (this field is not used by the pipeline)
+- `comments`: Optional. This field is intended to be user facing and is not used by the pipeline.
 
 Example:
 
 ```
 ex_sample,ex_lane,ex_adapter,ms_sample,donor_id,comments
-S001,LN001,QD001,S002,D001,"Buffy coat sample, 43yo male"
+S001,LN001,QD001,S002,D001,"Blood 40M"
 ```
 
 ### config/ms_samples.csv
@@ -63,25 +63,25 @@ S001,LN001,QD001,S002,D001,"Buffy coat sample, 43yo male"
 *config/ms_samples.csv* contains the following fields:
 
 - `ms_sample`: A unique ID assigned to each matched sample
-- `fastq1`: The path to the R1 FASTQ for each sample (relative to the SomaticCODEC directory)
-- `fastq2`: The path to the R2 FASTQ for each sample (relative to the SomaticCODEC directory)
+- `fastq1`: The path to the R1 FASTQ for each sample
+- `fastq2`: The path to the R2 FASTQ for each sample
 - `donor_id`: An ID shared between the ex_sample and the ms_sample to ensure a correct match
-- `comments`: Any comments about the sample (this field is not used by the pipeline)
+- `comments`: Optional. This field is intended to be user facing and is not used by the pipeline.
 
 Example:
 
 ```
 ms_sample,fastq1,fastq2,donor_id,comments
-S002,tmp/downloads/Buffy_D001_Age43_R1.fastq.gz,tmp/downloads/Buffy_D001_Age43_R2.fastq.gz,D001,"Buffy coat sample, 43yo male"
+S002,tmp/downloads/Buffy_D001_Age43_R1.fastq.gz,tmp/downloads/Buffy_D001_Age43_R2.fastq.gz,D001,"Blood 40M"
 ```
 
-### config/download_list.csv
+### config/download_list.csv (optional)
 
 *config/download_list.csv* contains the following fields:
 
 - `file_name`: The name of the file to be downloaded
 - `source_dir`: The absolute path to the file on S3
-- `destination_dir`: The path to the destination directory (relative to the SomaticCODEC directory, typically tmp/downloads)
+- `destination_dir`: The path to the destination directory (typically tmp/downloads)
 - `expected_md5sum`: The md5sum of the file (checked after download)
 
 Example:

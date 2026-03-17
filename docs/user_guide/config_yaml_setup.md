@@ -4,11 +4,7 @@ Download `config.yaml` from the `config/` directory. Make the following changes:
 
 #### All runs:
 
-- `run_name`: Used by bin scripts and to label various metrics plots.
-
-#### If using custom reference genome
-
-- `sci_params.shared.reference_genome`
+- `run_name`: Used to name pipeline output TAR package and some reports.
 
 #### If using automated S3 upload script:
 

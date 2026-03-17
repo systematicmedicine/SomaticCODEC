@@ -1,27 +1,28 @@
 # Assay Overview
 
-SomaticCODEC is a sequencing assay for quantifying somatic mutation burden in normal human tissues.  
-The assay consists of three stages: **library preparation**, **sequencing**, and a **bioinformatics pipeline**.
+SomaticCODEC is a sequencing assay for quantifying somatic SNVs in human DNA.
 
-The bioinformatics pipeline analyses two sequencing libraries derived from the same biological sample:
+The assay consists of three stages:
 
-- an **experimental (EX) sample**, prepared using the CODEC protocol and used for somatic variant calling
-- a **matched (MS) sample**, prepared using a mostly standard PCR-free workflow and used to identify and mask germline variants
+1. **Library preparation**
+2. **Sequencing**
+3. **Bioinformatics pipeline**
 
-## Assay structure
+SomaticCODEC utilises a matched-sample design. An `EX` (experimental) sample is used to call somatic variants, and an `MS` (matched) sample is used to identify germline variants and improve variant calling.
+
+Alternative terminology used in the literature to describe similar designs includes *case/control* and *tumor/normal*.
 
 ```
-Biological sample
-        │
-        ▼
- ┌──────────────────┐
- │   Library prep   │
- └──────────────────┘
-        │
-        ▼
+          Human DNA
+              │
+              ▼
+ ┌───────────────────────────┐
+ │        Library prep       │
+ └───────────────────────────┘
+        │           │
+        ▼           ▼
  ┌─────────────┬─────────────┐
  │  EX library │  MS library │
- │  (CODEC)    │  (PCR-free) │
  └─────────────┴─────────────┘
         │           │
         ▼           ▼
@@ -39,26 +40,38 @@ Biological sample
         Somatic SNV calls
 ```
 
-## Bioinformatics pipeline inputs
+## Library preparation
 
-The SomaticCODEC bioinformatics pipeline requires the following inputs.
+**Inputs**
 
-### Sequencing data
+- Human genomic DNA
 
-- **EX sample FASTQs** – experimental CODEC library used for somatic variant calling  
-- **MS sample FASTQs** – matched library used to identify and mask germline variants
+**Outputs**
 
-### Reference data
+- EX DNA library (CODEC)
+- MS DNA library (standard Illumina paired-end library)
 
-- Reference genome
-- Reference trinucleotide contexts
-- Known germline variant databases
-- Precomputed genomic masks
+## Sequencing
 
-## Pipeline outputs
+**Inputs**
 
-The pipeline produces:
+- EX DNA library (CODEC)
+- MS DNA library (standard Illumina paired-end library)
 
-- A VCF of Somatic SNV calls for each experimental sample
-- Component-level and system-level assay performance metrics
-- QC reports and diagnostic plots
+**Outputs**
+
+- EX FASTQ files (not demultiplexed)
+- MS FASTQ files (demultiplexed)
+
+## Bioinformatics pipeline
+
+**Inputs**
+
+- EX FASTQ files (not demultiplexed)
+- MS FASTQ files (demultiplexed)
+- Reference files (e.g. reference genome, genome masks, reference germline variants)
+
+**Outputs**
+
+- VCF containing called somatic variants
+- Multiple metrics files and QC reports
