@@ -4,7 +4,6 @@
 Checks if the test suite is being run using an up-to-date docker image
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 

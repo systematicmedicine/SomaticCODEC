@@ -4,7 +4,6 @@
 Test that the script check_included_chromosomes_present.py can detect missing chromosomes in FAI and BED files
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

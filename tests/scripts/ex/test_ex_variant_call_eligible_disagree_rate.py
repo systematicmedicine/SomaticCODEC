@@ -4,7 +4,6 @@
 Tests the script ex_variant_call_eligible_disagree_rate.py
 
 Authors:
-  - ChatGPT
   - James Phie
   - Joshua Johnstone
 """

@@ -7,7 +7,6 @@ Calculates the number of bases lost during ex_trim_fastq, the length percentiles
 This script is to be used exclusively with its parent rule ex_trim_summary_metrics
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import sys

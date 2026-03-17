@@ -4,7 +4,6 @@
 Tests the script fastqc_summary_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import json

@@ -4,7 +4,6 @@
 Tests the script ex_snv_read_position_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import pytest

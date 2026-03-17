@@ -4,7 +4,6 @@
 Tests the rule ex_call_dsc
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

@@ -6,7 +6,6 @@ matches the schema used in CI metadata.
 
 Authors:
     - Cameron Fraser
-    - ChatGPT
 """
 
 from pathlib import Path

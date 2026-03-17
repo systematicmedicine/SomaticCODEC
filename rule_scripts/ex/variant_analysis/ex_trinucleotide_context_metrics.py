@@ -8,7 +8,6 @@ contexts.
 Designed to be used exclusively with rule "ex_trinucleotide_context_metrics.smk"
 
 Authors:
-  - Chat-GPT
   - Cameron Fraser
   - Joshua Johnstone
 """

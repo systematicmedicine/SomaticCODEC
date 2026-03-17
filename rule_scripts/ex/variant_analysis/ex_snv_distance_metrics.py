@@ -6,7 +6,6 @@ For each SNV, calculate the distance to the nearest SNV
 Write a metrics file with percetiles of distances
 
 Authors:
-  - Chat-GPT
   - Cameron Fraser
   - Joshua Johnstone
 """

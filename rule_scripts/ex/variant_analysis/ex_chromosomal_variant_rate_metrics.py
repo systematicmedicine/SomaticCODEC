@@ -4,8 +4,7 @@
 
 Calculates Gini coefficient for difference in somatic variant rate between chromosomes.
 
-Authors: 
-    - Chat-GPT
+Authors:
     - Joshua Johnstone
 """
 import numpy as np

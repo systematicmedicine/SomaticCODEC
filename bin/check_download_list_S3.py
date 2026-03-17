@@ -6,7 +6,6 @@ Checks that the download list is configured correctly and that all files exist o
 Authors:
   - Cameron Fraser
   - Joshua Johnstone
-  - Chat-GPT
 
 """
 # --------------------------------------------------------------------------------

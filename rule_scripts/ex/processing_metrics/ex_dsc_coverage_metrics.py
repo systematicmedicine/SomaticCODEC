@@ -6,7 +6,6 @@ Calculates duplex coverage metrics
 
 Authors:
     - Joshua Johnstone
-    - Chat-GPT
 """
 
 # Import libraries

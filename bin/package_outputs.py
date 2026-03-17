@@ -7,7 +7,6 @@ Create a tar file containing all key outputs of a successful pipeline run,
 including a checksums.txt file for integrity verification.
 
 Authors:
-    * Chat-GPT
     * Cameron Fraser
 """
 

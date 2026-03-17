@@ -4,7 +4,6 @@
 Tests the rule ex_filter_bam
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

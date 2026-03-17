@@ -6,8 +6,8 @@ Downloads data from S3 to the local EC2 instance:
     - Assumes that the EC2 instance running this script has permission to access the data
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
+
 """
 
 print("[INFO] Starting download_s3.py")

@@ -4,7 +4,6 @@
 Tests the rule ex_generate_demux_adaptors
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import glob

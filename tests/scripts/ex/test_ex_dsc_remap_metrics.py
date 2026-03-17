@@ -4,7 +4,6 @@
 Tests the script ex_dsc_remap_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

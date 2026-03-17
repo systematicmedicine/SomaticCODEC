@@ -4,7 +4,6 @@
 Tests the rule ms_germline_risk
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

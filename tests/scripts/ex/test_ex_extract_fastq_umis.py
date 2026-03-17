@@ -4,7 +4,6 @@
 Tests the rule ex_extract_fastq_umis
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron fraser
 """

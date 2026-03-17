@@ -5,7 +5,6 @@ Tests the script ex_trinucleotide_context_metrics.py
   - Tests that trinucleotide contexts are corectly calculated for a sample
 
 Authors:
-  - Chat-GPT
   - Cameron Fraser
   - Joshua Johnstone
 """

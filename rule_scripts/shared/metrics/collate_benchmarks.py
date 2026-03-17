@@ -7,7 +7,6 @@ Searches for all benchmark files, and conbines them into a single CSV
 Designed to be used exclusively with the rule "collate_benchmarks"
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 
 """

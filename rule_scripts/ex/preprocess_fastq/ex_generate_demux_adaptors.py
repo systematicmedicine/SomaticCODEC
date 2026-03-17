@@ -23,7 +23,6 @@ Outputs:
       SEQUENCE
 
 Author:
-  - ChatGPT
   - Cameron Fraser
 """
 

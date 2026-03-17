@@ -4,7 +4,6 @@
 Tests the rule combine_masks
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

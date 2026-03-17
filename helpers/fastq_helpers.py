@@ -4,7 +4,6 @@
 Functions for obtaining data from FASTQ files.
 
 Authors: 
-    - Chat-GPT
     - Cameron Fraser
     - Joshua Johnstone
 """

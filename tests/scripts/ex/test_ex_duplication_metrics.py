@@ -4,7 +4,6 @@
 Tests the script ex_duplication_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import json

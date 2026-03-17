@@ -4,7 +4,6 @@
 Test the rule included_excluded_chromosomes_beds.smk
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
     - Joshua Johnstone
 """

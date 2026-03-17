@@ -4,7 +4,6 @@
 Tests the script ex_chromosomal_variant_rate_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import json

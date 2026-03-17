@@ -6,7 +6,6 @@
 #
 # Authors:
 #   - Cameron Fraser
-#   - ChatGPT
 #
 set -euo pipefail
 

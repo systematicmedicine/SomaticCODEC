@@ -4,7 +4,6 @@
 Functions for obtaining data from BCF files.
 
 Authors: 
-    - Chat-GPT
     - Joshua Johnstone
 """
 import pysam

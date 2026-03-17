@@ -7,7 +7,6 @@ Obtains the germline contexts for positions where somatic variants were called
 Designed to be used exclusively with the rule "ex_somatic_variant_germline_contexts"
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

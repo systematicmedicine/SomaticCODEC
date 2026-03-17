@@ -4,7 +4,6 @@
 Tests the script ex_somatic_variant_rate.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """

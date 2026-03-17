@@ -4,7 +4,6 @@
 Helper functions for loading metadata
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 
