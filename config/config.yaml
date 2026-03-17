@@ -36,7 +36,6 @@ sci_params:
       "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", 
       "chr20", "chr21", "chr22", "chrX", "chrY"
       ]
-    random_seed: 123
 
   ex_annotate_map:
     min_umi_length: 6
@@ -186,3 +185,5 @@ infrastructure:
   aws:
     s3_out_dir: "s3://<bucket>/<dir>/"
     sns_arn: "arn:aws:sns:<region>:<account_ID>:<topic_name>"
+
+  random_seed: 123
