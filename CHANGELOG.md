@@ -11,6 +11,10 @@ Each type of change has different validation requirements before it can be relea
 
 ## [Unreleased]
 
+### Minor
+- Added ex_snv_read_position_metrics script and rule (#366)
+- Added uniformity_SNV_read_position system metric (#366)
+
 ### Patch
 - Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)
 - Fixed bug that prevented rulegraph script from running (#364)
