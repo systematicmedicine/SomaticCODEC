@@ -13,7 +13,7 @@ rule ex_snv_read_position_metrics:
         bai_path = EX.FILTERED_DSC_INDEX,
         index_path = config["sci_params"]["shared"]["reference_genome"] + ".fai"
     output:
-        metrics_csv = EX.MET_SNV_READ_POSITION_CSV,
+        metrics_json = EX.MET_SNV_READ_POSITION_JSON,
         metrics_plot = EX.MET_SNV_READ_POSITION_PDF
     log:
         L.EX_SNV_READ_POSITION_METRICS
@@ -33,7 +33,7 @@ rule ex_snv_read_position_metrics:
             --vcf {input.vcf_path} \
             --bam {input.bam_path} \
             --bai {input.bai_path} \
-            --csv {output.metrics_csv} \
+            --json {output.metrics_json} \
             --plot {output.metrics_plot} \
             --log {log} 2>> {log}
         """

@@ -114,7 +114,7 @@ ex_variant_analysis = [
     expand(EX.MET_GNOMAD_OVERLAP_VCF, ex_sample = ex_sample_ids),
     expand(EX.MET_GNOMAD_OVERLAP_JSON, ex_sample = ex_sample_ids),
     expand(EX.MET_SNV_GERMLINE_CONTEXT, ex_sample = ex_sample_ids),
-    expand(EX.MET_SNV_READ_POSITION_CSV, ex_sample = ex_sample_ids),
+    expand(EX.MET_SNV_READ_POSITION_JSON, ex_sample = ex_sample_ids),
     expand(EX.MET_SNV_READ_POSITION_PDF, ex_sample = ex_sample_ids),
     EX.MET_RECURRENT_VARIANTS_VCF,
     EX.MET_RECURRENT_VARIANTS_JSON
