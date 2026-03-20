@@ -45,6 +45,7 @@ This repository is developed and maintained by [Systematic Medicine Pty Ltd](htt
 
 - [Rulegraph](docs/figures/variant_calling_rulegraph.svg)
 - [Repository structure](docs/development/respository_structure.md)
+- [Software testing](docs/development/software_testing.md)
 - [Versioning & releases](docs/development/versioning.md)
 
 <br>
