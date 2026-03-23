@@ -16,6 +16,17 @@ Tests are structured as follows:
 - **Integration tests**  
   Validate that the pipeline runs end-to-end, produces all expected output files, and that outputs contain data.
 
+## Bug-driven testing
+
+Bugs are addressed using a test-driven approach:
+
+1. Understand the issue
+2. Create a failing test that reproduces the bug
+3. Implement a fix
+4. Confirm the test passes
+
+This ensures that bugs are captured as tests and do not regress in future changes.
+
 ## Running tests
 
 Run the full test suite from the project root:

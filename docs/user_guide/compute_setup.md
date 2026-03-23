@@ -2,6 +2,8 @@
 
 ## Default platform (Amazon EC2)
 
+The SomaticCODEC pipeline is optimised for execution on Amazon EC2. This is the recommended option for the smoothest setup and most predictable performance.
+
 1. Log into [AWS](https://aws.amazon.com/)
 
 2. Navigate to EC2
@@ -50,7 +52,7 @@
 
 ## Custom platform
 
-If using a different compute platform from Amazon EC2:
+While the pipeline has not been tested on other compute platforms, the containerised workflow and configurable infrastructure parameters should make it straightforward to run in alternative environments.
 
 - Linux OS compatible with Docker
 
