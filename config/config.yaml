@@ -42,7 +42,7 @@ sci_params:
 
     known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz  # Used to compute germline overlap metrics
 
-  # Scientific parameters for individual rules. See rule for more information.
+  # Scientific parameters for individual rules. See rules for more information.
   ex_annotate_map:
     min_umi_length: 6
 
