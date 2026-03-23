@@ -34,6 +34,7 @@ Each type of change has different validation requirements before it can be relea
 - Added metrics files and component metrics for multimapping reads (#343)
 - Added component metric for germline risk rate (#347)
 - Added LICENSE file (#355)
+- Added URL for download of default reference files
 
 ### Changed
 
