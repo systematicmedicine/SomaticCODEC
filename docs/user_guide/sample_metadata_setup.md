@@ -88,6 +88,6 @@ Example:
 
 ```
 file_name,source_dir,destination_dir,expected_md5sum
-UCSC-GCRh38-p14-filtered.fa,s3://<bucket>/reference-genomes/UCSC-GCRh38-p14-filtered/,tmp/downloads,5e43e66f74da7ecf87f7060a310a26bf
+UCSC-GRCh38-p14-filtered.fa,s3://<bucket>/reference-genomes/UCSC-GRCh38-p14-filtered/,tmp/downloads,5e43e66f74da7ecf87f7060a310a26bf
 ```
 
