@@ -5,7 +5,7 @@
 run_name: experiment_1
 
 # ------------------------------------------------------------------------------
-# Metadata
+# Metadata paths
 # ------------------------------------------------------------------------------
 metadata:
 
@@ -22,21 +22,27 @@ metadata:
 # ------------------------------------------------------------------------------
 sci_params:
   
+  # Scientfic parameters shared across multiple rules
   shared:
     reference_genome: tmp/downloads/UCSC-GCRh38-p14-filtered.fa
-    reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
-    reference_genome_trinuc_counts: tmp/downloads/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv
-    known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz # Must be bgzipped
+    
     precomputed_masks:
-      - "tmp/downloads/GRCh38_alldifficultregions.bed"
-      - "tmp/downloads/gnomad_AF_0.1.bed"
-      - "tmp/downloads/GCRh38_repeat_masker.bed"
+      - "tmp/downloads/GRCh38_alldifficultregions.bed"  # Masks genomic regions associated with elevated error rates
+      - "tmp/downloads/gnomad_AF_0.1.bed"               # Marks genomic regions likely to contain common germline variants
+      - "tmp/downloads/GCRh38_repeat_masker.bed"        # Masks highly repetitive, error-prone genomic regions
+    
     included_chromosomes: [
       "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10",
       "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", 
       "chr20", "chr21", "chr22", "chrX", "chrY"
-      ]
+      ]  # Restricts analysis to canonical chromosomes
+ 
+    reference_tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv  # Reference trinucleotide context frequencies
+    reference_genome_trinuc_counts: tmp/downloads/UCSC-GCRh38-p14-filtered-trinucleotide-counts.csv  # Genome-wide trinucleotide counts for normalisation
 
+    known_germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz  # Used to compute germline overlap metrics
+
+  # Scientific parameters for individual rules. See rules for more information.
   ex_annotate_map:
     min_umi_length: 6
 
@@ -182,8 +188,8 @@ infrastructure:
   log_system_resource_usage:
       sleep_interval: 60
     
-  aws:
+  aws: # Only required if using AWS workflow
     s3_out_dir: "s3://<bucket>/<dir>/"
     sns_arn: "arn:aws:sns:<region>:<account_ID>:<topic_name>"
 
-  random_seed: 123
+  random_seed: 123 # For metrics that use random sampling such as ex_variant_call_eligible_disagree_rate
