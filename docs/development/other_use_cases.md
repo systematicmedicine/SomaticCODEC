@@ -22,6 +22,9 @@ When making substantive changes to the assay we strongly recommend re-validating
 
 We are currently establishing this capability. A cell culture–optimised profile is expected to be released in the future.
 
+- The `ms_sample` may need to be an isogenic control, rather than an independent sample from the same donor.
+- Some pipeline parameters may require adjustment for optimal performance.
+
 ## Other species
 
 - Restriction enzyme cut sites may result in different DNA fragment length distributions across species
@@ -34,8 +37,15 @@ We are currently establishing this capability. A cell culture–optimised profil
   - Trinucleotide context reference
 - Reduced effectiveness of genome masks may result in increased false positive SNV calls
 
-## No matched sample (dependent samples)
+## No matched sample (dependent samples design)
 
 - A dependent sample design requires higher `ex_sample` depth. In our use case, it was more cost-effective to use an `ms_sample` for germline variant calling than to increase `ex_sample` depth.
 - Using a dependent sample design may increase germline leakage, resulting in more false positive SNV calls. This can reduce sensitivity for low-VAF variants by increasing the effective noise floor.
+
+## Indel calling
+- In principle, indels can be called from the final DSC BAM.
+- Due to read length limitations, only short insertions are expected to have reasonable sensitivity. Confident indel calling requires sufficient flanking sequence on both sides; as insertion length increases, the probability that one flank falls outside the read also increases.
+- For longer insertions, long-read sequencing may be more appropriate, and the advantages of duplex error correction are likely to be less impactful.
+- Indels occur at approximately an order of magnitude lower rate than SNVs. At the default `ex_sample` depth, this results in increased sampling noise due to the lower number of observed events. To achieve reasonable performance, it is recommended to increase `ex_sample` depth.
+- The pipeline has been optimised for SNV calling. For best performance, indel calling may require reconfiguration of pipeline parameters.
 
