@@ -25,7 +25,6 @@ parser$add_argument("--index_path", required = TRUE)
 parser$add_argument("--metrics_json", required = TRUE)
 parser$add_argument("--metrics_plot", required = TRUE)
 parser$add_argument("--included_chroms", required = TRUE, nargs = "+")
-parser$add_argument("--run_name", required = TRUE)
 parser$add_argument("--log", required = TRUE)
 args <- parser$parse_args()
 
@@ -34,7 +33,6 @@ FAI_PATH <- args$index_path
 METRICS_PATH <- args$metrics_json
 PLOT_PATH <- args$metrics_plot
 INCLUDED_CHROMS <- args$included_chroms
-RUN_NAME <- args$run_name
 
 LOG_PATH <- args$log
 
@@ -119,10 +117,7 @@ write_json(metrics_json, METRICS_PATH, pretty = TRUE, auto_unbox = TRUE)
 plt <- ggplot(data = snv.pos, aes(x = Chrom, y = Percentile, colour = Chrom)) +
     geom_jitter(size = 0.5, alpha = 0.5, width = 0.1, height = 0) +
     scale_y_continuous(limits = c(0, 100.0)) +
-    ggtitle(
-        "Positional distribution of called SNVs", 
-        paste(Sys.Date(), RUN_NAME)
-        ) +
+    ggtitle("Positional distribution of called SNVs") +
     xlab("") +
     ylab("Genomic percentile") +
     theme_classic() +

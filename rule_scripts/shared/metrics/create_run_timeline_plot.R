@@ -21,13 +21,11 @@ parser <- ArgumentParser()
 parser$add_argument("--job_log", required = TRUE)
 parser$add_argument("--resources_log", required = TRUE)
 parser$add_argument("--plot", required = TRUE)
-parser$add_argument("--run_name", required = TRUE)
 parser$add_argument("--max_iops", required = TRUE)
 parser$add_argument("--max_throughput", required = TRUE)
 parser$add_argument("--log", required = TRUE)
 args <- parser$parse_args()
 
-exp_name <- args$run_name
 git_metadata <- args$git_metadata
 job_log_path <- args$job_log
 resources_log_path <- args$resources_log
@@ -50,7 +48,7 @@ resources_log <- read.csv(resources_log_path)
 # Create jobs plot
 date <- format(Sys.Date(), "%Y-%m-%d")
 pipeline_version <- fromJSON("logs/shared_rules/git_metadata.json")$git_tag
-title <- paste0(exp_name, " timeline")
+title <- paste0("Run timeline")
 subtitle <- paste0(date, ", ", pipeline_version)
 
 job_log <- job_log %>%

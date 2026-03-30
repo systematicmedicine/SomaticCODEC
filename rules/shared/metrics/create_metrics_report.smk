@@ -35,7 +35,6 @@ rule create_metrics_report:
         ex_lanes = md.get_ex_lane_ids(config),
         ex_samples = md.get_ex_sample_ids(config),
         ms_samples = md.get_ms_sample_ids(config),
-        run_name = config["run_name"]
     log:
         L.CREATE_METRICS_REPORT
     benchmark:
@@ -60,6 +59,5 @@ rule create_metrics_report:
             --ex_lanes {params.ex_lanes} \
             --ex_samples {params.ex_samples} \
             --ms_samples {params.ms_samples} \
-            --run_name {params.run_name} \
             --log {log} 2>> {log}
         """

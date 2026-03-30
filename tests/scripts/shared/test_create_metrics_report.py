@@ -118,7 +118,6 @@ def test_lane_id_not_split(lightweight_test_run, config, tmp_path, ex_lanes):
     system_metrics_metadata = config["metadata"]["system_metrics_metadata"]
     ex_samples = md.get_ex_sample_ids(config)
     ms_samples = md.get_ms_sample_ids(config)
-    run_name = "test_run"
 
     # Define test output paths
     component_csv = tmp_path / "component_metrics.csv"
@@ -141,7 +140,6 @@ def test_lane_id_not_split(lightweight_test_run, config, tmp_path, ex_lanes):
             "--ex_lanes", *ex_lanes,
             "--ex_samples", *ex_samples,
             "--ms_samples", *ms_samples,
-            "--run_name", str(run_name),
             "--log", str(log)
         ],
         check = True

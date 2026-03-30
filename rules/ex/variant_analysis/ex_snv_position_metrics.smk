@@ -15,7 +15,6 @@ rule ex_snv_position_metrics:
         metrics_plot = EX.MET_SNV_POSITION_PDF
     params:
         included_chroms = config["sci_params"]["shared"]["included_chromosomes"],
-        run_name = config["run_name"]
     log:
         L.EX_SNV_POSITION_METRICS
     benchmark:
@@ -36,6 +35,5 @@ rule ex_snv_position_metrics:
             --metrics_json {output.metrics_json} \
             --metrics_plot {output.metrics_plot} \
             --included_chroms {params.included_chroms} \
-            --run_name {params.run_name} \
             --log {log} 2>> {log}
         """

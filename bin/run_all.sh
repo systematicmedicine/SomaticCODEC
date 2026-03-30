@@ -43,13 +43,6 @@ with open('config/config.yaml') as f:
 print(cfg['infrastructure']['aws']['sns_arn'])
 ")
 
-EXPERIMENT_NAME=$(python3 -c "
-import yaml
-with open('config/config.yaml') as f:
-    cfg = yaml.safe_load(f)
-print(cfg['run_name'])
-")
-
 # Ensure required environment variables are set
 : "${AWS_REGION:?AWS_REGION must be set}"
 : "${INSTANCE_ID:?INSTANCE_ID must be set}"
@@ -67,7 +60,7 @@ function handle_exit {
     # Message via SNS
     aws sns publish \
         --topic-arn "$SNS_ARN" \
-        --subject "Pipeline $EXPERIMENT_NAME $STATUS" \
+        --subject "Pipeline $STATUS" \
         --message "$MSG" \
         --region $AWS_REGION
 

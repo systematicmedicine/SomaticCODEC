@@ -12,7 +12,6 @@ rule create_run_timeline_plot:
     output:
         plot = L.RUN_TIMELINE
     params:
-        run_name = config["run_name"],
         max_iops = config["infrastructure"]["create_run_timeline_plot"]["disk_iops"],
         max_throughput = config["infrastructure"]["create_run_timeline_plot"]["disk_throughput"]
     log:
@@ -33,7 +32,6 @@ rule create_run_timeline_plot:
             --job_log {input.job_log} \
             --resources_log {input.resources_log} \
             --plot {output.plot} \
-            --run_name {params.run_name} \
             --max_iops {params.max_iops} \
             --max_throughput {params.max_throughput} \
             --log {log} 2>> {log}

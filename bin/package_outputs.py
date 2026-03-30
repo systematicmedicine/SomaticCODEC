@@ -16,6 +16,7 @@ import tarfile
 import yaml
 import hashlib
 import tempfile
+from datetime import datetime
 
 def compute_file_checksum(file_path, hash_algo="sha256"):
     """Compute SHA256 checksum of a file."""
@@ -63,18 +64,8 @@ def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     print(f"[INFO] Project root: {root_dir}")
 
-    # Load experiment name
-    try:
-        config_path = os.path.join(root_dir, "config", "config.yaml")
-        with open(config_path, "r") as f:
-            config = yaml.safe_load(f)
-        experiment_name = config["run_name"]
-        print(f"[INFO] Experiment name: {experiment_name}")
-    except Exception as e:
-        print(f"[ERROR] Failed to read experiment name from config: {e}")
-        sys.exit(1)
-
-    archive_path = os.path.join(root_dir, f"{experiment_name}.tar.gz")
+    timestamp = datetime.now().strftime("%Y%m%d")
+    archive_path = os.path.join(root_dir, f"run_{timestamp}.tar.gz")
     print(f"[INFO] Creating archive: {archive_path}")
 
     archive_structure = {

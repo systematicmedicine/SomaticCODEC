@@ -157,11 +157,6 @@ def check_input_fastqs_unique(metadata: dict):
 
     print("[INFO] All input FASTQ file paths are unique")
 
-# Check that run_name has been set
-def check_run_name_set(config: dict):
-    if config["run_name"] == "experiment_1":
-        sys.exit(f"[ERROR] run_name has not been set, currently default value")
-
 # Check that ex_adapters are used only once per ex_lane
 def check_adapters_used_once_per_lane(metadata: dict):
 
@@ -216,9 +211,6 @@ if __name__ == "__main__":
 
     # Check that input FASTQs are globally unique
     check_input_fastqs_unique(metadata_tables)
-
-    # Check that run_name has been set
-    check_run_name_set(config)
 
     # Check that ex_adapters are used only once per ex_lane
     check_adapters_used_once_per_lane(metadata_tables)

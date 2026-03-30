@@ -32,7 +32,6 @@ parser$add_argument("--system_png", required = TRUE)
 parser$add_argument("--ex_lanes", required = TRUE, nargs="+")
 parser$add_argument("--ex_samples", required = TRUE, nargs="+")
 parser$add_argument("--ms_samples", required = TRUE, nargs="+")
-parser$add_argument("--run_name", required = TRUE)
 parser$add_argument("--log", required = TRUE)
 args <- parser$parse_args()
 
@@ -45,7 +44,6 @@ SYSTEM_PNG <- args$system_png
 EX_LANES <- args$ex_lanes
 EX_SAMPLES <- args$ex_samples
 MS_SAMPLES <- args$ms_samples
-EXP_NAME <- args$run_name
 LOG_PATH <- args$log
 
 
@@ -108,7 +106,7 @@ for (i in seq_along(report_types)) {
   write.csv(report_df, csv_path, row.names = FALSE, quote = FALSE)
 
   # Create and save heatmap
-  heatmap <- plot_metric_heatmap(report_df, paste0(type, "-level metrics report"), EXP_NAME)
+  heatmap <- plot_metric_heatmap(report_df, paste0(type, "-level metrics report"), format(Sys.time(), "%Y%m%d"))
   save_scaled_heatmap(
     plot = heatmap,
     path = png_path,
