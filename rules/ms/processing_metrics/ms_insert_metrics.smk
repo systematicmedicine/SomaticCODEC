@@ -9,7 +9,7 @@ from definitions.paths import benchmark as B
 rule ms_insert_metrics:
     input:
         bam = MS.DEDUPED_BAM,
-        dictf = os.path.splitext(config["sci_params"]["shared"]["reference_genome"])[0] + ".dict"
+        dictf = os.path.splitext(config["sci_params"]["reference_files"]["genome"])[0] + ".dict"
     output:
         insert_metrics = MS.MET_INSERT_SIZE_TXT,
         insert_hist = MS.MET_INSERT_SIZE_PDF

@@ -9,7 +9,7 @@ from definitions.paths import benchmark as B
 rule ex_snv_position_metrics:
     input:
         vcf_path = EX.CALLED_SNVS,
-        index_path = config["sci_params"]["shared"]["reference_genome"] + ".fai"
+        index_path = config["sci_params"]["reference_files"]["genome"] + ".fai"
     output:
         metrics_json = EX.MET_SNV_POSITION_JSON,
         metrics_plot = EX.MET_SNV_POSITION_PDF

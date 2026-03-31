@@ -11,7 +11,7 @@ rule ex_snv_read_position_metrics:
         vcf_path = EX.CALLED_SNVS,
         bam_path = EX.FILTERED_DSC,
         bai_path = EX.FILTERED_DSC_INDEX,
-        index_path = config["sci_params"]["shared"]["reference_genome"] + ".fai"
+        index_path = config["sci_params"]["reference_files"]["genome"] + ".fai"
     output:
         metrics_json = EX.MET_SNV_READ_POSITION_JSON,
         metrics_plot = EX.MET_SNV_READ_POSITION_PDF

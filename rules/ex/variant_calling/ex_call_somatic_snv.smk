@@ -17,7 +17,7 @@ rule ex_call_somatic_snv:
     input:
         bam = EX.FILTERED_DSC,
         bai = EX.FILTERED_DSC_INDEX,
-        ref = config["sci_params"]["shared"]["reference_genome"],
+        ref = config["sci_params"]["reference_files"]["genome"],
         include_bed = MS.INCLUDE_BED
     output:
         # Intermediate files

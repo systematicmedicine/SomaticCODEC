@@ -13,12 +13,12 @@ rule ms_alignment:
         r2_processed = MS.FILTERED_FASTQ_R2,
 
         # Refrence genome
-        ref = config["sci_params"]["shared"]["reference_genome"],
-        amb = config["sci_params"]["shared"]["reference_genome"] + ".amb",
-        ann = config["sci_params"]["shared"]["reference_genome"] + ".ann",
-        bwt = config["sci_params"]["shared"]["reference_genome"] + ".bwt.2bit.64",
-        pac = config["sci_params"]["shared"]["reference_genome"]+ ".pac",
-        sa = config["sci_params"]["shared"]["reference_genome"] + ".0123",
+        ref = config["sci_params"]["reference_files"]["genome"],
+        amb = config["sci_params"]["reference_files"]["genome"] + ".amb",
+        ann = config["sci_params"]["reference_files"]["genome"] + ".ann",
+        bwt = config["sci_params"]["reference_files"]["genome"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["reference_files"]["genome"] + ".pac",
+        sa = config["sci_params"]["reference_files"]["genome"] + ".0123",
 
     output:
         intermediate_sam = temp(MS.RAW_SAM),
