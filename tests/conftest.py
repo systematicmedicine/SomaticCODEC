@@ -10,7 +10,7 @@ Authors:
 """
 
 # ------------------------------------------------------------------------------------------
-# Imports 
+# Setup
 # ------------------------------------------------------------------------------------------
 import pytest
 import sys
@@ -24,9 +24,9 @@ def find_project_root(start: Path) -> Path:
     start = start.resolve()
     for p in [start, *start.parents]:
         # Use multiple sentinels to avoid false-positives
-        if (p / "config").is_dir() and (p / "helpers").is_dir() and (p / "rule_scripts").is_dir():
+        if (p / "profiles").is_dir() and (p / "helpers").is_dir() and (p / "rule_scripts").is_dir():
             return p
-    raise RuntimeError("Could not find repo root (config/, helpers/, rule_scripts/).")
+    raise RuntimeError("Could not find repo root (profiles/, helpers/, rule_scripts/).")
 
 # Insert PROJECT_ROOT into path
 PROJECT_ROOT = find_project_root(Path(__file__))
@@ -35,12 +35,15 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from helpers.config_helpers import build_config
 
+# Build config
+TEST_CONFIG = build_config(PROJECT_ROOT, "local-test", "test")
+
 # ------------------------------------------------------------------------------------------
-# Exported variables
+# Export variables
 # ------------------------------------------------------------------------------------------
 
 # Explicit public API of PROJECT_ROOT
-__all__ = ["PROJECT_ROOT"]
+__all__ = ["PROJECT_ROOT", "TEST_CONFIG"]
 
 # ------------------------------------------------------------------------------------------
 #  Functions
@@ -94,13 +97,10 @@ def lightweight_test_run():
     for file_path in files_to_copy:
         shutil.copy2(src_dir / file_path.name, dst_dir / file_path.name)
 
-    # Load environment + profile config and merge them
-    config_data = build_config(PROJECT_ROOT, "local-test", "test")
-
     # Write merged config to temp file
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
     with open(test_config_file.name, "w", encoding="utf-8") as f:
-        yaml.safe_dump(config_data, f)
+        yaml.safe_dump(TEST_CONFIG, f)
 
     # Log file setup
     log_dir = PROJECT_ROOT / "logs/bin_scripts"

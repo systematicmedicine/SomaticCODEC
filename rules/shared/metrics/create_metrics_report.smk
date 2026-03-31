@@ -14,8 +14,8 @@ from definitions.paths import benchmark as B
 rule create_metrics_report:
     input:
         # Metrics metadata
-        component_metrics_metadata = config["metadata"]["component_metrics_metadata"],
-        system_metrics_metadata = config["metadata"]["system_metrics_metadata"],
+        component_metrics_metadata = config["sci_params"]["metrics_manifests"]["component_metrics_metadata"],
+        system_metrics_metadata = config["sci_params"]["metrics_manifests"]["system_metrics_metadata"],
 
         # Metrics files
         ms_processing_metrics =  ms_processing_metrics,

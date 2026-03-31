@@ -4,14 +4,11 @@
 # ==============================================================================
 metadata:
 
-  ex_samples_metadata: config/ex_samples.csv
-  ex_lanes_metadata: config/ex_lanes.csv
-  ex_adapters_metadata: config/ex_adapters.csv
-  ms_samples_metadata: config/ms_samples.csv
-  component_metrics_metadata: config/component_level_metrics.xlsx
-  system_metrics_metadata: config/system_level_metrics.xlsx
-  download_list: config/download_list.csv
-
+  ex_samples_metadata: experiment/ex_samples.csv
+  ex_lanes_metadata: experiment/ex_lanes.csv
+  ex_adapters_metadata: experiment/ex_adapters.csv
+  ms_samples_metadata: experiment/ms_samples.csv
+  download_list: experiment/download_list.csv
 
 # ==============================================================================
 # Infrastructure

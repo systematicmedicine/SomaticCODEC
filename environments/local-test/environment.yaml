@@ -8,8 +8,6 @@ metadata:
   ex_lanes_metadata: tests/data/lightweight_test_run/config/ex_lanes.csv
   ex_adapters_metadata: tests/data/lightweight_test_run/config/ex_adapters.csv
   ms_samples_metadata: tests/data/lightweight_test_run/config/ms_samples.csv
-  component_metrics_metadata: config/component_level_metrics.xlsx
-  system_metrics_metadata: config/system_level_metrics.xlsx
   download_list: tests/data/lightweight_test_run/config/download_list.csv
 
 

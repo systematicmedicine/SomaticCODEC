@@ -10,8 +10,6 @@ sci_params:
 
   reference_files:
 
-  # Default reference files can be downloaded from: https://sm-unrestricted-public.s3.ap-southeast-2.amazonaws.com/somaticcodec/reference-data/refs-v1/
-
     genome: tmp/downloads/GRCh38_Chr21_plus_stubs.fa
     
     precomputed_masks:
@@ -25,16 +23,23 @@ sci_params:
     germline_variants: tmp/downloads/gnomad-chr21-micro.vcf.bgz  # Used to compute germline overlap metrics
 
   # ----------------------------------------------------------------------------
+  # Metrics manifests
+  # ----------------------------------------------------------------------------
+  metrics_manifests:
+    component_metrics_metadata: profiles/test/component_level_metrics.xlsx
+    system_metrics_metadata: profiles/test/system_level_metrics.xlsx
+
+  # ----------------------------------------------------------------------------
   # Scientific parameters shared by multiple rules
   # ----------------------------------------------------------------------------
-  
   shared:
 
+    # Restricts analysis to canonical chromosomes
     included_chromosomes: [
     "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10",
     "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", 
     "chr20", "chr21", "chr22", "chrX", "chrY"
-    ]  # Restricts analysis to canonical chromosomes
+    ]  
 
   # ----------------------------------------------------------------------------
   # Scientific parameters for individual rules
