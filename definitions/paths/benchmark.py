@@ -39,8 +39,6 @@ CREATE_JOB_LOG = "logs/shared_rules/create_job_log.benchmark.txt"
 
 CREATE_METRICS_REPORT = "logs/shared_rules/create_metrics_report.benchmark.txt"
 
-CREATE_RUN_TIMELINE_PLOT = "logs/shared_rules/create_run_timeline_plot.benchmark.txt"
-
 WRITE_GIT_METADATA = "logs/shared_rules/write_git_metadata.benchmark.txt"
 
 # ---------------------------------------------------------------------------------------------------------------

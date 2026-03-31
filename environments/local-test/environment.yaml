@@ -31,10 +31,6 @@ infrastructure:
 
   compression:
     gzip_level: 1
-
-  create_run_timeline_plot: # Values used to calculate disk usage (no effect on disk behaviour)
-    disk_iops: 8000
-    disk_throughput: 2000 # MiB/s
     
   log_system_resource_usage:
       sleep_interval: 60

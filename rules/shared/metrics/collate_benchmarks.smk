@@ -7,7 +7,7 @@ from definitions.paths import log as L
 rule collate_benchmarks:
     input:
         git_metadata = L.GIT_METADATA,
-        timeline_plot = L.RUN_TIMELINE
+        job_log_csv = L.JOB_LOG
     output:
         combined_benchmarks = L.COMBINED_BENCHMARKS
     log:
