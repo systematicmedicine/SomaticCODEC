@@ -1,18 +1,5 @@
 ---
 # ==============================================================================
-# Metadata paths
-# ==============================================================================
-metadata:
-
-  ex_samples_metadata: config/ex_samples.csv
-  ex_lanes_metadata: config/ex_lanes.csv
-  ex_adapters_metadata: config/ex_adapters.csv
-  ms_samples_metadata: config/ms_samples.csv
-  component_metrics_metadata: config/component_level_metrics.xlsx
-  system_metrics_metadata: config/system_level_metrics.xlsx
-  download_list: config/download_list.csv
-
-# ==============================================================================
 # Scientific parameters
 # ==============================================================================
 sci_params:
@@ -25,21 +12,21 @@ sci_params:
 
   # Default reference files can be downloaded from: https://sm-unrestricted-public.s3.ap-southeast-2.amazonaws.com/somaticcodec/reference-data/refs-v1/
 
-    genome: tmp/downloads/UCSC-GRCh38-p14-filtered.fa
+    genome: tmp/downloads/GRCh38_Chr21_plus_stubs.fa
     
     precomputed_masks:
-      - "tmp/downloads/GRCh38_alldifficultregions.bed"  # Masks genomic regions associated with elevated error rates
-      - "tmp/downloads/gnomad_AF_0.1.bed"               # Marks genomic regions likely to contain common germline variants
-      - "tmp/downloads/GRCh38_repeat_masker.bed"        # Masks highly repetitive, error-prone genomic regions
+      - tmp/downloads/GRCh38_alldifficultregions_10lines.bed      # Masks genomic regions associated with elevated error rates
+      - tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed  # Marks genomic regions likely to contain common germline variants
+      - tmp/downloads/GRCh38_repeat_masker_10lines.bed            # Masks highly repetitive, error-prone genomic regions
     
     tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv  # Reference trinucleotide context frequencies
     genome_trinuc_counts: tmp/downloads/UCSC-GRCh38-p14-filtered-trinucleotide-counts.csv  # Genome-wide trinucleotide counts for normalisation
 
-    germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz  # Used to compute germline overlap metrics
+    germline_variants: tmp/downloads/gnomad-chr21-micro.vcf.bgz  # Used to compute germline overlap metrics
 
   # ----------------------------------------------------------------------------
   # Scientific parameters shared by multiple rules
-  # ---------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   
   shared:
 
@@ -142,7 +129,7 @@ sci_params:
     max_depth: 250
     min_base_qual: 20
     min_map_qual: 0
-    min_depth: 40
+    min_depth: 1
 
   ms_map:
     band_width: 100
@@ -170,36 +157,3 @@ sci_params:
     spacer_length: 3
     qual_trim_threshold: 20 # Trims low quality bases from 3' end of read
 
-# ==============================================================================
-# Infrastructure
-# ==============================================================================
-infrastructure:
-    
-  memory: # Memory units are expressed in gigabytes (GB) throughout pipeline
-    light: 8
-    moderate: 32
-    heavy: 64
-    extra_heavy: 128
-    global_buffer: 16
-    
-  threads:
-    light: 2
-    moderate: 12
-    heavy: 24
-    global_buffer: 4
-    
-  compression:
-    gzip_level: 1
-
-  create_run_timeline_plot: # Values used to calculate disk usage (no effect on disk behaviour)
-    disk_iops: 8000
-    disk_throughput: 2000 # MiB/s
-    
-  log_system_resource_usage:
-      sleep_interval: 60
-    
-  aws: # Only required if using AWS workflow
-    s3_out_dir: "s3://<bucket>/<dir>/"
-    sns_arn: "arn:aws:sns:<region>:<account_ID>:<topic_name>"
-
-  random_seed: 123 # For metrics that use random sampling such as ex_variant_call_eligible_disagree_rate

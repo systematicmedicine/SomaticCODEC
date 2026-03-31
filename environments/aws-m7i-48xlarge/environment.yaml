@@ -1,0 +1,48 @@
+---
+# ==============================================================================
+# Metadata paths
+# ==============================================================================
+metadata:
+
+  ex_samples_metadata: config/ex_samples.csv
+  ex_lanes_metadata: config/ex_lanes.csv
+  ex_adapters_metadata: config/ex_adapters.csv
+  ms_samples_metadata: config/ms_samples.csv
+  component_metrics_metadata: config/component_level_metrics.xlsx
+  system_metrics_metadata: config/system_level_metrics.xlsx
+  download_list: config/download_list.csv
+
+
+# ==============================================================================
+# Infrastructure
+# ==============================================================================
+infrastructure:
+    
+  memory: # Memory units are expressed in gigabytes (GB) throughout pipeline
+    light: 8
+    moderate: 32
+    heavy: 64
+    extra_heavy: 128
+    global_buffer: 16
+    
+  threads:
+    light: 2
+    moderate: 12
+    heavy: 24
+    global_buffer: 4
+    
+  compression:
+    gzip_level: 1
+
+  create_run_timeline_plot: # Values used to calculate disk usage (no effect on disk behaviour)
+    disk_iops: 8000
+    disk_throughput: 2000 # MiB/s
+    
+  log_system_resource_usage:
+      sleep_interval: 60
+    
+  aws: # Only required if using AWS workflow
+    s3_out_dir: "s3://<bucket>/<dir>/"
+    sns_arn: "arn:aws:sns:<region>:<account_ID>:<topic_name>"
+
+  random_seed: 123 # For metrics that use random sampling such as ex_variant_call_eligible_disagree_rate
