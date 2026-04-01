@@ -13,7 +13,6 @@ Authors:
 import os
 import sys
 import tarfile
-import yaml
 import hashlib
 import tempfile
 from datetime import datetime
@@ -74,7 +73,10 @@ def main():
         "logs": "Processed data/logs",
         "rules": "Methods/rules",
         "rule_scripts": "Methods/rule_scripts",
-        "config": "Methods/config",
+        "environments": "Methods/environments",
+        "profiles": "Methods/profiles",
+        "tmp/runtime_config/merged_config.yaml": "Methods/merged_config.yaml",
+        "experiment": "Methods/experiment",
         "Snakefile": "Methods/Snakefile",
         "bin": "Methods/bin",
         "helpers": "Methods/helpers",

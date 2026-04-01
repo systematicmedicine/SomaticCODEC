@@ -74,7 +74,7 @@ def main() -> int:
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / "merged_config.yaml"
 
-    config_data = build_config(args.environment, args.profile)
+    config_data = build_config(PROJECT_ROOT, args.environment, args.profile)
 
     with output_path.open("w", encoding="utf-8") as f:
         yaml.safe_dump(config_data, f, sort_keys=False)

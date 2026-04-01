@@ -86,6 +86,9 @@ function handle_exit {
 # Run scripts
 # -----------------------------------------------------------------------------
 
+python3 -u bin/create_runtime_config.py --environment local-test --profile test
+
+
 # Step 1: check_sample_metadata.py
 echo "[INFO] Step 1: check_sample_metadata.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/check_sample_metadata.py > logs/bin_scripts/check_sample_metadata.log 2>&1; then

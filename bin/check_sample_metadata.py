@@ -181,15 +181,16 @@ def check_adapters_used_once_per_lane(metadata: dict):
 if __name__ == "__main__":
 
     # EnsureCheck script is run from project root
-    if not Path("config/config.yaml").is_file():
-        sys.exit("[ERROR] Run this script from the project root (config/config.yaml not found)")
+    if not Path("tmp/runtime_config/merged_config.yaml").is_file():
+        sys.exit("[ERROR] tmp/runtime_config/merged_config.yaml not found. " \
+        "Run this script from the project root, and ensure bin/create_runtime_config.py has been run first")
     
     # Load config.yaml
-    with open("config/config.yaml") as f:
+    with open("tmp/runtime_config/merged_config.yaml") as f:
         config = yaml.safe_load(f)
 
     if config is None:
-        sys.exit("[ERROR] config/config.yaml is empty or invalid")
+        sys.exit("[ERROR] tmp/runtime_config/merged_config.yaml is empty or invalid")
 
     # Load metadata tables
     metadata_tables = load_metadata_tables(config)

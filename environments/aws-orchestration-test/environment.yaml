@@ -35,4 +35,8 @@ infrastructure:
   log_system_resource_usage:
       sleep_interval: 60
 
+  aws: # Only required if using AWS workflow
+    s3_out_dir: "s3://<bucket>/<dir>/"
+    sns_arn: "arn:aws:sns:<region>:<account_ID>:<topic_name>"
+
   random_seed: 123 # For metrics that use random sampling such as ex_variant_call_eligible_disagree_rate
