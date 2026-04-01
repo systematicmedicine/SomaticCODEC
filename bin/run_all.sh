@@ -31,26 +31,18 @@
 
 set -euo pipefail
 
-# User-defined parameters
-ENVIRONMENT="${ENVIRONMENT:?ENVIRONMENT must be set (name of the environment directory under environments/)}"
-PROFILE="${PROFILE:?PROFILE must be set (name of the profile directory under profiles/)}"
-
 # Define log
 LOG_FILE="logs/bin_scripts/run_all.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 
-# Load params from environment.yaml
-SNS_ARN=$(python3 -c "
-import yaml
-with open('environments/$ENVIRONMENT/environment.yaml') as f:
-    cfg = yaml.safe_load(f)
-print(cfg['infrastructure']['aws']['sns_arn'])
-")
-
 # Ensure required environment variables are set
 : "${AWS_REGION:?AWS_REGION must be set}"
 : "${INSTANCE_ID:?INSTANCE_ID must be set}"
+: "${ENVIRONMENT:?ENVIRONMENT must be set (name of the environment directory under environments/)}"
+: "${PROFILE:?PROFILE must be set (name of the profile directory under profiles/)}"
+: "${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>/")}"
+: "${SNS_ARN:?SNS_ARN must be set ("arn:aws:sns:<region>:<account_ID>:<topic_name>")}"
 
 # -----------------------------------------------------------------------------
 # Cleanup function
@@ -138,7 +130,7 @@ fi
 
 # Step 8: upload_S3.sh
 echo "[INFO] Step 8: upload_S3.sh" | tee -a "$LOG_FILE"
-if ! bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
+if ! S3_TARGET_DIR="$S3_TARGET_DIR" bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 8: upload_S3.sh"
 fi
 

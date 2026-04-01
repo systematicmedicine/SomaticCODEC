@@ -10,7 +10,7 @@ The assay consists of three stages:
 
 SomaticCODEC utilises a matched-sample design. An `EX` (experimental) sample is used to call somatic variants, and an `MS` (matched) sample is used to identify germline variants and improve variant calling.
 
-Alternative terminology used in the literature to describe similar designs includes *case/control* and *tumor/normal*.
+Alternative terminology used in the literature to describe similar designs includes *case/control* and *tumour/normal*.
 
 ```
           Human DNA

@@ -58,12 +58,12 @@ While the pipeline has not been tested on other compute platforms, the container
 
 - Perform steps 6-8 from the Amazon EC2 instructions above
 
-- For a batch of 12 samples (12 EX and 12 MS), it is reccommended the compute platform has at least:
-    - 1.5x memory defined in `infrastructure.memory.extra_heavy`
-    - 1.5x threads defined in `infrastructure.memory.heavy`
+- For a batch of 12 samples (12 EX and 12 MS), it is recommended that the compute platform has at least:
+    - 1.5x memory defined in `environment.yaml` -> `infrastructure.memory.extra_heavy`
+    - 1.5x threads defined in `environment.yaml` -> `infrastructure.threads.heavy`
     - 12 TB free disk space
 
-- The defalt resource parameters defined in `config.yaml` are optimised for EC2 `m7i.48xlarge` instances running batches of 12 samples generated using the reccomended library prep and sequencing parameters . Consider adjusting these parameters if your context differs.
+The resource parameters defined in `environments` -> `aws-m7i-48xlarge` -> `environment.yaml` are optimised for running batches of 12 samples (generated using the recommended library prep and sequencing parameters) on an EC2 `m7i.48xlarge` instance. If your context differs, consider creating a new `environment.yaml` with adjusted resource parameters.
 
 
 

@@ -17,7 +17,7 @@ A graphical version of the report can be found at `results/system_metrics_report
 
 Component-level metrics measure the performance of individual assay components. The description for each metric can be found in `config/component_level_metrics.xlsx`
 
-All component level metrics that can be assessed bioinformaically can be found in `metrics/component_metrics_report.csv`
+All component level metrics that can be assessed bioinformatically can be found in `metrics/component_metrics_report.csv`
 
 A graphical version of the report can be found at `results/system_metrics_report.png`
 
