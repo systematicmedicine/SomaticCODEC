@@ -3,11 +3,15 @@
 
 Functions and fixtures for pytest to use across test functions.
 
-Authors: 
+Authors:
     - Joshua Johnstone
     - Cameron Fraser
 
 """
+
+# ------------------------------------------------------------------------------------------
+# Setup
+# ------------------------------------------------------------------------------------------
 import pytest
 import sys
 from pathlib import Path
@@ -16,33 +20,34 @@ import subprocess
 import yaml
 import tempfile
 
-# Find the root directory of the project
 def find_project_root(start: Path) -> Path:
     start = start.resolve()
     for p in [start, *start.parents]:
         # Use multiple sentinels to avoid false-positives
-        if (p / "config").is_dir() and (p / "helpers").is_dir() and (p / "rule_scripts").is_dir():
+        if (p / "profiles").is_dir() and (p / "helpers").is_dir() and (p / "rule_scripts").is_dir():
             return p
-    raise RuntimeError("Could not find repo root (config/, helpers/, rule_scripts/).")
+    raise RuntimeError("Could not find repo root (profiles/, helpers/, rule_scripts/).")
 
 # Insert PROJECT_ROOT into path
 PROJECT_ROOT = find_project_root(Path(__file__))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-# Explicit public API of PROJECT_ROOT
-__all__ = ["PROJECT_ROOT"]
+from helpers.config_helpers import build_config
 
-# Recursively update dict 'base' with values from dict 'override'. Nested dicts are merged; other values are replaced.
-def deep_update(base: dict, override: dict) -> dict:
-    if override is None:
-        return base
-    for k, v in override.items():
-        if isinstance(v, dict) and isinstance(base.get(k), dict):
-            deep_update(base[k], v)
-        else:
-            base[k] = v
-    return base
+# Build config
+TEST_CONFIG = build_config(PROJECT_ROOT, "local-test", "test")
+
+# ------------------------------------------------------------------------------------------
+# Export variables
+# ------------------------------------------------------------------------------------------
+
+# Explicit public API of PROJECT_ROOT
+__all__ = ["PROJECT_ROOT", "TEST_CONFIG"]
+
+# ------------------------------------------------------------------------------------------
+#  Functions
+# ------------------------------------------------------------------------------------------
 
 # Deletes all files from metrics, results, logs, tmp and .snakemake directories
 def clean_workspace():
@@ -71,16 +76,20 @@ def clean_workspace():
         for cache_dir in PROJECT_ROOT.rglob(pattern):
             shutil.rmtree(cache_dir)
 
+# ------------------------------------------------------------------------------------------
+# Fixtures
+# ------------------------------------------------------------------------------------------
+
 # Runs a small dataset through the snakemake pipeline to generate files for testing
-@pytest.fixture(scope = "session")
+@pytest.fixture(scope="session")
 def lightweight_test_run():
-    
+
     # Clean test environment
     clean_workspace()
-    
+
     # Copy test files to tmp/downloads
     src_dir = PROJECT_ROOT / "tests/data/lightweight_test_run/downloads"
-    dst_dir = PROJECT_ROOT /"tmp/downloads"
+    dst_dir = PROJECT_ROOT / "tmp/downloads"
     dst_dir.mkdir(exist_ok=True)
 
     files_to_copy = [f for f in src_dir.glob("*") if f.name != ".gitkeep"]
@@ -88,27 +97,16 @@ def lightweight_test_run():
     for file_path in files_to_copy:
         shutil.copy2(src_dir / file_path.name, dst_dir / file_path.name)
 
-    # Load base config
-    with Path(PROJECT_ROOT, "config/config.yaml").open("r", encoding="utf-8") as f:
-        config_data = yaml.safe_load(f) or {}
-
-    # Merge in config.dev.yaml (if present)
-    dev_config = PROJECT_ROOT / "config/config.dev.yaml"
-    if dev_config.exists():
-        with dev_config.open("r", encoding="utf-8") as f:
-            dev_data = yaml.safe_load(f) or {}
-        config_data = deep_update(config_data, dev_data)
-
     # Write merged config to temp file
     test_config_file = tempfile.NamedTemporaryFile(delete=False, suffix=".yaml")
-    with open(test_config_file.name, "w") as f:
-        yaml.safe_dump(config_data, f)
+    with open(test_config_file.name, "w", encoding="utf-8") as f:
+        yaml.safe_dump(TEST_CONFIG, f)
 
     # Log file setup
     log_dir = PROJECT_ROOT / "logs/bin_scripts"
     log_dir.mkdir(exist_ok=True)
     log_file = log_dir / "run_pipeline.log"
-    
+
     # Run snakemake
     snakemake_cmd = [
         "snakemake",
@@ -124,7 +122,7 @@ def lightweight_test_run():
                 snakemake_cmd,
                 cwd=str(PROJECT_ROOT),
                 stdout=None,
-                stderr=log, 
+                stderr=log,
                 text=True,
                 check=False,
             )

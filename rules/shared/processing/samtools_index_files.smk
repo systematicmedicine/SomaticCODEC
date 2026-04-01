@@ -7,9 +7,9 @@ from definitions.paths import benchmark as B
 
 rule samtools_index_files:
     input:
-        reference = config["sci_params"]["shared"]["reference_genome"]
+        reference = config["sci_params"]["reference_files"]["genome"]
     output:
-        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
+        fai = config["sci_params"]["reference_files"]["genome"] + ".fai"
     log:
         L.SAMTOOLS_INDEX_FILES
     benchmark:

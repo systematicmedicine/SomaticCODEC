@@ -12,7 +12,7 @@ rule ex_dsc_coverage_metrics:
         bam_ex_dsc = EX.FILTERED_DSC,
         bai_ex_dsc = EX.FILTERED_DSC_INDEX,
         include_bed = MS.INCLUDE_BED,
-        ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
+        ref_fai = config["sci_params"]["reference_files"]["genome"] + ".fai"
     output:
         json = EX.MET_DSC_COVERAGE_JSON,
         plot = EX.MET_DSC_COVERAGE_PLOT

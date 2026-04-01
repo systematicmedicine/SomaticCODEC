@@ -4,7 +4,7 @@
 
 - **MAJOR**: <B>Changes that could affect variant calling </b>
     - Example: Changing the tool used to call variants
-    - Example: Changing the default paramemter for read quality filtering
+    - Example: Changing the default parameter for read quality filtering
     - Example: Changing the Dockerfile
 
 - **MINOR**: <B>Changes that could affect computational performance/stability</b>
@@ -27,12 +27,12 @@ The validation required before updating the `master` branch depends on the scope
 
 - **MINOR**: 
     - All validation required for **PATCH**
-    - Pipeline runs successfully on a batch of atleast 12 samples of typical file size
+    - Pipeline runs successfully on a batch of at least 12 samples of typical file size
     - Changes to runtime and disk usage are acceptable
 
 - **PATCH**:
     - All unit and integration tests pass
-    - Every rule that affects variant calling or scientific metrics must have atleast 1 unit test
+    - Every rule that affects variant calling or scientific metrics must have at least 1 unit test
 
 ## Semantic versioning
 

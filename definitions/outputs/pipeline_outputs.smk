@@ -132,6 +132,5 @@ shared_metrics = [
     L.COMBINED_BENCHMARKS,
     L.SYSTEM_RESOURCE_USAGE,
     L.JOB_LOG,
-    L.RUN_TIMELINE,
     L.RUN_PIPELINE
 ]

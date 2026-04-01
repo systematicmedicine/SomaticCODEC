@@ -7,6 +7,7 @@ Downloads data from S3 to the local EC2 instance:
 
 Authors:
     - Cameron Fraser
+    - Joshua Johnstone
 
 """
 
@@ -17,7 +18,7 @@ import subprocess
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CSV_PATH = PROJECT_ROOT / "config" / "download_list.csv"
+CSV_PATH = PROJECT_ROOT / "experiment" / "download_list.csv"
 
 failed = False
 

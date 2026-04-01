@@ -30,7 +30,6 @@ TESTS_DIR = Path("tests/scripts")
 # Rules intentionally not tested (e.g. marker rules)
 EXCLUDED_RULES: Set[str] = {
     "collate_benchmarks",
-    "create_run_timeline_plot",
     "ensure_pipeline_log_exists",
     "write_git_metadata",
     "complete_setup",
@@ -66,7 +65,7 @@ EXCLUDED_TEST_NAMES: Set[str] = {
     "regex",
     "script_syntax",
     "fastqc_summary_metrics", # One test multiple rules
-    "multimapping_metrics"
+    "multimapping_metrics" # One test multiple rules
 }
 
 RULE_DECL_RE = re.compile(r"(?m)^\s*rule\s+([A-Za-z_][A-Za-z0-9_]*)\s*:")

@@ -157,11 +157,6 @@ def check_input_fastqs_unique(metadata: dict):
 
     print("[INFO] All input FASTQ file paths are unique")
 
-# Check that run_name has been set
-def check_run_name_set(config: dict):
-    if config["run_name"] == "experiment_1":
-        sys.exit(f"[ERROR] run_name has not been set, currently default value")
-
 # Check that ex_adapters are used only once per ex_lane
 def check_adapters_used_once_per_lane(metadata: dict):
 
@@ -186,15 +181,16 @@ def check_adapters_used_once_per_lane(metadata: dict):
 if __name__ == "__main__":
 
     # EnsureCheck script is run from project root
-    if not Path("config/config.yaml").is_file():
-        sys.exit("[ERROR] Run this script from the project root (config/config.yaml not found)")
+    if not Path("tmp/runtime_config/merged_config.yaml").is_file():
+        sys.exit("[ERROR] tmp/runtime_config/merged_config.yaml not found. " \
+        "Run this script from the project root, and ensure bin/create_runtime_config.py has been run first.")
     
     # Load config.yaml
-    with open("config/config.yaml") as f:
+    with open("tmp/runtime_config/merged_config.yaml") as f:
         config = yaml.safe_load(f)
 
     if config is None:
-        sys.exit("[ERROR] config/config.yaml is empty or invalid")
+        sys.exit("[ERROR] tmp/runtime_config/merged_config.yaml is empty or invalid")
 
     # Load metadata tables
     metadata_tables = load_metadata_tables(config)
@@ -216,9 +212,6 @@ if __name__ == "__main__":
 
     # Check that input FASTQs are globally unique
     check_input_fastqs_unique(metadata_tables)
-
-    # Check that run_name has been set
-    check_run_name_set(config)
 
     # Check that ex_adapters are used only once per ex_lane
     check_adapters_used_once_per_lane(metadata_tables)

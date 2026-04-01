@@ -23,6 +23,9 @@ Each type of change has different validation requirements before it can be relea
 - Updated user facing documentation (#369, 371)
 - Removed author references to ChatGPT (#370)
 - Corrected spelling of GRCh38 in reference files (#372)
+- Split config.yaml into environment.yaml and profile.yaml (#373)
+- Moved experiment metadata sheets from config/ to experiment/ (#373)
+- Removed run timeline plot rule and script (#373)
 
 ## [5.0.0] - 2026-03-13
 

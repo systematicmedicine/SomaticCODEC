@@ -3,13 +3,14 @@
 # --- run_all.sh ---
 #
 # Master orchestration script to run the full bioinformatics pipeline:
-#   1. Check sample metadata configuration
-#   2. Check download list configuration
-#   3. Download files from S3
-#   4. Check pipeline configuration (Snakemake dryrun)
-#   5. Run pipeline
-#   6. Package outputs for upload to S3
-#   7. Upload packaged outputs to S3
+#   1. Create runtime config (combine environment and profile configs)
+#   2. Check sample metadata configuration
+#   3. Check download list configuration
+#   4. Download files from S3
+#   5. Check pipeline configuration (Snakemake dryrun)
+#   6. Run pipeline
+#   7. Package outputs for upload to S3
+#   8. Upload packaged outputs to S3
 #   
 # Logs:
 #   - High-level: logs/bin_scripts/run_all.log
@@ -35,24 +36,13 @@ LOG_FILE="logs/bin_scripts/run_all.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 
-# Load params from config
-SNS_ARN=$(python3 -c "
-import yaml
-with open('config/config.yaml') as f:
-    cfg = yaml.safe_load(f)
-print(cfg['infrastructure']['aws']['sns_arn'])
-")
-
-EXPERIMENT_NAME=$(python3 -c "
-import yaml
-with open('config/config.yaml') as f:
-    cfg = yaml.safe_load(f)
-print(cfg['run_name'])
-")
-
 # Ensure required environment variables are set
 : "${AWS_REGION:?AWS_REGION must be set}"
 : "${INSTANCE_ID:?INSTANCE_ID must be set}"
+: "${ENVIRONMENT:?ENVIRONMENT must be set (name of the environment directory under environments/)}"
+: "${PROFILE:?PROFILE must be set (name of the profile directory under profiles/)}"
+: "${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>")}"
+: "${SNS_ARN:?SNS_ARN must be set ("arn:aws:sns:<region>:<account_ID>:<topic_name>")}"
 
 # -----------------------------------------------------------------------------
 # Cleanup function
@@ -67,7 +57,7 @@ function handle_exit {
     # Message via SNS
     aws sns publish \
         --topic-arn "$SNS_ARN" \
-        --subject "Pipeline $EXPERIMENT_NAME $STATUS" \
+        --subject "Pipeline $STATUS" \
         --message "$MSG" \
         --region $AWS_REGION
 
@@ -93,48 +83,55 @@ function handle_exit {
 # Run scripts
 # -----------------------------------------------------------------------------
 
-# Step 1: check_sample_metadata.py
-echo "[INFO] Step 1: check_sample_metadata.py" | tee -a "$LOG_FILE"
+# Step 1: create_runtime_config.py
+echo "[INFO] Step 1: create_runtime_config.py" | tee -a "$LOG_FILE"
+if ! python3 -u bin/create_runtime_config.py --environment "$ENVIRONMENT" --profile "$PROFILE" > logs/bin_scripts/create_runtime_config.log 2>&1; then
+    echo "[ERROR] create_runtime_config.py failed. See logs/bin_scripts/create_runtime_config.log" | tee -a "$LOG_FILE"
+    exit 1
+fi
+
+# Step 2: check_sample_metadata.py
+echo "[INFO] Step 2: check_sample_metadata.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/check_sample_metadata.py > logs/bin_scripts/check_sample_metadata.log 2>&1; then
     echo "[ERROR] check_sample_metadata.py failed. See logs/bin_scripts/check_sample_metadata.log" | tee -a "$LOG_FILE"
     exit 1
 fi
 
-# Step 2: check_download_list_S3.py
-echo "[INFO] Step 2: check_download_list_S3.py" | tee -a "$LOG_FILE"
+# Step 3: check_download_list_S3.py
+echo "[INFO] Step 3: check_download_list_S3.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/check_download_list_S3.py > logs/bin_scripts/check_download_list_S3.log 2>&1; then
     echo "[ERROR] check_download_list_S3.py failed. See logs/bin_scripts/check_download_list_S3.log" | tee -a "$LOG_FILE"
     exit 1
 fi
 
-# Step 3: download_S3.py
-echo "[INFO] Step 3: download_S3.py" | tee -a "$LOG_FILE"
+# Step 4: download_S3.py
+echo "[INFO] Step 4: download_S3.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/download_S3.py > logs/bin_scripts/download_S3.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 2: download_S3.py"
+    handle_exit "FAILED" "Pipeline failed at step 4: download_S3.py"
 fi
 
-# Step 4: dryrun.sh
-echo "[INFO] Step 4: dryrun.sh" | tee -a "$LOG_FILE"
+# Step 5: dryrun.sh
+echo "[INFO] Step 5: dryrun.sh" | tee -a "$LOG_FILE"
 if ! bash bin/dryrun.sh > logs/bin_scripts/dryrun.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 2: dryrun.sh"
+    handle_exit "FAILED" "Pipeline failed at step 5: dryrun.sh"
 fi
 
-# Step 5: run_pipeline.sh
-echo "[INFO] Step 5: run_pipeline.sh" | tee -a "$LOG_FILE"
-if ! bash bin/run_pipeline.sh > logs/bin_scripts/run_pipeline.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 4: run_pipeline.sh"
+# Step 6: run_pipeline.py
+echo "[INFO] Step 6: run_pipeline.py" | tee -a "$LOG_FILE"
+if ! python3 -u bin/run_pipeline.py > logs/bin_scripts/run_pipeline.log 2>&1; then
+    handle_exit "FAILED" "Pipeline failed at step 6: run_pipeline.py"
 fi
 
-# Step 6: package_outputs.py
-echo "[INFO] Step 6: package_outputs.py" | tee -a "$LOG_FILE"
+# Step 7: package_outputs.py
+echo "[INFO] Step 7: package_outputs.py" | tee -a "$LOG_FILE"
 if ! python3 bin/package_outputs.py > logs/bin_scripts/package_outputs.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 5: package_outputs.py"
+    handle_exit "FAILED" "Pipeline failed at step 7: package_outputs.py"
 fi
 
-# Step 7: upload_S3.sh
-echo "[INFO] Step 7: upload_S3.sh" | tee -a "$LOG_FILE"
-if ! bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
-    handle_exit "FAILED" "Pipeline failed at step 6: upload_S3.sh"
+# Step 8: upload_S3.sh
+echo "[INFO] Step 8: upload_S3.sh" | tee -a "$LOG_FILE"
+if ! S3_TARGET_DIR="$S3_TARGET_DIR" bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
+    handle_exit "FAILED" "Pipeline failed at step 8: upload_S3.sh"
 fi
 
 # ✅ Success case

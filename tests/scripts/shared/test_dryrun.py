@@ -14,8 +14,8 @@ import pytest
 import yaml
 import tempfile
 from pathlib import Path
-
-from conftest import PROJECT_ROOT, clean_workspace, deep_update
+from conftest import PROJECT_ROOT, clean_workspace
+from helpers.config_helpers import build_config
 
 # Pytest marking
 pytestmark = [
@@ -23,12 +23,11 @@ pytestmark = [
     pytest.mark.order(7)
 ]
 
-
 def test_snakemake_dryrun():
     # Clean test environment
     clean_workspace()
 
-    # PSnakefile path
+    # Snakefile path
     snakefile = PROJECT_ROOT / "Snakefile"
 
     # Create empty test files in tmp/downloads
@@ -40,22 +39,14 @@ def test_snakemake_dryrun():
     for src in files_to_create:
         (dst_dir / src.name).touch()
 
-    # Load base config
-    with Path(PROJECT_ROOT, "config/config.yaml").open("r", encoding="utf-8") as f:
-        config_data = yaml.safe_load(f) or {}
-
-    # Merge in config.dev.yaml (if present)
-    dev_config = PROJECT_ROOT / "config/config.dev.yaml"
-    if dev_config.exists():
-        with dev_config.open("r", encoding="utf-8") as f:
-            dev_data = yaml.safe_load(f) or {}
-        config_data = deep_update(config_data, dev_data)
+    # Load environment + profile config and merge them
+    config_data = build_config(PROJECT_ROOT, "local-test", "test")
 
     # Write merged config to temp file
     with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yaml") as tf:
         yaml.safe_dump(config_data, tf, sort_keys=False)
         test_config_path = tf.name
-    
+
     try:
         # Create snakemake command
         cmd = [

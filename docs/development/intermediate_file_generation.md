@@ -2,7 +2,7 @@
 
 By default, the pipeline deletes intermediate files that are marked with temp(). If these files are required, they can be generated using the steps below.
 
-1. Create config files as per the [config.yaml setup](../setup/config_yaml_setup.md) and [metadata file setup](../setup/metadata_file_setup) guides.
+1. Create experiment metadata files as per the [experiment metadata setup guide](../setup/experiment_metadata_setup.md).
 
 2. Set up EC2 instance as per the [compute setup guide](../setup/compute_setup.md), with the following change:
     * Allocate 2500GiB per EX or MS sample (instead of 500 GiB)
@@ -11,10 +11,10 @@ By default, the pipeline deletes intermediate files that are marked with temp().
 
 4. Open *bin/run_pipeline.sh* with nano and add the `--notemp` flag to the Snakemake command
 
-```
+```bash
 snakemake \
     --snakefile Snakefile \
-    --configfile config/config.yaml \
+    --configfile tmp/runtime_config/merged_config.yaml \
     --cores $USABLE_CORES \
     --resources memory=$USABLE_MEM_GB \
     --keep-going \

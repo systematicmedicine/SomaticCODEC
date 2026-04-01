@@ -7,13 +7,13 @@ from definitions.paths import benchmark as B
 
 rule bwamem_index_files:
     input:
-        reference = config["sci_params"]["shared"]["reference_genome"]
+        reference = config["sci_params"]["reference_files"]["genome"]
     output:
-        amb = config["sci_params"]["shared"]["reference_genome"] + ".amb",
-        ann = config["sci_params"]["shared"]["reference_genome"] + ".ann",
-        bwt = config["sci_params"]["shared"]["reference_genome"] + ".bwt.2bit.64",
-        pac = config["sci_params"]["shared"]["reference_genome"] + ".pac",
-        sa = config["sci_params"]["shared"]["reference_genome"] + ".0123"
+        amb = config["sci_params"]["reference_files"]["genome"] + ".amb",
+        ann = config["sci_params"]["reference_files"]["genome"] + ".ann",
+        bwt = config["sci_params"]["reference_files"]["genome"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["reference_files"]["genome"] + ".pac",
+        sa = config["sci_params"]["reference_files"]["genome"] + ".0123"
     log:
         L.BWAMEM_INDEX_FILES
     benchmark:

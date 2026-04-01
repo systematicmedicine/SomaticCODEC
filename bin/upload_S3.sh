@@ -6,37 +6,30 @@
 #
 # Authors:
 #   - Cameron Fraser
+#   - Joshua Johnstone
 # 
 set -euo pipefail
 
 echo "[INFO] Starting upload_S3.sh: $(date)"
 
 # Check that this script is being run from the project root
-if [[ ! -f "config/config.yaml" || ! -f "Snakefile" ]]; then
+if [[ ! -f "Snakefile" ]]; then
   echo "[ERROR] Please run this script from the project root."
   exit 1
 fi
 
-# Read S3 bucket ARN from config
-S3_TARGET=$(python3 -c "
-import yaml
-try:
-    with open('config/config.yaml') as f:
-        cfg = yaml.safe_load(f)
-    print(cfg['infrastructure']['aws']['s3_out_dir'].rstrip('/'))
-except Exception as e:
-    import sys
-    print(f'[ERROR] Failed to read infrastructure.aws.s3_out_dir from config.yaml: {e}', file=sys.stderr)
-    sys.exit(1)
-")
+RUNTIME_CONFIG="tmp/runtime_config/merged_config.yaml"
 
-echo "[INFO] Target S3 bucket: $S3_TARGET"
+# Check S3 target directory has been set
+S3_TARGET_DIR="${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>")}"
+
+echo "[INFO] Target S3 bucket: $S3_TARGET_DIR"
 
 # Upload all .tar.gz files in project root
 for f in ./*.tar.gz; do
   if [[ -f "$f" ]]; then
-    echo "[INFO] Uploading $f → $S3_TARGET/"
-    if ! aws s3 cp "$f" "$S3_TARGET/"; then
+    echo "[INFO] Uploading $f → $S3_TARGET_DIR/"
+    if ! aws s3 cp "$f" "$S3_TARGET_DIR/"; then
       echo "[ERROR] Upload failed for $f"
       exit 1
     fi

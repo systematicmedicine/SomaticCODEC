@@ -5,6 +5,7 @@ visualise_rulegraph.py
 
 Authors:
     - Cameron Fraser
+    - Joshua Johnstone
 
 Render a Snakemake rulegraph for inspection and documentation.
 
@@ -27,6 +28,10 @@ Not intended for:
 - Pipeline execution
 - Performance benchmarking
 - Scientific or production runs
+
+Example usage:
+python3 -m bin.visualise_rulegraph
+
 """
 
 from __future__ import annotations
@@ -35,23 +40,9 @@ import re
 import subprocess
 import sys
 import tempfile
-from datetime import date
 from pathlib import Path
-
 import yaml
-
-
-def merge_existing(base, dev):
-    """Deep-merge dev into base, but only for keys already present in base."""
-    if isinstance(base, dict) and isinstance(dev, dict):
-        out = dict(base)
-        for k, v in dev.items():
-            if k not in base:
-                continue
-            out[k] = merge_existing(base[k], v)
-        return out
-    return dev
-
+from helpers.config_helpers import build_config
 
 def touch_lightweight_test_downloads(project_root: Path, downloads_root: Path) -> None:
     """Create empty placeholder download files based on lightweight_test_run."""
@@ -82,23 +73,22 @@ def extract_dot(text: str) -> str | None:
 def main() -> int:
     project_root = Path.cwd()
     snakefile = project_root / "Snakefile"
-    config_base = project_root / "config" / "config.yaml"
-    config_dev = project_root / "config" / "config.dev.yaml"
+    environment_config = project_root / "environments" / "local-test" / "environment.yaml"
+    profile_config = project_root / "profiles" / "test" / "profile.yaml"
     downloads_link = project_root / "tmp" / "downloads"
 
     target_rule = "called_variants"
-    today = date.today().strftime("%Y%m%d")
     svg_out = project_root / "docs" / "figures" / "variant_calling_rulegraph.svg"
     svg_out.parent.mkdir(parents=True, exist_ok=True)
 
-    for p in (snakefile, config_base, config_dev):
+    for p in (snakefile, environment_config, profile_config):
         if not p.exists():
             print(f"ERROR: missing {p}", file=sys.stderr)
             return 2
 
-    base = yaml.safe_load(config_base.read_text(encoding="utf-8")) or {}
-    dev = yaml.safe_load(config_dev.read_text(encoding="utf-8")) or {}
-    merged = merge_existing(base, dev)
+    environment_name = environment_config.parent.name
+    profile_name = profile_config.parent.name
+    merged_config = build_config(project_root, environment_name, profile_name)
 
     with tempfile.TemporaryDirectory() as tmpdir_str:
         tmpdir = Path(tmpdir_str)
@@ -118,19 +108,17 @@ def main() -> int:
 
             merged_cfg = tmpdir / "config.merged.yaml"
             merged_cfg.write_text(
-                yaml.safe_dump(merged, sort_keys=False),
+                yaml.safe_dump(merged_config, sort_keys=False),
                 encoding="utf-8",
             )
 
             proc = subprocess.run(
                 [
                     "snakemake",
-                    "-s",
-                    str(snakefile),
+                    "-s", str(snakefile),
                     "--rulegraph",
                     target_rule,
-                    "--configfile",
-                    str(merged_cfg),
+                    "--configfile", str(merged_cfg),
                 ],
                 cwd=str(project_root),
                 stdout=subprocess.PIPE,

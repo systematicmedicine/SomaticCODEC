@@ -4,7 +4,7 @@ This document outlines suggested approaches for adapting SomaticCODEC to alterna
 
 Modifying the assay generally falls into three categories:
 
-- Adjusting `config.yaml` → `sci_params` (simplest)
+- Adjusting `profile.yaml` -> `sci_params` (simplest)
 - Modifying pipeline rules (moderate difficulty)
 - Modifying library preparation (most difficult)
 

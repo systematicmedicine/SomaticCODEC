@@ -44,9 +44,6 @@ JOB_LOG = "logs/shared_rules/job_log.csv"
 
 CREATE_METRICS_REPORT = "logs/shared_rules/create_metrics_report.log"
 
-CREATE_RUN_TIMELINE_PLOT = "logs/shared_rules/create_run_timeline_plot.log"
-RUN_TIMELINE = "logs/shared_rules/run_timeline.pdf"
-
 WRITE_GIT_METADATA = "logs/shared_rules/write_git_metadata.log"
 GIT_METADATA = "logs/shared_rules/git_metadata.json"
 
