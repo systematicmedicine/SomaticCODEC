@@ -17,7 +17,7 @@ import pandas as pd
 import pytest
 
 import helpers.get_metadata as md
-from conftest import PROJECT_ROOT, TEST_CONFIG
+from tests.conftest import PROJECT_ROOT, TEST_CONFIG
 
 # -------------------------------------------------------------------------------------
 # Fixtures

@@ -28,7 +28,7 @@ pytestmark = [
 ]
 
 # Define paths
-from conftest import PROJECT_ROOT, TEST_CONFIG
+from tests.conftest import PROJECT_ROOT, TEST_CONFIG
 
 CSV_PATH = os.path.join(
     PROJECT_ROOT,

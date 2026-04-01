@@ -12,10 +12,8 @@ Authors:
 import subprocess
 import pytest
 import yaml
-import tempfile
-from pathlib import Path
-from conftest import PROJECT_ROOT, clean_workspace
-from helpers.config_helpers import build_config
+from tests.conftest import PROJECT_ROOT, TEST_CONFIG
+from tests.helpers.clean_workspace import clean_workspace
 
 # Pytest marking
 pytestmark = [
@@ -23,9 +21,9 @@ pytestmark = [
     pytest.mark.order(7)
 ]
 
-def test_snakemake_dryrun():
+def test_snakemake_dryrun(tmp_path_factory):
     # Clean test environment
-    clean_workspace()
+    clean_workspace(PROJECT_ROOT)
 
     # Snakefile path
     snakefile = PROJECT_ROOT / "Snakefile"
@@ -39,13 +37,11 @@ def test_snakemake_dryrun():
     for src in files_to_create:
         (dst_dir / src.name).touch()
 
-    # Load environment + profile config and merge them
-    config_data = build_config(PROJECT_ROOT, "local-test", "test")
-
     # Write merged config to temp file
-    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yaml") as tf:
-        yaml.safe_dump(config_data, tf, sort_keys=False)
-        test_config_path = tf.name
+    test_tmp_dir = tmp_path_factory.mktemp("test_dir")
+    test_config_file = test_tmp_dir / "merged_config.yaml"
+    with open(test_config_file, "w", encoding="utf-8") as f:
+        yaml.safe_dump(TEST_CONFIG, f)
 
     try:
         # Create snakemake command
@@ -54,7 +50,7 @@ def test_snakemake_dryrun():
             "--dryrun",
             "--quiet",
             "--snakefile", str(snakefile),
-            "--configfile", test_config_path,
+            "--configfile", test_config_file,
         ]
 
         # Run snakemake command from repo root (more deterministic)
@@ -66,5 +62,4 @@ def test_snakemake_dryrun():
             f"STDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}"
         )
     finally:
-        Path(test_config_path).unlink(missing_ok=True)
-        clean_workspace()
+        clean_workspace(PROJECT_ROOT)
