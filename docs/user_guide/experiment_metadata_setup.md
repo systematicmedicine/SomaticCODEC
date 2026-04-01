@@ -4,7 +4,7 @@ Download the following CSV files from `experiment/` and populate them for your e
 
 - ***experiment/ex_adapters.csv***: Defines the sequences for each CODEC adapter quadruplex.
 - ***experiment/ex_lanes.csv***: Defines the sample ID and FASTQ files for each `ex_lane`.
-- ***experiment/ex_samples.csv***: Defines the sample ID for each `ex_sample`, the `ex_lane` it derives from and the `ms_sample` it pairs with.
+- ***experiment/ex_samples.csv***: Defines the sample ID for each `ex_sample`, the `ex_lane` it derives from, and the `ms_sample` it pairs with.
 - ***experiment/ms_samples.csv***: Defines the sample ID and FASTQ files for each `ms_sample`.
 - ***experiment/download_list.csv***: Optional. Defines files to download using *bin/download_S3.py*.
 
@@ -18,12 +18,11 @@ Download the following CSV files from `experiment/` and populate them for your e
 - `r2_start`: The P7 adapter sequence
 - `r2_end`: The P5 bridge sequence
 
-Example using quadruplex 1 from Bae *et al.* 2023:
+Example using quadruplex 1 from [Bae *et al.* 2023](https://doi.org/10.1038/s41588-023-01376-0):
 
-```
-ex_adapter,r1_start,r1_end,r2_start,r2_end
-QD001,CTTGAACGGACTGTCCAC,GTAGTCTAACGCTCGGTG,CACCGAGCGTTAGACTAC,GTGGACAGTCCGTTCAAG
-```
+| ex_adapter | r1_start | r1_end | r2_start | r2_end |
+|------------|----------|--------|----------|--------|
+| QD001 | CTTGAACGGACTGTCCAC | GTAGTCTAACGCTCGGTG |CACCGAGCGTTAGACTAC | GTGGACAGTCCGTTCAAG |
 
 ### experiment/ex_lanes.csv
 
@@ -35,10 +34,9 @@ QD001,CTTGAACGGACTGTCCAC,GTAGTCTAACGCTCGGTG,CACCGAGCGTTAGACTAC,GTGGACAGTCCGTTCAA
 
 Example:
 
-```
-ex_lane,fastq1,fastq2
-LN001,tmp/downloads/L001_R1.fastq.gz,tmp/downloads/L001_R2.fastq.gz
-```
+| ex_lane | fastq1 | fastq2 |
+|---------|--------|--------|
+| LN001 | tmp/downloads/L001_R1.fastq.gz | tmp/downloads/L001_R2.fastq.gz |
 
 ### experiment/ex_samples.csv
 
@@ -53,10 +51,9 @@ LN001,tmp/downloads/L001_R1.fastq.gz,tmp/downloads/L001_R2.fastq.gz
 
 Example:
 
-```
-ex_sample,ex_lane,ex_adapter,ms_sample,donor_id,comments
-S001,LN001,QD001,S002,D001,"Blood 40M"
-```
+| ex_sample | ex_lane | ex_adapter | ms_sample | donor_id | comments |
+|-----------|---------|------------|-----------|----------|----------|
+| S001 | LN001 | QD001 | S002 | D001 | Blood 40M |
 
 ### experiment/ms_samples.csv
 
@@ -70,10 +67,9 @@ S001,LN001,QD001,S002,D001,"Blood 40M"
 
 Example:
 
-```
-ms_sample,fastq1,fastq2,donor_id,comments
-S002,tmp/downloads/Buffy_D001_Age43_R1.fastq.gz,tmp/downloads/Buffy_D001_Age43_R2.fastq.gz,D001,"Blood 40M"
-```
+| ms_sample | fastq1 | fastq2 | donor_id | comments |
+|-----------|--------|--------|----------|----------|
+| S002 | tmp/downloads/Buffy_D001_Age43_R1.fastq.gz | tmp/downloads/Buffy_D001_Age43_R2.fastq.gz | D001 | Blood 40M |
 
 ### experiment/download_list.csv (optional)
 
@@ -86,8 +82,6 @@ S002,tmp/downloads/Buffy_D001_Age43_R1.fastq.gz,tmp/downloads/Buffy_D001_Age43_R
 
 Example:
 
-```
-file_name,source_dir,destination_dir,expected_md5sum
-UCSC-GRCh38-p14-filtered.fa,s3://<bucket>/reference-genomes/UCSC-GRCh38-p14-filtered/,tmp/downloads,5e43e66f74da7ecf87f7060a310a26bf
-```
-
+| file_name | source_dir | destination_dir | expected_md5sum |
+|-----------|------------|-----------------|-----------------|
+| UCSC-GRCh38-p14-filtered.fa | s3://sm-unrestricted-public/somaticcodec/reference-data/refs-v1/ | tmp/downloads | 5e43e66f74da7ecf87f7060a310a26bf |
