@@ -9,6 +9,7 @@ Requires the runtime config to already exist at:
 
 Authors:
     - Cameron Fraser
+    - Joshua Johnstone
 """
 
 # ------------------------------------------------------------------------------------------

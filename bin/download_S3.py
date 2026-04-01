@@ -7,6 +7,7 @@ Downloads data from S3 to the local EC2 instance:
 
 Authors:
     - Cameron Fraser
+    - Joshua Johnstone
 
 """
 

@@ -2,13 +2,13 @@
 
 ## Preparation
 
-The following instructions assume you have:
+The following instructions assume:
 - `ex_lane` and `ms_sample` FASTQ files have been generated
-- Prepared sample metadata sheets
+- Experiment metadata sheets have been filled
 - Reference files are ready for staging
-- Set up the compute platform
+- Compute platform has been set up
 
-See the relevant documentation for more information on how to perform the above steps.
+See the relevant documentation for more information on carrying out the above steps.
 
 ## Running pipeline
 
@@ -21,7 +21,7 @@ See the relevant documentation for more information on how to perform the above 
     - `ms_samples.csv`
     - `download_list.csv` (optional)
 
-    On `Amazon EC2` this can be accomplished with the following command:
+    Uploading these files to an `Amazon EC2` instance can be accomplished with the following command:
 
     ```bash
     scp -i ~/.ssh/<private_key>.pem <dir_with_experiment_sheets>/* ubuntu@<public_IPv4_address>:SomaticCODEC/experiment/
@@ -149,7 +149,7 @@ The following process assumes:
     ```bash
     ENVIRONMENT="<environment_name>" \
     PROFILE="<profile_name>" \
-    S3_TARGET_DIR="s3://<bucket>/<dir>/" \
+    S3_TARGET_DIR="s3://<bucket>/<dir>" \
     SNS_ARN="arn:aws:sns:<region>:<account_ID>:<topic_name>" \
     bash bin/run_all.sh
     ```

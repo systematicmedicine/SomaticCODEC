@@ -2,7 +2,7 @@
 
 By default, the pipeline deletes intermediate files that are marked with temp(). If these files are required, they can be generated using the steps below.
 
-1. Create experiment metadata files as per the [experiment metadata setup](../setup/experiment_metadata_setup.md) guide.
+1. Create experiment metadata files as per the [experiment metadata setup guide](../setup/experiment_metadata_setup.md).
 
 2. Set up EC2 instance as per the [compute setup guide](../setup/compute_setup.md), with the following change:
     * Allocate 2500GiB per EX or MS sample (instead of 500 GiB)

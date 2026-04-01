@@ -41,7 +41,7 @@ echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 : "${INSTANCE_ID:?INSTANCE_ID must be set}"
 : "${ENVIRONMENT:?ENVIRONMENT must be set (name of the environment directory under environments/)}"
 : "${PROFILE:?PROFILE must be set (name of the profile directory under profiles/)}"
-: "${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>/")}"
+: "${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>")}"
 : "${SNS_ARN:?SNS_ARN must be set ("arn:aws:sns:<region>:<account_ID>:<topic_name>")}"
 
 # -----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ if ! bash bin/dryrun.sh > logs/bin_scripts/dryrun.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 5: dryrun.sh"
 fi
 
-# Step 6: run_pipeline.sh
+# Step 6: run_pipeline.py
 echo "[INFO] Step 6: run_pipeline.py" | tee -a "$LOG_FILE"
 if ! python3 -u bin/run_pipeline.py > logs/bin_scripts/run_pipeline.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 6: run_pipeline.py"

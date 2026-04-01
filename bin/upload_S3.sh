@@ -6,6 +6,7 @@
 #
 # Authors:
 #   - Cameron Fraser
+#   - Joshua Johnstone
 # 
 set -euo pipefail
 
