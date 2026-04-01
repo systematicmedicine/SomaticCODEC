@@ -63,7 +63,7 @@ def main():
     root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     print(f"[INFO] Project root: {root_dir}")
 
-    timestamp = datetime.now().strftime("%Y%m%d")
+    timestamp = datetime.now().strftime("%Y%m%d-%H:%M:%S")
     archive_path = os.path.join(root_dir, f"run_{timestamp}.tar.gz")
     print(f"[INFO] Creating archive: {archive_path}")
 

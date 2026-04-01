@@ -183,7 +183,7 @@ if __name__ == "__main__":
     # EnsureCheck script is run from project root
     if not Path("tmp/runtime_config/merged_config.yaml").is_file():
         sys.exit("[ERROR] tmp/runtime_config/merged_config.yaml not found. " \
-        "Run this script from the project root, and ensure bin/create_runtime_config.py has been run first")
+        "Run this script from the project root, and ensure bin/create_runtime_config.py has been run first.")
     
     # Load config.yaml
     with open("tmp/runtime_config/merged_config.yaml") as f:
