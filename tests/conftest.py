@@ -28,17 +28,15 @@ PROJECT_ROOT = find_project_root(Path(__file__))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from helpers.config_helpers import build_config
-
-# Build config
-TEST_CONFIG = build_config(PROJECT_ROOT, "local-test", "test")
+# Define test config path
+TEST_CONFIG_PATH = PROJECT_ROOT / "tmp" / "runtime_config" / "merged_config.yaml"
 
 # ------------------------------------------------------------------------------------------
 # Export variables
 # ------------------------------------------------------------------------------------------
 
-# Explicit public API of PROJECT_ROOT
-__all__ = ["PROJECT_ROOT", "TEST_CONFIG"]
+# Explicit public API of PROJECT_ROOT and TEST_CONFIG_PATH
+__all__ = ["PROJECT_ROOT", "TEST_CONFIG_PATH"]
 
 # ------------------------------------------------------------------------------------------
 # Import fixtures

@@ -10,6 +10,7 @@ tests\\expected\\test_regex\\regex_expected_values.csv
 
 Authors:
     - Cameron Fraser
+    - Joshua Johnstone
 """
 
 # Import libraries
@@ -20,6 +21,9 @@ from rpy2 import robjects
 from rpy2.robjects.conversion import localconverter
 from rpy2.robjects import default_converter
 from rpy2.robjects import pandas2ri
+from helpers.config_helpers import load_yaml
+from tests.conftest import PROJECT_ROOT, TEST_CONFIG_PATH
+from tests.helpers.build_test_config import build_test_config
 
 # Pytest marking
 pytestmark = [
@@ -27,8 +31,13 @@ pytestmark = [
     pytest.mark.order(4)
 ]
 
+# Build test config using bin script
+build_test_config(PROJECT_ROOT, TEST_CONFIG_PATH)
+
+# Load test config
+test_config = load_yaml(TEST_CONFIG_PATH)
+
 # Define paths
-from tests.conftest import PROJECT_ROOT, TEST_CONFIG
 
 CSV_PATH = os.path.join(
     PROJECT_ROOT,
@@ -40,12 +49,12 @@ CSV_PATH = os.path.join(
 
 COMPONENT_XLSX = os.path.join(
     PROJECT_ROOT,
-    TEST_CONFIG["sci_params"]["metrics_manifests"]["component_metrics_metadata"],
+    test_config["sci_params"]["metrics_manifests"]["component_metrics_metadata"],
 )
 
 SYSTEM_XLSX = os.path.join(
     PROJECT_ROOT,
-    TEST_CONFIG["sci_params"]["metrics_manifests"]["system_metrics_metadata"],
+    test_config["sci_params"]["metrics_manifests"]["system_metrics_metadata"],
 )
 
 R_SCRIPT_PATH = os.path.join(

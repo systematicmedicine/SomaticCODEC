@@ -11,9 +11,9 @@ Authors:
 # Import libraries
 import subprocess
 import pytest
-import yaml
-from tests.conftest import PROJECT_ROOT, TEST_CONFIG
+from tests.conftest import PROJECT_ROOT, TEST_CONFIG_PATH
 from tests.helpers.clean_workspace import clean_workspace
+from tests.helpers.build_test_config import build_test_config
 
 # Pytest marking
 pytestmark = [
@@ -21,12 +21,12 @@ pytestmark = [
     pytest.mark.order(7)
 ]
 
-def test_snakemake_dryrun(tmp_path_factory):
+# Bin script path
+DRYRUN_BIN_SCRIPT = "bin/dryrun.sh"
+
+def test_snakemake_dryrun():
     # Clean test environment
     clean_workspace(PROJECT_ROOT)
-
-    # Snakefile path
-    snakefile = PROJECT_ROOT / "Snakefile"
 
     # Create empty test files in tmp/downloads
     src_dir = PROJECT_ROOT / "tests" / "data" / "lightweight_test_run" / "downloads"
@@ -37,23 +37,12 @@ def test_snakemake_dryrun(tmp_path_factory):
     for src in files_to_create:
         (dst_dir / src.name).touch()
 
-    # Write merged config to temp file
-    test_tmp_dir = tmp_path_factory.mktemp("test_dir")
-    test_config_file = test_tmp_dir / "merged_config.yaml"
-    with open(test_config_file, "w", encoding="utf-8") as f:
-        yaml.safe_dump(TEST_CONFIG, f)
+    # Build test config using bin script
+    build_test_config(PROJECT_ROOT, TEST_CONFIG_PATH)
 
     try:
-        # Create snakemake command
-        cmd = [
-            "snakemake",
-            "--dryrun",
-            "--quiet",
-            "--snakefile", str(snakefile),
-            "--configfile", test_config_file,
-        ]
-
-        # Run snakemake command from repo root (more deterministic)
+        # Run dryrun bin script from repo root (more deterministic)
+        cmd = ["bash", DRYRUN_BIN_SCRIPT]
         result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), capture_output=True, text=True)
 
         # Assert dryrun was successful
