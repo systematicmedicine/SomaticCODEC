@@ -28,6 +28,8 @@ Each type of change has different validation requirements before it can be relea
 - Removed run timeline plot rule and script (#373)
 - Moved pytest fixtures out of conftest.py and into tests/fixtures/ (#374)
 - Test scripts now run pipeline using bin scripts (#374)
+- Added tests to check that keys match between environment.yaml and profile.yaml files (#375)
+- Removed SNS messaging from bin/run_all.sh (#375)
 
 ## [5.0.0] - 2026-03-13
 
