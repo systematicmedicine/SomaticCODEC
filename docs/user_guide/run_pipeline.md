@@ -106,9 +106,7 @@ See the relevant documentation for more information on carrying out the above st
 
 ## Alternative process (end-end pipeline automation)
 
-The following process assumes:
-- You are using the default compute platform (Amazon EC2)
-- You have configured AWS SNS to send an email when the pipeline finishes
+The following process assumes that you are using the default compute platform (Amazon EC2).
 
 1. **Upload sample metadata sheets**
     
@@ -150,8 +148,7 @@ The following process assumes:
     ENVIRONMENT="<environment_name>" \
     PROFILE="<profile_name>" \
     S3_TARGET_DIR="s3://<bucket>/<dir>" \
-    SNS_ARN="arn:aws:sns:<region>:<account_ID>:<topic_name>" \
     bash bin/run_all.sh
     ```
 
-5. **Upon completion (success or failure), an email will be sent and the instance will shut down.**
+5. **Upon completion (success or failure), the instance will shut down.**

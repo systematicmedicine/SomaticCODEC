@@ -63,3 +63,12 @@ def build_config(project_root: Path, environment_name: str, profile_name: str) -
     )
 
     return deep_update(environment_config, profile_config)
+
+def flatten_yaml_keys(yaml_dict, prefix = ""):
+    keys = []
+    for key, value in yaml_dict.items():
+        key_with_parents = f"{prefix}.{key}" if prefix else key
+        keys.append(key_with_parents)
+        if isinstance(value, dict):
+            keys.extend(flatten_yaml_keys(value, key_with_parents))
+    return keys

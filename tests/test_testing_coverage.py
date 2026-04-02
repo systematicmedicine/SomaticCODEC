@@ -55,7 +55,7 @@ EXCLUDED_RULES: Set[str] = {
 }
 
 # Tests that do not correspond to a single rule name (e.g. multi-rule tests)
-# These are the *rule_name* portion from test_<rule_name>.py
+# These are the *name* portion from test_<name>.py
 EXCLUDED_TEST_NAMES: Set[str] = {
     "docker",
     "dryrun",
@@ -64,6 +64,8 @@ EXCLUDED_TEST_NAMES: Set[str] = {
     "path_constants",
     "regex",
     "script_syntax",
+    "environments",
+    "profiles",
     "fastqc_summary_metrics", # One test multiple rules
     "multimapping_metrics" # One test multiple rules
 }

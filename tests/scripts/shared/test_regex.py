@@ -28,7 +28,7 @@ from tests.helpers.build_test_config import build_test_config
 # Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(4)
+    pytest.mark.order(3)
 ]
 
 # Build test config using bin script

@@ -15,7 +15,7 @@ import pytest
 # Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(5)
+    pytest.mark.order(4)
 ]
 
 # Adjust these two roots to match your repo layout
