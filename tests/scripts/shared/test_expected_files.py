@@ -56,6 +56,10 @@ def file_manifest() -> list[str]:
                 continue
             if ".snakemake" in path.parts:
                 continue
+            if "merged_config.yaml" in path.parts:
+                continue
+            if "run_pipeline_stats.json" in path.parts:
+                continue
 
             out.add(str(path))
 

@@ -43,8 +43,8 @@ def lightweight_test_run():
     # Build test config using bin script
     build_test_config(PROJECT_ROOT, TEST_CONFIG_PATH)
     
-    # Run pipeline with bin script
-    cmd = ["python3", RUN_PIPELINE_BIN_SCRIPT]
+    # Run pipeline in notemp mode with bin script
+    cmd = ["python3", RUN_PIPELINE_BIN_SCRIPT, "--notemp"]
     with log_file.open("w", encoding="utf-8") as log:
         result = subprocess.run(
             cmd,

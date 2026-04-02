@@ -23,7 +23,7 @@ def build_test_config(project_root, test_config_path):
         cmd,
         cwd=str(project_root),
         text=True,
-        check=False)
+        check = True)
     
     if not Path(test_config_path).is_file():
         sys.exit(f"[ERROR] Test runtime config ({test_config_path}) not found")
