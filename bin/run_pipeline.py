@@ -84,7 +84,7 @@ def get_total_cores() -> int:
 # ------------------------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the Snakemake pipeline."
+        description="Run the Snakemake pipeline"
     )
     parser.add_argument(
         "--notemp",
