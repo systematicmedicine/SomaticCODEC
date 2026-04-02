@@ -18,7 +18,7 @@
 #
 # Exit:
 #   - Returns non-zero exit code if any step fails.
-#   - Sends SNS notification with status and shuts down instance.
+#   - Shuts down instance.
 #
 # Authors:
 #   - Cameron Fraser
@@ -42,7 +42,6 @@ echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 : "${ENVIRONMENT:?ENVIRONMENT must be set (name of the environment directory under environments/)}"
 : "${PROFILE:?PROFILE must be set (name of the profile directory under profiles/)}"
 : "${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>")}"
-: "${SNS_ARN:?SNS_ARN must be set ("arn:aws:sns:<region>:<account_ID>:<topic_name>")}"
 
 # -----------------------------------------------------------------------------
 # Cleanup function
@@ -53,13 +52,6 @@ function handle_exit {
 
     # Log exit message
     echo "[INFO] $MSG" | tee -a "$LOG_FILE"
-
-    # Message via SNS
-    aws sns publish \
-        --topic-arn "$SNS_ARN" \
-        --subject "Pipeline $STATUS" \
-        --message "$MSG" \
-        --region $AWS_REGION
 
     # Wait 2 minutes before shutting down
     echo "[INFO] Instance shutdown in 2 minutes" | tee -a "$LOG_FILE"

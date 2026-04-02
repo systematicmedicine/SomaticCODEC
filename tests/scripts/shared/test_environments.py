@@ -12,7 +12,10 @@ from pathlib import Path
 from tests.conftest import PROJECT_ROOT
 from helpers.config_helpers import load_yaml, flatten_yaml_keys
 
-pytestmark = pytest.mark.order(5)
+pytestmark = [
+    pytest.mark.quicktests,
+    pytest.mark.order(5)
+]
 
 def test_environment_yaml_keys():
 
