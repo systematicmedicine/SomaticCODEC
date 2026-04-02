@@ -21,6 +21,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 import yaml
+import argparse
 
 # ------------------------------------------------------------------------------------------
 # Bootstrap helpers
@@ -79,10 +80,26 @@ def get_total_cores() -> int:
     return total_cores
 
 # ------------------------------------------------------------------------------------------
+# Argument parsing
+# ------------------------------------------------------------------------------------------
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Run the Snakemake pipeline"
+    )
+    parser.add_argument(
+        "--notemp",
+        action="store_true",
+        help="Run Snakemake in notemp mode",
+    )
+    return parser.parse_args()
+
+# ------------------------------------------------------------------------------------------
 # Main
 # ------------------------------------------------------------------------------------------
 def main() -> int:
     print(f"[INFO] Starting run_pipeline.py: {datetime.now()}")
+
+    args = parse_args()
 
     runtime_config_path = PROJECT_ROOT / "tmp" / "runtime_config" / "merged_config.yaml"
     config_data = load_runtime_config(runtime_config_path)
@@ -116,15 +133,28 @@ def main() -> int:
     log_dir.mkdir(parents=True, exist_ok=True)
     stats_path = log_dir / "run_pipeline_stats.json"
 
-    snakemake_cmd = [
-        "snakemake",
-        "--snakefile", str(PROJECT_ROOT / "Snakefile"),
-        "--configfile", str(runtime_config_path),
-        "--cores", str(usable_cores),
-        "--resources", f"memory={usable_mem_gb}",
-        "--keep-going",
-        "--stats", str(stats_path),
-    ]
+    if args.notemp:
+        # Run in notemp mode if flag is set to True
+        snakemake_cmd = [
+            "snakemake",
+            "--snakefile", str(PROJECT_ROOT / "Snakefile"),
+            "--configfile", str(runtime_config_path),
+            "--cores", str(usable_cores),
+            "--resources", f"memory={usable_mem_gb}",
+            "--keep-going",
+            "--stats", str(stats_path),
+            "--notemp",
+    ]     
+    else: 
+        snakemake_cmd = [
+            "snakemake",
+            "--snakefile", str(PROJECT_ROOT / "Snakefile"),
+            "--configfile", str(runtime_config_path),
+            "--cores", str(usable_cores),
+            "--resources", f"memory={usable_mem_gb}",
+            "--keep-going",
+            "--stats", str(stats_path),
+        ]
 
     result = subprocess.run(
         snakemake_cmd,

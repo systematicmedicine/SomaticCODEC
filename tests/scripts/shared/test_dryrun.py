@@ -11,11 +11,9 @@ Authors:
 # Import libraries
 import subprocess
 import pytest
-import yaml
-import tempfile
-from pathlib import Path
-from conftest import PROJECT_ROOT, clean_workspace
-from helpers.config_helpers import build_config
+from tests.conftest import PROJECT_ROOT, TEST_CONFIG_PATH
+from tests.helpers.clean_workspace import clean_workspace
+from tests.helpers.build_test_config import build_test_config
 
 # Pytest marking
 pytestmark = [
@@ -23,12 +21,12 @@ pytestmark = [
     pytest.mark.order(7)
 ]
 
+# Bin script path
+DRYRUN_BIN_SCRIPT = "bin/dryrun.sh"
+
 def test_snakemake_dryrun():
     # Clean test environment
-    clean_workspace()
-
-    # Snakefile path
-    snakefile = PROJECT_ROOT / "Snakefile"
+    clean_workspace(PROJECT_ROOT)
 
     # Create empty test files in tmp/downloads
     src_dir = PROJECT_ROOT / "tests" / "data" / "lightweight_test_run" / "downloads"
@@ -39,25 +37,12 @@ def test_snakemake_dryrun():
     for src in files_to_create:
         (dst_dir / src.name).touch()
 
-    # Load environment + profile config and merge them
-    config_data = build_config(PROJECT_ROOT, "local-test", "test")
-
-    # Write merged config to temp file
-    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yaml") as tf:
-        yaml.safe_dump(config_data, tf, sort_keys=False)
-        test_config_path = tf.name
+    # Build test config using bin script
+    build_test_config(PROJECT_ROOT, TEST_CONFIG_PATH)
 
     try:
-        # Create snakemake command
-        cmd = [
-            "snakemake",
-            "--dryrun",
-            "--quiet",
-            "--snakefile", str(snakefile),
-            "--configfile", test_config_path,
-        ]
-
-        # Run snakemake command from repo root (more deterministic)
+        # Run dryrun bin script from repo root (more deterministic)
+        cmd = ["bash", DRYRUN_BIN_SCRIPT]
         result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), capture_output=True, text=True)
 
         # Assert dryrun was successful
@@ -66,5 +51,4 @@ def test_snakemake_dryrun():
             f"STDOUT:\n{result.stdout}\n\nSTDERR:\n{result.stderr}"
         )
     finally:
-        Path(test_config_path).unlink(missing_ok=True)
-        clean_workspace()
+        clean_workspace(PROJECT_ROOT)

@@ -12,12 +12,9 @@ Authors:
 # -------------------------------------------------------------------------------------
 from pathlib import Path
 import subprocess
-
 import pandas as pd
 import pytest
-
 import helpers.get_metadata as md
-from conftest import PROJECT_ROOT, TEST_CONFIG
 
 # -------------------------------------------------------------------------------------
 # Fixtures
@@ -41,7 +38,7 @@ def metrics_df(request):
 # -------------------------------------------------------------------------------------
 # Shared tests (run for both reports)
 # -------------------------------------------------------------------------------------
-def test_expected_metrics_present(lightweight_test_run, metrics_df):
+def test_expected_metrics_present(lightweight_test_run, metrics_df, config):
     report_type = metrics_df["report_type"].iloc[0]
     reported = set(
         metrics_df["Metric"]
@@ -52,10 +49,7 @@ def test_expected_metrics_present(lightweight_test_run, metrics_df):
     )
 
     manifest_key = "component_metrics_metadata" if report_type == "component" else "system_metrics_metadata"
-    expected_manifest = (
-        Path(PROJECT_ROOT)
-        / TEST_CONFIG["sci_params"]["metrics_manifests"][manifest_key]
-    )
+    expected_manifest = config["sci_params"]["metrics_manifests"][manifest_key]
     expected_df = pd.read_excel(expected_manifest)
 
     expected = set(

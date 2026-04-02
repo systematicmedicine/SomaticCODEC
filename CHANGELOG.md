@@ -7,7 +7,7 @@ Types of changes:
 - `MINOR`
 - `PATCH`
 
-Each type of change has different validation requirements before it can be released. See `docs/development/versioning.md`
+Each type of change has different validation requirements before it can be released. See the [versioning document](docs/development/versioning.md).
 
 ## [Unreleased]
 
@@ -26,6 +26,8 @@ Each type of change has different validation requirements before it can be relea
 - Split config.yaml into environment.yaml and profile.yaml (#373)
 - Moved experiment metadata sheets from config/ to experiment/ (#373)
 - Removed run timeline plot rule and script (#373)
+- Moved pytest fixtures out of conftest.py and into tests/fixtures/ (#374)
+- Test scripts now run pipeline using bin scripts (#374)
 
 ## [5.0.0] - 2026-03-13
 

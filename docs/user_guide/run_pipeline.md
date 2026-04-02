@@ -129,7 +129,7 @@ The following process assumes:
     tmux new -s codec-session
     ```
 
-3. **Run the docker container (pass EC2 parameters)**
+3. **Run the docker container (pass EC2 metadata)**
     
     ```bash
     TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && \

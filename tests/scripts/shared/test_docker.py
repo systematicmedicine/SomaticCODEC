@@ -23,7 +23,7 @@ pytestmark = [
 
 
 # Define hard coded parameters
-from conftest import PROJECT_ROOT
+from tests.conftest import PROJECT_ROOT
 IMAGE_INFO_SHA_FILE = "/image-info/dockerfile.sha256"
 IMAGE_INFO_ENVIRONMENT_SHA = "/image-info/environment.sha256"
 LOCAL_DOCKERFILE = PROJECT_ROOT / "Dockerfile"

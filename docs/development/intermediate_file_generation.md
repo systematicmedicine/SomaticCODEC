@@ -2,41 +2,34 @@
 
 By default, the pipeline deletes intermediate files that are marked with temp(). If these files are required, they can be generated using the steps below.
 
-1. Create experiment metadata files as per the [experiment metadata setup guide](../setup/experiment_metadata_setup.md).
+1. Create experiment metadata files as per the [experiment metadata setup guide](../user_guide/experiment_metadata_setup.md).
 
-2. Set up EC2 instance as per the [compute setup guide](../setup/compute_setup.md), with the following change:
+2. Set up EC2 instance as per the [compute setup guide](../user_guide/compute_setup.md), with the following change:
     * Allocate 2500GiB per EX or MS sample (instead of 500 GiB)
 
-3. Create tmux session and run docker as per the [Run pipeline](../run_pipeline.md) document
+3. Run pipeline as per the [Run pipeline guide](../user_guide/run_pipeline.md), with the following change:
 
-4. Open *bin/run_pipeline.sh* with nano and add the `--notemp` flag to the Snakemake command
+    * At step 9 (Run pipeline), include the --notemp flag to preserve files marked with temp()
 
-```bash
-snakemake \
-    --snakefile Snakefile \
-    --configfile tmp/runtime_config/merged_config.yaml \
-    --cores $USABLE_CORES \
-    --resources memory=$USABLE_MEM_GB \
-    --keep-going \
-    --notemp \
-    --stats logs/bin_scripts/run_pipeline_stats.json
-```
+        ```bash
+        python3 -u bin/run_pipeline.py --notemp
+        ```
 
-5. Run pipeline as per the [Run pipeline document](docs/run_pipeline.md)
+4. Following successful completion of the pipeline, the instance will shut down
 
-6. Following successful completion of the pipeline, the instance will shut down
+5. Start the instance
 
-7. Start the instance
-
-8. Create a new tmux session and start the existing docker container
+6. Create a new tmux session and start the existing docker container
 
 ```
+cd SomaticCODEC
+
 tmux new -s file-transfer
 
 docker start -ai codec-container
 ```
 
-9. Upload select intermediate files to s3:
+7. Upload select intermediate files to s3:
 
 ```
 aws s3 cp tmp/ \
