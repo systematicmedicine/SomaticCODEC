@@ -24,7 +24,7 @@ import importlib
 import itertools
 import pytest
 
-pytestmark = pytest.mark.order(9)
+pytestmark = pytest.mark.order(10)
 
 # ------------------------------------------------------------------------------------------------
 # Helper functions

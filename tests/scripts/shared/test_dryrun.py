@@ -18,7 +18,7 @@ from tests.helpers.build_test_config import build_test_config
 # Pytest marking
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(7)
+    pytest.mark.order(8)
 ]
 
 # Bin script path
