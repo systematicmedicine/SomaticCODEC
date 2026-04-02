@@ -1,7 +1,7 @@
 """
---- test_metadata_schema.py ---
+--- test_experiment_sheets.py ---
 
-Check that the schema (header row) of the user-facing metadata templates
+Check that the schema (header row) of the user-facing experiment metadata sheets
 matches the schema used in CI metadata.
 
 Authors:
@@ -22,7 +22,7 @@ pytestmark = [
 TEMPLATE_DIR = Path("experiment")          
 CI_METADATA_DIR = Path("tests/data/lightweight_test_run/config")
 
-# List the 5 metadata filenames (must exist in both dirs)
+# List the 5 experiment metadata filenames (must exist in both dirs)
 METADATA_FILES = [
     "download_list.csv",
     "ex_samples.csv",

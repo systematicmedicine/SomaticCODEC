@@ -60,7 +60,7 @@ EXCLUDED_TEST_NAMES: Set[str] = {
     "docker",
     "dryrun",
     "expected_files",
-    "metadata_schema",
+    "experiment_sheets",
     "path_constants",
     "regex",
     "script_syntax",
