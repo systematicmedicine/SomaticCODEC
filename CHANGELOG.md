@@ -14,6 +14,7 @@ Each type of change has different validation requirements before it can be relea
 ### Minor
 - Added ex_snv_read_position_metrics script, rule, and tests (#366)
 - Added uniformity_SNV_read_position system metric (#366)
+- Updated thresholds for germline risk rate component metric (#377)
 
 ### Patch
 - Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)
