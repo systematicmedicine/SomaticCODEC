@@ -33,6 +33,7 @@ Each type of change has different validation requirements before it can be relea
 - Added tests to check that keys match between environment.yaml and profile.yaml files (#375)
 - Removed SNS messaging from bin/run_all.sh (#375)
 - Updated user facing documentation (#379)
+- Renamed environment.yml to dependencies.yml to reduce confusion with environments concept (#381)
 
 ## [5.0.0] - 2026-03-13
 
