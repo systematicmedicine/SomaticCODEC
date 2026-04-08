@@ -3,7 +3,7 @@
 </p>
 
 # SomaticCODEC
-**SomaticCODEC is a sequencing assay for quantifying somatic mutation burden in normal human tissues.**
+**SomaticCODEC is a sequencing assay for quantifying somatic mutation burden**
 
 The assay combines a modified CODEC sequencing protocol with a Snakemake-based analysis pipeline to accurately measure somatic single-nucleotide variants across the full variant allele frequency (VAF) spectrum. Many sequencing pipelines are optimised for high-VAF variants, whereas SomaticCODEC is designed to quantify somatic variants across both low and high VAFs.
 
