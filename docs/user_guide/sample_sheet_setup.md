@@ -1,4 +1,4 @@
-# Preparing experiment metadata sheets
+# Preparing sample sheets
 
 Download the following CSV files from `experiment/` and populate them for your experiment using the instructions below.
 
@@ -6,7 +6,7 @@ Download the following CSV files from `experiment/` and populate them for your e
 - ***experiment/ex_lanes.csv***: Defines the sample ID and FASTQ files for each `ex_lane`.
 - ***experiment/ex_samples.csv***: Defines the sample ID for each `ex_sample`, the `ex_lane` it derives from, and the `ms_sample` it pairs with.
 - ***experiment/ms_samples.csv***: Defines the sample ID and FASTQ files for each `ms_sample`.
-- ***experiment/download_list.csv***: Optional. Defines files to download using *bin/download_S3.py*.
+- ***experiment/download_list.csv***: Optional. Only required if staging files using *bin/download_S3.py*.
 
 ### experiment/ex_adapters.csv
 
@@ -74,6 +74,8 @@ Example:
 ### experiment/download_list.csv (optional)
 
 *experiment/download_list.csv* contains the following fields:
+
+A download list is only required if you are staging files using *bin/download_S3.py*.
 
 - `file_name`: The name of the file to be downloaded
 - `source_dir`: The absolute path to the file on S3

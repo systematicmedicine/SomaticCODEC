@@ -7,7 +7,7 @@
 
 ### System level performance metrics
 
-System-level metrics measure the performance of the entire assay. The description for each metric can be found in `config/system_level_metrics.xlsx`.
+System-level metrics measure the performance of the entire assay. The description for each metric can be found in `system_level_metrics.xlsx` for each profile.
 
 All system level performance metrics that can be assessed during routine usage can be found in `results/system_metrics_report.csv`
 
@@ -15,7 +15,7 @@ A graphical version of the report can be found at `results/system_metrics_report
 
 ### Component level performance metrics
 
-Component-level metrics measure the performance of individual assay components. The description for each metric can be found in `config/component_level_metrics.xlsx`
+Component-level metrics measure the performance of individual assay components. The description for each metric can be found in `component_level_metrics.xlsx` for each profile.
 
 All component level metrics that can be assessed bioinformatically can be found in `metrics/component_metrics_report.csv`
 
