@@ -32,6 +32,7 @@ Each type of change has different validation requirements before it can be relea
 - Test scripts now run pipeline using bin scripts (#374)
 - Added tests to check that keys match between environment.yaml and profile.yaml files (#375)
 - Removed SNS messaging from bin/run_all.sh (#375)
+- Updated user facing documentation (#379)
 
 ## [5.0.0] - 2026-03-13
 
