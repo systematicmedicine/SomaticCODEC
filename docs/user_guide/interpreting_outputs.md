@@ -1,34 +1,41 @@
 # Interpreting pipeline outputs
 
-### Called variants
+## Called variants
 
-* Called SNVs can be found in `results/{ex_sample}/{ex_sample}_called_snvs.vcf`
-* SNV rate can be found in `results/{ex_sample}/{ex_sample}_somatic_variant_rate.json`
+A VCF containing all called SNVs can be found in `results/{ex_sample}/{ex_sample}_called_snvs.vcf`
 
-### System level performance metrics
+SNV rate can be found in `results/{ex_sample}/{ex_sample}_somatic_variant_rate.json`
 
-System-level metrics measure the performance of the entire assay. The description for each metric can be found in `system_level_metrics.xlsx` for each profile.
+## Assay performance metrics
 
-All system level performance metrics that can be assessed during routine usage can be found in `results/system_metrics_report.csv`
+### System level
 
-A graphical version of the report can be found at `results/system_metrics_report.png`
+System-level metrics measure the performance of the entire assay. 
 
-### Component level performance metrics
+There are two types of system-level metics:
+- Metrics assessed for every sample or batch
+- Metrics that require specialised datasets (e.g. linearity, precision)
 
-Component-level metrics measure the performance of individual assay components. The description for each metric can be found in `component_level_metrics.xlsx` for each profile.
-
-All component level metrics that can be assessed bioinformatically can be found in `metrics/component_metrics_report.csv`
-
-A graphical version of the report can be found at `results/system_metrics_report.png`
+The pipeline reports all system-level metrics that can be assessed on every sample or batch. The report can be found at `results/system_metrics_report.csv`. The description for each metric can be found in `profiles/<profile>/system_level_metrics.xlsx`. 
 
 
-### Metrics thresholds
+### Component level
+
+Component-level metrics measure the performance of individual assay components. 
+
+There are two types of component-level metics:
+- Metrics assessed during library prep
+- metrics assessed bioinformatically
+
+The pipeline reports all component-level metrics that are assessed bioinformatically. The report can be found at `metrics/component_metrics_report.csv`. The description for each metric can be found in `profiles/<profile>/component_level_metrics.xlsx`. 
+
+### Reporting thresholds
 
 Thresholds for each component and system level metric were established using a combination of internal data (~20 batches) and first-principles reasoning.
 
 These thresholds are intended as a guide for troubleshooting assay performance. Results may differ if different wet-lab, sequencing, or bioinformatic parameters are used.
 
-### Additional metrics
+### Other metrics
 Additional metrics files are generated that are not included in the automated report. These can be found in the `metrics/` and `results/` directories.
 
 Some notable files:
