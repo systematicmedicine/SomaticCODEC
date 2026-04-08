@@ -82,7 +82,7 @@ def main():
         "bin": "Methods/bin",
         "helpers": "Methods/helpers",
         "Dockerfile": "Methods/Dockerfile",
-        "environment.yml": "Methods/environment.yml"
+        "dependencies.yml": "Methods/dependencies.yml"
     }
 
     # Compute checksums
