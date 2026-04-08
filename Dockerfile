@@ -4,7 +4,7 @@
 # Description       : Builds a Docker image with all dependencies needed to run the codec-opensource pipeline.
 # Maintainer        : Cameron Fraser <info@systematicmedicine.com>
 # Base image        : Ubuntu 24.04
-# Package sources   : All software installed via APT or Conda (see environment.yml)
+# Package sources   : All software installed via APT or Conda (see dependencies.yml)
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------------------------
-# Install CONDA PACKAGES FROM ENVIRONMENT.YML
+# Install CONDA PACKAGES FROM DEPENDENCIES.YML
 # ------------------------------------------------------------------------------
 ENV MINIFORGE_VERSION=25.3.0-3
 ENV MINIFORGE_URL=https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-Linux-x86_64.sh
@@ -53,9 +53,9 @@ RUN wget --quiet ${MINIFORGE_URL} -O miniforge.sh && \
     bash miniforge.sh -b -p /opt/conda && \
     rm miniforge.sh
 
-# Install conda environment from environment.yml
-COPY environment.yml /tmp/environment.yml
-RUN conda env create -f /tmp/environment.yml && conda clean -afy
+# Install conda environment from dependencies.yml
+COPY dependencies.yml /tmp/dependencies.yml
+RUN conda env create -f /tmp/dependencies.yml && conda clean -afy
 
 # Re-assert environment variables after conda setup
 ENV PATH="/opt/conda/envs/codec-env/bin:/opt/conda/bin:/root/.cargo/bin:$PATH"
@@ -65,12 +65,12 @@ ENV CONDA_DEFAULT_ENV=codec-env
 # CAPTURE IMAGE BUILD METADATA (PROVENANCE)
 # ------------------------------------------------------------------------------
 COPY Dockerfile /tmp/Dockerfile
-COPY environment.yml /tmp/environment.yml
+COPY dependencies.yml /tmp/dependencies.yml
 RUN mkdir -p /image-info && \
     cp /tmp/Dockerfile /image-info/Dockerfile && \
-    cp /tmp/environment.yml /image-info/environment.yml && \
+    cp /tmp/dependencies.yml /image-info/dependencies.yml && \
     sha256sum /image-info/Dockerfile | awk '{print $1}' > /image-info/dockerfile.sha256 && \
-    sha256sum /image-info/environment.yml | awk '{print $1}' > /image-info/environment.sha256
+    sha256sum /image-info/dependencies.yml | awk '{print $1}' > /image-info/environment.sha256
 
 # ------------------------------------------------------------------------------
 # FINAL SETUP

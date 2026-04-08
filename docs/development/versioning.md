@@ -9,7 +9,7 @@ The SomaticCODEC repository uses semantic versioning, with levels of validation 
 Examples:
 - Changing any rule or script that could affect variant calling (excluding comments or whitespace)
 - Changing any configurable parameter that could affect variant calling
-- Changing the Dockerfile or environment.yml
+- Changing the Dockerfile or dependencies.yml
 
 ### MINOR -  Changes that could affect computational stability
 

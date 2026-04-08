@@ -16,5 +16,5 @@
 | `rules/` | Modular Snakemake rule definitions |
 | `tests/` | Pytest test suite and associated reference data |
 | `tmp/` | Intermediate files generated during runtime and temporary downloads of input files |
-| `Dockerfile`, `environment.yml` | Define the containerised software environment (Docker image and dependencies) |
+| `Dockerfile`, `dependencies.yml` | Define the containerised software environment (Docker image and dependencies) |
 | `Snakefile` | Top-level Snakemake file that orchestrates pipeline execution |
