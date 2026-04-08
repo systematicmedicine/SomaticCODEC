@@ -10,7 +10,6 @@ Authors:
 """
 
 import shutil
-import pandas as pd
 import os
 
 def clean_workspace(project_root):
@@ -43,5 +42,9 @@ def clean_workspace(project_root):
     experiment_dir = project_root / "experiment"
     for file in os.listdir(experiment_dir):
         file_path = experiment_dir / file
-        template = pd.read_csv(file_path, nrows = 0)
-        template.to_csv(file_path, index = False)
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            header = f.readline()
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(header)
