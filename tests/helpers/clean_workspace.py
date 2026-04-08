@@ -10,6 +10,8 @@ Authors:
 """
 
 import shutil
+import pandas as pd
+import os
 
 def clean_workspace(project_root):
     for folder in ["metrics", "results", "tmp", "logs", ".snakemake"]:
@@ -36,3 +38,10 @@ def clean_workspace(project_root):
     for pattern in (".pytest_cache", "__pycache__"):
         for cache_dir in project_root.rglob(pattern):
             shutil.rmtree(cache_dir)
+
+    # Replace filled sample sheets with templates
+    experiment_dir = project_root / "experiment"
+    for file in os.listdir(experiment_dir):
+        file_path = experiment_dir / file
+        template = pd.read_csv(file_path, nrows = 0)
+        template.to_csv(file_path, index = False)

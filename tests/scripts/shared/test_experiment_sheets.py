@@ -20,7 +20,7 @@ pytestmark = [
 
 # Adjust these two roots to match your repo layout
 TEMPLATE_DIR = Path("experiment")          
-CI_METADATA_DIR = Path("tests/data/lightweight_test_run/config")
+CI_METADATA_DIR = Path("tests/data/lightweight_test_run/experiment")
 
 # List the 5 experiment metadata filenames (must exist in both dirs)
 METADATA_FILES = [

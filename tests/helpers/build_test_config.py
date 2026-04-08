@@ -17,7 +17,7 @@ def build_test_config(project_root, test_config_path):
     CREATE_RUNTIME_CONFIG_SCRIPT = "bin/create_runtime_config.py"
 
     cmd = ["python3", CREATE_RUNTIME_CONFIG_SCRIPT,
-           "--environment", "local-test",
+           "--environment", "test",
            "--profile", "test"]
     subprocess.run(
         cmd,
