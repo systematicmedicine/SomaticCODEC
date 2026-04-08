@@ -27,7 +27,7 @@ SomaticCODEC comprises a laboratory protocol for library preparation ([Phie *et 
   - [Preparing sample sheets](docs/user_guide/sample_sheet_setup.md)
   - [Obtaining reference files](docs/user_guide/obtain_reference_files.md)
   - [Setting up compute platform](docs/user_guide/compute_setup.md)
-  - [Selecting a profile](dpcs/user_guide/profiles.md)
+  - [Selecting a profile](docs/user_guide/profiles.md)
 - [Running the pipeline](docs/user_guide/run_pipeline.md)
 - [Interpreting outputs](docs/user_guide/interpreting_outputs.md)
 - [Troubleshooting](docs/user_guide/troubleshooting.md)
