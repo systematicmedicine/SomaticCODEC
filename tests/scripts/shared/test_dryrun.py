@@ -11,6 +11,7 @@ Authors:
 # Import libraries
 import subprocess
 import pytest
+import shutil
 from tests.conftest import PROJECT_ROOT, TEST_CONFIG_PATH
 from tests.helpers.clean_workspace import clean_workspace
 from tests.helpers.build_test_config import build_test_config
@@ -36,6 +37,16 @@ def test_snakemake_dryrun():
     files_to_create = [f for f in src_dir.glob("*") if f.name != ".gitkeep"]
     for src in files_to_create:
         (dst_dir / src.name).touch()
+
+    # Copy experiment metadata sheets to experiment/
+    exp_src_dir = PROJECT_ROOT / "tests/data/lightweight_test_run/experiment"
+    exp_dst_dir = PROJECT_ROOT / "experiment/"
+    exp_dst_dir.mkdir(exist_ok=True)
+
+    files_to_copy = [f for f in exp_src_dir.glob("*") if f.name != ".gitkeep"]
+
+    for file_path in files_to_copy:
+        shutil.copy2(exp_src_dir / file_path.name, exp_dst_dir / file_path.name)
 
     # Build test config using bin script
     build_test_config(PROJECT_ROOT, TEST_CONFIG_PATH)

@@ -153,7 +153,7 @@ def test_variant_edge_cases_vcf(lightweight_test_run, tmp_path, deduped_bam, ded
     shutil.copytree("rule_scripts", tmp_path / "rule_scripts")
     shutil.copytree("rules", tmp_path / "rules")
     shutil.copytree("tmp/downloads", tmp_path / "tmp/downloads")
-    shutil.copytree("tests/data/lightweight_test_run/config", tmp_path / "tests/data/lightweight_test_run/config")
+    shutil.copytree("experiment", tmp_path / "experiment")
     shutil.copytree("definitions", tmp_path / "definitions")
 
     # Run snakemake inside temporary directory
