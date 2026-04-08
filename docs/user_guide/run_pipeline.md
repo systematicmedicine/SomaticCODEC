@@ -1,18 +1,17 @@
 # Running the pipeline
 
-## Preparation
+The instructions below for running the pipeline assume the following:
 
-The following instructions assume:
-- `ex_lane` and `ms_sample` FASTQ files have been generated
-- Experiment metadata sheets have been filled
-- Reference files are ready for staging
-- Compute platform has been set up
+- The compute platform has been set up
+- Sample sheets have been prepared
+- `ex_lane` FASTQ files, `ms_sample` FASTQ files, and reference files are ready for staging
+- A profile has been chosen
 
-See the relevant documentation for more information on carrying out the above steps.
+There are two options for running the pipeline: stepwise and automated. Both run the same bin scripts. The automated option orchestrates these via a wrapper script and assumes execution on AWS. New users should use the stepwise approach.
 
-## Running pipeline
+## Running pipeline (stepwise)
 
-1. **Upload experiment metadata sheets**
+1. **Upload sample sheets**
     
     Upload the following files to the `experiment/` directory:
     - `ex_lanes.csv`
@@ -24,7 +23,7 @@ See the relevant documentation for more information on carrying out the above st
     Uploading these files to an `Amazon EC2` instance can be accomplished with the following command:
 
     ```bash
-    scp -i ~/.ssh/<private_key>.pem <dir_with_experiment_sheets>/* ubuntu@<public_IPv4_address>:SomaticCODEC/experiment/
+    scp -i ~/.ssh/<private_key>.pem <dir_with_sample_sheets>/* ubuntu@<public_IPv4_address>:SomaticCODEC/experiment/
     ```
 
 2. **Start a tmux session**
@@ -36,6 +35,7 @@ See the relevant documentation for more information on carrying out the above st
 3. **Run the docker container**
 
     ```bash
+    # Run inside the SomaticCODEC directory
     sudo docker run -it \
     --name codec-container \
     -v "$PWD":/work \
@@ -51,13 +51,13 @@ See the relevant documentation for more information on carrying out the above st
         --profile <profile_name>
     ```
 
-5. **Check sample metadata**
+5. **Check sample sheets**
 
     ```bash
     python3 -u bin/check_sample_metadata.py
     ```
 
-6. **Check download list configuration (optional)**
+6. **Check download list (optional)**
 
     Run the following command if you plan to stage files using `bin/download_S3.py`
 
@@ -104,9 +104,7 @@ See the relevant documentation for more information on carrying out the above st
     bash bin/upload_S3.sh
     ```
 
-## Alternative process (end-end pipeline automation)
-
-The following process assumes that you are using the default compute platform (Amazon EC2).
+## Running pipeline (automated)
 
 1. **Upload sample metadata sheets**
     
@@ -118,7 +116,7 @@ The following process assumes that you are using the default compute platform (A
     - `download_list.csv`
 
     ```bash
-    scp -i ~/.ssh/<private_key>.pem <dir_with_config_files>/* ubuntu@<public_IPv4_address>:SomaticCODEC/config/
+    scp -i ~/.ssh/<private_key>.pem <dir_with_sample_sheets>/* ubuntu@<public_IPv4_address>:SomaticCODEC/experiment/
     ```
 
 2. **Start a tmux session**
@@ -130,6 +128,7 @@ The following process assumes that you are using the default compute platform (A
 3. **Run the docker container (pass EC2 metadata)**
     
     ```bash
+    # Run inside the SomaticCODEC directory
     TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && \
     INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id) && \
     REGION=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d'"' -f4) && \

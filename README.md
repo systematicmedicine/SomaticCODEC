@@ -3,7 +3,7 @@
 </p>
 
 # SomaticCODEC
-**SomaticCODEC is a sequencing assay for quantifying somatic mutation burden in normal human tissues.**
+**SomaticCODEC is a sequencing assay for quantifying somatic mutation burden**
 
 The assay combines a modified CODEC sequencing protocol with a Snakemake-based analysis pipeline to accurately measure somatic single-nucleotide variants across the full variant allele frequency (VAF) spectrum. Many sequencing pipelines are optimised for high-VAF variants, whereas SomaticCODEC is designed to quantify somatic variants across both low and high VAFs.
 
@@ -24,9 +24,10 @@ SomaticCODEC comprises a laboratory protocol for library preparation ([Phie *et 
 - [Assay overview](docs/user_guide/assay_overview.md)
 - Before running the pipeline
   - [Generating sequencing data](docs/user_guide/generating_sequencing_data.md)
-  - [Preparing experiment metadata](docs/user_guide/experiment_metadata_setup.md)
+  - [Preparing sample sheets](docs/user_guide/sample_sheet_setup.md)
   - [Obtaining reference files](docs/user_guide/obtain_reference_files.md)
   - [Setting up compute platform](docs/user_guide/compute_setup.md)
+  - [Selecting a profile](dpcs/user_guide/profiles.md)
 - [Running the pipeline](docs/user_guide/run_pipeline.md)
 - [Interpreting outputs](docs/user_guide/interpreting_outputs.md)
 - [Troubleshooting](docs/user_guide/troubleshooting.md)

@@ -1,39 +1,62 @@
 # Versioning & releases
 
-## Types of changes
+The SomaticCODEC repository uses semantic versioning, with levels of validation depending on the scope of the change. Version numbers use the MAJOR.MINOR.PATCH format (e.g. `v3.0.1`).
 
-- **MAJOR**: <B>Changes that could affect variant calling </b>
-    - Example: Changing the tool used to call variants
-    - Example: Changing the default parameter for read quality filtering
-    - Example: Changing the Dockerfile
+## Change levels
 
-- **MINOR**: <B>Changes that could affect computational performance/stability</b>
-    - Example: Updating resource allocation to a rule
-    - Example: Adding a new scientific metric that calculates genomic coverage
-    - Example: Adding an innocent little metrics script that shouldn't affect performance...
+### MAJOR - Changes that could affect variant calling
 
-- **PATCH**: <B>Changes that can't affect variant calling or computational performance/stability</b>
-    - Example: Changing metrics report configuration (component_metrics.xlsx, system_metrics.xlsx)
-    - Example: Adding new unit tests
-    - Example: Updating documentation
+Examples:
+- Changing any rule or script that could affect variant calling (excluding comments or whitespace)
+- Changing any configurable parameter that could affect variant calling
+- Changing the Dockerfile or environment.yml
 
-## Validation required to release a new version
+### MINOR -  Changes that could affect computational stability
 
-The validation required before updating the `master` branch depends on the scope of the changes. If multiple changes, use the highest level of change.
+Examples: 
+- Updating resource allocation to a rule
+- Adding any new rule with uncharacterised computational performance
 
-- **MAJOR**: 
-    - All validation required for **MINOR** and **PATCH**
-    - All system and component level metrics are assessed. Net improvement in assay performance.
+### PATCH - Changes that can't affect variant calling or computational stability
 
-- **MINOR**: 
-    - All validation required for **PATCH**
-    - Pipeline runs successfully on a batch of at least 12 samples of typical file size
-    - Changes to runtime and disk usage are acceptable
+Examples:
+- Changing metrics configurations
+- Adding unit tests
+- Updating documentation
 
-- **PATCH**:
-    - All unit and integration tests pass
-    - Every rule that affects variant calling or scientific metrics must have at least 1 unit test
+## Types of validation
 
-## Semantic versioning
+### Scientific performance
+    
+For each validated profile affected by the change:
+- Characterise performance of all system level metrics, including system level metrics that require specialised datasets such as linearity and precision.
+- Characterise performance of all component-level metrics (excluding library-prep metrics)
 
-Version numbers use the MAJOR.MINOR.PATCH format (e.g. `v3.0.1`).
+Note: scientific performance testing only tests the core pipeline underlying variant calling, it does not assess the validity of assay performance metrics.
+
+### Computational stability
+
+- Pipeline runs without crashing on 12 typical sized EX/MS sample pairs
+- Pipeline runtime is characterised
+
+### Software testing
+- All unit and integration tests pass
+- Every rule that affects variant calling or scientific metrics must have at least 1 unit test
+- Every fixed bug must have at least 1 unit test that reproduces failure
+
+## Validation requirements
+
+The following validation must be performed before updating the `master` branch.
+
+### MAJOR
+
+`Scientific performance` + `Computational stability` + `Software testing`
+
+### MINOR
+
+`Computational stability` + `Software testing`
+
+### PATCH
+
+`Software testing`
+

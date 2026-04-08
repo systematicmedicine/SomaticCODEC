@@ -1,8 +1,14 @@
 # Setting up compute platform
 
-## Default platform (Amazon EC2)
+SomaticCODEC uses Docker-based containerisation to enable portability across computational platforms. In principle, the pipeline can be run on any Linux system with sufficient resources and Docker support.
 
-The SomaticCODEC pipeline is optimised for execution on Amazon EC2. This is the recommended option for the smoothest setup and most predictable performance.
+Platform-specific configurations are defined using `enviroments`, which specify parameters such as thread and memory allocation.
+
+`AWS m7i.48xlarge` instances have been routinely used to run the pipeline and provide a well-characterised, low-friction pathway for execution. Recommendations for using alternative platforms are also provided.
+
+## AWS m7i.48xlarge setup
+
+It is recommended to use a fresh AWS instance for each pipeline run to minimise the risk of carryover artefacts from previous executions.
 
 1. Log into [AWS](https://aws.amazon.com/)
 
@@ -17,10 +23,11 @@ The SomaticCODEC pipeline is optimised for execution on Amazon EC2. This is the 
     - Allow SSH traffic: My IP
     - Configure storage: 
         - Volume type: gp3
-        - Size: 500 GiB per EX or MS sample
+        - Size: 500 GB free disk space per sample (EX and MS each)
         - IOPS: 8000
         - Throughput (MiB/s): 2000
-    - IAM instance profile: A profile with read access to the bucket where the sequencing data is stored, and write access to the bucket where the outputs will be uploaded
+    - IAM instance profile (optional): 
+        - If staging files from S3, select a profile with access to the relevant bucket.
 
 5. Connect to the instance
     - Copy the *Public IPv4 address* for the instance
@@ -34,7 +41,6 @@ The SomaticCODEC pipeline is optimised for execution on Amazon EC2. This is the 
 
     ```
     curl -fsSL https://get.docker.com | sudo bash
-    sudo usermod -aG docker "$USER" 
     ```
 
 7. Clone the SomaticCODEC repository
@@ -50,20 +56,38 @@ The SomaticCODEC pipeline is optimised for execution on Amazon EC2. This is the 
     sudo docker build -t codec-image .
     ```
 
-## Custom platform
+## Other compute platforms
 
-While the pipeline has not been tested on other compute platforms, the containerised workflow and configurable infrastructure parameters should make it straightforward to run in alternative environments.
+### Create environment config
 
-- Linux OS compatible with Docker
+Before using a different compute platform, ensure an environment configuration has been defined:
+- If no environment exists, create one in the `/environments` directory.
+- Each environment must contain an `environment.yaml` file
+- Key parameters to configure include `infrastructure.memory` and `infrastructure.threads`. These parameters control resource allocation during pipeline execution.
 
-- Perform steps 6-8 from the Amazon EC2 instructions above
+### Installing SomaticCODEC
 
-- For a batch of 12 samples (12 EX and 12 MS), it is recommended that the compute platform has at least:
-    - 1.5x memory defined in `environment.yaml` -> `infrastructure.memory.extra_heavy`
-    - 1.5x threads defined in `environment.yaml` -> `infrastructure.threads.heavy`
-    - 12 TB free disk space
+Follow the Docker installation, repository cloning, and image build steps described above.
 
-The resource parameters defined in `environments` -> `aws-m7i-48xlarge` -> `environment.yaml` are optimised for running batches of 12 samples (generated using the recommended library prep and sequencing parameters) on an EC2 `m7i.48xlarge` instance. If your context differs, consider creating a new `environment.yaml` with adjusted resource parameters.
+### Reccomended system resources
+
+The resources required depend on:
+- Number of samples
+- Reads per sample
+- Reference file size (e.g. genome)
+- Desired runtime
+
+For a typical use case (~2.5e8 reads per ex sample, 5.0e8 reads per ms sample), the following minimum resources are reccomended:
+- 500 GB free disk space per sample (EX and MS each)
+- 32 threads
+- 256 GB memory
+
+It may be possible to run the pipeline with fewer resources, but testing will be required.
+
+
+
+
+
 
 
 

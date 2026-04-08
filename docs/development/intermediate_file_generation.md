@@ -1,5 +1,7 @@
 # intermediate_file_generation.md
 
+*This document provides instructions for generating intermediate files. This is aimed at an internal audience.*
+
 By default, the pipeline deletes intermediate files that are marked with temp(). If these files are required, they can be generated using the steps below.
 
 1. Create experiment metadata files as per the [experiment metadata setup guide](../user_guide/experiment_metadata_setup.md).
