@@ -36,7 +36,7 @@ Thresholds for each component and system level metric were established using a c
 These thresholds are intended as a guide for troubleshooting assay performance. Results may differ if different wet-lab, sequencing, or bioinformatic parameters are used.
 
 ### Other metrics
-Additional metrics files are generated that are not included in the automated report. These can be found in the `metrics/` and `results/` directories.
+Additional metrics files are generated that are not included in the automated report (e.g. plots and figures). These can be found in the `metrics/` and `results/` directories.
 
 Some notable files:
 
