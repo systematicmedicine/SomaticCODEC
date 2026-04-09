@@ -31,21 +31,17 @@ By default, the pipeline deletes intermediate files that are marked with temp().
         -n
         ```
 
-4. Following successful completion of the pipeline, the instance will shut down
+        Following successful completion of the pipeline, start the shut-down instance and Docker container:
 
-5. Start the instance
+        ```
+        cd SomaticCODEC
 
-6. Create a new tmux session and start the existing docker container
+        tmux new -s file-transfer
 
-```
-cd SomaticCODEC
+        docker start -ai codec-container
+        ```
 
-tmux new -s file-transfer
-
-docker start -ai codec-container
-```
-
-7. Upload select intermediate files to s3:
+4. Upload select intermediate files to S3:
 
 ```
 aws s3 cp tmp/ \

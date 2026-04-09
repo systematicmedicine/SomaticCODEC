@@ -45,13 +45,15 @@ while getopts ":e:p:s:n" opt; do
     s) S3_TARGET_DIR="$OPTARG" ;;
     n) NOTEMP=true ;;
     :) 
-      echo "Missing argument for -$OPTARG"
-      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
+      echo "[ERROR] Missing argument for -$OPTARG"
+      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir> [-n]"
+      echo "Optional flags: -n  Run pipeline in notemp mode"
       exit 1
       ;;
     \?)
-      echo "Unknown argument: -$OPTARG"
-      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
+      echo "[ERROR] Unknown argument: -$OPTARG"
+      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir> [-n]"
+      echo "Optional flags: -n  Run pipeline in notemp mode"
       exit 1
       ;;
   esac
@@ -59,7 +61,8 @@ done
 
 if [[ -z "${ENVIRONMENT:-}" || -z "${PROFILE:-}" || -z "${S3_TARGET_DIR:-}" ]]; then
   echo "[ERROR] Missing required flags"
-  echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
+  echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir> [-n]"
+  echo "Optional flags: -n  Run pipeline in notemp mode"
   exit 1
 fi
 
