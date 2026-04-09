@@ -2,7 +2,7 @@
 
 SomaticCODEC uses Docker-based containerisation to enable portability across computational platforms. In principle, the pipeline can be run on any Linux system with sufficient resources and Docker support.
 
-Platform-specific configurations are defined using `enviroments`, which specify parameters such as thread and memory allocation.
+Platform-specific configurations are defined using `environments`, which specify parameters such as thread and memory allocation.
 
 `AWS m7i.48xlarge` instances have been routinely used to run the pipeline and provide a well-characterised, low-friction pathway for execution. Recommendations for using alternative platforms are also provided.
 
