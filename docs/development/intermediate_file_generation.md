@@ -9,29 +9,39 @@ By default, the pipeline deletes intermediate files that are marked with temp().
 2. Set up EC2 instance as per the [compute setup guide](../user_guide/compute_setup.md), with the following change:
     * Allocate 2500GiB per EX or MS sample (instead of 500 GiB)
 
-3. Run pipeline as per the [Run pipeline guide](../user_guide/run_pipeline.md), with the following change:
+3. Run pipeline as per the [Run pipeline guide](../user_guide/run_pipeline.md), with the following changes:
 
-    * At step 9 (Run pipeline), include the --notemp flag to preserve files marked with temp()
+    * If using the stepwise approach:
+
+        At step 9 (Run pipeline), include the --notemp flag
 
         ```bash
         python3 -u bin/run_pipeline.py --notemp
         ```
 
-4. Following successful completion of the pipeline, the instance will shut down
+    * If using the automated approach:
 
-5. Start the instance
+        At step 4 (Run all pipeline steps), include the -n flag
 
-6. Create a new tmux session and start the existing docker container
+        ```bash
+        bash bin/run_all.sh \
+        -e <environment> \
+        -p <profile> \
+        -s <S3_target_dir> \
+        -n
+        ```
 
-```
-cd SomaticCODEC
+        Following successful completion of the pipeline, start the shut-down instance and Docker container:
 
-tmux new -s file-transfer
+        ```
+        cd SomaticCODEC
 
-docker start -ai codec-container
-```
+        tmux new -s file-transfer
 
-7. Upload select intermediate files to s3:
+        docker start -ai codec-container
+        ```
+
+4. Upload select intermediate files to S3:
 
 ```
 aws s3 cp tmp/ \

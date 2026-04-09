@@ -37,16 +37,16 @@ It is recommended to use a fresh AWS instance for each pipeline run to minimise 
     ssh -i ~/.ssh/<private_key>.pem ubuntu@<public_IPv4_address>
     ```
 
-6. Install Docker
-
-    ```
-    curl -fsSL https://get.docker.com | sudo bash
-    ```
-
-7. Clone the SomaticCODEC repository
+6. Clone the SomaticCODEC repository
 
     ```
     git clone https://github.com/systematicmedicine/SomaticCODEC.git
+    ```
+
+7. Install Docker
+
+    ```
+    curl -fsSL https://get.docker.com | sudo bash
     ```
 
 8. Build Docker image
@@ -69,7 +69,7 @@ Before using a different compute platform, ensure an environment configuration h
 
 Follow the Docker installation, repository cloning, and image build steps described above.
 
-### Reccomended system resources
+### Recommended system resources
 
 The resources required depend on:
 - Number of samples
@@ -77,7 +77,7 @@ The resources required depend on:
 - Reference file size (e.g. genome)
 - Desired runtime
 
-For a typical use case (~2.5e8 reads per ex sample, 5.0e8 reads per ms sample), the following minimum resources are reccomended:
+For a typical use case (~2.5e8 reads per ex sample, 5.0e8 reads per ms sample), the following minimum resources are recommended:
 - 500 GB free disk space per sample (EX and MS each)
 - 32 threads
 - 256 GB memory

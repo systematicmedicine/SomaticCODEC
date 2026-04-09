@@ -36,12 +36,39 @@ LOG_FILE="logs/bin_scripts/run_all.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 
+# Load parameters
+NOTEMP=false
+while getopts ":e:p:s:n" opt; do
+  case $opt in
+    e) ENVIRONMENT="$OPTARG" ;;
+    p) PROFILE="$OPTARG" ;;
+    s) S3_TARGET_DIR="$OPTARG" ;;
+    n) NOTEMP=true ;;
+    :) 
+      echo "[ERROR] Missing argument for -$OPTARG"
+      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir> [-n]"
+      echo "Optional flags: -n  Run pipeline in notemp mode"
+      exit 1
+      ;;
+    \?)
+      echo "[ERROR] Unknown argument: -$OPTARG"
+      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir> [-n]"
+      echo "Optional flags: -n  Run pipeline in notemp mode"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -z "${ENVIRONMENT:-}" || -z "${PROFILE:-}" || -z "${S3_TARGET_DIR:-}" ]]; then
+  echo "[ERROR] Missing required flags"
+  echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir> [-n]"
+  echo "Optional flags: -n  Run pipeline in notemp mode"
+  exit 1
+fi
+
 # Ensure required environment variables are set
 : "${AWS_REGION:?AWS_REGION must be set}"
 : "${INSTANCE_ID:?INSTANCE_ID must be set}"
-: "${ENVIRONMENT:?ENVIRONMENT must be set (name of the environment directory under environments/)}"
-: "${PROFILE:?PROFILE must be set (name of the profile directory under profiles/)}"
-: "${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>")}"
 
 # -----------------------------------------------------------------------------
 # Cleanup function
@@ -110,8 +137,15 @@ fi
 
 # Step 6: run_pipeline.py
 echo "[INFO] Step 6: run_pipeline.py" | tee -a "$LOG_FILE"
-if ! python3 -u bin/run_pipeline.py > logs/bin_scripts/run_pipeline.log 2>&1; then
+if [[ "$NOTEMP" = true ]]; then
+    echo "[INFO] Running pipeline in notemp mode"
+    if ! python3 -u bin/run_pipeline.py --notemp > logs/bin_scripts/run_pipeline.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 6: run_pipeline.py"
+    fi    
+else
+    if ! python3 -u bin/run_pipeline.py > logs/bin_scripts/run_pipeline.log 2>&1; then
+    handle_exit "FAILED" "Pipeline failed at step 6: run_pipeline.py"
+    fi
 fi
 
 # Step 7: package_outputs.py
@@ -122,7 +156,7 @@ fi
 
 # Step 8: upload_S3.sh
 echo "[INFO] Step 8: upload_S3.sh" | tee -a "$LOG_FILE"
-if ! S3_TARGET_DIR="$S3_TARGET_DIR" bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
+if ! bash bin/upload_S3.sh $S3_TARGET_DIR > logs/bin_scripts/upload_S3.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 8: upload_S3.sh"
 fi
 
