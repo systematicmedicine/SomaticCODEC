@@ -100,8 +100,8 @@ There are two options for running the pipeline: stepwise and automated. Both run
 11. **Upload packaged outputs to S3 (optional)**
 
     ```bash
-    S3_TARGET_DIR="s3://<bucket>/<dir>" \
-    bash bin/upload_S3.sh
+    bash bin/upload_S3.sh \
+    -s <S3_target_dir>
     ```
 
 ## Running pipeline (automated)
@@ -144,10 +144,10 @@ There are two options for running the pipeline: stepwise and automated. Both run
 4. **Run all pipeline steps**
 
     ```bash
-    ENVIRONMENT="<environment_name>" \
-    PROFILE="<profile_name>" \
-    S3_TARGET_DIR="s3://<bucket>/<dir>" \
-    bash bin/run_all.sh
+    bash bin/run_all.sh \
+    -e <environment> \
+    -p <profile> \
+    -s <S3_target_dir>
     ```
 
 5. **Upon completion (success or failure), the instance will shut down.**

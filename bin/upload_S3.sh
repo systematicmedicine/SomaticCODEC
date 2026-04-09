@@ -18,10 +18,24 @@ if [[ ! -f "Snakefile" ]]; then
   exit 1
 fi
 
-RUNTIME_CONFIG="tmp/runtime_config/merged_config.yaml"
+# Load parameters
+while getopts "s:" opt; do
+  case $opt in
+    s) S3_TARGET_DIR="$OPTARG" ;;
+    *) 
+      echo "Usage: bash $0 -s <S3_target_dir>"
+      exit 1
+      ;;
+  esac
+done
 
-# Check S3 target directory has been set
-S3_TARGET_DIR="${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>")}"
+if [[ -z "${S3_TARGET_DIR:-}" ]]; then
+  echo "[ERROR] Missing required flags."
+  echo "Usage: bash $0 -s <S3_target_dir>"
+  exit 1
+fi
+
+RUNTIME_CONFIG="tmp/runtime_config/merged_config.yaml"
 
 echo "[INFO] Target S3 bucket: $S3_TARGET_DIR"
 

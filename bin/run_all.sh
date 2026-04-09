@@ -36,12 +36,28 @@ LOG_FILE="logs/bin_scripts/run_all.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 
+# Load parameters
+while getopts "eps:" opt; do
+  case $opt in
+    e) ENVIRONMENT="$OPTARG" ;;
+    p) PROFILE="$OPTARG" ;;
+    s) S3_TARGET_DIR="$OPTARG" ;;
+    *) 
+      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -z "${ENVIRONMENT:-}" || -z "${PROFILE:-}" || -z "${S3_TARGET_DIR:-}" ]]; then
+  echo "[ERROR] Missing required flags."
+  echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
+  exit 1
+fi
+
 # Ensure required environment variables are set
 : "${AWS_REGION:?AWS_REGION must be set}"
 : "${INSTANCE_ID:?INSTANCE_ID must be set}"
-: "${ENVIRONMENT:?ENVIRONMENT must be set (name of the environment directory under environments/)}"
-: "${PROFILE:?PROFILE must be set (name of the profile directory under profiles/)}"
-: "${S3_TARGET_DIR:?S3_TARGET_DIR must be set ("s3://<bucket>/<dir>")}"
 
 # -----------------------------------------------------------------------------
 # Cleanup function
@@ -122,7 +138,7 @@ fi
 
 # Step 8: upload_S3.sh
 echo "[INFO] Step 8: upload_S3.sh" | tee -a "$LOG_FILE"
-if ! S3_TARGET_DIR="$S3_TARGET_DIR" bash bin/upload_S3.sh > logs/bin_scripts/upload_S3.log 2>&1; then
+if ! bash bin/upload_S3.sh -s $S3_TARGET_DIR > logs/bin_scripts/upload_S3.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 8: upload_S3.sh"
 fi
 
