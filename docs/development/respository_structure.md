@@ -5,7 +5,7 @@
 | `bin/` | User-facing scripts for pipeline orchestration |
 | `definitions/` | Centralised definitions of pipeline outputs and path constants |
 | `docs/` | Pipeline documentation |
-| `environments/` | Compute platform specific configuration (e.g. memory allcoation) |
+| `environments/` | Compute platform specific configuration (e.g. memory allocation) |
 | `experiment/` | Run specific metadata e.g. sample sheets |
 | `helpers/` | Shared functionality used by multiple scripts and rules |
 | `logs/` | Runtime logs and benchmark files |
