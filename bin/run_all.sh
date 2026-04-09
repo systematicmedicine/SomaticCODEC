@@ -37,6 +37,7 @@ mkdir -p "$(dirname "$LOG_FILE")"
 echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 
 # Load parameters
+NOTEMP=false
 while getopts ":e:p:s:n" opt; do
   case $opt in
     e) ENVIRONMENT="$OPTARG" ;;
@@ -133,7 +134,6 @@ fi
 
 # Step 6: run_pipeline.py
 echo "[INFO] Step 6: run_pipeline.py" | tee -a "$LOG_FILE"
-
 if [[ "$NOTEMP" = true ]]; then
     echo "[INFO] Running pipeline in notemp mode"
     if ! python3 -u bin/run_pipeline.py --notemp > logs/bin_scripts/run_pipeline.log 2>&1; then

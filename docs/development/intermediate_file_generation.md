@@ -13,7 +13,7 @@ By default, the pipeline deletes intermediate files that are marked with temp().
 
     * If using the stepwise approach:
 
-        At step 9 (Run pipeline), include the --notemp flag to preserve files marked with temp()
+        At step 9 (Run pipeline), include the --notemp flag
 
         ```bash
         python3 -u bin/run_pipeline.py --notemp
@@ -21,7 +21,7 @@ By default, the pipeline deletes intermediate files that are marked with temp().
 
     * If using the automated approach:
 
-        At step 4 (Run all pipeline steps), include the -n flag to preserve files marked with temp()
+        At step 4 (Run all pipeline steps), include the -n flag
 
         ```bash
         bash bin/run_all.sh \
@@ -30,7 +30,6 @@ By default, the pipeline deletes intermediate files that are marked with temp().
         -s <S3_target_dir> \
         -n
         ```
-
 
 4. Following successful completion of the pipeline, the instance will shut down
 
