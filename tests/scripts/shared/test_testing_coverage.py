@@ -66,6 +66,7 @@ EXCLUDED_TEST_NAMES: Set[str] = {
     "script_syntax",
     "environments",
     "profiles",
+    "testing_coverage",
     "fastqc_summary_metrics", # One test multiple rules
     "multimapping_metrics" # One test multiple rules
 }

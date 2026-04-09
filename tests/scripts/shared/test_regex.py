@@ -23,7 +23,7 @@ from rpy2.robjects import default_converter
 from rpy2.robjects import pandas2ri
 from helpers.config_helpers import load_yaml
 from tests.conftest import PROJECT_ROOT, TEST_CONFIG_PATH
-from tests.helpers.build_test_config import build_test_config
+from helpers.test_helpers import build_test_config
 
 # Pytest marking
 pytestmark = [

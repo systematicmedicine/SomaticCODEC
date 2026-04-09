@@ -43,5 +43,6 @@ __all__ = ["PROJECT_ROOT", "TEST_CONFIG_PATH"]
 # ------------------------------------------------------------------------------------------
 
 pytest_plugins = [
+    "tests.fixtures.dryrun",
     "tests.fixtures.lightweight_test_run"
 ]

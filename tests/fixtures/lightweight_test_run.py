@@ -12,8 +12,7 @@ Authors:
 import pytest
 import subprocess
 import shutil
-from tests.helpers.clean_workspace import clean_workspace
-from tests.helpers.build_test_config import build_test_config
+from helpers.test_helpers import clean_workspace, build_test_config
 from tests.conftest import PROJECT_ROOT, TEST_CONFIG_PATH
 
 # Bin script path

@@ -1,5 +1,5 @@
 """
---- test_lightweight_test_run_initialization.py
+--- test_fixture_init_dryrun.py ---
 
 This tests forces the creation of fixtures required for downstream tests.
 
@@ -10,8 +10,12 @@ Author: Cameron Fraser
 
 import pytest
 
-pytestmark = pytest.mark.order(9)
+# Pytest marking
+pytestmark = [
+    pytest.mark.quicktests,
+    pytest.mark.order(8)
+]
 
 # Ensure fixture runs successfully before any dependent tests
-def test_lightweight_test_run_initialization(lightweight_test_run):
+def test_dryrun_initialization(dryrun_fixture):
     pass

@@ -36,6 +36,8 @@ Each type of change has different validation requirements before it can be relea
 - Updated user facing documentation (#379)
 - Removed wet-lab and non-bioinformatically-assessed metrics from profiles (#378)
 - Updated thresholds for germline risk rate component metric (#377)
+- Merged test/helpers into helpers (#383)
+- Created dryrun test fixture (#383)
 
 ## [5.0.0] - 2026-03-13
 
