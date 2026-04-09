@@ -13,8 +13,7 @@ import subprocess
 import pytest
 import shutil
 from tests.conftest import PROJECT_ROOT, TEST_CONFIG_PATH
-from tests.helpers.clean_workspace import clean_workspace
-from tests.helpers.build_test_config import build_test_config
+from helpers.test_helpers import clean_workspace, build_test_config
 
 # Pytest marking
 pytestmark = [
