@@ -1,5 +1,5 @@
 """
---- test_lightweight_test_run_initialization.py
+--- test_lightweight_test_run_initialization.py ---
 
 This tests forces the creation of fixtures required for downstream tests.
 
