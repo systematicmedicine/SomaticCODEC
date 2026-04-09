@@ -1,8 +1,8 @@
 # ==============================================================================
-# Dockerfile for the codec-opensource pipeline
+# Dockerfile for the SomaticCODEC pipeline
 #
-# Description       : Builds a Docker image with all dependencies needed to run the codec-opensource pipeline.
-# Maintainer        : Cameron Fraser <info@systematicmedicine.com>
+# Description       : Builds a Docker image with all dependencies needed to run the SomaticCODEC pipeline.
+# Maintainer        : Systematic Medicine <info@systematicmedicine.com>
 # Base image        : Ubuntu 24.04
 # Package sources   : All software installed via APT or Conda (see dependencies.yml)
 # ==============================================================================
