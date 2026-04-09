@@ -15,12 +15,15 @@ Each type of change has different validation requirements before it can be relea
 - Implemented profile and environment system (#373)
 - Moved sample sheets from config/ to experiment/ (#373)
 - Renamed environment.yml to dependencies.yml to reduce confusion with environments concept (#381)
+- Removed SNS messaging from bin/run_all.sh (#375)
 - Modified orchestration-level bin scripts to take arguments instead of environment variables (#384)
 - Added optional notemp flags to bin/run_pipeline.py and bin/run_all.sh (#374 and 384)
 
 ### Minor
 - Added ex_snv_read_position_metrics script, rule, and tests (#366)
 - Added uniformity_SNV_read_position system metric (#366)
+- Removed run timeline plot rule and script (#373)
+- Merged test/helpers into helpers (#383)
 
 ### Patch
 - Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)
@@ -30,14 +33,11 @@ Each type of change has different validation requirements before it can be relea
 - Updated user facing documentation (#369, 371, 374, 379, 384)
 - Removed author references to ChatGPT (#370)
 - Corrected spelling of GRCh38 in reference files (#372)
-- Removed run timeline plot rule and script (#373)
 - Moved pytest fixtures out of conftest.py and into tests/fixtures/ (#374)
 - Test scripts now run pipeline using bin scripts (#374)
 - Added tests to check that keys match between environment.yaml and profile.yaml files (#375)
-- Removed SNS messaging from bin/run_all.sh (#375)
 - Removed wet-lab and non-bioinformatically-assessed metrics from profiles (#378)
 - Updated thresholds for germline risk rate component metric (#377)
-- Merged test/helpers into helpers (#383)
 - Created dryrun test fixture (#383)
 
 ## [5.0.0] - 2026-03-13
