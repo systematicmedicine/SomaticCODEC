@@ -37,12 +37,19 @@ mkdir -p "$(dirname "$LOG_FILE")"
 echo "[INFO] Starting run_all.sh: $(date)" | tee -a "$LOG_FILE"
 
 # Load parameters
-while getopts "eps:" opt; do
+while getopts ":e:p:s:n" opt; do
   case $opt in
     e) ENVIRONMENT="$OPTARG" ;;
     p) PROFILE="$OPTARG" ;;
     s) S3_TARGET_DIR="$OPTARG" ;;
-    *) 
+    n) NOTEMP=true ;;
+    :) 
+      echo "Missing argument for -$OPTARG"
+      echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
+      exit 1
+      ;;
+    \?)
+      echo "Unknown argument: -$OPTARG"
       echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
       exit 1
       ;;
@@ -50,7 +57,7 @@ while getopts "eps:" opt; do
 done
 
 if [[ -z "${ENVIRONMENT:-}" || -z "${PROFILE:-}" || -z "${S3_TARGET_DIR:-}" ]]; then
-  echo "[ERROR] Missing required flags."
+  echo "[ERROR] Missing required flags"
   echo "Usage: bash $0 -e <environment> -p <profile> -s <S3_target_dir>"
   exit 1
 fi
@@ -126,8 +133,16 @@ fi
 
 # Step 6: run_pipeline.py
 echo "[INFO] Step 6: run_pipeline.py" | tee -a "$LOG_FILE"
-if ! python3 -u bin/run_pipeline.py > logs/bin_scripts/run_pipeline.log 2>&1; then
+
+if [[ "$NOTEMP" = true ]]; then
+    echo "[INFO] Running pipeline in notemp mode"
+    if ! python3 -u bin/run_pipeline.py --notemp > logs/bin_scripts/run_pipeline.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 6: run_pipeline.py"
+    fi    
+else
+    if ! python3 -u bin/run_pipeline.py > logs/bin_scripts/run_pipeline.log 2>&1; then
+    handle_exit "FAILED" "Pipeline failed at step 6: run_pipeline.py"
+    fi
 fi
 
 # Step 7: package_outputs.py
@@ -138,7 +153,7 @@ fi
 
 # Step 8: upload_S3.sh
 echo "[INFO] Step 8: upload_S3.sh" | tee -a "$LOG_FILE"
-if ! bash bin/upload_S3.sh -s $S3_TARGET_DIR > logs/bin_scripts/upload_S3.log 2>&1; then
+if ! bash bin/upload_S3.sh $S3_TARGET_DIR > logs/bin_scripts/upload_S3.log 2>&1; then
     handle_exit "FAILED" "Pipeline failed at step 8: upload_S3.sh"
 fi
 

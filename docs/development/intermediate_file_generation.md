@@ -9,13 +9,28 @@ By default, the pipeline deletes intermediate files that are marked with temp().
 2. Set up EC2 instance as per the [compute setup guide](../user_guide/compute_setup.md), with the following change:
     * Allocate 2500GiB per EX or MS sample (instead of 500 GiB)
 
-3. Run pipeline as per the [Run pipeline guide](../user_guide/run_pipeline.md), with the following change:
+3. Run pipeline as per the [Run pipeline guide](../user_guide/run_pipeline.md), with the following changes:
 
-    * At step 9 (Run pipeline), include the --notemp flag to preserve files marked with temp()
+    * If using the stepwise approach:
+
+        At step 9 (Run pipeline), include the --notemp flag to preserve files marked with temp()
 
         ```bash
         python3 -u bin/run_pipeline.py --notemp
         ```
+
+    * If using the automated approach:
+
+        At step 4 (Run all pipeline steps), include the -n flag to preserve files marked with temp()
+
+        ```bash
+        bash bin/run_all.sh \
+        -e <environment> \
+        -p <profile> \
+        -s <S3_target_dir> \
+        -n
+        ```
+
 
 4. Following successful completion of the pipeline, the instance will shut down
 

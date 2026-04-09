@@ -100,8 +100,7 @@ There are two options for running the pipeline: stepwise and automated. Both run
 11. **Upload packaged outputs to S3 (optional)**
 
     ```bash
-    bash bin/upload_S3.sh \
-    -s <S3_target_dir>
+    bash bin/upload_S3.sh <S3_target_dir>
     ```
 
 ## Running pipeline (automated)

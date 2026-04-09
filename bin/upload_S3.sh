@@ -14,28 +14,12 @@ echo "[INFO] Starting upload_S3.sh: $(date)"
 
 # Check that this script is being run from the project root
 if [[ ! -f "Snakefile" ]]; then
-  echo "[ERROR] Please run this script from the project root."
+  echo "[ERROR] Please run this script from the project root"
   exit 1
 fi
 
 # Load parameters
-while getopts "s:" opt; do
-  case $opt in
-    s) S3_TARGET_DIR="$OPTARG" ;;
-    *) 
-      echo "Usage: bash $0 -s <S3_target_dir>"
-      exit 1
-      ;;
-  esac
-done
-
-if [[ -z "${S3_TARGET_DIR:-}" ]]; then
-  echo "[ERROR] Missing required flags."
-  echo "Usage: bash $0 -s <S3_target_dir>"
-  exit 1
-fi
-
-RUNTIME_CONFIG="tmp/runtime_config/merged_config.yaml"
+S3_TARGET_DIR=$1
 
 echo "[INFO] Target S3 bucket: $S3_TARGET_DIR"
 
