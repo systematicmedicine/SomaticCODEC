@@ -1,3 +1,8 @@
+# dependencies.yml
+#
+# Defines the Conda environment used to build the SomaticCODEC Docker image,
+# including all required Python, R, and system dependencies.
+
 name: codec-env
 channels:
   - conda-forge
