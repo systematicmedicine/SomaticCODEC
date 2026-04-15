@@ -39,6 +39,10 @@ Each type of change has different validation requirements before it can be relea
 - Updated thresholds for germline risk rate component metric (#377)
 - Merged test/helpers into helpers (#383)
 - Created dryrun test fixture (#383)
+- Corrected reversed thresholds for uniformity_SNV_read_position system metric (#386)
+- Renamed ex_variant_call eligible component metric to ex_genome_call eligible (#386)
+- Renamed uniformity_SNV_position system metric to uniformity_SNV_genome_position (#386)
+- Renamed uniformity_SNV_spacing system metric to uniformity_SNV_nearest_neighbour (#386)
 
 ## [5.0.0] - 2026-03-13
 
