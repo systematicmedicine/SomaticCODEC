@@ -41,6 +41,8 @@ Each type of change has different validation requirements before it can be relea
 - Created dryrun test fixture (#383)
 - Corrected reversed thresholds for uniformity_SNV_read_position system metric ()
 - Renamed ex_variant_call eligible component metric to ex_genome_call eligible ()
+- Renamed uniformity_SNV_position system metric to uniformity_SNV_genome_position ()
+- Renamed uniformity_SNV_spacing system metric to uniformity_SNV_nearest_neighbour ()
 
 ## [5.0.0] - 2026-03-13
 
