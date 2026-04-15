@@ -40,6 +40,7 @@ Each type of change has different validation requirements before it can be relea
 - Merged test/helpers into helpers (#383)
 - Created dryrun test fixture (#383)
 - Corrected reversed thresholds for uniformity_SNV_read_position system metric ()
+- Renamed ex_variant_call eligible component metric to ex_genome_call eligible ()
 
 ## [5.0.0] - 2026-03-13
 
