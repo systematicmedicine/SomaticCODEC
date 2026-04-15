@@ -39,6 +39,7 @@ Each type of change has different validation requirements before it can be relea
 - Updated thresholds for germline risk rate component metric (#377)
 - Merged test/helpers into helpers (#383)
 - Created dryrun test fixture (#383)
+- Corrected reversed thresholds for uniformity_SNV_read_position system metric ()
 
 ## [5.0.0] - 2026-03-13
 

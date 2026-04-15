@@ -25,5 +25,5 @@ __pycache__/
 .vscode/
 
 # Temp files that exist while .xlsx files are open
-config/~$component_level_metrics.xlsx
-config/~$system_level_metrics.xlsx
+profiles/*/~$component_level_metrics.xlsx
+profiles/*/~$system_level_metrics.xlsx
