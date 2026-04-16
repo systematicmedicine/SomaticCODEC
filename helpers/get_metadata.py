@@ -146,6 +146,7 @@ def get_ms_to_donor_id_map(config):
     df = load_metadata(config)["ms_samples_metadata"]
     return dict(zip(df["ms_sample"], df["donor_id"]))
 
+
 """
 Returns a dictionary mapping ms_sample to its FASTQ file paths
     dict[ms_sample] -> (fastq1_path, fastq2_path)
@@ -159,11 +160,18 @@ def get_ms_sample_fastqs(config):
         for _, row in df.iterrows()
     }
 
+
+"""
+Returns a dictionary mapping each ms_adapter to its sequence
+    dict[ms_adapter_r{1,2}] -> sequence
+"""
+
 def get_ms_adapters(config):
     metadata = load_metadata(config)
     df = metadata["ms_adapters_metadata"]
 
     return df.iloc[0].to_dict()
+
 
 """ 
 Load sample metadata from CSV files into dictionary 
