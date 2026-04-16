@@ -6,6 +6,7 @@ Download the following CSV files from `experiment/` and populate them for your e
 - ***experiment/ex_lanes.csv***: Defines the sample ID and FASTQ files for each `ex_lane`.
 - ***experiment/ex_samples.csv***: Defines the sample ID for each `ex_sample`, the `ex_lane` it derives from, and the `ms_sample` it pairs with.
 - ***experiment/ms_samples.csv***: Defines the sample ID and FASTQ files for each `ms_sample`.
+- ***experiment/ms_adapters.csv***: Defines the sequences for matched sample adapters.
 - ***experiment/download_list.csv***: Optional. Only required if staging files using *bin/download_S3.py*.
 
 ### experiment/ex_adapters.csv
@@ -70,6 +71,19 @@ Example:
 | ms_sample | fastq1 | fastq2 | donor_id | comments |
 |-----------|--------|--------|----------|----------|
 | S002 | tmp/downloads/Buffy_D001_Age43_R1.fastq.gz | tmp/downloads/Buffy_D001_Age43_R2.fastq.gz | D001 | Blood 40M |
+
+### experiment/ms_adapters.csv
+
+*experiment/ms_adapters.csv* contains the following fields:
+
+- `ms_adapter_r1`: The expected adapter sequence for R1
+- `ms_adapter_r2`: The expected adapter sequence for R2
+
+Example:
+
+| ms_adapter_r1 | ms_adapter_r2 |
+|-----------------------------------|-----------------------------------|
+| AGATCGGAAGAGCACACGTCTGAACTCCAGTCA | AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT |
 
 ### experiment/download_list.csv (optional)
 

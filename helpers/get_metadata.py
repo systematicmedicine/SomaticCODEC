@@ -159,6 +159,11 @@ def get_ms_sample_fastqs(config):
         for _, row in df.iterrows()
     }
 
+def get_ms_adapters(config):
+    metadata = load_metadata(config)
+    df = metadata["ms_adapters_metadata"]
+
+    return df.iloc[0].to_dict()
 
 """ 
 Load sample metadata from CSV files into dictionary 
@@ -171,6 +176,7 @@ def load_metadata(config):
     metadata["ms_samples_metadata"] = pd.read_csv(config["metadata"]["ms_samples_metadata"])
     metadata["ex_lanes_metadata"] = pd.read_csv(config["metadata"]["ex_lanes_metadata"])
     metadata["ex_adapters_metadata"] = pd.read_csv(config["metadata"]["ex_adapters_metadata"])
+    metadata["ms_adapters_metadata"] = pd.read_csv(config["metadata"]["ms_adapters_metadata"])
 
     return metadata
 

@@ -24,8 +24,8 @@ rule ms_trim_fastq:
         r2 = temp(MS.TRIMMED_FASTQ_R2),
         metrics = MS.MET_TRIM_FASTQ
     params:
-        adaptor_1 = config["sci_params"]["ms_trim_fastq"]["adaptor_1"],
-        adaptor_2 = config["sci_params"]["ms_trim_fastq"]["adaptor_2"],
+        adapter_r1 = md.get_ms_adapters(config)["ms_adapter_r1"],
+        adapter_r2 = md.get_ms_adapters(config)["ms_adapter_r2"],
         spacer_length = config["sci_params"]["ms_trim_fastq"]["spacer_length"],
         qual_trim_threshold = config["sci_params"]["ms_trim_fastq"]["qual_trim_threshold"],
         max_error_rate = config["sci_params"]["ms_trim_fastq"]["max_error_rate"],
@@ -60,10 +60,10 @@ rule ms_trim_fastq:
         printf "\n\n##### Adapter/quality trimming #####\n" >> {output.metrics}
         cutadapt \
             -j {threads} \
-            -a {params.adaptor_1} \
-            -A {params.adaptor_1} \
-            -a {params.adaptor_2} \
-            -A {params.adaptor_2} \
+            -a {params.adapter_r1} \
+            -A {params.adapter_r1} \
+            -a {params.adapter_r2} \
+            -A {params.adapter_r2} \
             -a "G{{10}}" \
             -A "G{{10}}" \
             --quality-cutoff {params.qual_trim_threshold} \
