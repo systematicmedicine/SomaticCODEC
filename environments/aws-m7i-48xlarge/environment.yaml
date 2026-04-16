@@ -8,6 +8,7 @@ metadata:
   ex_lanes_metadata: experiment/ex_lanes.csv
   ex_adapters_metadata: experiment/ex_adapters.csv
   ms_samples_metadata: experiment/ms_samples.csv
+  ms_adapters_metadata: experiment/ms_adapters.csv
   download_list: experiment/download_list.csv
 
 # ==============================================================================

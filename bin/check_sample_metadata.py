@@ -174,6 +174,25 @@ def check_adapters_used_once_per_lane(metadata: dict):
     
     print("[INFO] Each ex_adapter is used only once per ex_lane")
 
+# Check that ms_adapter sequences are valid
+def check_ms_adapter_sequences_valid(metadata: dict):
+
+    df = metadata["ms_adapters_metadata"]
+
+    if df.empty:
+            sys.exit(f"[ERROR] No ms_adapter sequences provided")
+    
+    for adapter in ("ms_adapter_r1", "ms_adapter_r2"):
+        sequence = df[adapter].iloc[0]
+        if pd.isna(sequence) or not sequence:
+            sys.exit(f"[ERROR] No sequence provided for {adapter}")
+
+        for char in sequence:
+            if char not in "ATCG":
+                sys.exit(f"[ERROR] Invalid base ({char}) in {adapter}: {sequence}")
+
+    print("[INFO] ms_adapter sequences are valid (A/T/C/G only, length > 0)")
+
 
 # --------------------------------------------------------------------------------
 # Main logic
@@ -215,3 +234,6 @@ if __name__ == "__main__":
 
     # Check that ex_adapters are used only once per ex_lane
     check_adapters_used_once_per_lane(metadata_tables)
+
+    # Check that ex_adapter sequences contain only A/T/C/G and have length > 0
+    check_ms_adapter_sequences_valid(metadata_tables)

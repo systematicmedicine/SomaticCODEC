@@ -155,8 +155,6 @@ sci_params:
     optical_duplicate_distance: 2500
 
   ms_trim_fastq:
-    adaptor_1: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
-    adaptor_2: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
     max_error_rate: 0.1
     min_overlap: 3
     spacer_length: 3
