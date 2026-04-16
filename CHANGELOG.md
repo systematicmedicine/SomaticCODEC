@@ -23,6 +23,7 @@ Each type of change has different validation requirements before it can be relea
 - Added ex_snv_read_position_metrics script, rule, and tests (#366)
 - Added uniformity_SNV_read_position system metric (#366)
 - Removed run timeline plot rule and script (#373)
+- Updated bin/package_outputs.py to include definitions and docs directories (#387)
 
 ### Patch
 - Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)

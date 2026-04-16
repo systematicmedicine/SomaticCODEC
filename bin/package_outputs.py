@@ -76,6 +76,8 @@ def main():
         "rule_scripts": "Methods/rule_scripts",
         "environments": "Methods/environments",
         "profiles": "Methods/profiles",
+        "definitions": "Methods/definitions",
+        "docs": "Methods/docs",
         "tmp/runtime_config/merged_config.yaml": "Methods/merged_config.yaml",
         "experiment": "Methods/experiment",
         "Snakefile": "Methods/Snakefile",
