@@ -18,6 +18,7 @@ There are two options for running the pipeline: stepwise and automated. Both run
     - `ex_samples.csv`
     - `ex_adapters.csv`
     - `ms_samples.csv`
+    - `ms_adapters.csv`
     - `download_list.csv` (optional)
 
     Uploading these files to an `Amazon EC2` instance can be accomplished with the following command:
@@ -112,6 +113,7 @@ There are two options for running the pipeline: stepwise and automated. Both run
     - `ex_samples.csv`
     - `ex_adapters.csv`
     - `ms_samples.csv`
+    - `ms_adapters.csv`
     - `download_list.csv`
 
     ```bash
