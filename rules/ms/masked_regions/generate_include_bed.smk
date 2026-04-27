@@ -14,7 +14,7 @@ rule generate_include_bed:
         mask_bed = lambda wc: MS.COMBINED_MASK.format(
             ms_sample=md.get_ex_to_ms_sample_map(config)[wc.ex_sample]
         ),
-        fai = config["sci_params"]["reference_files"]["genome"] + ".fai"
+        fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai"
     output:
         include_bed = MS.INCLUDE_BED
     log:

@@ -68,8 +68,8 @@ def file_manifest() -> list[str]:
 # Collate list of expected files from config
 def expected_from_config(config) -> list[str]:
     rf = config["sci_params"]["reference_files"]
-    ref = Path(rf["genome"])
-    gnomad = Path(rf["germline_variants"])
+    ref = Path(rf["genome"]["f"])
+    gnomad = Path(rf["germline_variants"]["f"])
 
     paths = {
         # Reference genome & indicies
@@ -87,11 +87,11 @@ def expected_from_config(config) -> list[str]:
         str(gnomad) + ".tbi",
 
         # Trinucleotide contexts
-        str(rf["tri_contexts"]),
-        str(rf["genome_trinuc_counts"]),
+        str(rf["tri_contexts"]["f"]),
+        str(rf["genome_trinuc_counts"]["f"]),
 
         # Precomputed masks
-        *rf.get("precomputed_masks", []),
+        *rf.get("precomputed_masks", {}).get("f", []),
     }
 
     return sorted(p for p in paths if p)

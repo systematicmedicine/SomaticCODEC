@@ -9,11 +9,11 @@ from definitions.paths import benchmark as B
 
 rule ms_masking_metrics:
     input:
-        precomputed_masks = expand("{mask}", mask=config["sci_params"]["reference_files"]["precomputed_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["reference_files"]["precomputed_masks"]["f"]),
         ms_lowdepth_bed = MS.LOW_DEPTH_MASK,
         ms_germ_risk_bed = MS.GERMLINE_RISK_MASK,
         combined_bed = MS.COMBINED_MASK,
-        ref_index = config["sci_params"]["reference_files"]["genome"] + ".fai"
+        ref_index = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai"
     output:
         mask_metrics = MS.MET_MASKING,
         int_sorted = temp(MS.MET_MASKING_INT1),

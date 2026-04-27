@@ -10,7 +10,7 @@ from definitions.paths import benchmark as B
 rule ms_add_read_groups:
     input:
         bam = MS.RAW_BAM,
-        dictf = os.path.splitext(config["sci_params"]["reference_files"]["genome"])[0] + ".dict"
+        dictf = os.path.splitext(config["sci_params"]["reference_files"]["genome"]["f"])[0] + ".dict"
     output:
         bam = temp(MS.READ_GROUP_BAM)
     params:

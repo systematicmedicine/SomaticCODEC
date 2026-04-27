@@ -21,11 +21,11 @@ import yaml
 
 # Define reference files (dotted keys into config)
 REFERENCE_FILES = [
-    "sci_params.reference_files.genome",
-    "sci_params.reference_files.precomputed_masks",
-    "sci_params.reference_files.tri_contexts",
-    "sci_params.reference_files.genome_trinuc_counts",
-    "sci_params.reference_files.germline_variants", # list-valued
+    "sci_params.reference_files.genome.f",
+    "sci_params.reference_files.precomputed_masks.f",
+    "sci_params.reference_files.tri_contexts.f",
+    "sci_params.reference_files.genome_trinuc_counts.f",
+    "sci_params.reference_files.germline_variants.f", # list-valued
 ]
 
 # Define sample FASTQ files from metadata tables

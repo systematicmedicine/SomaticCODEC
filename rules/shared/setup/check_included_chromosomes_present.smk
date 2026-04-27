@@ -7,8 +7,8 @@ from definitions.paths import benchmark as B
 
 rule check_included_chromosomes_present:
     input:
-        fai = config["sci_params"]["reference_files"]["genome"] + ".fai",
-        precomputed_masks = config["sci_params"]["reference_files"]["precomputed_masks"]
+        fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai",
+        precomputed_masks = config["sci_params"]["reference_files"]["precomputed_masks"]["f"]
     output:
         done_file = L.CHECK_INCLUDED_CHROMOSOMES_PRESENT_DONE
     params:

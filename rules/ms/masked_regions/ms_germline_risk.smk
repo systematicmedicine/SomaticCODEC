@@ -12,7 +12,7 @@ from definitions.paths import benchmark as B
 rule ms_germline_risk:
     input:
         vcf = MS.PILEUP_DEPTH,
-        ref_fai = config["sci_params"]["reference_files"]["genome"] + ".fai"
+        ref_fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai"
     output:
         # Intermediate files
         intermediate_alt_vcf = temp(MS.GERMLINE_RISK_INT1),

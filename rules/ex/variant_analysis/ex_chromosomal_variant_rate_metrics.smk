@@ -9,7 +9,7 @@ from definitions.paths import benchmark as B
 rule ex_chromosomal_variant_rate_metrics:
     input:
         vcf = EX.CALLED_SNVS,
-        fai = config["sci_params"]["reference_files"]["genome"] + ".fai"
+        fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai"
     output:
         metrics = EX.MET_CHROM_VARIANT_RATE
     params:

@@ -7,7 +7,7 @@ Types of changes:
 - `MINOR`
 - `PATCH`
 
-Each type of change has different validation requirements before it can be released. See the [versioning document](docs/development/versioning.md).
+Each type of change has different validation requirements before it can be released. See the [change control document](docs/development/change_control.md).
 
 ## [Unreleased]
 
@@ -19,6 +19,7 @@ Each type of change has different validation requirements before it can be relea
 - Modified bin scripts to take arguments instead of environment variables (#384)
 - Added optional notemp mode to bin/run_pipeline.py and bin/run_all.sh (#374 and 384)
 - Moved ms adapter sequences from profile.yaml files to experiment/ms_adapters.csv (#388)
+- Added md5sums for reference files to profile.yaml (#389)
 
 ### Minor
 - Added ex_snv_read_position_metrics script, rule, and tests (#366)
