@@ -14,12 +14,12 @@ rule ex_realign_dsc:
         bam = EX.RAW_DSC,
 
         # Reference genome
-        ref = config["sci_params"]["reference_files"]["genome"],
-        amb = config["sci_params"]["reference_files"]["genome"] + ".amb",
-        ann = config["sci_params"]["reference_files"]["genome"] + ".ann",
-        bwt = config["sci_params"]["reference_files"]["genome"] + ".bwt.2bit.64",
-        pac = config["sci_params"]["reference_files"]["genome"] + ".pac",
-        sa = config["sci_params"]["reference_files"]["genome"] + ".0123"
+        ref = config["sci_params"]["reference_files"]["genome"]["f"],
+        amb = config["sci_params"]["reference_files"]["genome"]["f"] + ".amb",
+        ann = config["sci_params"]["reference_files"]["genome"]["f"] + ".ann",
+        bwt = config["sci_params"]["reference_files"]["genome"]["f"] + ".bwt.2bit.64",
+        pac = config["sci_params"]["reference_files"]["genome"]["f"] + ".pac",
+        sa = config["sci_params"]["reference_files"]["genome"]["f"] + ".0123"
     output:
         # Intermediate files
         intermediate_fastq = temp(EX.REALIGN_DSC_INT1),

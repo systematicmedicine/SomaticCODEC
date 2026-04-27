@@ -10,17 +10,31 @@ sci_params:
 
   reference_files:
 
-    genome: tmp/downloads/GRCh38_Chr21_plus_stubs.fa
+    genome: 
+      f: tmp/downloads/GRCh38_Chr21_plus_stubs.fa
+      md5: B0FE0648B9FED7791BE7BF70D1E795EB
     
     precomputed_masks:
-      - tmp/downloads/GRCh38_alldifficultregions_10lines.bed      # Masks genomic regions associated with elevated error rates
-      - tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed  # Marks genomic regions likely to contain common germline variants
-      - tmp/downloads/GRCh38_repeat_masker_10lines.bed            # Masks highly repetitive, error-prone genomic regions
+      f:
+        - tmp/downloads/GRCh38_alldifficultregions_10lines.bed      # Masks genomic regions associated with elevated error rates
+        - tmp/downloads/GRCh38-gnomad-variants-AF-0.01_10lines.bed  # Masks genomic regions likely to contain common germline variants
+        - tmp/downloads/GRCh38_repeat_masker_10lines.bed            # Masks highly repetitive, error-prone genomic regions
+      md5:
+        - EDF0C1AC6EDEB944ADF985AE42E61D90 # GRCh38_alldifficultregions_10lines.bed
+        - EDF0C1AC6EDEB944ADF985AE42E61D90 # GRCh38-gnomad-variants-AF-0.01_10lines.bed
+        - b04d51c45573bb74b0fee51fe452c6d9 # GRCh38_repeat_masker_10lines.bed
     
-    tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv  # Reference trinucleotide context frequencies
-    genome_trinuc_counts: tmp/downloads/UCSC-GRCh38-p14-filtered-trinucleotide-counts.csv  # Genome-wide trinucleotide counts for normalisation
+    tri_contexts: # Reference trinucleotide context frequencies
+      f: tmp/downloads/2025-09-30_trinucleotide_contexts.csv
+      md5: BA87BB2D38F03402F2F6F42FB34B215C
 
-    germline_variants: tmp/downloads/gnomad-chr21-micro.vcf.bgz  # Used to compute germline overlap metrics
+    genome_trinuc_counts: # Genome-wide trinucleotide counts for normalisation
+      f: tmp/downloads/UCSC-GRCh38-p14-filtered-trinucleotide-counts.csv
+      md5: B386B0E26007D88D856C8D9E3EF18794
+
+    germline_variants: # Used to compute germline overlap metrics
+      f: tmp/downloads/gnomad-chr21-micro.vcf.bgz
+      md5: FE47D5353992FD019966B721CF9FA550
 
   # ----------------------------------------------------------------------------
   # Metrics manifests

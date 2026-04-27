@@ -10,17 +10,31 @@ sci_params:
 
   reference_files:
 
-    genome: tmp/downloads/UCSC-GRCh38-p14-filtered.fa
+    genome: 
+      f: tmp/downloads/UCSC-GRCh38-p14-filtered.fa
+      md5: 5E43E66F74DA7ECF87F7060A310A26BF
     
     precomputed_masks:
-      - tmp/downloads/GRCh38_alldifficultregions.bed  # Masks genomic regions associated with elevated error rates
-      - tmp/downloads/gnomad_AF_0.1.bed               # Marks genomic regions likely to contain common germline variants
-      - tmp/downloads/GRCh38_repeat_masker.bed        # Masks highly repetitive, error-prone genomic regions
+      f:
+        - tmp/downloads/GRCh38_alldifficultregions.bed  # Masks genomic regions associated with elevated error rates
+        - tmp/downloads/gnomad_AF_0.1.bed               # Masks genomic regions likely to contain common germline variants
+        - tmp/downloads/GRCh38_repeat_masker.bed        # Masks highly repetitive, error-prone genomic regions
+      md5:
+        - 00A50AB9BFCABB518C221D4544B54F1E # GRCh38_alldifficultregions.bed
+        - 5EAF464E646F49ADD13DA63F914B2880 # gnomad_AF_0.1.bed
+        - FF69BD95D8A2FFB098F23D82DA55074E # GRCh38_repeat_masker.bed
     
-    tri_contexts: tmp/downloads/2025-09-30_trinucleotide_contexts.csv  # Reference trinucleotide context frequencies
-    genome_trinuc_counts: tmp/downloads/UCSC-GRCh38-p14-filtered-trinucleotide-counts.csv  # Genome-wide trinucleotide counts for normalisation
+    tri_contexts: # Reference trinucleotide context frequencies
+      f: tmp/downloads/2025-09-30_trinucleotide_contexts.csv  
+      md5: BA87BB2D38F03402F2F6F42FB34B215C
 
-    germline_variants: tmp/downloads/gnomad_AF_0.001.vcf.bgz  # Used to compute germline overlap metrics
+    genome_trinuc_counts: # Genome-wide trinucleotide counts for normalisation
+      f: tmp/downloads/UCSC-GRCh38-p14-filtered-trinucleotide-counts.csv
+      md5: B386B0E26007D88D856C8D9E3EF18794
+
+    germline_variants: # Used to compute germline overlap metrics
+      f: tmp/downloads/gnomad_AF_0.001.vcf.bgz
+      md5: FCCA04C12F3CC5258BC0508283B209F2
 
   # ----------------------------------------------------------------------------
   # Metrics manifests

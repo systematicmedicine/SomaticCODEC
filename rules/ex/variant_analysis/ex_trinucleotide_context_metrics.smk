@@ -11,9 +11,9 @@ rule ex_trinucleotide_context_metrics:
     input:
         vcf_path = EX.CALLED_SNVS,
         vcf_all_path = EX.CALL_SOMATIC_SNV_INT3,
-        ref_fasta_path = config["sci_params"]["reference_files"]["genome"],
-        ref_contexts_path = config["sci_params"]["reference_files"]["tri_contexts"],
-        ref_trinuc_counts_path = config["sci_params"]["reference_files"]["genome_trinuc_counts"]
+        ref_fasta_path = config["sci_params"]["reference_files"]["genome"]["f"],
+        ref_contexts_path = config["sci_params"]["reference_files"]["tri_contexts"]["f"],
+        ref_trinuc_counts_path = config["sci_params"]["reference_files"]["genome_trinuc_counts"]["f"]
     output:
         proportions_csv = EX.MET_TRINUC_PROPORTIONS,
         similarities_csv = EX.MET_TRINUC_SIMILARITIES,

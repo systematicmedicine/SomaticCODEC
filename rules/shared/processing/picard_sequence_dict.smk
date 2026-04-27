@@ -7,9 +7,9 @@ from definitions.paths import benchmark as B
 
 rule picard_sequence_dict:
     input:
-        ref = config["sci_params"]["reference_files"]["genome"]
+        ref = config["sci_params"]["reference_files"]["genome"]["f"]
     output:
-        dictf = os.path.splitext(config["sci_params"]["reference_files"]["genome"])[0] + ".dict"
+        dictf = os.path.splitext(config["sci_params"]["reference_files"]["genome"]["f"])[0] + ".dict"
     log:
         L.PICARD_SEQUENCE_DICT
     benchmark:
