@@ -9,7 +9,7 @@ Types of changes:
 
 Each type of change has different validation requirements before it can be released. See the [change control document](docs/development/change_control.md).
 
-## [Unreleased]
+## [6.0.0] - 2026-04-27
 
 ### Major
 - Implemented profile and environment system (#373)
