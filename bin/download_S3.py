@@ -50,9 +50,9 @@ with open(CSV_PATH, newline='', encoding='utf-8-sig') as csvfile:
         downloaded_md5sum = subprocess.run(
             ["md5sum", str(destination_path)],
             capture_output=True, text=True, check=True
-        ).stdout.split()[0].strip()
+        ).stdout.split()[0].strip().lower()
 
-        if downloaded_md5sum != expected_md5sum:
+        if downloaded_md5sum != expected_md5sum.strip().lower():
             failed = True
             print(f"❌ md5sum of {file_name} does not match expected md5sum")
             print(f"expected: {expected_md5sum}")
