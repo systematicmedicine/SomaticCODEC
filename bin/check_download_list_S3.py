@@ -90,7 +90,7 @@ def check_download_list_md5sums(metadata: dict):
     if "expected_md5sum" not in dl_df.columns:
         sys.exit("[ERROR] expected_md5sum column missing from download_list.csv")
 
-    invalid = dl_df["expected_md5sum"].isna() | ~dl_df["expected_md5sum"].astype(str).str.match(r"^[0-9a-f]{32}$")
+    invalid = dl_df["expected_md5sum"].isna() | ~dl_df["expected_md5sum"].astype(str).str.match(r"^[0-9a-f]{32}$", case = False)
     if invalid.any():
         bad = dl_df.loc[invalid, ["destination_dir", "file_name", "expected_md5sum"]]
         sys.exit("[ERROR] Invalid or missing MD5 checksums:\n" + bad.to_string(index=False))
