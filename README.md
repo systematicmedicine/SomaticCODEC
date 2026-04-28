@@ -52,7 +52,6 @@ This repository is developed and maintained by [Systematic Medicine Pty Ltd](htt
 <br>
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![CI: passing](https://img.shields.io/github/actions/workflow/status/systematicmedicine/SomaticCODEC/test.yml)
 ![Version](https://img.shields.io/github/v/tag/systematicmedicine/SomaticCODEC?label=version)
 ![Repo Size](https://img.shields.io/github/repo-size/systematicmedicine/SomaticCODEC)
 ![Last Commit](https://img.shields.io/github/last-commit/systematicmedicine/SomaticCODEC)
