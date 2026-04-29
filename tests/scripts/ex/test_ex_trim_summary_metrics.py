@@ -4,7 +4,6 @@
 Test that the script ex_trim_summary_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import json

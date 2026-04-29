@@ -4,7 +4,6 @@
 Tests the rule ms_low_depth
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 from pathlib import Path

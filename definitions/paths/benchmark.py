@@ -39,8 +39,6 @@ CREATE_JOB_LOG = "logs/shared_rules/create_job_log.benchmark.txt"
 
 CREATE_METRICS_REPORT = "logs/shared_rules/create_metrics_report.benchmark.txt"
 
-CREATE_RUN_TIMELINE_PLOT = "logs/shared_rules/create_run_timeline_plot.benchmark.txt"
-
 WRITE_GIT_METADATA = "logs/shared_rules/write_git_metadata.benchmark.txt"
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -144,6 +142,8 @@ EX_SNV_POSITION_METRICS = "logs/{ex_sample}/ex_snv_position_metrics.benchmark.tx
 EX_GNOMAD_OVERLAP = "logs/{ex_sample}/ex_gnomAD_overlap.benchmark.txt"
 
 EX_SOMATIC_VARIANT_GERMLINE_CONTEXTS = "logs/{ex_sample}/ex_somatic_variant_germline_contexts.benchmark.txt"
+
+EX_SNV_READ_POSITION_METRICS = "logs/{ex_sample}/ex_snv_read_position_metrics.benchmark.txt"
 
 EX_RECURRENT_VARIANT_METRICS = "logs/shared_rules/ex_recurrent_variant_metrics.benchmark.txt"
 

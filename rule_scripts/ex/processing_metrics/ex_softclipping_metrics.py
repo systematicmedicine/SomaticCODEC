@@ -7,7 +7,6 @@ Quantifies how much soft clipping is present in final DSC
 Rule to be used exclusively with parent rule, ex_softclipping_metrics
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
     - Joshua Johnstone
 """

@@ -5,7 +5,6 @@ Functions for printing the first n lines of pipeline output files.
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 
 """
 from pathlib import Path

@@ -17,7 +17,7 @@ rule ex_variant_call_eligible_disagree_rate:
     params:
         required_Q = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"],
         number_of_reads = config["sci_params"]["ex_variant_call_disagree_metrics"]["number_of_reads"],
-        random_seed = config["sci_params"]["shared"]["random_seed"]
+        random_seed = config["infrastructure"]["random_seed"]
     log:
         L.EX_VARIANT_CALL_ELIGIBLE_DISAGREE_RATE
     benchmark:

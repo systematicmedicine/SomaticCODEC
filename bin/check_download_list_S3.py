@@ -6,7 +6,6 @@ Checks that the download list is configured correctly and that all files exist o
 Authors:
   - Cameron Fraser
   - Joshua Johnstone
-  - Chat-GPT
 
 """
 # --------------------------------------------------------------------------------
@@ -22,11 +21,11 @@ import yaml
 
 # Define reference files (dotted keys into config)
 REFERENCE_FILES = [
-    "sci_params.shared.reference_genome",
-    "sci_params.shared.reference_tri_contexts",
-    "sci_params.shared.reference_genome_trinuc_counts",
-    "sci_params.shared.known_germline_variants",
-    "sci_params.shared.precomputed_masks",  # list-valued
+    "sci_params.reference_files.genome.f",
+    "sci_params.reference_files.precomputed_masks.f",
+    "sci_params.reference_files.tri_contexts.f",
+    "sci_params.reference_files.genome_trinuc_counts.f",
+    "sci_params.reference_files.germline_variants.f", # list-valued
 ]
 
 # Define sample FASTQ files from metadata tables
@@ -91,7 +90,7 @@ def check_download_list_md5sums(metadata: dict):
     if "expected_md5sum" not in dl_df.columns:
         sys.exit("[ERROR] expected_md5sum column missing from download_list.csv")
 
-    invalid = dl_df["expected_md5sum"].isna() | ~dl_df["expected_md5sum"].astype(str).str.match(r"^[0-9a-f]{32}$")
+    invalid = dl_df["expected_md5sum"].isna() | ~dl_df["expected_md5sum"].astype(str).str.match(r"^[0-9a-f]{32}$", case = False)
     if invalid.any():
         bad = dl_df.loc[invalid, ["destination_dir", "file_name", "expected_md5sum"]]
         sys.exit("[ERROR] Invalid or missing MD5 checksums:\n" + bad.to_string(index=False))
@@ -129,15 +128,16 @@ def check_s3_files_exist(metadata: dict):
 if __name__ == "__main__":
 
     # EnsureCheck script is run from project root
-    if not Path("config/config.yaml").is_file():
-        sys.exit("[ERROR] Run this script from the project root (config/config.yaml not found)")
+    if not Path("tmp/runtime_config/merged_config.yaml").is_file():
+        sys.exit("[ERROR] tmp/runtime_config/merged_config.yaml not found. " \
+        "Run this script from the project root, and ensure bin/create_runtime_config.py has been run first")
     
     # Load config.yaml
-    with open("config/config.yaml") as f:
+    with open("tmp/runtime_config/merged_config.yaml") as f:
         config = yaml.safe_load(f)
 
     if config is None:
-        sys.exit("[ERROR] config/config.yaml is empty or invalid")
+        sys.exit("[ERROR] tmp/runtime_config/merged_config.yaml is empty or invalid")
 
     # Load metadata tables
     metadata_tables = load_metadata_tables(config)

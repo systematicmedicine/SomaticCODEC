@@ -4,7 +4,6 @@
 Test that the script ex_snv_distance_metrics.py works correctly
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 

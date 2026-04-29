@@ -6,7 +6,6 @@ Generates depth metrics for the final EX DSC BAM
 
 Authors:
     - Joshua Johnstone
-    - Chat-GPT
 """
 
 # Import libraries

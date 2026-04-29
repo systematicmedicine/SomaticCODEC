@@ -7,7 +7,6 @@ Generates a summary file with the percentage of reads that mapped to multiple po
 To be used with any rule that generates multimapping metrics for a BAM file
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

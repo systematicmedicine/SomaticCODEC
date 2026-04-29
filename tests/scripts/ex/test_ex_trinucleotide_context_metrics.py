@@ -5,7 +5,6 @@ Tests the script ex_trinucleotide_context_metrics.py
   - Tests that trinucleotide contexts are corectly calculated for a sample
 
 Authors:
-  - Chat-GPT
   - Cameron Fraser
   - Joshua Johnstone
 """
@@ -34,9 +33,9 @@ def test_ex_trinucleotide_context_metrics(lightweight_test_run, tmp_path, vcf_pa
   
   # Load reference file paths from config
   config = load_config(lightweight_test_run["test_config_path"])
-  ref_fasta_path = config["sci_params"]["shared"]["reference_genome"]
-  ref_contexts_path = config["sci_params"]["shared"]["reference_tri_contexts"]
-  ref_trinuc_counts_path = config["sci_params"]["shared"]["reference_genome_trinuc_counts"]
+  ref_fasta_path = config["sci_params"]["reference_files"]["genome"]["f"]
+  ref_contexts_path = config["sci_params"]["reference_files"]["tri_contexts"]["f"]
+  ref_trinuc_counts_path = config["sci_params"]["reference_files"]["genome_trinuc_counts"]["f"]
 
   # Define tmp output paths
   proportions_csv = tmp_path / "trinuc_proportions.csv"

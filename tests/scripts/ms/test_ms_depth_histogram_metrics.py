@@ -5,7 +5,6 @@ Tests the rule ms_depth_histogram_metrics.py
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 """
 
 import shutil
@@ -42,7 +41,7 @@ def test_depth_hist_values_correct(tmp_path, lightweight_test_run):
     shutil.copytree("rule_scripts", tmp_path / "rule_scripts")
     shutil.copytree("rules", tmp_path / "rules")
     shutil.copytree("tmp/downloads", tmp_path / "tmp/downloads")
-    shutil.copytree("tests/data/lightweight_test_run/config", tmp_path / "tests/data/lightweight_test_run/config")
+    shutil.copytree("experiment", tmp_path / "experiment")
     shutil.copytree("definitions", tmp_path / "definitions")
     
     # Define target file

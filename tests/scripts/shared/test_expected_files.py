@@ -24,7 +24,7 @@ import importlib
 import itertools
 import pytest
 
-pytestmark = pytest.mark.order(9)
+pytestmark = pytest.mark.order(10)
 
 # ------------------------------------------------------------------------------------------------
 # Helper functions
@@ -56,6 +56,10 @@ def file_manifest() -> list[str]:
                 continue
             if ".snakemake" in path.parts:
                 continue
+            if "merged_config.yaml" in path.parts:
+                continue
+            if "run_pipeline_stats.json" in path.parts:
+                continue
 
             out.add(str(path))
 
@@ -63,9 +67,9 @@ def file_manifest() -> list[str]:
 
 # Collate list of expected files from config
 def expected_from_config(config) -> list[str]:
-    sp = config["sci_params"]["shared"]
-    ref = Path(sp["reference_genome"])
-    gnomad = Path(sp["known_germline_variants"])
+    rf = config["sci_params"]["reference_files"]
+    ref = Path(rf["genome"]["f"])
+    gnomad = Path(rf["germline_variants"]["f"])
 
     paths = {
         # Reference genome & indicies
@@ -83,11 +87,11 @@ def expected_from_config(config) -> list[str]:
         str(gnomad) + ".tbi",
 
         # Trinucleotide contexts
-        str(sp["reference_tri_contexts"]),
-        str(sp["reference_genome_trinuc_counts"]),
+        str(rf["tri_contexts"]["f"]),
+        str(rf["genome_trinuc_counts"]["f"]),
 
         # Precomputed masks
-        *sp.get("precomputed_masks", []),
+        *rf.get("precomputed_masks", {}).get("f", []),
     }
 
     return sorted(p for p in paths if p)

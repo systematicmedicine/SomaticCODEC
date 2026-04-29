@@ -5,7 +5,6 @@ Functions for obtaining the number of data points from pipeline output files.
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 
 """
 from pathlib import Path

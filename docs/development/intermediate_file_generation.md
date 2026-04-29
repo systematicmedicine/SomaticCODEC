@@ -1,42 +1,47 @@
 # intermediate_file_generation.md
 
+*This document provides instructions for generating intermediate files. This is aimed at an internal audience.*
+
 By default, the pipeline deletes intermediate files that are marked with temp(). If these files are required, they can be generated using the steps below.
 
-1. Create config files as per the [config.yaml setup](../setup/config_yaml_setup.md) and [metadata file setup](../setup/metadata_file_setup) guides.
+1. Create sample sheet files as per the [sample sheet setup guide](../user_guide/sample_sheet_setup.md).
 
-2. Set up EC2 instance as per the [compute setup guide](../setup/compute_setup.md), with the following change:
+2. Set up EC2 instance as per the [compute setup guide](../user_guide/compute_setup.md), with the following change:
     * Allocate 2500GiB per EX or MS sample (instead of 500 GiB)
 
-3. Create tmux session and run docker as per the [Run pipeline](../run_pipeline.md) document
+3. Run pipeline as per the [Run pipeline guide](../user_guide/run_pipeline.md), with the following changes:
 
-4. Open *bin/run_pipeline.sh* with nano and add the `--notemp` flag to the Snakemake command
+    * If using the stepwise approach:
 
-```
-snakemake \
-    --snakefile Snakefile \
-    --configfile config/config.yaml \
-    --cores $USABLE_CORES \
-    --resources memory=$USABLE_MEM_GB \
-    --keep-going \
-    --notemp \
-    --stats logs/bin_scripts/run_pipeline_stats.json
-```
+        At step 9 (Run pipeline), include the --notemp flag
 
-5. Run pipeline as per the [Run pipeline document](docs/run_pipeline.md)
+        ```bash
+        python3 -u bin/run_pipeline.py --notemp
+        ```
 
-6. Following successful completion of the pipeline, the instance will shut down
+    * If using the automated approach:
 
-7. Start the instance
+        At step 4 (Run all pipeline steps), include the -n flag
 
-8. Create a new tmux session and start the existing docker container
+        ```bash
+        bash bin/run_all.sh \
+        -e <environment> \
+        -p <profile> \
+        -s <S3_target_dir> \
+        -n
+        ```
 
-```
-tmux new -s file-transfer
+        Following successful completion of the pipeline, start the shut-down instance and Docker container:
 
-docker start -ai codec-container
-```
+        ```
+        cd SomaticCODEC
 
-9. Upload select intermediate files to s3:
+        tmux new -s file-transfer
+
+        docker start -ai codec-container
+        ```
+
+4. Upload select intermediate files to S3:
 
 ```
 aws s3 cp tmp/ \

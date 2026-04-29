@@ -11,7 +11,7 @@ from definitions.paths import benchmark as B
 rule combine_masks:
     input:
         # Precomputed masks as defined in config
-        precomputed_masks = expand("{mask}", mask=config["sci_params"]["shared"]["precomputed_masks"]),
+        precomputed_masks = expand("{mask}", mask=config["sci_params"]["reference_files"]["precomputed_masks"]["f"]),
         
         # Excluded chromosomes (inverse of included chromosomes defined in config)
         excluded_chromosomes_bed = S.EXCLUDED_CHROMS_BED,
@@ -23,7 +23,7 @@ rule combine_masks:
         ms_germ_risk_bed = MS.GERMLINE_RISK_MASK,
 
         # Reference FAI
-        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai" 
+        fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai" 
     output:
         combined_bed = temp(MS.COMBINED_MASK),
         intermediate_cat = temp(MS.COMBINE_MASKS_INT1),

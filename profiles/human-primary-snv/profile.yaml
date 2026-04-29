@@ -1,0 +1,175 @@
+---
+# ==============================================================================
+# Scientific parameters
+# ==============================================================================
+sci_params:
+  
+  # ----------------------------------------------------------------------------
+  # Reference files
+  # ----------------------------------------------------------------------------
+
+  reference_files:
+
+    genome: 
+      f: tmp/downloads/UCSC-GRCh38-p14-filtered.fa
+      md5: 5E43E66F74DA7ECF87F7060A310A26BF
+    
+    precomputed_masks:
+      f:
+        - tmp/downloads/GRCh38_alldifficultregions.bed  # Masks genomic regions associated with elevated error rates
+        - tmp/downloads/gnomad_AF_0.1.bed               # Masks genomic regions likely to contain common germline variants
+        - tmp/downloads/GRCh38_repeat_masker.bed        # Masks highly repetitive, error-prone genomic regions
+      md5:
+        - 00A50AB9BFCABB518C221D4544B54F1E # GRCh38_alldifficultregions.bed
+        - 5EAF464E646F49ADD13DA63F914B2880 # gnomad_AF_0.1.bed
+        - FF69BD95D8A2FFB098F23D82DA55074E # GRCh38_repeat_masker.bed
+    
+    tri_contexts: # Reference trinucleotide context frequencies
+      f: tmp/downloads/2025-09-30_trinucleotide_contexts.csv  
+      md5: BA87BB2D38F03402F2F6F42FB34B215C
+
+    genome_trinuc_counts: # Genome-wide trinucleotide counts for normalisation
+      f: tmp/downloads/UCSC-GRCh38-p14-filtered-trinucleotide-counts.csv
+      md5: B386B0E26007D88D856C8D9E3EF18794
+
+    germline_variants: # Used to compute germline overlap metrics
+      f: tmp/downloads/gnomad_AF_0.001.vcf.bgz
+      md5: FCCA04C12F3CC5258BC0508283B209F2
+
+  # ----------------------------------------------------------------------------
+  # Metrics manifests
+  # ----------------------------------------------------------------------------
+  metrics_manifests:
+    component_metrics_metadata: profiles/human-primary-snv/component_level_metrics.xlsx
+    system_metrics_metadata: profiles/human-primary-snv/system_level_metrics.xlsx
+
+  # ----------------------------------------------------------------------------
+  # Scientific parameters shared by multiple rules
+  # ----------------------------------------------------------------------------
+  shared:
+
+    # Restricts analysis to canonical chromosomes
+    included_chromosomes: [
+    "chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10",
+    "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", 
+    "chr20", "chr21", "chr22", "chrX", "chrY"
+    ]  
+
+  # ----------------------------------------------------------------------------
+  # Scientific parameters for individual rules
+  # ----------------------------------------------------------------------------
+  
+  ex_annotate_map:
+    min_umi_length: 6
+
+  ex_call_dsc:
+    error_rate_pre_umi: 45
+    error_rate_post_umi: 40
+    min_input_base_quality: 30
+    min_read_pairs: 1
+    min_duplex_length: 1
+    max_duplex_disagreement_rate: 0.02
+
+  ex_call_somatic_snv:
+    max_base_quality: 150
+    min_base_quality: 70
+    min_mapping_quality: 0
+
+  ex_demultiplex_fastq:
+    max_error_rate: 0.1
+    min_adapter_overlap: 8
+
+  ex_dsc_coverage_metrics:
+    ex_depth_threshold: 1
+
+  ex_extract_fastq_umis:
+    umi_length: 3
+
+  ex_filter_dsc:
+    min_mapq: 50
+
+  ex_filter_fastq:
+    min_read_length: 80
+    average_quality_threshold: 30
+
+  ex_group_by_umi:
+    min_umi_length: 6
+
+  ex_map:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
+
+  ex_remap_dsc:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
+
+  ex_trim_fastq:
+    max_error_rate: 0.12
+    min_adapter_overlap: 8
+    r1_cut_start: 3
+    r2_cut_start: 3
+    r1_cut_end: -9  # Must be negative
+    r2_cut_end: -9  # Must be negative
+    quality_cutoff: 20
+    
+  ex_variant_call_disagree_metrics:
+    number_of_reads: 2000000
+
+  ms_filter_fastq:
+    average_quality_threshold: 30
+    min_read_length: 100
+
+  ms_germline_risk:
+    indel_padding_bases: 5
+    min_alt_vaf: 0.10
+
+  ms_pileup:
+    max_base_qual: 60
+    max_depth: 250
+    min_base_qual: 20
+    min_map_qual: 0
+    min_depth: 40
+
+  ms_map:
+    band_width: 100
+    gap_extension_penalty: 1
+    clipping_penalty: 5
+    gap_open_penalty: 6
+    matching_score: 1
+    mem_max_occurances: 10000
+    min_alignment_score_thresh: 30
+    min_seed_length: 19
+    mismatch_penalty: 4
+    reseed_factor: 1.5
+    unpaired_read_penalty: 9
+    z_dropoff: 100
+
+  ms_remove_duplicates:
+    duplicate_decision_method: t # Measures positions based on template start/end
+    optical_duplicate_distance: 2500
+
+  ms_trim_fastq:
+    max_error_rate: 0.1
+    min_overlap: 3
+    spacer_length: 3
+    qual_trim_threshold: 20 # Trims low quality bases from 3' end of read

@@ -4,7 +4,6 @@
 Tests the script ex_variant_call_eligible_disagree_rate.py
 
 Authors:
-  - ChatGPT
   - James Phie
   - Joshua Johnstone
 """
@@ -138,7 +137,7 @@ def test_at_least_one_disagreement_found(lightweight_test_run):
     config = load_config(lightweight_test_run["test_config_path"])
     ex_samples = get_ex_sample_ids(config)
     REQUIRED_Q = config["sci_params"]["ex_call_somatic_snv"]["min_base_quality"]
-    RANDOM_SEED = config["sci_params"]["shared"]["random_seed"]
+    RANDOM_SEED = config["infrastructure"]["random_seed"]
 
     for ex_sample in ex_samples:
 

@@ -7,7 +7,6 @@ Generates a metrics file with the germline risk rate
 To be used with rule ms_germline_risk_rate
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 

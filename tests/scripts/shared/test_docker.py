@@ -4,7 +4,6 @@
 Checks if the test suite is being run using an up-to-date docker image
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 
@@ -24,11 +23,11 @@ pytestmark = [
 
 
 # Define hard coded parameters
-from conftest import PROJECT_ROOT
+from tests.conftest import PROJECT_ROOT
 IMAGE_INFO_SHA_FILE = "/image-info/dockerfile.sha256"
 IMAGE_INFO_ENVIRONMENT_SHA = "/image-info/environment.sha256"
 LOCAL_DOCKERFILE = PROJECT_ROOT / "Dockerfile"
-LOCAL_ENVIRONMENT = PROJECT_ROOT / "environment.yml"
+LOCAL_ENVIRONMENT = PROJECT_ROOT / "dependencies.yml"
 
 # Returns true if running inside docker container
 def is_inside_docker() -> bool:
@@ -79,10 +78,10 @@ def test_dockerfile_sha256_matches():
         f"  Image: {image_sha}"
     )
 
-# Checks that environment.yml sha256sum matchs
+# Checks that dependencies.yml sha256sum matchs
 def test_environment_sha256_matches():
     if not LOCAL_ENVIRONMENT.exists():
-        pytest.fail("Local environment.yml not found in PROJECT_ROOT.")
+        pytest.fail("Local dependencies.yml not found in PROJECT_ROOT.")
 
     try:
         with open(IMAGE_INFO_ENVIRONMENT_SHA, "rt") as f:
@@ -93,7 +92,7 @@ def test_environment_sha256_matches():
     local_sha = sha256sum(LOCAL_ENVIRONMENT)
 
     assert image_sha == local_sha, (
-        f"environment.yml SHA mismatch:\n"
+        f"dependencies.yml SHA mismatch:\n"
         f"  Local: {local_sha}\n"
         f"  Image: {image_sha}"
     )
@@ -101,7 +100,7 @@ def test_environment_sha256_matches():
 # Checks that all dependencies have an explicit version specified
 def test_environment_pins_versions():
     if not LOCAL_ENVIRONMENT.exists():
-        pytest.fail("Local environment.yml not found.")
+        pytest.fail("Local dependencies.yml not found.")
 
     with open(LOCAL_ENVIRONMENT, "r") as f:
         env = yaml.safe_load(f)

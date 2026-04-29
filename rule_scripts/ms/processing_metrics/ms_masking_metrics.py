@@ -6,7 +6,6 @@ Calculates the percentage of the genome masked by each BED file. To be used with
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 """
 
 import sys

@@ -4,7 +4,6 @@
 Tests the script ex_dsc_coverage_metrics.py
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import pytest

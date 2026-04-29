@@ -27,7 +27,7 @@ from pathlib import Path
 
 pytestmark = [
     pytest.mark.quicktests,
-    pytest.mark.order(6),
+    pytest.mark.order(7),
 ]
 
 NON_MET_ALLOWED_SUFFIXES = (

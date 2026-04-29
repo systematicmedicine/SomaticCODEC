@@ -5,7 +5,6 @@ Tests the script ms_duplication_metrics.py
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 """
 import pytest
 import json

@@ -6,7 +6,6 @@ Calculates the % of the genome covered at various depth thresholds.
 
 Authors: 
     - Joshua Johnstone
-    - Chat-GPT
 """
 
 import sys

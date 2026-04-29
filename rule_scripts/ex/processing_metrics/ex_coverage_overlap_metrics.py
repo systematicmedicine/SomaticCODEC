@@ -6,7 +6,6 @@ Compares overlap between various coverage metrics
 
 Authors:
     - Joshua Johnstone
-    - Chat-GPT
 """
 
 # Import libraries

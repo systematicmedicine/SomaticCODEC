@@ -6,8 +6,9 @@ Downloads data from S3 to the local EC2 instance:
     - Assumes that the EC2 instance running this script has permission to access the data
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
+    - Joshua Johnstone
+
 """
 
 print("[INFO] Starting download_s3.py")
@@ -17,7 +18,7 @@ import subprocess
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CSV_PATH = PROJECT_ROOT / "config" / "download_list.csv"
+CSV_PATH = PROJECT_ROOT / "experiment" / "download_list.csv"
 
 failed = False
 
@@ -49,9 +50,9 @@ with open(CSV_PATH, newline='', encoding='utf-8-sig') as csvfile:
         downloaded_md5sum = subprocess.run(
             ["md5sum", str(destination_path)],
             capture_output=True, text=True, check=True
-        ).stdout.split()[0].strip()
+        ).stdout.split()[0].strip().lower()
 
-        if downloaded_md5sum != expected_md5sum:
+        if downloaded_md5sum != expected_md5sum.strip().lower():
             failed = True
             print(f"❌ md5sum of {file_name} does not match expected md5sum")
             print(f"expected: {expected_md5sum}")

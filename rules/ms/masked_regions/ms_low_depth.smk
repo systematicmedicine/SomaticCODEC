@@ -10,7 +10,7 @@ from definitions.paths import benchmark as B
 rule ms_low_depth:
     input:
         pileup_depth_vcf = MS.PILEUP_DEPTH,
-        ref_fai = config["sci_params"]["shared"]["reference_genome"] + ".fai"
+        ref_fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai"
     output:
         intermediate_bed = temp(MS.LOW_DEPTH_MASK_INT1),
         lowdepth_bed = temp(MS.LOW_DEPTH_MASK)

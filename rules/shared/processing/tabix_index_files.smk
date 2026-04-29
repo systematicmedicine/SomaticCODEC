@@ -7,9 +7,9 @@ from definitions.paths import benchmark as B
 
 rule tabix_index_files:
     input:
-        germline_vcf = config["sci_params"]["shared"]["known_germline_variants"]
+        germline_vcf = config["sci_params"]["reference_files"]["germline_variants"]["f"]
     output:
-        germline_tbi = config["sci_params"]["shared"]["known_germline_variants"] + ".tbi"
+        germline_tbi = config["sci_params"]["reference_files"]["germline_variants"]["f"] + ".tbi"
     log:
         L.TABIX_INDEX_FILES
     benchmark:

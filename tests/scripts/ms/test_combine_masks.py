@@ -4,7 +4,6 @@
 Tests the rule combine_masks
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """
@@ -27,7 +26,7 @@ def assert_correctly_merged(lightweight_test_run, ms_sample):
     pre_files = [
         MS.LOW_DEPTH_MASK.format(ms_sample=ms_sample),
         MS.GERMLINE_RISK_MASK.format(ms_sample=ms_sample),
-        *config["sci_params"]["shared"]["precomputed_masks"],
+        *config["sci_params"]["reference_files"]["precomputed_masks"]["f"],
         S.EXCLUDED_CHROMS_BED
         ]
     pre_dfs = [read_bed(f) for f in pre_files]
@@ -63,7 +62,7 @@ def assert_combined_bed_order_matches_ref(lightweight_test_run, ms_sample):
 
     # Load reference fai file and get chromosome order as a list
     config = load_config(lightweight_test_run["test_config_path"])
-    fai_path = config["sci_params"]["shared"]["reference_genome"] + ".fai"
+    fai_path = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai"
     fai_df = pd.read_csv(fai_path, sep="\t", header=None, usecols=[0], names=["chrom"])
     fai_chrom_order = fai_df["chrom"].tolist()
 

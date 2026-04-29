@@ -9,7 +9,7 @@ from definitions.paths import benchmark as B
 
 rule included_excluded_chromosomes_beds:
     input:
-        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai",
+        fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai",
     output:
         exclude_bed = temp(S.EXCLUDED_CHROMS_BED),
         include_bed = temp(S.INCLUDED_CHROMS_BED)

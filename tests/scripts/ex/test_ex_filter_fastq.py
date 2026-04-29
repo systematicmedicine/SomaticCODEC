@@ -4,7 +4,6 @@
 Tests the rule ex_filter_fastq
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
     - Joshua Johnstone
 """

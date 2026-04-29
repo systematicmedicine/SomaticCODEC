@@ -7,7 +7,6 @@ Generates a summary file with key fastqc metrics
 To be used with all rules that generate fastqc reports
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import pandas as pd

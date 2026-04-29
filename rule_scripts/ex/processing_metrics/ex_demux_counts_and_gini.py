@@ -7,7 +7,6 @@ Generates a summary file with adaptor counts and the Gini coefficient for inequa
 To be used with rule ex_demux_counts_and_gini
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 import numpy as np

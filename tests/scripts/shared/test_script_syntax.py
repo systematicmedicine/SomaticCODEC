@@ -3,19 +3,17 @@
 
 Tests scripts for syntax errors
     - Tests .py, .R and .sh scripts
-    - Test fails if any scripts have other file extenstions
+    - Test fails if any scripts have other file extensions
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 
 """
 # Import libraries
 import subprocess
 import pytest
-from pathlib import Path
 import pytest
-from conftest import PROJECT_ROOT
+from tests.conftest import PROJECT_ROOT
 
 # Pytest marking
 pytestmark = [

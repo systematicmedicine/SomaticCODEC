@@ -7,7 +7,6 @@ Tests the ex_snv_position.R script against 3 VCF cases:
   - multi_chrom: multiple chromosomes
 
 Authors:
-  - Chat-GPT 
   - Cameron Fraser
 """
 # --------------------------------------------------------------------------------------
@@ -67,7 +66,6 @@ def test_ex_snv_position(case_name, vcf_path):
         metrics_json = tmpdir / f"{case_name}_metrics.json"
         plot_path = tmpdir / f"{case_name}_plot.pdf"
         log_path = tmpdir / f"{case_name}_log.txt"
-        run_name = "test-exp"
         included_chromosomes = ["chr21", "chr22"]
 
         # Run the R script
@@ -79,7 +77,6 @@ def test_ex_snv_position(case_name, vcf_path):
             "--index_path", FAI_PATH,
             "--metrics_json", metrics_json,
             "--metrics_plot", plot_path,
-            "--run_name", run_name,
             "--log", log_path,
             "--included_chroms", *included_chromosomes
         ],

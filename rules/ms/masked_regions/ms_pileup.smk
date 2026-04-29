@@ -12,8 +12,8 @@ rule ms_pileup:
     input:
         bam = MS.DEDUPED_BAM,
         bai = MS.DEDUPED_BAM_INDEX,
-        ref = config["sci_params"]["shared"]["reference_genome"],
-        fai = config["sci_params"]["shared"]["reference_genome"] + ".fai",
+        ref = config["sci_params"]["reference_files"]["genome"]["f"],
+        fai = config["sci_params"]["reference_files"]["genome"]["f"] + ".fai",
         included_chromsomes_bed = S.INCLUDED_CHROMS_BED
     output:
         intermediate_pileup = temp(MS.PILEUP_INT),

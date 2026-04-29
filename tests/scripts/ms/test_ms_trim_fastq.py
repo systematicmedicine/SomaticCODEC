@@ -6,7 +6,6 @@ Tests the rule ms_trim_fastq
     - Number of bases less after trimming
 
 Authors:
-    - Chat-GPT
     - Cameron Fraser
 """
 

@@ -1,0 +1,38 @@
+---
+# ==============================================================================
+# Metadata paths
+# ==============================================================================
+metadata:
+
+  ex_samples_metadata: experiment/ex_samples.csv
+  ex_lanes_metadata: experiment/ex_lanes.csv
+  ex_adapters_metadata: experiment/ex_adapters.csv
+  ms_samples_metadata: experiment/ms_samples.csv
+  ms_adapters_metadata: experiment/ms_adapters.csv
+  download_list: experiment/download_list.csv
+
+# ==============================================================================
+# Infrastructure
+# ==============================================================================
+infrastructure:
+    
+  memory: # Memory units are expressed in gigabytes (GB) throughout pipeline
+    light: 8
+    moderate: 32
+    heavy: 64
+    extra_heavy: 128
+    global_buffer: 16
+    
+  threads:
+    light: 2
+    moderate: 12
+    heavy: 24
+    global_buffer: 4
+    
+  compression:
+    gzip_level: 1
+    
+  log_system_resource_usage:
+      sleep_interval: 60
+
+  random_seed: 123 # For metrics that use random sampling such as ex_variant_call_eligible_disagree_rate

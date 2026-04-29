@@ -4,7 +4,6 @@
 Tests the rule ex_realign_dsc
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 from pathlib import Path

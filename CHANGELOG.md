@@ -2,14 +2,50 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
-
 Types of changes:
-- `Added` for new features.
-- `Changed` for changes in existing functionality.
-- `Deprecated` for soon-to-be removed features.
-- `Removed` for now removed features.
-- `Fixed` for any bug fixes.
+- `MAJOR`
+- `MINOR`
+- `PATCH`
+
+Each type of change has different validation requirements before it can be released. See the [change control document](docs/development/change_control.md).
+
+## [6.0.0] - 2026-04-27
+
+### Major
+- Implemented profile and environment system (#373)
+- Moved sample sheets from config/ to experiment/ (#373)
+- Renamed environment.yml to dependencies.yml to reduce confusion with environments concept (#381)
+- Removed SNS messaging from bin/run_all.sh (#375)
+- Modified bin scripts to take arguments instead of environment variables (#384)
+- Added optional notemp mode to bin/run_pipeline.py and bin/run_all.sh (#374 and 384)
+- Moved ms adapter sequences from profile.yaml files to experiment/ms_adapters.csv (#388)
+- Added md5sums for reference files to profile.yaml (#389)
+
+### Minor
+- Added ex_snv_read_position_metrics script, rule, and tests (#366)
+- Added uniformity_SNV_read_position system metric (#366)
+- Removed run timeline plot rule and script (#373)
+- Updated bin/package_outputs.py to include definitions and docs directories (#387)
+
+### Patch
+- Changelog now groups changes into MAJOR/MINOR/PATCH rather than Added/Changed/Fixed (#363)
+- Fixed bug that prevented rulegraph script from running (#364)
+- Changed rulegraph format (#365)
+- Moved random_seed from sci_params to infrastructure in config.yaml (#368)
+- Updated user facing documentation (#369, 371, 374, 379, 384, 385)
+- Removed author references to ChatGPT (#370)
+- Corrected spelling of GRCh38 in reference files (#372)
+- Moved pytest fixtures out of conftest.py and into tests/fixtures/ (#374)
+- Test scripts now run pipeline using bin scripts (#374)
+- Added tests to check that keys match between environment.yaml and profile.yaml files (#375)
+- Removed wet-lab and non-bioinformatically-assessed metrics from profiles (#378)
+- Updated thresholds for germline risk rate component metric (#377)
+- Merged test/helpers into helpers (#383)
+- Created dryrun test fixture (#383)
+- Corrected reversed thresholds for uniformity_SNV_read_position system metric (#386)
+- Renamed ex_variant_call eligible component metric to ex_genome_call eligible (#386)
+- Renamed uniformity_SNV_position system metric to uniformity_SNV_genome_position (#386)
+- Renamed uniformity_SNV_spacing system metric to uniformity_SNV_nearest_neighbour (#386)
 
 ## [5.0.0] - 2026-03-13
 
@@ -22,6 +58,7 @@ Types of changes:
 - Added metrics files and component metrics for multimapping reads (#343)
 - Added component metric for germline risk rate (#347)
 - Added LICENSE file (#355)
+- Added URL for download of default reference files
 
 ### Changed
 

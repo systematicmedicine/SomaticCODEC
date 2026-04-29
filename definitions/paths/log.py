@@ -44,9 +44,6 @@ JOB_LOG = "logs/shared_rules/job_log.csv"
 
 CREATE_METRICS_REPORT = "logs/shared_rules/create_metrics_report.log"
 
-CREATE_RUN_TIMELINE_PLOT = "logs/shared_rules/create_run_timeline_plot.log"
-RUN_TIMELINE = "logs/shared_rules/run_timeline.pdf"
-
 WRITE_GIT_METADATA = "logs/shared_rules/write_git_metadata.log"
 GIT_METADATA = "logs/shared_rules/git_metadata.json"
 
@@ -152,6 +149,8 @@ EX_SNV_POSITION_METRICS = "logs/{ex_sample}/ex_snv_position_metrics.log"
 EX_GNOMAD_OVERLAP = "logs/{ex_sample}/ex_gnomAD_overlap.log"
 
 EX_SOMATIC_VARIANT_GERMLINE_CONTEXTS = "logs/{ex_sample}/ex_somatic_variant_germline_contexts.log"
+
+EX_SNV_READ_POSITION_METRICS = "logs/{ex_sample}/ex_snv_read_position_metrics.log"
 
 EX_RECURRENT_VARIANT_METRICS = "logs/shared_rules/ex_recurrent_variant_metrics.log"
 

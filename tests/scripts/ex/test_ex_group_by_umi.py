@@ -4,7 +4,6 @@
 Tests the rule ex_group_by_umi
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
 """
 from pathlib import Path

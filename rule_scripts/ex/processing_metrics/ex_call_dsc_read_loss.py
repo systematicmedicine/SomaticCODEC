@@ -7,7 +7,6 @@ Generates a summary file with the percentage of reads lost during ex_call_dsc
 To be used with rule ex_call_dsc_read_loss
 
 Authors:
-    - Chat-GPT
     - Joshua Johnstone
     - Cameron Fraser
 """
