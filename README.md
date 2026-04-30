@@ -49,6 +49,12 @@ This repository is developed and maintained by [Systematic Medicine Pty Ltd](htt
 - [Software testing](docs/development/software_testing.md)
 - [Adapting to other use cases](docs/development/other_use_cases.md)
 
+### Citation
+
+If you use SomaticCODEC, please cite:
+
+Johnstone JN, Phie J, Fraser C. (2026) "Quantifying Somatic Mutation Burden: An Assay Validation Framework and Implementation in SomaticCODEC". *bioRxiv*.
+
 <br>
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)

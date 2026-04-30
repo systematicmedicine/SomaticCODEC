@@ -9,6 +9,11 @@ Types of changes:
 
 Each type of change has different validation requirements before it can be released. See the [change control document](docs/development/change_control.md).
 
+## [6.0.2] - 2026-05-01
+
+### Patch
+- Added citation to README (#397)
+
 ## [6.0.1] - 2026-04-30
 
 ### Patch
