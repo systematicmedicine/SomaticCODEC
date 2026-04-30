@@ -12,7 +12,7 @@ Each type of change has different validation requirements before it can be relea
 ## [6.0.1] - 2026-04-30
 
 ### Patch
-- Revised user-facing documentation ()
+- Revised user-facing documentation (#395)
 
 ## [6.0.0] - 2026-04-27
 
