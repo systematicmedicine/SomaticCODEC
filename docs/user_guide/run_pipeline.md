@@ -73,7 +73,7 @@ There are two options for running the pipeline: stepwise and automated. Both run
     - `ms_sample` FASTQ files (defined in `ms_samples.csv`)
     - Reference files defined in `config.yaml` -> `sci_params.shared`
 
-    If the following files are located on Amazon S3, and are defined in `download_list.csv`, they can be staged using the following command:
+    If these files are located on Amazon S3, and are defined in `download_list.csv`, they can be staged using the following command:
 
     ```bash
     python3 -u bin/download_S3.py
@@ -150,5 +150,6 @@ There are two options for running the pipeline: stepwise and automated. Both run
     -p <profile> \
     -s <S3_target_dir>
     ```
+    Packaged outputs will be sent to the S3 target directory (write access is required).
 
 5. **Upon completion (success or failure), the instance will shut down.**

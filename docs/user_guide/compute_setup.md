@@ -27,10 +27,10 @@ It is recommended to use a fresh AWS instance for each pipeline run to minimise 
         - IOPS: 8000
         - Throughput (MiB/s): 2000
     - IAM instance profile (optional): 
-        - If staging files from S3, select a profile with access to the relevant bucket.
+        - If staging files from S3, or uploading packaged outputs to S3, select a profile with appropriate access to the relevant bucket.
 
 5. Connect to the instance
-    - Copy the *Public IPv4 address* for the instance
+    - Copy the `Public IPv4 address` for the instance
     - Connect via SSH
 
     ```
