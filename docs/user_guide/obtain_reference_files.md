@@ -4,4 +4,4 @@ The reference files required for each profile are defined in `profile.yaml` -> `
 
 Reference files for the preconfigured profiles can be downloaded from: 
 
-`https://sm-unrestricted-public.s3.ap-southeast-2.amazonaws.com/somaticcodec/reference-data/refs-v1/`
+`https://sm-unrestricted-public.s3.ap-southeast-2.amazonaws.com/somaticcodec/reference-data/refs-v1/manifest.txt`

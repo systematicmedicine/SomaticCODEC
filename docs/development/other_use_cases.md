@@ -15,7 +15,7 @@ When making substantive changes to the assay we strongly recommend re-validating
 
 - Consider replacing or extending rule `ex_call_somatic_snv` with a cancer-optimised caller (e.g. `Mutect2`). 
 - Consider generating a lower depth for the `ms_sample`. By default, the assay requires ≥40× depth in the matched sample. This reduces germline leakage and helps low-VAF somatic variants rise above the noise floor. This level of depth may be unnecessary if detection of low-VAF variants is not required.
-- Consider a higher depth for the `ex_sample`. By default, the assay averages ~1× depth across the genome, which limits precision when estimating variant allele frequencies. To achieve higher depth more cost-effectively, consider targeting a smaller subset of the genome.
+- Consider a higher depth for the `ex_sample`. By default, the assay averages ~15× duplex depth across the genome, which limits precision when estimating variant allele frequencies. To achieve higher depth more cost-effectively, consider targeting a smaller subset of the genome.
 
 
 ## Cultured cells (human)
@@ -29,12 +29,13 @@ We are currently establishing this capability. A cell culture–optimised profil
 
 - Restriction enzyme cut sites may result in different DNA fragment length distributions across species
   - Verify that DNA fragment sizes are appropriate after fragmentation
-  - In an internal pilot, mouse DNA yielded a similar size distribution to human DNA without modification to the protocol
+  - In an internal pilot, mouse DNA yielded a similar size distribution to human DNA without modification to the protocol.
 - Human-specific reference resources must be replaced:
   - Reference genome
   - Genome masks
   - Germline variant database
   - Trinucleotide context reference
+  - Genome trinucleotide counts
 - Reduced effectiveness of genome masks may result in increased false positive SNV calls
 
 ## No matched sample (dependent samples design)

@@ -12,7 +12,7 @@ SNV rate can be found in `results/{ex_sample}/{ex_sample}_somatic_variant_rate.j
 
 System-level metrics measure the performance of the entire assay. 
 
-There are two types of system-level metics:
+There are two types of system-level metrics:
 - Metrics assessed for every sample or batch
 - Metrics that require specialised datasets (e.g. linearity, precision)
 
@@ -23,7 +23,7 @@ The pipeline reports all system-level metrics that can be assessed on every samp
 
 Component-level metrics measure the performance of individual assay components. 
 
-There are two types of component-level metics:
+There are two types of component-level metrics:
 - Metrics assessed during library prep
 - metrics assessed bioinformatically
 
@@ -36,6 +36,7 @@ Thresholds for each component and system level metric were established using a c
 These thresholds are intended as a guide for troubleshooting assay performance. Results may differ if different wet-lab, sequencing, or bioinformatic parameters are used.
 
 ### Other metrics
+
 Additional metrics files are generated that are not included in the automated report (e.g. plots and figures). These can be found in the `metrics/` and `results/` directories.
 
 Some notable files:

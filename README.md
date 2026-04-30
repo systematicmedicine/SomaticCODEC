@@ -9,7 +9,7 @@ The assay combines a modified CODEC sequencing protocol with a Snakemake-based a
 
 Applications include ageing research, mosaicism studies, and preventative cancer genomics. The pipeline’s modular design enables adaptation to other use cases (e.g. tumour biology), although re-validation would be required.
 
-SomaticCODEC comprises a laboratory protocol for library preparation ([Phie *et al*. 2026]()) and a bioinformatics pipeline for analysing the resulting sequencing data ([Johnstone *et al*. 2026]()).
+SomaticCODEC comprises a laboratory protocol for library preparation Phie *et al*. 2026 (currently under review) and a bioinformatics pipeline for analysing the resulting sequencing data ([Johnstone *et al*. 2026]()).
 
 ### Key features
 
@@ -25,9 +25,9 @@ SomaticCODEC comprises a laboratory protocol for library preparation ([Phie *et 
 - Before running the pipeline
   - [Generating sequencing data](docs/user_guide/generating_sequencing_data.md)
   - [Preparing sample sheets](docs/user_guide/sample_sheet_setup.md)
+  - [Selecting a profile](docs/user_guide/profiles.md)
   - [Obtaining reference files](docs/user_guide/obtain_reference_files.md)
   - [Setting up compute platform](docs/user_guide/compute_setup.md)
-  - [Selecting a profile](docs/user_guide/profiles.md)
 - [Running the pipeline](docs/user_guide/run_pipeline.md)
 - [Interpreting outputs](docs/user_guide/interpreting_outputs.md)
 - [Troubleshooting](docs/user_guide/troubleshooting.md)
@@ -52,7 +52,6 @@ This repository is developed and maintained by [Systematic Medicine Pty Ltd](htt
 <br>
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![CI: passing](https://img.shields.io/github/actions/workflow/status/systematicmedicine/SomaticCODEC/test.yml)
 ![Version](https://img.shields.io/github/v/tag/systematicmedicine/SomaticCODEC?label=version)
 ![Repo Size](https://img.shields.io/github/repo-size/systematicmedicine/SomaticCODEC)
 ![Last Commit](https://img.shields.io/github/last-commit/systematicmedicine/SomaticCODEC)
