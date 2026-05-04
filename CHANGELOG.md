@@ -9,6 +9,11 @@ Types of changes:
 
 Each type of change has different validation requirements before it can be released. See the [change control document](docs/development/change_control.md).
 
+## [Unreleased]
+
+### Minor
+- Added clonality metrics (#)
+
 ## [6.0.2] - 2026-05-01
 
 ### Patch

@@ -51,7 +51,9 @@ EXCLUDED_RULES: Set[str] = {
     "ms_germ_risk_variant_metrics", # Wrapper for external tool
     "ms_multimapping_metrics", # One test multiple rules
     "ex_multimapping_raw_metrics", # One test multiple rules
-    "ex_multimapping_dsc_metrics" # One test multiple rules
+    "ex_multimapping_dsc_metrics", # One test multiple rules
+    "ex_snv_clonality_metrics", # One test multiple rules
+    "ms_germline_clonality_metrics" # One test multiple rules
 }
 
 # Tests that do not correspond to a single rule name (e.g. multi-rule tests)
@@ -68,7 +70,8 @@ EXCLUDED_TEST_NAMES: Set[str] = {
     "profiles",
     "testing_coverage",
     "fastqc_summary_metrics", # One test multiple rules
-    "multimapping_metrics" # One test multiple rules
+    "multimapping_metrics", # One test multiple rules
+    "clonality_metrics" # One test multiple rules
 }
 
 RULE_DECL_RE = re.compile(r"(?m)^\s*rule\s+([A-Za-z_][A-Za-z0-9_]*)\s*:")
