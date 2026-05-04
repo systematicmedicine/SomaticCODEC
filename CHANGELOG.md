@@ -12,7 +12,7 @@ Each type of change has different validation requirements before it can be relea
 ## [Unreleased]
 
 ### Minor
-- Added clonality metrics (#)
+- Added clonality metrics (#400)
 
 ## [6.0.2] - 2026-05-01
 
