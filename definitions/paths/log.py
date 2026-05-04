@@ -154,6 +154,8 @@ EX_SNV_READ_POSITION_METRICS = "logs/{ex_sample}/ex_snv_read_position_metrics.lo
 
 EX_RECURRENT_VARIANT_METRICS = "logs/shared_rules/ex_recurrent_variant_metrics.log"
 
+EX_SNV_CLONALITY_METRICS = "logs/{ex_sample}/ex_snv_clonality_metrics.log"
+
 # ---------------------------------------------------------------------------------------------------------------
 # MS - Core pipeline
 # ---------------------------------------------------------------------------------------------------------------
@@ -210,6 +212,8 @@ MS_DEPTH_HISTOGRAM_METRICS = "logs/{ms_sample}/ms_depth_histogram_metrics.log"
 MS_COVERAGE_BY_DEPTH_METRICS = "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
 
 # Masked regions
+
+MS_GERMLINE_CLONALITY_METRICS = "logs/{ms_sample}/ms_germline_clonality_metrics.log"
 
 MS_GERM_RISK_VARIANT_METRICS = "logs/{ms_sample}/ms_germ_risk_variant_metrics.log"
 MS_GERMLINE_RISK_RATE = "logs/{ms_sample}/ms_germline_risk_rate.log"

@@ -175,4 +175,4 @@ MET_SNV_READ_POSITION_PDF = "results/{ex_sample}/{ex_sample}_snv_read_position_p
 MET_RECURRENT_VARIANTS_VCF = "results/batch/batch_recurrent_variants.vcf"
 MET_RECURRENT_VARIANTS_JSON = "results/batch/batch_recurrent_variant_metrics.json"
 
-
+MET_SNV_CLONALITY = "results/{ex_sample}/{ex_sample}_snv_clonality_metrics.json"

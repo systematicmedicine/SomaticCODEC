@@ -119,6 +119,8 @@ MET_COVERAGE = "metrics/ms/{ms_sample}/{ms_sample}_coverage_metrics.json"
 
 # Masked regions
 
+MET_GERMLINE_CLONALITY = "metrics/ms/{ms_sample}/{ms_sample}_germline_clonality_metrics.json"
+
 MET_GERM_RISK_VARIANTS = "metrics/ms/{ms_sample}/{ms_sample}_germ_risk_variant_metrics.txt"
 MET_GERM_RISK_RATE = "metrics/ms/{ms_sample}/{ms_sample}_germ_risk_rate.json"
 
