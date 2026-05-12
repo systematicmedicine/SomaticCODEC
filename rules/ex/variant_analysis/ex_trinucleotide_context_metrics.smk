@@ -7,7 +7,7 @@ from definitions.paths.io import ex as EX
 from definitions.paths import log as L
 from definitions.paths import benchmark as B
 
-rule ex_trinucleotide_context_metrics:
+rule ex_trinucleotide_signature_metrics:
     input:
         vcf_path = EX.CALLED_SNVS,
         vcf_all_path = EX.CALL_SOMATIC_SNV_INT3,
@@ -21,9 +21,9 @@ rule ex_trinucleotide_context_metrics:
     params:
         sample = "{ex_sample}"
     log:
-        L.EX_TRINUCLEOTIDE_CONTEXT_METRICS
+        L.EX_TRINUCLEOTIDE_SIGNATURE_METRICS
     benchmark:
-        B.EX_TRINUCLEOTIDE_CONTEXT_METRICS
+        B.EX_TRINUCLEOTIDE_SIGNATURE_METRICS
     threads:
         1
     resources:
@@ -34,7 +34,7 @@ rule ex_trinucleotide_context_metrics:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Calculate trinucleotide contexts
-        ex_trinucleotide_context_metrics.py \
+        ex_trinucleotide_signature_metrics.py \
             --vcf_path {input.vcf_path} \
             --vcf_all_path {input.vcf_all_path} \
             --ref_fasta_path {input.ref_fasta_path} \
