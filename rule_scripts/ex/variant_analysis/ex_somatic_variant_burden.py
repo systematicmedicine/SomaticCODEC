@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
---- ex_somatic_variant_rate.py ---
+--- ex_somatic_variant_burden.py ---
 
-Calculates the somatic variant rate and bases filtered during variant calling from vcf's produced by bcftools pileup and bcftools call. 
+Calculates the somatic variant burden and bases filtered during variant calling. 
 
 This script is to be used exclusively with its parent rule
 
@@ -27,7 +27,7 @@ def main(args):
     # Redirect stdout and stderr to the Snakemake log file
     sys.stdout = open(args.log, "a")
     sys.stderr = open(args.log, "a")
-    print("[INFO] Starting ex_somatic_variant_rate.py")
+    print("[INFO] Starting ex_somatic_variant_burden.py")
 
     # Setup
     vcf_path = args.vcf_all
@@ -59,7 +59,7 @@ def main(args):
         # Filtered bases - total bases filtered for base quality
         # Evaluated bases - total bases assessed for variants (ie. denominator)
         # Number of SNV bases - total number of 1bp SNVs detected (MNVs counted as multiple 1bp SNVs)
-        # SNV rate - Number of SNV bases divided by evaluated bases
+        # SNV burden - Number of SNV bases divided by evaluated bases
         # SNVs per diploid - Estimate of the number of SNVs per 6.4Gbp
 
         f.seek(0)  # Rewind to process data lines
@@ -84,8 +84,8 @@ def main(args):
             evaluated_bases += dp_fmt
             num_snv_bases += sum(ad_vals[1:]) if len(ad_vals) > 1 else 0
 
-    snv_rate = num_snv_bases / evaluated_bases if evaluated_bases > 0 else 0
-    snv_per_diploid = snv_rate * HUMAN_NUC_GENOME_SIZE
+    snv_burden = num_snv_bases / evaluated_bases if evaluated_bases > 0 else 0
+    snv_per_diploid = snv_burden * HUMAN_NUC_GENOME_SIZE
 
     # Write output to JSON
     results = {
@@ -113,9 +113,9 @@ def main(args):
             "value": num_snv_bases,
             "description": "Total number of single-base SNVs detected (MNVs decomposed to 1 bp units)."
         },
-        "snv_rate": {
-            "value": float(f"{snv_rate:.6e}"),
-            "description": "SNV rate per base (num_snv_bases / evaluated_bases)."
+        "snv_burden": {
+            "value": float(f"{snv_burden:.6e}"),
+            "description": "SNV burden per base (num_snv_bases / evaluated_bases)."
         },
         "snv_per_diploid": {
             "value": round(snv_per_diploid, 2),
@@ -127,7 +127,7 @@ def main(args):
         json.dump(results, out, indent=4)
 
     # Print script completion message to log
-    print("[INFO] Completed ex_somatic_variant_rate.py")
+    print("[INFO] Completed ex_somatic_variant_burden.py")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

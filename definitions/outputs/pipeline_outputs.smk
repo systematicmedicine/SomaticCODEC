@@ -104,7 +104,7 @@ ex_variant_calling = [
 # Analysis of called variants
 # ---------------------------------------------------------------------------------------------
 ex_variant_analysis = [
-    expand(EX.MET_SOMATIC_VARIANT_RATE, ex_sample = ex_sample_ids),
+    expand(EX.MET_SOMATIC_VARIANT_BURDEN, ex_sample = ex_sample_ids),
     expand(EX.MET_CHROM_VARIANT_RATE, ex_sample = ex_sample_ids),
     expand(EX.MET_TRINUC_PROPORTIONS, ex_sample = ex_sample_ids),
     expand(EX.MET_TRINUC_SIMILARITIES, ex_sample = ex_sample_ids),

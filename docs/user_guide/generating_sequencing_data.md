@@ -9,7 +9,7 @@
 
 ### EX samples
 
-- For library prep and sequencing, follow `Basic Protocol 1` from Phie *et al*. 2026 (currently under review)
+- For library prep and sequencing, follow `Basic Protocol 1` from Phie *et al*. 2026 (under review)
 - By default we recommend 12 EX samples per 3B lane of a `NovaSeq X 25B` flow cell
 - The bioinformatics pipeline assumes that the EX samples **are not demultiplexed** before running the pipeline
 - A pair of FASTQ files (R1/R2) containing reads from multiple non-demultiplexed EX samples are referred to as an `ex_lane` 
@@ -17,7 +17,7 @@
 
 ### MS samples
 
-- For library prep and sequencing, follow `Basic Protocol 2` from Phie *et al*. 2026 (currently under review)
+- For library prep and sequencing, follow `Basic Protocol 2` from Phie *et al*. 2026 (under review)
 - By default we recommend 6 MS samples per 3B lane of a `NovaSeq X 25B` flow cell
 - The bioinformatics pipeline assumes that the MS samples **are demultiplexed** before running the pipeline.
 - A pair of FASTQ files (R1/R2) containing reads from a single MS sample are referred to as an `ms_sample`

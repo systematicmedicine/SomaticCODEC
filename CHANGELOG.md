@@ -11,13 +11,19 @@ Each type of change has different validation requirements before it can be relea
 
 ## [Unreleased]
 
+### Major
+- Updated terminology for trinucleotide signature and somatic SNV burden throughout (#401)
+
 ### Minor
 - Added clonality metrics (#400)
+
+### Patch
+- Updated DOI link for Johnstone *et al.* (2026) manuscript (commit bb453c0)
 
 ## [6.0.2] - 2026-05-01
 
 ### Patch
-- Added citation to README (#397)
+- Added SomaticCODEC citation to README (#397)
 
 ## [6.0.1] - 2026-04-30
 
@@ -253,7 +259,7 @@ Each type of change has different validation requirements before it can be relea
 ### Changed
 
 - Swapped umi_tools dedup for fgbio GroupReadsByUmi, and fgbio SortBam and SetMateInformation for samtools sort and fixmate (#233)
-- Updated default parameters for ex_call_dsc (Commit b17019d)
+- Updated default parameters for ex_call_dsc (commit b17019d)
     - Increased min_input_base_quality from 10 to 30
     - Decreased max_duplex_disagreement_rate from 0.04 to 0.02
 - Refactored rules file structure. Each smk file contains a single rule, and smk files are located in nested directory structure. (#239)

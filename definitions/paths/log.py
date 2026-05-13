@@ -138,10 +138,10 @@ EX_VARIANT_CALL_ELIGIBLE_DISAGREE_RATE = "logs/{ex_sample}/ex_variant_call_eligi
 
 # Variant analysis
 
-EX_SOMATIC_VARIANT_RATE = "logs/{ex_sample}/ex_somatic_variant_rate.log"
+EX_SOMATIC_VARIANT_BURDEN = "logs/{ex_sample}/ex_SOMATIC_VARIANT_BURDEN.log"
 EX_CHROMOSOMAL_VARIANT_RATE_METRICS = "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
 
-EX_TRINUCLEOTIDE_CONTEXT_METRICS = "logs/{ex_sample}/ex_trinucleotide_context_metrics.log"
+EX_TRINUCLEOTIDE_SIGNATURE_METRICS = "logs/{ex_sample}/ex_trinucleotide_signature_metrics.log"
 
 EX_SNV_DISTANCE_METRICS = "logs/{ex_sample}/ex_snv_distance_metrics.log"
 EX_SNV_POSITION_METRICS = "logs/{ex_sample}/ex_snv_position_metrics.log"
