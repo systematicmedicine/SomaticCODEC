@@ -6,15 +6,15 @@ from definitions.paths.io import ex as EX
 from definitions.paths import log as L
 from definitions.paths import benchmark as B
 
-rule ex_somatic_variant_rate:
+rule ex_somatic_variant_burden:
     input:
         vcf_all = EX.CALL_SOMATIC_SNV_INT3
     output:
-        results = EX.MET_SOMATIC_VARIANT_RATE
+        results = EX.MET_SOMATIC_VARIANT_BURDEN
     log:
-        L.EX_SOMATIC_VARIANT_RATE
+        L.EX_SOMATIC_VARIANT_BURDEN
     benchmark:
-        B.EX_SOMATIC_VARIANT_RATE
+        B.EX_SOMATIC_VARIANT_BURDEN
     threads:
         1
     resources:
@@ -25,7 +25,7 @@ rule ex_somatic_variant_rate:
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
         # Calculate somatic variant rate
-        ex_somatic_variant_rate.py \
+        ex_somatic_variant_burden.py \
             --vcf_all {input.vcf_all} \
             --results {output.results} \
             --log {log} 2>> {log}

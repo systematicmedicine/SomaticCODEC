@@ -151,7 +151,7 @@ MET_VAR_CALL_DISAGREE = "metrics/ex/{ex_sample}/{ex_sample}_variant_call_disagre
 
 # Variant analysis
 
-MET_SOMATIC_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.json"
+MET_SOMATIC_VARIANT_BURDEN = "results/{ex_sample}/{ex_sample}_somatic_variant_burden.json"
 MET_CHROM_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
 
 MET_TRINUC_PROPORTIONS = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv"

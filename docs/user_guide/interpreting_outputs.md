@@ -2,9 +2,9 @@
 
 ## Called variants
 
-A VCF containing all called SNVs can be found in `results/{ex_sample}/{ex_sample}_called_snvs.vcf`
+A VCF containing all called somatic SNVs can be found in `results/{ex_sample}/{ex_sample}_called_snvs.vcf`
 
-SNV rate can be found in `results/{ex_sample}/{ex_sample}_somatic_variant_rate.json`
+Somatic SNV burden can be found in `results/{ex_sample}/{ex_sample}_somatic_variant_burden.json`
 
 ## Assay performance metrics
 

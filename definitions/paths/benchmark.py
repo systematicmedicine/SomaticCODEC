@@ -131,7 +131,7 @@ EX_VARIANT_CALL_ELIGIBLE_DISAGREE_RATE = "logs/{ex_sample}/ex_variant_call_eligi
 
 # Variant analysis
 
-EX_SOMATIC_VARIANT_RATE = "logs/{ex_sample}/ex_somatic_variant_rate.benchmark.txt"
+EX_SOMATIC_VARIANT_BURDEN = "logs/{ex_sample}/ex_somatic_variant_burden.benchmark.txt"
 EX_CHROMOSOMAL_VARIANT_RATE_METRICS = "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.benchmark.txt"
 
 EX_TRINUCLEOTIDE_SIGNATURE_METRICS = "logs/{ex_sample}/ex_trinucleotide_signature_metrics.benchmark.txt"
