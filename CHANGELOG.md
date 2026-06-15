@@ -13,6 +13,7 @@ Each type of change has different validation requirements before it can be relea
 
 ### Major
 - Updated terminology for trinucleotide signature and somatic SNV burden throughout (#401)
+- Removed temporary file mark from key BAM files (#)
 
 ### Minor
 - Added clonality metrics (#400)

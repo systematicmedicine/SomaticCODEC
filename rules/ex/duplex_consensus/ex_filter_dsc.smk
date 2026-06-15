@@ -12,7 +12,7 @@ rule ex_filter_dsc:
         bam = EX.ANNOTATED_DSC
     output:
         intermediate_bam = temp(EX.FILTER_DSC_INT1),
-        bam = temp(EX.FILTERED_DSC),
+        bam = EX.FILTERED_DSC,
         bai = temp(EX.FILTERED_DSC_INDEX)
     params:
         min_mapq = config["sci_params"]["ex_filter_dsc"]["min_mapq"],
