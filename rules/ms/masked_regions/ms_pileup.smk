@@ -32,7 +32,7 @@ rule ms_pileup:
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

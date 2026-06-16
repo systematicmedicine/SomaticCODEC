@@ -41,7 +41,7 @@ rule ex_call_somatic_snv:
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["heavy"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

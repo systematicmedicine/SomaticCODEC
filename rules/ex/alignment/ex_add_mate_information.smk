@@ -21,7 +21,7 @@ rule ex_add_mate_information:
     threads:
         config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["extra_heavy"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         # Set memory limit

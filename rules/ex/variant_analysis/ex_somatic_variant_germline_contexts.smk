@@ -23,7 +23,7 @@ rule ex_somatic_variant_germline_contexts:
     threads: 
         config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

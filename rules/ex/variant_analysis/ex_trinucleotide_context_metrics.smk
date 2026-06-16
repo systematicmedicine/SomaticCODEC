@@ -27,7 +27,7 @@ rule ex_trinucleotide_signature_metrics:
     threads:
         1
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit
