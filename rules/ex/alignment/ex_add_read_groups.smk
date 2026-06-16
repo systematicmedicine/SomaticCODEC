@@ -20,7 +20,7 @@ rule ex_add_read_groups:
     benchmark:
         B.EX_ADD_READ_GROUPS
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["light"]
     resources:
         memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:

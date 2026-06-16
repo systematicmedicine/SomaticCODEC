@@ -21,7 +21,7 @@ rule ms_low_depth:
     threads:
         1
     resources:
-        memory = config["infrastructure"]["memory"]["extra_heavy"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

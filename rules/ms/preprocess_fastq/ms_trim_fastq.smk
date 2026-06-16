@@ -36,9 +36,9 @@ rule ms_trim_fastq:
     benchmark:
         B.MS_TRIM_FASTQ
     threads: 
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

@@ -28,7 +28,7 @@ rule ex_filter_bam:
     threads: 
         config["infrastructure"]["threads"]["heavy"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

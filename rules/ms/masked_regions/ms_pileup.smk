@@ -30,9 +30,9 @@ rule ms_pileup:
     benchmark:
         B.MS_PILEUP
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["light"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

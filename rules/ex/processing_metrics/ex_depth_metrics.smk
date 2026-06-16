@@ -24,7 +24,7 @@ rule ex_depth_metrics:
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["extra_heavy"]
+        memory = config["infrastructure"]["memory"]["heavy"]
     shell:
         """
         # Set memory limit

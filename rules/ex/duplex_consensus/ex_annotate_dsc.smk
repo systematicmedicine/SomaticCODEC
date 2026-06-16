@@ -27,10 +27,10 @@ rule ex_annotate_dsc:
         L.EX_ANNOTATE_DSC
     benchmark:
         B.EX_ANNOTATE_DSC
+    threads:
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
-    threads:
-        config["infrastructure"]["threads"]["heavy"]
     shell:
         """
         # Set memory limit

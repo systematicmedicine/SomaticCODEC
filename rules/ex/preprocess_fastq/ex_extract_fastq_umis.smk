@@ -34,9 +34,9 @@ rule ex_extract_fastq_umis:
     benchmark:
         B.EX_EXTRACT_FASTQ_UMIS
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

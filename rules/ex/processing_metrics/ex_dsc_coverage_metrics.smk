@@ -26,7 +26,7 @@ rule ex_dsc_coverage_metrics:
     threads:
         config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["extra_heavy"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         # Set memory limit

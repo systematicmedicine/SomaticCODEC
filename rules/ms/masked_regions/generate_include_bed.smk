@@ -24,7 +24,7 @@ rule generate_include_bed:
     threads:
         1
     resources:
-        memory = config["infrastructure"]["memory"]["moderate"]
+        memory = config["infrastructure"]["memory"]["light"]
     shell:
         """
         # Set memory limit

@@ -24,7 +24,7 @@ rule ms_filter_fastq:
     benchmark:
         B.MS_FILTER_FASTQ
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
