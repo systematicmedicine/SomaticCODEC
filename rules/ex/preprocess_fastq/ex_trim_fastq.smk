@@ -54,7 +54,7 @@ rule ex_trim_fastq:
     benchmark:
         B.EX_TRIM_FASTQ
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

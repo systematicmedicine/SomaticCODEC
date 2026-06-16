@@ -22,7 +22,7 @@ rule ex_group_by_umi:
     benchmark:
         B.EX_GROUP_BY_UMI
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["heavy"]
     shell:

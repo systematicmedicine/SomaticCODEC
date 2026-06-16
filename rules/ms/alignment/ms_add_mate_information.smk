@@ -21,7 +21,7 @@ rule ms_add_mate_information:
     benchmark:
         B.MS_ADD_MATE_INFORMATION
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["heavy"]
     shell:

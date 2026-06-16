@@ -29,7 +29,7 @@ rule ex_call_dsc:
     benchmark:
         B.EX_CALL_DSC
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

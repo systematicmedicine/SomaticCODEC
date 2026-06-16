@@ -39,7 +39,7 @@ rule ex_call_somatic_snv:
     benchmark:
         B.EX_CALL_SOMATIC_SNV
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["light"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

@@ -21,7 +21,7 @@ rule ex_somatic_variant_germline_contexts:
     benchmark:
         B.EX_SOMATIC_VARIANT_GERMLINE_CONTEXTS
     threads: 
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["light"]
     shell:

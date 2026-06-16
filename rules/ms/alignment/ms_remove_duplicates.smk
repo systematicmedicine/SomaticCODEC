@@ -24,7 +24,7 @@ rule ms_remove_duplicates:
     benchmark:
         B.MS_REMOVE_DUPLICATES
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

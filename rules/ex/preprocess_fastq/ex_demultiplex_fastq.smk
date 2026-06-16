@@ -36,7 +36,7 @@ rule ex_demultiplex_fastq:
     benchmark:
         B.EX_DEMULTIPLEX_FASTQ
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:
