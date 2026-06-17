@@ -42,7 +42,7 @@ rule ms_alignment:
     benchmark:
         B.MS_ALIGNMENT
     threads: 
-        config["infrastructure"]["threads"]["moderate"]
+        config["infrastructure"]["threads"]["heavy"]
     resources:
         memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:
