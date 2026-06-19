@@ -9,7 +9,7 @@ Types of changes:
 
 Each type of change has different validation requirements before it can be released. See the [change control document](docs/development/change_control.md).
 
-## [7.0.0] - 2026-06-16
+## [6.1.0] - 2026-06-19
 
 ### Major
 - Updated terminology for trinucleotide signature and somatic SNV burden throughout (#401)
@@ -18,6 +18,9 @@ Each type of change has different validation requirements before it can be relea
 
 ### Minor
 - Added clonality metrics (#400)
+- Updated instructions for intermediate file generation ()
+- Added DOI link for Phie *et al.* 2026 manuscript ()
+- Updated requirements for change control and validation ()
 
 ### Patch
 - Updated DOI link for Johnstone *et al.* (2026) manuscript (commit bb453c0)

@@ -2,7 +2,34 @@
 
 *This document provides instructions for generating intermediate files. This is aimed at an internal audience.*
 
-By default, the pipeline deletes intermediate files that are marked with temp(). If these files are required, they can be generated using the steps below.
+## Key BAM files
+
+By default, the pipeline preserves key BAM files and deletes all other intermediate files. To upload these BAM files to S3:
+
+1. Following successful completion of the pipeline, start the shut-down instance and Docker container:
+
+        ```
+        cd SomaticCODEC
+
+        tmux new -s file-transfer
+
+        docker start -ai codec-container
+
+2. Upload BAM files to S3:
+
+```
+aws s3 cp tmp/ \
+s3://<destination_bucket>/<directory>/ \
+--recursive \
+--exclude "*" \
+--include "*_deduped_alignment.bam" \
+--include "*_umi_grouped_alignment.bam" \
+--include "*_filtered_dsc.bam"
+```
+
+## Other intermediate files
+
+If other intermediate files are required, they can be generated and preserved using the steps below.
 
 1. Create sample sheet files as per the [sample sheet setup guide](../user_guide/sample_sheet_setup.md).
 

@@ -9,7 +9,7 @@ The assay combines a modified CODEC sequencing protocol with a Snakemake-based a
 
 Applications include ageing research, mosaicism studies, and preventative cancer genomics. The pipeline’s modular design enables adaptation to other use cases (e.g. tumour biology), although re-validation would be required.
 
-SomaticCODEC comprises a laboratory protocol for library preparation (Phie *et al*. 2026; under review) and a bioinformatics pipeline for analysing the resulting sequencing data ([Johnstone *et al*. 2026](https://doi.org/10.64898/2026.04.30.722079)).
+SomaticCODEC comprises a laboratory protocol for library preparation ([Phie *et al*. 2026](https://doi.org/10.1002/cpz1.70400)) and a bioinformatics pipeline for analysing the resulting sequencing data ([Johnstone *et al*. 2026](https://doi.org/10.64898/2026.04.30.722079)).
 
 ### Key features
 
