@@ -31,7 +31,7 @@ When submitting a bug report, please include enough information for us to reprod
 ## Supported configurations
 
 The pipeline is developed and tested using:
-- The library preparation methods outlined in Phie *et al*. 2026 (under review)
+- The library preparation methods outlined in [Phie *et al*. 2026](https://doi.org/10.1002/cpz1.70400)
 - The `profiles` released with the repository 
 - The `AWS m7i.48xlarge` compute platform and associated environment
 
