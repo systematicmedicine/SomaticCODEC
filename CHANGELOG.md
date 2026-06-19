@@ -18,9 +18,9 @@ Each type of change has different validation requirements before it can be relea
 
 ### Minor
 - Added clonality metrics (#400)
-- Updated instructions for intermediate file generation ()
-- Added DOI link for Phie *et al.* 2026 manuscript ()
-- Updated requirements for change control and validation ()
+- Updated instructions for intermediate file generation (#406)
+- Added DOI link for Phie *et al.* 2026 manuscript (#406)
+- Updated requirements for change control and validation (#406)
 
 ### Patch
 - Updated DOI link for Johnstone *et al.* (2026) manuscript (commit bb453c0)
