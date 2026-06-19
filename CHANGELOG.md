@@ -11,19 +11,17 @@ Each type of change has different validation requirements before it can be relea
 
 ## [6.1.0] - 2026-06-19
 
-### Major
-- Updated terminology for trinucleotide signature and somatic SNV burden throughout (#401)
+### Minor
+- Added clonality metrics (#400)
 - Removed temporary file mark from key BAM files (#402)
 - Updated memory and thread allocation for various rules (#404)
 
-### Minor
-- Added clonality metrics (#400)
+### Patch
+- Updated DOI link for Johnstone *et al.* 2026 manuscript (commit bb453c0)
+- Updated terminology for trinucleotide signature and somatic SNV burden throughout (#401)
 - Updated instructions for intermediate file generation (#406)
 - Added DOI link for Phie *et al.* 2026 manuscript (#406)
 - Updated requirements for change control and validation (#406)
-
-### Patch
-- Updated DOI link for Johnstone *et al.* (2026) manuscript (commit bb453c0)
 
 ## [6.0.2] - 2026-05-01
 
