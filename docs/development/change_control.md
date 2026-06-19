@@ -20,7 +20,7 @@ Changes that do not affect variant calling performance, but do affect metrics or
 
 Validation required = `Computational stability` + `Software testing`
 
-If any change is made to a file that is involved in variant calling, `Scientific performance (Demonstrating Equivalence)` must also be validated.
+If any change is made to a file that is involved in variant calling (including data processing prior to variant calling), `Scientific performance (Demonstrating Equivalence)` must also be validated.
 
 ### PATCH - All other changes
 

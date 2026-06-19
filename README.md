@@ -53,6 +53,8 @@ This repository is developed and maintained by [Systematic Medicine Pty Ltd](htt
 
 If you use SomaticCODEC, please cite:
 
+Phie, J., Johnstone, J.N., Fraser, C. and Bae, J. (2026) “CODEC Library Preparation From Genomic DNA,” *Current Protocols*. Available at: https://doi.org/10.1002/cpz1.70400
+
 Johnstone, J.N., Phie, J. and Fraser, C. (2026) “Quantifying Somatic Mutation Burden: An Assay Validation Framework and Implementation in SomaticCODEC,” *bioRxiv*. Available at: https://doi.org/10.64898/2026.04.30.722079.
 
 <br>
