@@ -46,6 +46,7 @@ ms_processing_metrics = [
     expand(MS.MET_INSERT_SIZE_PDF, ms_sample = ms_sample_ids),
     expand(MS.MET_DEPTH, ms_sample = ms_sample_ids),
     expand(MS.MET_COVERAGE, ms_sample = ms_sample_ids),
+    expand(MS.MET_GERMLINE_CLONALITY, ms_sample = ms_sample_ids),
     expand(MS.MET_GERM_RISK_VARIANTS, ms_sample = ms_sample_ids),
     expand(MS.MET_GERM_RISK_RATE, ms_sample = ms_sample_ids),
     expand(MS.MET_MASKING, ms_sample = ms_sample_ids)
@@ -103,7 +104,7 @@ ex_variant_calling = [
 # Analysis of called variants
 # ---------------------------------------------------------------------------------------------
 ex_variant_analysis = [
-    expand(EX.MET_SOMATIC_VARIANT_RATE, ex_sample = ex_sample_ids),
+    expand(EX.MET_SOMATIC_VARIANT_BURDEN, ex_sample = ex_sample_ids),
     expand(EX.MET_CHROM_VARIANT_RATE, ex_sample = ex_sample_ids),
     expand(EX.MET_TRINUC_PROPORTIONS, ex_sample = ex_sample_ids),
     expand(EX.MET_TRINUC_SIMILARITIES, ex_sample = ex_sample_ids),
@@ -117,7 +118,8 @@ ex_variant_analysis = [
     expand(EX.MET_SNV_READ_POSITION_JSON, ex_sample = ex_sample_ids),
     expand(EX.MET_SNV_READ_POSITION_PDF, ex_sample = ex_sample_ids),
     EX.MET_RECURRENT_VARIANTS_VCF,
-    EX.MET_RECURRENT_VARIANTS_JSON
+    EX.MET_RECURRENT_VARIANTS_JSON,
+    expand(EX.MET_SNV_CLONALITY, ex_sample = ex_sample_ids),
 ]
 
 # ---------------------------------------------------------------------------------------------

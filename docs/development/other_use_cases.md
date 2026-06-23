@@ -34,7 +34,7 @@ We are currently establishing this capability. A cell culture–optimised profil
   - Reference genome
   - Genome masks
   - Germline variant database
-  - Trinucleotide context reference
+  - Reference trinucleotide signatures
   - Genome trinucleotide counts
 - Reduced effectiveness of genome masks may result in increased false positive SNV calls
 

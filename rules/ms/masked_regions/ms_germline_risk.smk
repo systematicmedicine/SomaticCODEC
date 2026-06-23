@@ -40,7 +40,7 @@ rule ms_germline_risk:
     threads:
         config["infrastructure"]["threads"]["light"]
     resources:
-        memory = config["infrastructure"]["memory"]["extra_heavy"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """   
         # Set memory limit

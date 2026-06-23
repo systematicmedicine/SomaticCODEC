@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
---- ex_trinucleotide_context_metrics.py ---
+--- ex_trinucleotide_signature_metrics.py ---
 
-Calculate normalised trinucleotide context for a sample, and compare to reference
-contexts.
+Calculate normalised trinucleotide signature for a sample, and compare to reference
+signatures.
 
-Designed to be used exclusively with rule "ex_trinucleotide_context_metrics.smk"
+Designed to be used exclusively with rule "ex_trinucleotide_signature_metrics.smk"
 
 Authors:
   - Cameron Fraser
@@ -253,7 +253,7 @@ def main(args):
     # Start logging
     sys.stdout = open(args.log, "a")
     sys.stderr = open(args.log, "a")
-    print("[INFO] Starting ex_trinucleotide_context_metrics.py")
+    print("[INFO] Starting ex_trinucleotide_signature_metrics.py")
 
     # Define inputs
     vcf_path = args.vcf_path
@@ -361,7 +361,7 @@ def main(args):
     # Generate comparison plots
     generate_comparison_plots(similarity_dict_normalised, ref_df, sample_proportions_normalised, SAMPLE_NAME, output_plot_pdf_normalised, CONTEXTS)
 
-    print("[INFO] Finished ex_trinucleotide_context_metrics.py")
+    print("[INFO] Finished ex_trinucleotide_signature_metrics.py")
 
 if __name__ == "__main__":
     # Snakemake parameter injection

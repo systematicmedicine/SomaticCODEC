@@ -138,10 +138,10 @@ EX_VARIANT_CALL_ELIGIBLE_DISAGREE_RATE = "logs/{ex_sample}/ex_variant_call_eligi
 
 # Variant analysis
 
-EX_SOMATIC_VARIANT_RATE = "logs/{ex_sample}/ex_somatic_variant_rate.log"
+EX_SOMATIC_VARIANT_BURDEN = "logs/{ex_sample}/ex_SOMATIC_VARIANT_BURDEN.log"
 EX_CHROMOSOMAL_VARIANT_RATE_METRICS = "logs/{ex_sample}/ex_chromosomal_variant_rate_metrics.log"
 
-EX_TRINUCLEOTIDE_CONTEXT_METRICS = "logs/{ex_sample}/ex_trinucleotide_context_metrics.log"
+EX_TRINUCLEOTIDE_SIGNATURE_METRICS = "logs/{ex_sample}/ex_trinucleotide_signature_metrics.log"
 
 EX_SNV_DISTANCE_METRICS = "logs/{ex_sample}/ex_snv_distance_metrics.log"
 EX_SNV_POSITION_METRICS = "logs/{ex_sample}/ex_snv_position_metrics.log"
@@ -153,6 +153,8 @@ EX_SOMATIC_VARIANT_GERMLINE_CONTEXTS = "logs/{ex_sample}/ex_somatic_variant_germ
 EX_SNV_READ_POSITION_METRICS = "logs/{ex_sample}/ex_snv_read_position_metrics.log"
 
 EX_RECURRENT_VARIANT_METRICS = "logs/shared_rules/ex_recurrent_variant_metrics.log"
+
+EX_SNV_CLONALITY_METRICS = "logs/{ex_sample}/ex_snv_clonality_metrics.log"
 
 # ---------------------------------------------------------------------------------------------------------------
 # MS - Core pipeline
@@ -210,6 +212,8 @@ MS_DEPTH_HISTOGRAM_METRICS = "logs/{ms_sample}/ms_depth_histogram_metrics.log"
 MS_COVERAGE_BY_DEPTH_METRICS = "logs/{ms_sample}/ms_coverage_by_depth_metrics.log"
 
 # Masked regions
+
+MS_GERMLINE_CLONALITY_METRICS = "logs/{ms_sample}/ms_germline_clonality_metrics.log"
 
 MS_GERM_RISK_VARIANT_METRICS = "logs/{ms_sample}/ms_germ_risk_variant_metrics.log"
 MS_GERMLINE_RISK_RATE = "logs/{ms_sample}/ms_germline_risk_rate.log"

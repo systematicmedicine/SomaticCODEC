@@ -9,7 +9,7 @@ The assay combines a modified CODEC sequencing protocol with a Snakemake-based a
 
 Applications include ageing research, mosaicism studies, and preventative cancer genomics. The pipeline’s modular design enables adaptation to other use cases (e.g. tumour biology), although re-validation would be required.
 
-SomaticCODEC comprises a laboratory protocol for library preparation Phie *et al*. 2026 (currently under review) and a bioinformatics pipeline for analysing the resulting sequencing data ([Johnstone *et al*. 2026]()).
+SomaticCODEC comprises a laboratory protocol for library preparation ([Phie *et al*. 2026](https://doi.org/10.1002/cpz1.70400)) and a bioinformatics pipeline for analysing the resulting sequencing data ([Johnstone *et al*. 2026](https://doi.org/10.64898/2026.04.30.722079)).
 
 ### Key features
 
@@ -53,7 +53,9 @@ This repository is developed and maintained by [Systematic Medicine Pty Ltd](htt
 
 If you use SomaticCODEC, please cite:
 
-Johnstone JN, Phie J, Fraser C. (2026) "Quantifying Somatic Mutation Burden: An Assay Validation Framework and Implementation in SomaticCODEC". *bioRxiv*.
+Phie, J., Johnstone, J.N., Fraser, C. and Bae, J. (2026) “CODEC Library Preparation From Genomic DNA,” *Current Protocols*. Available at: https://doi.org/10.1002/cpz1.70400
+
+Johnstone, J.N., Phie, J. and Fraser, C. (2026) “Quantifying Somatic Mutation Burden: An Assay Validation Framework and Implementation in SomaticCODEC,” *bioRxiv*. Available at: https://doi.org/10.64898/2026.04.30.722079.
 
 <br>
 

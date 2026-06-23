@@ -19,9 +19,9 @@ rule ex_add_mate_information:
     benchmark:
         B.EX_ADD_MATE_INFORMATION
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
-        memory = config["infrastructure"]["memory"]["extra_heavy"]
+        memory = config["infrastructure"]["memory"]["moderate"]
     shell:
         """
         # Set memory limit

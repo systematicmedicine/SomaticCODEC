@@ -19,7 +19,7 @@ rule bwamem_index_files:
     benchmark:
         B.BWAMEM_INDEX_FILES
     threads:
-        config["infrastructure"]["threads"]["moderate"]
+        1
     resources:
         memory = config["infrastructure"]["memory"]["extra_heavy"]
     shell:

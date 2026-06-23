@@ -1,20 +1,20 @@
 """
-Calculate the somatic variant rate
+Calculates the percentage of somatic SNVs that are clonal
 """
 
 from definitions.paths.io import ex as EX
 from definitions.paths import log as L
 from definitions.paths import benchmark as B
 
-rule ex_somatic_variant_burden:
+rule ex_snv_clonality_metrics:
     input:
-        vcf_all = EX.CALL_SOMATIC_SNV_INT3
+        vcf = EX.CALLED_SNVS
     output:
-        results = EX.MET_SOMATIC_VARIANT_BURDEN
+        metrics_json = EX.MET_SNV_CLONALITY
     log:
-        L.EX_SOMATIC_VARIANT_BURDEN
+        L.EX_SNV_CLONALITY_METRICS
     benchmark:
-        B.EX_SOMATIC_VARIANT_BURDEN
+        B.EX_SNV_CLONALITY_METRICS
     threads:
         1
     resources:
@@ -24,9 +24,9 @@ rule ex_somatic_variant_burden:
         # Set memory limit
         ulimit -v $(( {resources.memory} * 1024 * 1024 )) 2>> {log}
         
-        # Calculate somatic variant rate
-        ex_somatic_variant_burden.py \
-            --vcf_all {input.vcf_all} \
-            --results {output.results} \
+        # Calculate clonality metrics
+        clonality_metrics.py \
+            --vcf {input.vcf} \
+            --json {output.metrics_json} \
             --log {log} 2>> {log}
         """

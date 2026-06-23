@@ -12,7 +12,7 @@ rule ms_remove_duplicates:
         bai = MS.MATE_INFO_BAM_INDEX
     output:
         intermediate_unsorted = temp(MS.REMOVE_DUPLICATES_INT),
-        bam = temp(MS.DEDUPED_BAM),
+        bam = MS.DEDUPED_BAM,
         bai = temp(MS.DEDUPED_BAM_INDEX),
         dedup_metrics = MS.MET_DEDUP_REPORT
     params:
@@ -24,7 +24,7 @@ rule ms_remove_duplicates:
     benchmark:
         B.MS_REMOVE_DUPLICATES
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["moderate"]
     shell:

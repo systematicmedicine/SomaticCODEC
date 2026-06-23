@@ -1,7 +1,7 @@
 """
---- test_ex_trinucleotide_context_metrics.py ---
+--- test_ex_trinucleotide_signature_metrics.py ---
 
-Tests the script ex_trinucleotide_context_metrics.py
+Tests the script ex_trinucleotide_signature_metrics.py
   - Tests that trinucleotide contexts are corectly calculated for a sample
 
 Authors:
@@ -10,7 +10,7 @@ Authors:
 """
 
 # Import libraries
-import rule_scripts.ex.variant_analysis.ex_trinucleotide_context_metrics as tcm
+import rule_scripts.ex.variant_analysis.ex_trinucleotide_signature_metrics as tcm
 import pytest
 import types
 from pathlib import Path
@@ -24,12 +24,12 @@ from helpers.get_metadata import load_config
 # Integration test - Tests that output CSVs with the correct columns are created from input files
 @pytest.mark.parametrize("vcf_path, vcf_all_path, expected_props_csv, expected_similarities_csv", [
     # Variant call eligible regions contain only one trinucleotide
-    ("tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_variants.vcf",
-     "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_all_positions.vcf",
-     "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_props.csv",
-     "tests/data/test_ex_trinucleotide_context_metrics/var_call_eligible_one_trinuc_only/S00X_expected_similarities.csv")
+    ("tests/data/test_ex_trinucleotide_signature_metrics/var_call_eligible_one_trinuc_only/S00X_variants.vcf",
+     "tests/data/test_ex_trinucleotide_signature_metrics/var_call_eligible_one_trinuc_only/S00X_all_positions.vcf",
+     "tests/data/test_ex_trinucleotide_signature_metrics/var_call_eligible_one_trinuc_only/S00X_expected_props.csv",
+     "tests/data/test_ex_trinucleotide_signature_metrics/var_call_eligible_one_trinuc_only/S00X_expected_similarities.csv")
 ])
-def test_ex_trinucleotide_context_metrics(lightweight_test_run, tmp_path, vcf_path, vcf_all_path, expected_props_csv, expected_similarities_csv):
+def test_ex_trinucleotide_signature_metrics(lightweight_test_run, tmp_path, vcf_path, vcf_all_path, expected_props_csv, expected_similarities_csv):
   
   # Load reference file paths from config
   config = load_config(lightweight_test_run["test_config_path"])
@@ -42,7 +42,7 @@ def test_ex_trinucleotide_context_metrics(lightweight_test_run, tmp_path, vcf_pa
   similarities_csv = tmp_path / "trinuc_similarities.csv"
   plot_pdf_raw = tmp_path / "trinuc_plots_raw.pdf"
   plot_pdf_normalised = tmp_path / "trinuc_plots_normalised.pdf"
-  log = tmp_path / "ex_trinucleotide_context_metrics.log"
+  log = tmp_path / "ex_trinucleotide_signature_metrics.log"
 
   # Define params
   sample = "S00X"
@@ -80,8 +80,8 @@ def test_ex_trinucleotide_context_metrics(lightweight_test_run, tmp_path, vcf_pa
 # Tests that the get_genome_trinuc_counts_props function returns the expected output
 def test_get_genome_trinuc_counts_props(tmp_path):
     # Define inputs
-    ref_trinuc_counts_path = "tests/data/test_ex_trinucleotide_context_metrics/test_get_genome_trinuc_counts_props/trinuc_genome_counts.csv"
-    expected_counts_props = "tests/data/test_ex_trinucleotide_context_metrics/test_get_genome_trinuc_counts_props/expected_counts_props.csv"
+    ref_trinuc_counts_path = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_genome_trinuc_counts_props/trinuc_genome_counts.csv"
+    expected_counts_props = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_genome_trinuc_counts_props/expected_counts_props.csv"
     CONTEXTS = tcm.get_contexts()
 
     # Define output
@@ -128,10 +128,10 @@ def test_get_genome_trinuc_counts_props(tmp_path):
 # Tests that the get_variant_call_eligible_trinuc_counts_props function returns the expected output
 def test_get_variant_call_eligible_trinuc_counts_props(tmp_path):
     # Define inputs
-    ref_fasta_path = "tests/data/test_ex_trinucleotide_context_metrics/test_get_variant_call_eligible_trinuc_counts_props/ref.fa"
+    ref_fasta_path = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_variant_call_eligible_trinuc_counts_props/ref.fa"
     ref_genome = Fasta(ref_fasta_path, rebuild=False)
-    vcf_all = "tests/data/test_ex_trinucleotide_context_metrics/test_get_variant_call_eligible_trinuc_counts_props/all_positions.vcf"
-    expected_vce_counts_props = "tests/data/test_ex_trinucleotide_context_metrics/test_get_variant_call_eligible_trinuc_counts_props/expected_vce_counts_props.csv"
+    vcf_all = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_variant_call_eligible_trinuc_counts_props/all_positions.vcf"
+    expected_vce_counts_props = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_variant_call_eligible_trinuc_counts_props/expected_vce_counts_props.csv"
     CONTEXTS = tcm.get_contexts()
 
     # Define output path
@@ -183,10 +183,10 @@ def test_get_variant_call_eligible_trinuc_counts_props(tmp_path):
 # Tests that the get_sample_trinuc_context_counts function returns the expected output
 def test_get_sample_trinuc_context_counts(tmp_path):
     # Define inputs
-    vcf_path = "tests/data/test_ex_trinucleotide_context_metrics/test_get_sample_trinuc_context_counts/snvs.vcf"
-    ref_fasta_path = "tests/data/test_ex_trinucleotide_context_metrics/test_get_sample_trinuc_context_counts/ref.fa"
+    vcf_path = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_sample_trinuc_context_counts/snvs.vcf"
+    ref_fasta_path = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_sample_trinuc_context_counts/ref.fa"
     ref_genome = Fasta(ref_fasta_path, rebuild=False)
-    expected_snv_counts = "tests/data/test_ex_trinucleotide_context_metrics/test_get_sample_trinuc_context_counts/expected_snv_counts.csv"
+    expected_snv_counts = "tests/data/test_ex_trinucleotide_signature_metrics/test_get_sample_trinuc_context_counts/expected_snv_counts.csv"
     CONTEXTS = tcm.get_contexts()
 
     # Define output path
@@ -268,7 +268,7 @@ def test_get_sample_trinuc_context_proportions():
     CONTEXTS = tcm.get_contexts()
 
     # Define expected output data
-    expected_context_props = pd.read_csv("tests/data/test_ex_trinucleotide_context_metrics/test_get_sample_trinuc_context_proportions/expected_context_props.csv")
+    expected_context_props = pd.read_csv("tests/data/test_ex_trinucleotide_signature_metrics/test_get_sample_trinuc_context_proportions/expected_context_props.csv")
 
     # Run function with test data
     context_props = tcm.get_sample_trinuc_context_proportions(sample_context_counts, CONTEXTS)
@@ -284,18 +284,18 @@ def test_get_sample_trinuc_context_proportions():
 # Tests that the function calculate_cosine_similarities correctly calculates cosine similarity
 @pytest.mark.parametrize("sample_proportions_csv, expected_cosine_sim", [
     # Sample proportions the same as reference context proportions
-    ("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/sample_proportions_matched.csv",
+    ("tests/data/test_ex_trinucleotide_signature_metrics/test_calculate_cosine_similarities/sample_proportions_matched.csv",
      1),
      # Sample proportions opposite to reference context proportions
-    ("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/sample_proportions_opposite.csv",
+    ("tests/data/test_ex_trinucleotide_signature_metrics/test_calculate_cosine_similarities/sample_proportions_opposite.csv",
      0),
      # Sample proportions similar but not the same as reference context proportions
-    ("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/sample_proportions_similar.csv",
+    ("tests/data/test_ex_trinucleotide_signature_metrics/test_calculate_cosine_similarities/sample_proportions_similar.csv",
      0.980581)
 ])
 def test_calculate_cosine_similarities(tmp_path, sample_proportions_csv, expected_cosine_sim):
     # Define inputs
-    ref_contexts = pd.read_csv("tests/data/test_ex_trinucleotide_context_metrics/test_calculate_cosine_similarities/ref_contexts.csv")
+    ref_contexts = pd.read_csv("tests/data/test_ex_trinucleotide_signature_metrics/test_calculate_cosine_similarities/ref_contexts.csv")
     profiles = ref_contexts["Profile"].unique()
     CONTEXTS = ["ACA>A", "ACC>A", "ACG>A", "ACT>A"]
     sample_proportions_df = pd.read_csv(sample_proportions_csv)

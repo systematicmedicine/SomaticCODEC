@@ -1,7 +1,7 @@
 """
---- test_ex_somatic_variant_rate.py
+--- test_ex_somatic_variant_burden.py
 
-Tests the script ex_somatic_variant_rate.py
+Tests the script ex_somatic_variant_burden.py
 
 Authors:
     - Joshua Johnstone
@@ -11,12 +11,12 @@ import pytest
 import os
 import json
 import types
-from rule_scripts.ex.variant_analysis.ex_somatic_variant_rate import main
+from rule_scripts.ex.variant_analysis.ex_somatic_variant_burden import main
 @pytest.mark.parametrize(
     "vcf_path, expected_metrics",
     [
         (
-            "tests/data/test_ex_somatic_variant_rate/variants.vcf",
+            "tests/data/test_ex_somatic_variant_burden/variants.vcf",
             {
                 "starting_bases": {"value": 35},
                 "min-BQ": {"value": 20},
@@ -24,12 +24,12 @@ from rule_scripts.ex.variant_analysis.ex_somatic_variant_rate import main
                 "filtered_bases": {"value": 0},
                 "evaluated_bases": {"value": 35},
                 "num_snv_bases": {"value": 11},
-                "snv_rate": {"value": 0.3142857},
+                "snv_burden": {"value": 0.3142857},
                 "snv_per_diploid": {"value": 1905743997},
             },
         ),
         (
-            "tests/data/test_ex_somatic_variant_rate/filtered_variants.vcf",
+            "tests/data/test_ex_somatic_variant_burden/filtered_variants.vcf",
             {
                 "starting_bases": {"value": 32},
                 "min-BQ": {"value": 20},
@@ -37,12 +37,12 @@ from rule_scripts.ex.variant_analysis.ex_somatic_variant_rate import main
                 "filtered_bases": {"value": 9},
                 "evaluated_bases": {"value": 23},
                 "num_snv_bases": {"value": 15},
-                "snv_rate": {"value": 0.6521739},
+                "snv_burden": {"value": 0.6521739},
                 "snv_per_diploid": {"value": 3954607210},
             },
         ),
         (
-            "tests/data/test_ex_somatic_variant_rate/no_variants.vcf",
+            "tests/data/test_ex_somatic_variant_burden/no_variants.vcf",
             {
                 "starting_bases": {"value": 0},
                 "min-BQ": {"value": 20},
@@ -50,14 +50,14 @@ from rule_scripts.ex.variant_analysis.ex_somatic_variant_rate import main
                 "filtered_bases": {"value": 0},
                 "evaluated_bases": {"value": 0},
                 "num_snv_bases": {"value": 0},
-                "snv_rate": {"value": 0},
+                "snv_burden": {"value": 0},
                 "snv_per_diploid": {"value": 0},
             },
         ),
     ]
 )
 
-def test_somatic_variant_rate(tmp_path, vcf_path, expected_metrics):
+def test_somatic_variant_burden(tmp_path, vcf_path, expected_metrics):
     output_file = tmp_path / "results.json"
     log_file = tmp_path / "log.txt"
 
@@ -86,7 +86,7 @@ def test_somatic_variant_rate(tmp_path, vcf_path, expected_metrics):
     assert metrics["filtered_bases"]["value"] == expected_metrics["filtered_bases"]["value"]
     assert metrics["evaluated_bases"]["value"] == expected_metrics["evaluated_bases"]["value"]
     assert metrics["num_snv_bases"]["value"] == expected_metrics["num_snv_bases"]["value"]
-    assert pytest.approx(metrics["snv_rate"]["value"], rel=1e-6) == expected_metrics["snv_rate"]["value"]
+    assert pytest.approx(metrics["snv_burden"]["value"], rel=1e-6) == expected_metrics["snv_burden"]["value"]
     assert pytest.approx(metrics["snv_per_diploid"]["value"], rel=1e-4) == expected_metrics["snv_per_diploid"]["value"]
 
     if os.path.exists(str(log_file)):

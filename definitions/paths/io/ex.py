@@ -151,7 +151,7 @@ MET_VAR_CALL_DISAGREE = "metrics/ex/{ex_sample}/{ex_sample}_variant_call_disagre
 
 # Variant analysis
 
-MET_SOMATIC_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_somatic_variant_rate.json"
+MET_SOMATIC_VARIANT_BURDEN = "results/{ex_sample}/{ex_sample}_somatic_variant_burden.json"
 MET_CHROM_VARIANT_RATE = "results/{ex_sample}/{ex_sample}_chromosomal_variant_rate_metrics.json"
 
 MET_TRINUC_PROPORTIONS = "results/{ex_sample}/{ex_sample}_trinuc_proportions.csv"
@@ -175,4 +175,4 @@ MET_SNV_READ_POSITION_PDF = "results/{ex_sample}/{ex_sample}_snv_read_position_p
 MET_RECURRENT_VARIANTS_VCF = "results/batch/batch_recurrent_variants.vcf"
 MET_RECURRENT_VARIANTS_JSON = "results/batch/batch_recurrent_variant_metrics.json"
 
-
+MET_SNV_CLONALITY = "results/{ex_sample}/{ex_sample}_snv_clonality_metrics.json"

@@ -12,7 +12,7 @@ rule ex_group_by_umi:
     output:
         intermediate_moveumi = temp(EX.GROUP_BY_UMI_INT1),
         intermediate_moveumi_sorted = temp(EX.GROUP_BY_UMI_INT2),
-        bam = temp(EX.UMI_GROUPED_BAM),
+        bam = EX.UMI_GROUPED_BAM,
         umi_metrics = EX.MET_GROUP_BY_UMI,
     params:
         compression_level = config["infrastructure"]["compression"]["gzip_level"],
@@ -22,7 +22,7 @@ rule ex_group_by_umi:
     benchmark:
         B.EX_GROUP_BY_UMI
     threads:
-        config["infrastructure"]["threads"]["heavy"]
+        config["infrastructure"]["threads"]["moderate"]
     resources:
         memory = config["infrastructure"]["memory"]["heavy"]
     shell:
