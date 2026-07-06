@@ -8,24 +8,25 @@ By default, the pipeline preserves key BAM files and deletes all other intermedi
 
 1. Following successful completion of the pipeline, start the shut-down instance and Docker container:
 
-        ```
-        cd SomaticCODEC
+    ```
+    cd SomaticCODEC
 
-        tmux new -s file-transfer
+    tmux new -s file-transfer
 
-        docker start -ai codec-container
+    docker start -ai codec-container
+    ```
 
 2. Upload BAM files to S3:
 
-```
-aws s3 cp tmp/ \
-s3://<destination_bucket>/<directory>/ \
---recursive \
---exclude "*" \
---include "*_deduped_alignment.bam" \
---include "*_umi_grouped_alignment.bam" \
---include "*_filtered_dsc.bam"
-```
+    ```
+    aws s3 cp tmp/ \
+    s3://<destination_bucket>/<directory>/ \
+    --recursive \
+    --exclude "*" \
+    --include "*_deduped_alignment.bam" \
+    --include "*_umi_grouped_alignment.bam" \
+    --include "*_filtered_dsc.bam"
+    ```
 
 ## Other intermediate files
 
