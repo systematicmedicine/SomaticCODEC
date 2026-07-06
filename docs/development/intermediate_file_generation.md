@@ -6,17 +6,21 @@
 
 By default, the pipeline preserves key BAM files and deletes all other intermediate files. To upload these BAM files to S3:
 
-1. Following successful completion of the pipeline, start the shut-down instance and Docker container:
+1. Following successful completion of the pipeline, start the shut-down instance and create a new tmux session:
 
     ```
     cd SomaticCODEC
 
     tmux new -s file-transfer
-
-    docker start -ai codec-container
     ```
 
-2. Upload BAM files to S3:
+2. Restart the Docker container:
+
+    ```
+    sudo docker start -ai codec-container
+    ```
+
+3. Upload BAM files to S3:
 
     ```
     aws s3 cp tmp/ \
